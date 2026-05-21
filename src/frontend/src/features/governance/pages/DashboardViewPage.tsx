@@ -27,6 +27,11 @@ import {
   Tv,
   X,
   Maximize2,
+  MoreVertical,
+  BarChart2,
+  Download,
+  Link as LinkIcon,
+  Bell,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -56,11 +61,23 @@ import { BlastRadiusWidget } from '../widgets/BlastRadiusWidget';
 import { TeamHealthWidget } from '../widgets/TeamHealthWidget';
 import { ReleaseCalendarWidget } from '../widgets/ReleaseCalendarWidget';
 import { QueryWidget } from '../widgets/QueryWidget';
+import { OtelMetricsWidget } from '../widgets/OtelMetricsWidget';
+import { OtelLogsWidget } from '../widgets/OtelLogsWidget';
+import { OtelTracesWidget } from '../widgets/OtelTracesWidget';
+import { OtelErrorRateWidget } from '../widgets/OtelErrorRateWidget';
+import { OtelServiceMapWidget } from '../widgets/OtelServiceMapWidget';
+import { PieChartWidget } from '../widgets/PieChartWidget';
+import { BarGaugeWidget } from '../widgets/BarGaugeWidget';
+import { HeatmapCalendarWidget } from '../widgets/HeatmapCalendarWidget';
+import { TreemapWidget } from '../widgets/TreemapWidget';
+import { HistogramWidget } from '../widgets/HistogramWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
 import { DashboardHistoryDrawer } from '../components/DashboardHistoryDrawer';
 import { DashboardSharingModal } from '../components/DashboardSharingModal';
+import { TimeRangePicker, parseTimeRange } from '../components/TimeRangePicker';
+import { AnnotationsOverlay } from '../components/AnnotationsOverlay';
 
 // ── Widget registry map ────────────────────────────────────────────────────
 
@@ -85,6 +102,17 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'team-health': TeamHealthWidget,
   'release-calendar': ReleaseCalendarWidget,
   'query-widget': QueryWidget,
+  // Observability widgets
+  'obs-metrics': OtelMetricsWidget,
+  'obs-logs': OtelLogsWidget,
+  'obs-traces': OtelTracesWidget,
+  'obs-error-rate': OtelErrorRateWidget,
+  'obs-service-map': OtelServiceMapWidget,
+  'obs-pie-chart': PieChartWidget,
+  'obs-bar-gauge': BarGaugeWidget,
+  'obs-heatmap-calendar': HeatmapCalendarWidget,
+  'obs-treemap': TreemapWidget,
+  'obs-histogram': HistogramWidget,
   // Extended widget types - placeholder components
   'incident-count': StatWidget,
   'mttr-widget': StatWidget,
@@ -172,12 +200,192 @@ function layoutToGridCols(layout: string): string {
   }
 }
 
+// ── Widget Actions Menu ────────────────────────────────────────────────────
+
+interface WidgetActionsMenuProps {
+  widgetId: string;
+  dashboardId: string;
+  slot: WidgetSlot;
+  onClose: () => void;
+  onInspect: () => void;
+  navigate: ReturnType<typeof import('react-router-dom').useNavigate>;
+  t: ReturnType<typeof import('react-i18next').useTranslation>['t'];
+}
+
+function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, navigate, t }: WidgetActionsMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [onClose]);
+
+  function handleDownloadJson() {
+    const blob = new Blob([JSON.stringify(slot, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `widget-${widgetId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    onClose();
+  }
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(`${window.location.href.split('#')[0]}#widget-${widgetId}`).catch(() => {});
+    onClose();
+  }
+
+  function handleCreateAlert() {
+    navigate(`/governance/dashboards/${dashboardId}/monitors/new?widgetId=${widgetId}`);
+    onClose();
+  }
+
+  function handleEditWidget() {
+    navigate(`/governance/dashboards/${dashboardId}/edit`);
+    onClose();
+  }
+
+  return (
+    <div
+      ref={menuRef}
+      role="menu"
+      className="absolute top-6 right-0 z-50 w-48 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl"
+    >
+      <button
+        type="button"
+        role="menuitem"
+        onClick={onInspect}
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+      >
+        <BarChart2 size={12} className="shrink-0" />
+        {t('governance.dashboardView.widgetMenu.inspect', 'Inspect')}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        onClick={handleDownloadJson}
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+      >
+        <Download size={12} className="shrink-0" />
+        {t('governance.dashboardView.widgetMenu.downloadCsv', 'Download CSV')}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        onClick={handleCopyLink}
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+      >
+        <LinkIcon size={12} className="shrink-0" />
+        {t('governance.dashboardView.widgetMenu.copyLink', 'Copy link')}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        onClick={handleCreateAlert}
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+      >
+        <Bell size={12} className="shrink-0" />
+        {t('governance.dashboardView.widgetMenu.createAlert', 'Create alert')}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        onClick={handleEditWidget}
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+      >
+        <Settings size={12} className="shrink-0" />
+        {t('governance.dashboardView.widgetMenu.editWidget', 'Edit widget')}
+      </button>
+    </div>
+  );
+}
+
+// ── Widget Inspect Modal ───────────────────────────────────────────────────
+
+interface WidgetInspectModalProps {
+  slot: WidgetSlot;
+  onClose: () => void;
+  t: ReturnType<typeof import('react-i18next').useTranslation>['t'];
+}
+
+function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('governance.dashboardView.inspectWidget', 'Inspect widget')}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl overflow-auto max-h-[80vh]">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <BarChart2 size={14} className="text-accent" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+              {t('governance.dashboardView.inspectTitle', 'Widget Inspector')}
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+            aria-label={t('governance.dashboardView.closeInspect', 'Close inspector')}
+          >
+            <X size={14} />
+          </button>
+        </div>
+        <div className="p-4">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+            {([
+              ['widgetId', slot.widgetId],
+              ['type', slot.type],
+              ['posX', slot.posX],
+              ['posY', slot.posY],
+              ['width', slot.width],
+              ['height', slot.height],
+              ['effectiveServiceId', slot.effectiveServiceId ?? '—'],
+              ['effectiveTeamId', slot.effectiveTeamId ?? '—'],
+              ['effectiveTimeRange', slot.effectiveTimeRange],
+              ['customTitle', slot.customTitle ?? '—'],
+              ['metric', slot.metric ?? '—'],
+              ['nqlQuery', slot.nqlQuery ?? '—'],
+              ['renderHint', slot.renderHint ?? '—'],
+            ] as [string, string | number][]).map(([key, val]) => (
+              <div key={key} className="contents">
+                <dt className="text-gray-500 dark:text-gray-400 font-medium">{key}</dt>
+                <dd className="text-gray-900 dark:text-white font-mono truncate">{String(val)}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-4 rounded bg-gray-50 dark:bg-gray-800 p-2">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              {t('governance.dashboardView.inspectRawJson', 'Raw JSON')}
+            </p>
+            <pre className="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap">
+              {JSON.stringify(slot, null, 2)}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────
 
 const AUTO_REFRESH_OPTIONS = [
-  { value: 0, label: 'Off' },
-  { value: 30, label: '30s' },
-  { value: 60, label: '60s' },
+  { value: 0,   label: 'Off' },
+  { value: 10,  label: '10s' },
+  { value: 30,  label: '30s' },
+  { value: 60,  label: '1m' },
+  { value: 300, label: '5m' },
 ];
 
 export function DashboardViewPage() {
@@ -215,6 +423,11 @@ function DashboardViewInner() {
   const [isLiveEnabled, setIsLiveEnabled] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qc = useQueryClient();
+  // Widget context menu — stores the widgetId with an open menu (null = closed)
+  const [widgetMenuOpenId, setWidgetMenuOpenId] = useState<string | null>(null);
+  // Widget inspect modal — stores widgetId being inspected
+  const [inspectWidgetId, setInspectWidgetId] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // ── Deep-link: sync state → URL params ────────────────────────────────
   useEffect(() => {
@@ -409,21 +622,7 @@ function DashboardViewInner() {
           {/* Global controls */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Time range */}
-            <div className="flex items-center gap-1.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1">
-              <Clock size={12} className="text-gray-400" />
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="text-xs bg-transparent text-gray-700 dark:text-gray-300 focus:outline-none"
-                aria-label={t('governance.dashboardView.timeRangeLabel', 'Time range')}
-              >
-                {TIME_RANGE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {t(opt.labelKey, opt.value)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TimeRangePicker value={timeRange} onChange={setTimeRange} />
 
             {/* Auto-refresh */}
             <select
@@ -597,78 +796,130 @@ function DashboardViewInner() {
           {t('governance.dashboardView.noWidgets', 'No widgets configured. Click Edit to add widgets.')}
         </div>
       ) : (
-        <div className={`grid gap-4 auto-rows-[160px] ${gridColsClass}`}>
-          {data.widgets.map((slot) => {
-            const WidgetComponent = WIDGET_MAP[slot.type as WidgetType];
-            const style = widgetGridStyle(slot);
-            // Variables override: if a variable is set it takes precedence over the slot's effectiveServiceId/TeamId
-            const resolvedServiceId = varService || slot.effectiveServiceId;
-            const resolvedTeamId = varTeam || slot.effectiveTeamId;
-            // V3.3 — Drill-down destination for this widget
-            const drillDest = getDrillRoute(slot.type as WidgetType, {
-              serviceId: resolvedServiceId,
-              teamId: resolvedTeamId,
-              environmentId: activeEnvironmentId,
-              from: crossFilter.from,
-              to: crossFilter.to,
-            });
-
-            return (
-              <div
-                key={slot.widgetId}
-                style={style}
-                className="group relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden"
-              >
-                {WidgetComponent ? (
-                  <WidgetComponent
-                    widgetId={slot.widgetId}
-                    config={{
-                      serviceId: resolvedServiceId,
-                      teamId: resolvedTeamId,
-                      timeRange: slot.effectiveTimeRange,
-                      customTitle: slot.customTitle,
-                      metric: slot.metric,
-                      content: slot.content,
-                      nqlQuery: slot.nqlQuery,
-                      renderHint: slot.renderHint,
-                    }}
-                    environmentId={activeEnvironmentId}
-                    timeRange={slot.effectiveTimeRange}
-                    title={slot.customTitle}
-                    onCrossFilter={(f) => applyCrossFilter({ ...f, sourceWidgetId: slot.widgetId })}
-                    onDrillDown={(path) => navigate(path)}
-                    activeCrossFilter={hasCrossFilter ? crossFilter : null}
+        <div className="relative">
+          {/* Annotations overlay — positioned relative to the grid container */}
+          <div className="absolute top-0 right-0 z-10">
+            {(() => {
+              try {
+                const { from, to } = parseTimeRange(timeRange);
+                return (
+                  <AnnotationsOverlay
+                    tenantId={TENANT_ID}
+                    from={from.toISOString()}
+                    to={to.toISOString()}
+                    serviceNames={varService ? [varService] : undefined}
+                    enabled={Boolean(dashboardId)}
                   />
-                ) : (
-                  <div className="h-full flex items-center justify-center p-2">
-                    <Skeleton variant="rectangular" className="h-full w-full" />
-                  </div>
-                )}
-                {/* Hover controls row: Drill-down + Expand */}
-                <div className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
-                  {drillDest && (
+                );
+              } catch {
+                return null;
+              }
+            })()}
+          </div>
+
+          <div ref={gridRef} className={`grid gap-4 auto-rows-[160px] ${gridColsClass}`}>
+            {data.widgets.map((slot) => {
+              const WidgetComponent = WIDGET_MAP[slot.type as WidgetType];
+              const style = widgetGridStyle(slot);
+              // Variables override: if a variable is set it takes precedence over the slot's effectiveServiceId/TeamId
+              const resolvedServiceId = varService || slot.effectiveServiceId;
+              const resolvedTeamId = varTeam || slot.effectiveTeamId;
+              // V3.3 — Drill-down destination for this widget
+              const drillDest = getDrillRoute(slot.type as WidgetType, {
+                serviceId: resolvedServiceId,
+                teamId: resolvedTeamId,
+                environmentId: activeEnvironmentId,
+                from: crossFilter.from,
+                to: crossFilter.to,
+              });
+              const isMenuOpen = widgetMenuOpenId === slot.widgetId;
+
+              return (
+                <div
+                  key={slot.widgetId}
+                  id={`widget-${slot.widgetId}`}
+                  style={style}
+                  className="group relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden"
+                >
+                  {WidgetComponent ? (
+                    <WidgetComponent
+                      widgetId={slot.widgetId}
+                      config={{
+                        serviceId: resolvedServiceId,
+                        teamId: resolvedTeamId,
+                        timeRange: slot.effectiveTimeRange,
+                        customTitle: slot.customTitle,
+                        metric: slot.metric,
+                        content: slot.content,
+                        nqlQuery: slot.nqlQuery,
+                        renderHint: slot.renderHint,
+                      }}
+                      environmentId={activeEnvironmentId}
+                      timeRange={slot.effectiveTimeRange}
+                      title={slot.customTitle}
+                      onCrossFilter={(f) => applyCrossFilter({ ...f, sourceWidgetId: slot.widgetId })}
+                      onDrillDown={(path) => navigate(path)}
+                      activeCrossFilter={hasCrossFilter ? crossFilter : null}
+                    />
+                  ) : (
+                    <div className="h-full flex items-center justify-center p-2">
+                      <Skeleton variant="rectangular" className="h-full w-full" />
+                    </div>
+                  )}
+                  {/* Hover controls row: Drill-down + Expand + Widget actions menu */}
+                  <div className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
+                    {drillDest && (
+                      <button
+                        type="button"
+                        onClick={() => navigate(drillDest.path)}
+                        className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent text-xs"
+                        title={t(drillDest.labelKey, drillDest.label)}
+                        aria-label={t(drillDest.labelKey, drillDest.label)}
+                      >
+                        ↗
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => navigate(drillDest.path)}
-                      className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent text-xs"
-                      title={t(drillDest.labelKey, drillDest.label)}
-                      aria-label={t(drillDest.labelKey, drillDest.label)}
+                      onClick={() => setExpandedWidgetId(slot.widgetId)}
+                      className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
+                      aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
                     >
-                      ↗
+                      <Maximize2 size={12} />
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setExpandedWidgetId(slot.widgetId)}
-                    className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
-                    aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
-                  >
-                    <Maximize2 size={12} />
-                  </button>
+                    {/* Widget actions menu button */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setWidgetMenuOpenId(isMenuOpen ? null : slot.widgetId);
+                        }}
+                        className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
+                        aria-label={t('governance.dashboardView.widgetActions', 'Widget actions')}
+                        aria-haspopup="menu"
+                        aria-expanded={isMenuOpen}
+                      >
+                        <MoreVertical size={12} />
+                      </button>
+                      {/* Widget actions dropdown */}
+                      {isMenuOpen && (
+                        <WidgetActionsMenu
+                          widgetId={slot.widgetId}
+                          dashboardId={dashboardId!}
+                          slot={slot}
+                          onClose={() => setWidgetMenuOpenId(null)}
+                          onInspect={() => { setInspectWidgetId(slot.widgetId); setWidgetMenuOpenId(null); }}
+                          navigate={navigate}
+                          t={t}
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -750,6 +1001,19 @@ function DashboardViewInner() {
         isOpen={showSharingModal}
         onClose={() => setShowSharingModal(false)}
       />
+
+      {/* Widget Inspect Modal */}
+      {inspectWidgetId && (() => {
+        const slot = data.widgets.find((w) => w.widgetId === inspectWidgetId);
+        if (!slot) return null;
+        return (
+          <WidgetInspectModal
+            slot={slot}
+            onClose={() => setInspectWidgetId(null)}
+            t={t}
+          />
+        );
+      })()}
     </PageContainer>
   );
 }

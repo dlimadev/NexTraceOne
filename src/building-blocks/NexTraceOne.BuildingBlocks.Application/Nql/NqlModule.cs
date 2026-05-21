@@ -13,7 +13,8 @@ public enum NqlModule
     Operations = 2,
     Knowledge = 3,
     FinOps = 4,
-    Governance = 5
+    Governance = 5,
+    Telemetry = 6
 }
 
 /// <summary>
@@ -42,7 +43,13 @@ public enum NqlEntity
 
     // Governance
     GovernanceTeams = 50,
-    GovernanceDomains = 51
+    GovernanceDomains = 51,
+
+    // Telemetry (OpenTelemetry)
+    TelemetryLogs = 60,
+    TelemetryMetrics = 61,
+    TelemetryTraces = 62,
+    TelemetryErrors = 63
 }
 
 /// <summary>Helper para mapear string "module.entity" para <see cref="NqlEntity"/>.</summary>
@@ -59,7 +66,11 @@ public static class NqlEntityMap
         ["knowledge.docs"]           = NqlEntity.KnowledgeDocs,
         ["finops.costs"]             = NqlEntity.FinOpsCosts,
         ["governance.teams"]         = NqlEntity.GovernanceTeams,
-        ["governance.domains"]       = NqlEntity.GovernanceDomains
+        ["governance.domains"]       = NqlEntity.GovernanceDomains,
+        ["telemetry.logs"]           = NqlEntity.TelemetryLogs,
+        ["telemetry.metrics"]        = NqlEntity.TelemetryMetrics,
+        ["telemetry.traces"]         = NqlEntity.TelemetryTraces,
+        ["telemetry.errors"]         = NqlEntity.TelemetryErrors
     };
 
     public static bool TryParse(string source, out NqlEntity entity) =>

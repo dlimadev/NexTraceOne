@@ -47,7 +47,8 @@ public static class UpdateCustomDashboard
         string Layout,
         IReadOnlyList<WidgetInput> Widgets,
         string? TeamId = null,
-        string? ChangeNote = null) : ICommand;
+        string? ChangeNote = null,
+        IReadOnlyList<string>? Tags = null) : ICommand;
 
     /// <summary>Validação do comando de atualização.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -118,7 +119,8 @@ public static class UpdateCustomDashboard
                 layout: request.Layout,
                 widgets: widgets,
                 teamId: request.TeamId,
-                now: now);
+                now: now,
+                tags: request.Tags);
 
             // Criar snapshot de revisão após cada Update (V3.1 — audit trail)
             var widgetsJson = JsonSerializer.Serialize(dashboard.Widgets, _jsonOptions);

@@ -29,6 +29,17 @@ export type WidgetType =
   | 'team-health'
   | 'release-calendar'
   | 'query-widget'
+  // Observability widgets
+  | 'obs-metrics'
+  | 'obs-logs'
+  | 'obs-traces'
+  | 'obs-error-rate'
+  | 'obs-service-map'
+  | 'obs-pie-chart'
+  | 'obs-bar-gauge'
+  | 'obs-heatmap-calendar'
+  | 'obs-treemap'
+  | 'obs-histogram'
   // Extended widget types used in drill routes
   | 'incident-count'
   | 'mttr-widget'
@@ -67,6 +78,16 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'team-health',
   'release-calendar',
   'query-widget',
+  'obs-metrics',
+  'obs-logs',
+  'obs-traces',
+  'obs-error-rate',
+  'obs-service-map',
+  'obs-pie-chart',
+  'obs-bar-gauge',
+  'obs-heatmap-calendar',
+  'obs-treemap',
+  'obs-histogram',
 ];
 
 export interface WidgetConfig {
@@ -82,6 +103,30 @@ export interface WidgetConfig {
   nqlQuery?: string | null;
   /** QueryWidget (V3.2): render hint override (table|line|bar|area|stat|heatmap) */
   renderHint?: string | null;
+  /** Observability widget: metric name to display */
+  metricName?: string | null;
+  /** Observability widget: log severity filter (ERROR, WARN, INFO) */
+  logSeverity?: string | null;
+  /** Observability widget: minimum trace duration in ms */
+  minDurationMs?: number | null;
+  // Visualization overrides
+  chartType?: 'line' | 'bar' | 'area' | 'step' | null;
+  fillOpacity?: number | null;
+  lineWidth?: number | null;
+  showDataLabels?: boolean | null;
+  legendPosition?: 'bottom' | 'right' | 'hidden' | null;
+  yAxisMin?: number | null;
+  yAxisMax?: number | null;
+  unit?: string | null;
+  colorScheme?: 'blue' | 'green' | 'red' | 'purple' | 'rainbow' | null;
+  // Pie/Donut specific
+  donut?: boolean | null;
+  // Thresholds (value → color mapping)
+  thresholds?: Array<{ value: number; color: string; label?: string }> | null;
+  // Data grouping
+  groupBy?: string | null;
+  // Distribution/Histogram
+  bucketSize?: number | null;
 }
 
 export interface WidgetSlot {
@@ -127,16 +172,18 @@ export type WidgetCategory =
   | 'knowledge'
   | 'finops'
   | 'ai'
-  | 'customQuery';
+  | 'customQuery'
+  | 'observability';
 
 export const WIDGET_CATEGORIES: { value: WidgetCategory; labelKey: string }[] = [
-  { value: 'all',         labelKey: 'widgetCategories.all' },
-  { value: 'services',    labelKey: 'widgetCategories.services' },
-  { value: 'changes',     labelKey: 'widgetCategories.changes' },
-  { value: 'operations',  labelKey: 'widgetCategories.operations' },
-  { value: 'knowledge',   labelKey: 'widgetCategories.knowledge' },
-  { value: 'finops',      labelKey: 'widgetCategories.finops' },
-  { value: 'customQuery', labelKey: 'widgetCategories.customQuery' },
+  { value: 'all',           labelKey: 'widgetCategories.all' },
+  { value: 'services',      labelKey: 'widgetCategories.services' },
+  { value: 'changes',       labelKey: 'widgetCategories.changes' },
+  { value: 'operations',    labelKey: 'widgetCategories.operations' },
+  { value: 'knowledge',     labelKey: 'widgetCategories.knowledge' },
+  { value: 'finops',        labelKey: 'widgetCategories.finops' },
+  { value: 'customQuery',   labelKey: 'widgetCategories.customQuery' },
+  { value: 'observability', labelKey: 'widgetCategories.observability' },
 ];
 
 // ── Registry ───────────────────────────────────────────────────────────────
@@ -318,6 +365,87 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
     category: 'customQuery',
   },
+  // Observability widgets
+  'obs-metrics': {
+    type: 'obs-metrics',
+    labelKey: 'governance.customDashboards.widgets.obsMetrics',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+    category: 'observability',
+  },
+  'obs-logs': {
+    type: 'obs-logs',
+    labelKey: 'governance.customDashboards.widgets.obsLogs',
+    defaultWidth: 3,
+    defaultHeight: 3,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+    category: 'observability',
+  },
+  'obs-traces': {
+    type: 'obs-traces',
+    labelKey: 'governance.customDashboards.widgets.obsTraces',
+    defaultWidth: 3,
+    defaultHeight: 3,
+    personas: ['Engineer', 'TechLead', 'Architect'],
+    category: 'observability',
+  },
+  'obs-error-rate': {
+    type: 'obs-error-rate',
+    labelKey: 'governance.customDashboards.widgets.obsErrorRate',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+    category: 'observability',
+  },
+  'obs-service-map': {
+    type: 'obs-service-map',
+    labelKey: 'governance.customDashboards.widgets.obsServiceMap',
+    defaultWidth: 3,
+    defaultHeight: 3,
+    personas: ['Architect', 'TechLead'],
+    category: 'observability',
+  },
+  'obs-pie-chart': {
+    type: 'obs-pie-chart',
+    labelKey: 'governance.customDashboards.widgets.obsPieChart',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'FinOps', 'Auditor'],
+    category: 'observability',
+  },
+  'obs-bar-gauge': {
+    type: 'obs-bar-gauge',
+    labelKey: 'governance.customDashboards.widgets.obsBarGauge',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'observability',
+  },
+  'obs-heatmap-calendar': {
+    type: 'obs-heatmap-calendar',
+    labelKey: 'governance.customDashboards.widgets.obsHeatmapCalendar',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'observability',
+  },
+  'obs-treemap': {
+    type: 'obs-treemap',
+    labelKey: 'governance.customDashboards.widgets.obsTreemap',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Executive', 'Architect', 'FinOps', 'TechLead'],
+    category: 'observability',
+  },
+  'obs-histogram': {
+    type: 'obs-histogram',
+    labelKey: 'governance.customDashboards.widgets.obsHistogram',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect'],
+    category: 'observability',
+  },
   // Extended widget types
   'incident-count': {
     type: 'incident-count',
@@ -490,6 +618,10 @@ export const NQL_RENDER_HINTS = [
   { value: 'area',    labelKey: 'nqlEditor.renderHintArea' },
   { value: 'stat',    labelKey: 'nqlEditor.renderHintStat' },
   { value: 'heatmap', labelKey: 'nqlEditor.renderHintHeatmap' },
+  { value: 'pie',     labelKey: 'nqlEditor.renderHintPie' },
+  { value: 'gauge',   labelKey: 'nqlEditor.renderHintGauge' },
+  { value: 'scatter', labelKey: 'nqlEditor.renderHintScatter' },
+  { value: 'treemap', labelKey: 'nqlEditor.renderHintTreemap' },
 ] as const;
 
 export type NqlRenderHint = (typeof NQL_RENDER_HINTS)[number]['value'];

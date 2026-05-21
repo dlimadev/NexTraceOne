@@ -99,6 +99,9 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// <summary>Identificador opcional da equipa proprietária do dashboard.</summary>
     public string? TeamId { get; private set; }
 
+    /// <summary>Tags para categorização e filtragem do dashboard (máx. 20, normalizadas para lowercase).</summary>
+    public IReadOnlyList<string> Tags { get; private set; } = [];
+
     /// <summary>Identificador do tenant proprietário.</summary>
     public string TenantId { get; private init; } = string.Empty;
 
@@ -133,7 +136,8 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         string userId,
         DateTimeOffset now,
         string? teamId = null,
-        bool isSystem = false)
+        bool isSystem = false,
+        IReadOnlyList<string>? tags = null)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Guard.Against.StringTooLong(name, 100, nameof(name));
@@ -158,6 +162,7 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
             CurrentRevisionNumber = 0,
             IsSystem = isSystem,
             TeamId = teamId,
+            Tags = tags ?? [],
             TenantId = tenantId,
             CreatedByUserId = userId,
             CreatedAt = now,
@@ -202,7 +207,8 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         string layout,
         IReadOnlyList<DashboardWidget> widgets,
         string? teamId,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        IReadOnlyList<string>? tags = null)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Guard.Against.StringTooLong(name, 100, nameof(name));
@@ -216,6 +222,7 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         Layout = layout.Trim();
         Widgets = widgets;
         TeamId = teamId;
+        Tags = tags ?? Tags;
         CurrentRevisionNumber++;
         UpdatedAt = now;
     }
@@ -227,6 +234,16 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     {
         Guard.Against.Null(variables, nameof(variables));
         Variables = variables;
+        UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Define as tags do dashboard, normalizando para lowercase e removendo duplicados.
+    /// Aceita no máximo 20 tags; tags em branco são descartadas silenciosamente.
+    /// </summary>
+    public void SetTags(IReadOnlyList<string> tags, DateTimeOffset now)
+    {
+        Tags = tags.Select(t => t.Trim().ToLowerInvariant()).Where(t => t.Length > 0).Distinct().Take(20).ToList();
         UpdatedAt = now;
     }
 

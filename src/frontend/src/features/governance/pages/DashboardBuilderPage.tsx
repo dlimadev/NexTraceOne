@@ -1,44 +1,93 @@
 /**
- * DashboardBuilderPage — editor de dashboard por slots (Fase 4, melhorias de UX).
- * Interface slot-based: utilizador seleciona posição num grid fixo e atribui um widget.
- * Cada slot tem: tipo, serviço alvo, time range override, título personalizado,
- * e para StatWidget: metric selector; para TextMarkdownWidget: content textarea.
- * Preview em tempo real à direita. Guarda via PUT /governance/dashboards/{id}.
- * Suporta Export/Import JSON (compatível com Grafana-like portability) e Auto-arrange.
+ * DashboardBuilderPage — editor visual de dashboard com drag-and-drop (Fase 5).
+ * Substitui o editor de formulário baseado em lista por um canvas interativo
+ * estilo Grafana/Kibana usando react-grid-layout v2.
+ * Paleta lateral de widgets com busca e filtro por categoria,
+ * arrastar widgets para o canvas, redimensionar, configurar por painel lateral.
+ * Guarda via PUT /governance/dashboards/{id}.
  */
-import { useState, useRef, useEffect } from 'react';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+
+import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Plus,
-  Trash2,
   Save,
-  LayoutGrid,
   Eye,
+  EyeOff,
   Download,
   Upload,
   Shuffle,
-  Copy,
-  ChevronDown,
   Search,
+  Settings,
+  X,
+  ChevronDown,
+  ChevronUp,
+  LayoutGrid,
 } from 'lucide-react';
-import { useEnvironment } from '../../../contexts/EnvironmentContext';
-import { PageContainer } from '../../../components/shell';
+import {
+  GridLayout,
+  useContainerWidth,
+  type LayoutItem,
+  type Layout,
+} from 'react-grid-layout';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
-import { Card, CardBody } from '../../../components/Card';
 import client from '../../../api/client';
 import {
   ALL_WIDGET_TYPES,
   WIDGET_META,
+  WIDGET_CATEGORIES,
   TIME_RANGE_OPTIONS,
   STAT_METRIC_OPTIONS,
+  NQL_RENDER_HINTS,
   type WidgetType,
   type WidgetSlot,
+  type WidgetCategory,
 } from '../widgets/WidgetRegistry';
+
+// ── Emoji icon map ─────────────────────────────────────────────────────────
+
+const WIDGET_ICONS: Record<string, string> = {
+  'dora-metrics':          '📊',
+  'service-scorecard':     '🏆',
+  'incident-summary':      '🚨',
+  'change-confidence':     '🎯',
+  'cost-trend':            '💰',
+  'reliability-slo':       '🛡️',
+  'knowledge-graph':       '🕸️',
+  'on-call-status':        '📞',
+  'alert-status':          '⚠️',
+  'change-timeline':       '📅',
+  'slo-gauge':             '⏱️',
+  'deployment-frequency':  '🚀',
+  'stat':                  '📈',
+  'text-markdown':         '📝',
+  'top-services':          '🔝',
+  'contract-coverage':     '📋',
+  'blast-radius':          '💥',
+  'team-health':           '💪',
+  'release-calendar':      '📆',
+  'query-widget':          '🔍',
+  'obs-metrics':           '📡',
+  'obs-logs':              '📜',
+  'obs-traces':            '🔗',
+  'obs-error-rate':        '🚦',
+  'obs-service-map':       '🗺️',
+  'obs-pie-chart':         '🥧',
+  'obs-bar-gauge':         '📊',
+  'obs-heatmap-calendar':  '🗓️',
+  'obs-treemap':           '🟩',
+  'obs-histogram':         '📉',
+};
+
+function widgetIcon(type: string): string {
+  return WIDGET_ICONS[type] ?? '📦';
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -48,6 +97,7 @@ interface DashboardDetail {
   description?: string | null;
   layout: string;
   persona: string;
+  tags?: string[] | null;
   widgets: WidgetSlot[];
   isSystem: boolean;
   teamId?: string | null;
@@ -55,23 +105,110 @@ interface DashboardDetail {
 
 const LAYOUTS = ['single-column', 'two-column', 'three-column', 'grid', 'custom'] as const;
 
-const MAX_COLS: Record<string, number> = {
-  'single-column': 1,
-  'two-column': 2,
-  'three-column': 3,
-  grid: 4,
-  custom: 4,
-};
+const PERSONAS = [
+  'Engineer', 'TechLead', 'Architect', 'Executive',
+  'Product', 'PlatformAdmin', 'Auditor',
+] as const;
 
-// ── Hooks ──────────────────────────────────────────────────────────────────
+/** Internal builder slot — uses x/y/w/h for react-grid-layout */
+interface BuilderSlot {
+  tempId: string;
+  existingWidgetId?: string | null;
+  type: WidgetType;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  serviceId: string;
+  teamId: string;
+  timeRange: string;
+  customTitle: string;
+  metric: string;
+  content: string;
+  nqlQuery: string;
+  renderHint: string;
+  metricName: string;
+  otelEnvironment: string;
+  logSeverity: string;
+  minDurationMs: string;
+  // Visualization
+  chartType: string;
+  unit: string;
+  colorScheme: string;
+  donut: boolean;
+  showDataLabels: boolean;
+  legendPosition: string;
+  yAxisMin: string;
+  yAxisMax: string;
+  groupBy: string;
+  thresholds: string;
+  bucketSize: string;
+}
 
-const useGetDashboard = (dashboardId: string, tenantId: string) =>
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function makeTempId(): string {
+  return `slot-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function widgetFromSlot(w: WidgetSlot): BuilderSlot {
+  return {
+    tempId: makeTempId(),
+    existingWidgetId: w.widgetId,
+    type: (w.type as WidgetType) ?? 'dora-metrics',
+    x: w.posX ?? 0,
+    y: w.posY ?? 0,
+    w: w.width ?? 2,
+    h: w.height ?? 2,
+    serviceId: '',
+    teamId: '',
+    timeRange: w.timeRange ?? '24h',
+    customTitle: w.customTitle ?? '',
+    metric: w.metric ?? '',
+    content: w.content ?? '',
+    nqlQuery: w.nqlQuery ?? '',
+    renderHint: w.renderHint ?? 'table',
+    metricName: '',
+    otelEnvironment: '',
+    logSeverity: 'ERROR',
+    minDurationMs: '',
+    chartType: '',
+    unit: '',
+    colorScheme: '',
+    donut: false,
+    showDataLabels: false,
+    legendPosition: '',
+    yAxisMin: '',
+    yAxisMax: '',
+    groupBy: '',
+    thresholds: '[]',
+    bucketSize: '',
+  };
+}
+
+function slotsToLayout(slots: BuilderSlot[]): Layout {
+  return slots.map((s) => ({
+    i: s.tempId,
+    x: s.x,
+    y: s.y,
+    w: s.w,
+    h: s.h,
+    minW: 1,
+    minH: 1,
+  }));
+}
+
+// ── API hooks ──────────────────────────────────────────────────────────────
+
+const TENANT_ID = 'default';
+
+const useGetDashboard = (dashboardId: string) =>
   useQuery({
-    queryKey: ['dashboard-detail', dashboardId, tenantId],
+    queryKey: ['dashboard-detail', dashboardId, TENANT_ID],
     queryFn: () =>
       client
         .get<DashboardDetail>(`/governance/dashboards/${dashboardId}`, {
-          params: { tenantId },
+          params: { tenantId: TENANT_ID },
         })
         .then((r) => r.data),
     enabled: Boolean(dashboardId),
@@ -90,427 +227,1027 @@ const useUpdateDashboard = (dashboardId: string) => {
   });
 };
 
-// ── Builder slot editor ────────────────────────────────────────────────────
+// ── Auto-arrange (bin-packing, 12-col grid) ────────────────────────────────
 
-interface BuilderSlot {
-  tempId: string;
-  existingWidgetId?: string | null;
-  type: WidgetType;
-  posX: number;
-  posY: number;
-  width: number;
-  height: number;
-  serviceId: string;
-  teamId: string;
-  timeRange: string;
-  customTitle: string;
-  metric: string;
-  content: string;
-}
+function autoArrange(slots: BuilderSlot[]): BuilderSlot[] {
+  const COLS = 12;
+  // Ocupação de células: Set<`${x},${y}`>
+  const occupied = new Set<string>();
 
-function makeSlotId() {
-  return `slot-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-function widgetFromDetail(w: WidgetSlot): BuilderSlot {
-  return {
-    tempId: makeSlotId(),
-    existingWidgetId: w.widgetId,
-    type: (w.type as WidgetType) ?? 'dora-metrics',
-    posX: w.posX,
-    posY: w.posY,
-    width: w.width ?? 2,
-    height: w.height ?? 2,
-    serviceId: '',
-    teamId: '',
-    timeRange: w.timeRange ?? '24h',
-    customTitle: w.customTitle ?? '',
-    metric: w.metric ?? '',
-    content: w.content ?? '',
+  const isFree = (x: number, y: number, w: number, h: number): boolean => {
+    for (let dy = 0; dy < h; dy++) {
+      for (let dx = 0; dx < w; dx++) {
+        if (x + dx >= COLS) return false;
+        if (occupied.has(`${x + dx},${y + dy}`)) return false;
+      }
+    }
+    return true;
   };
+
+  const occupy = (x: number, y: number, w: number, h: number) => {
+    for (let dy = 0; dy < h; dy++) {
+      for (let dx = 0; dx < w; dx++) {
+        occupied.add(`${x + dx},${y + dy}`);
+      }
+    }
+  };
+
+  const sorted = [...slots].sort((a, b) => b.w * b.h - a.w * a.h);
+  let maxY = 0;
+
+  return sorted.map((slot) => {
+    const w = Math.min(slot.w, COLS);
+    const h = slot.h;
+    // Scan rows from top
+    for (let y = 0; y <= maxY + 1; y++) {
+      for (let x = 0; x <= COLS - w; x++) {
+        if (isFree(x, y, w, h)) {
+          occupy(x, y, w, h);
+          maxY = Math.max(maxY, y + h - 1);
+          return { ...slot, x, y, w };
+        }
+      }
+    }
+    // Fallback: append at bottom
+    const y = maxY + 1;
+    occupy(0, y, w, h);
+    maxY = y + h - 1;
+    return { ...slot, x: 0, y, w };
+  });
 }
 
-// ── Grid Preview ────────────────────────────────────────────────────────────
+// ── Widget Palette ─────────────────────────────────────────────────────────
 
-/** Derives grid columns count from layout string */
-function layoutCols(layout: string): number {
-  switch (layout) {
-    case 'single-column': return 1;
-    case 'two-column': return 2;
-    case 'three-column': return 3;
-    default: return 4;
-  }
+interface PaletteCardProps {
+  type: WidgetType;
+  label: string;
+  meta: (typeof WIDGET_META)[WidgetType];
+  onAdd: (type: WidgetType) => void;
+  onDragStart: (type: WidgetType) => void;
 }
 
-/** Visual preview of the current slot layout */
-function GridPreview({ slots, layout }: { slots: BuilderSlot[]; layout: string }) {
-  const { t } = useTranslation();
-  const cols = layoutCols(layout);
-
-  if (slots.length === 0) {
-    return (
-      <div className="h-40 flex items-center justify-center text-xs text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
-        {t('governance.dashboardBuilder.previewEmpty', 'No widgets yet')}
-      </div>
-    );
-  }
-
-  // Compute grid height: max (posY + height) across all slots
-  const gridRows = Math.max(...slots.map((s) => s.posY + s.height), 2);
-
+function PaletteCard({ type, label, meta, onAdd, onDragStart }: PaletteCardProps) {
   return (
     <div
-      className="border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-900/50"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${gridRows}, 40px)`,
-        gap: '4px',
+      className="flex flex-col items-center gap-1 p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-grab active:cursor-grabbing hover:border-accent/60 hover:shadow-md transition-all select-none"
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'copy';
+        e.dataTransfer.setData('application/x-widget-type', type);
+        onDragStart(type);
       }}
-      aria-label={t('governance.dashboardBuilder.previewLabel', 'Dashboard preview')}
+      onClick={() => onAdd(type)}
+      title={`${label} — ${meta.defaultWidth}×${meta.defaultHeight} — drag or click to add`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onAdd(type); }}
     >
-      {slots.map((slot) => {
-        const meta = WIDGET_META[slot.type];
-        const clampedPosX = Math.min(Math.max(slot.posX, 0), cols - 1);
-        const clampedWidth = Math.min(slot.width, cols - clampedPosX);
-        return (
-          <div
-            key={slot.tempId}
-            style={{
-              gridColumn: `${clampedPosX + 1} / span ${clampedWidth}`,
-              gridRow: `${slot.posY + 1} / span ${slot.height}`,
-            }}
-            className="rounded bg-accent/10 border border-accent/30 flex flex-col items-center justify-center p-1 overflow-hidden"
-            title={slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type)}
-          >
-            <span className="text-[9px] font-semibold text-accent truncate w-full text-center leading-tight">
-              {slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type)}
-            </span>
-            <span className="text-[8px] text-gray-400 tabular-nums">{slot.width}×{slot.height}</span>
-          </div>
-        );
-      })}
+      <span className="text-xl leading-none">{widgetIcon(type)}</span>
+      <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 text-center leading-tight line-clamp-2">
+        {label}
+      </span>
+      <span className="text-[9px] text-gray-400 tabular-nums">
+        {meta.defaultWidth}×{meta.defaultHeight}
+      </span>
     </div>
   );
 }
 
-// ── Size presets ───────────────────────────────────────────────────────────
+// ── Widget Config Drawer ───────────────────────────────────────────────────
 
-const SIZE_PRESETS = [
-  { label: 'S', labelKey: 'governance.dashboardBuilder.sizePreset.s', width: 1, height: 1 },
-  { label: 'M', labelKey: 'governance.dashboardBuilder.sizePreset.m', width: 2, height: 2 },
-  { label: 'W', labelKey: 'governance.dashboardBuilder.sizePreset.w', width: 3, height: 2 },
-  { label: 'L', labelKey: 'governance.dashboardBuilder.sizePreset.l', width: 3, height: 3 },
-] as const;
-
-// ── Widget Picker Panel ────────────────────────────────────────────────────
-
-const PICKER_PERSONAS = [
-  'Engineer',
-  'TechLead',
-  'Architect',
-  'Executive',
-  'Product',
-  'PlatformAdmin',
-  'Auditor',
-] as const;
-
-interface WidgetPickerPanelProps {
-  selected: WidgetType;
-  onSelect: (type: WidgetType) => void;
-  disabled?: boolean;
+interface ConfigDrawerProps {
+  slot: BuilderSlot;
+  onUpdate: (patch: Partial<BuilderSlot>) => void;
+  onClose: () => void;
 }
 
-function WidgetPickerPanel({ selected, onSelect, disabled }: WidgetPickerPanelProps) {
+function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [personaFilter, setPersonaFilter] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Close panel when clicking outside
-  useEffect(() => {
-    if (!open) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [open]);
-
-  // Close panel on Escape key
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
-
-  const filtered = ALL_WIDGET_TYPES.filter((wt) => {
-    const meta = WIDGET_META[wt];
-    const label = t(meta.labelKey, wt).toLowerCase();
-    const matchesSearch = !search || label.includes(search.toLowerCase());
-    const matchesPersona = !personaFilter || meta.personas.includes(personaFilter);
-    return matchesSearch && matchesPersona;
-  });
-
-  if (disabled) {
-    return (
-      <button
-        type="button"
-        disabled
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white text-left opacity-50 flex items-center justify-between"
-      >
-        <span className="truncate">{t(WIDGET_META[selected].labelKey, selected)}</span>
-        <ChevronDown size={12} className="shrink-0 ml-1 text-gray-400" />
-      </button>
-    );
-  }
+  const isObsEnv = slot.type.startsWith('obs-');
+  const isObsLogs = slot.type === 'obs-logs';
+  const isObsTraces = slot.type === 'obs-traces';
+  const isObsMetricsType = slot.type === 'obs-metrics';
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div
+      className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 flex flex-col"
+      role="dialog"
+      aria-label={t('governance.dashboardBuilder.configPanel', 'Widget configuration')}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{widgetIcon(slot.type)}</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+            {slot.customTitle || t(WIDGET_META[slot.type]?.labelKey ?? slot.type, slot.type)}
+          </span>
+        </div>
+        <button
+          onClick={onClose}
+          className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+          aria-label={t('common.close', 'Close')}
+        >
+          <X size={16} />
+        </button>
+      </div>
+
+      {/* Fields */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+
+        {/* Custom title */}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            {t('governance.dashboardBuilder.customTitle', 'Custom Title')}
+          </label>
+          <input
+            type="text"
+            value={slot.customTitle}
+            onChange={(e) => onUpdate({ customTitle: e.target.value })}
+            maxLength={80}
+            placeholder={t('governance.dashboardBuilder.customTitlePlaceholder', 'Optional override')}
+            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+          />
+        </div>
+
+        {/* Time range */}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            {t('governance.dashboardBuilder.timeRangeOverride', 'Time Range Override')}
+          </label>
+          <select
+            value={slot.timeRange}
+            onChange={(e) => onUpdate({ timeRange: e.target.value })}
+            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+          >
+            {TIME_RANGE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {t(opt.labelKey, opt.value)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Service */}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            {t('governance.dashboardBuilder.serviceFilter', 'Service')}
+          </label>
+          <input
+            type="text"
+            value={slot.serviceId}
+            onChange={(e) => onUpdate({ serviceId: e.target.value })}
+            placeholder={t('governance.dashboardBuilder.serviceFilterPlaceholder', 'All services')}
+            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+          />
+        </div>
+
+        {/* Team */}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            {t('governance.dashboardBuilder.teamFilter', 'Team')}
+          </label>
+          <input
+            type="text"
+            value={slot.teamId}
+            onChange={(e) => onUpdate({ teamId: e.target.value })}
+            placeholder={t('governance.dashboardBuilder.teamFilterPlaceholder', 'All teams')}
+            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+          />
+        </div>
+
+        {/* Conditional: stat */}
+        {slot.type === 'stat' && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              {t('governance.dashboardBuilder.statMetric', 'KPI Metric')}
+            </label>
+            <select
+              value={slot.metric || 'incidents-open'}
+              onChange={(e) => onUpdate({ metric: e.target.value })}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            >
+              {STAT_METRIC_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {t(opt.labelKey, opt.value)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Conditional: text-markdown */}
+        {slot.type === 'text-markdown' && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              {t('governance.dashboardBuilder.textContent', 'Content (Markdown)')}
+            </label>
+            <textarea
+              value={slot.content}
+              onChange={(e) => onUpdate({ content: e.target.value })}
+              rows={8}
+              maxLength={2000}
+              placeholder={t('governance.dashboardBuilder.textContentPlaceholder', 'Supports **bold**, *italic*, # headings')}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono focus:outline-none focus:border-accent resize-y"
+            />
+            <p className="mt-1 text-[9px] text-gray-400">{slot.content.length}/2000</p>
+          </div>
+        )}
+
+        {/* Conditional: query-widget */}
+        {slot.type === 'query-widget' && (
+          <>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {t('governance.dashboardBuilder.nqlQuery', 'NQL Query')}
+              </label>
+              <textarea
+                value={slot.nqlQuery}
+                onChange={(e) => onUpdate({ nqlQuery: e.target.value })}
+                rows={4}
+                placeholder="SELECT * FROM services LIMIT 20"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono focus:outline-none focus:border-accent resize-y"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {t('governance.dashboardBuilder.renderHint', 'Render Hint')}
+              </label>
+              <select
+                value={slot.renderHint || 'table'}
+                onChange={(e) => onUpdate({ renderHint: e.target.value })}
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              >
+                {NQL_RENDER_HINTS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {t(opt.labelKey, opt.value)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+
+        {/* Conditional: Observability widgets */}
+        {isObsEnv && (
+          <>
+            {isObsMetricsType && (
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  {t('governance.dashboardBuilder.metricName', 'Metric Name')}
+                </label>
+                <input
+                  type="text"
+                  value={slot.metricName}
+                  onChange={(e) => onUpdate({ metricName: e.target.value })}
+                  placeholder="http.server.request.duration"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {t('governance.dashboardBuilder.otelEnvironment', 'Environment')}
+              </label>
+              <input
+                type="text"
+                value={slot.otelEnvironment}
+                onChange={(e) => onUpdate({ otelEnvironment: e.target.value })}
+                placeholder="production"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              />
+            </div>
+            {isObsLogs && (
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  {t('governance.dashboardBuilder.logSeverity', 'Log Severity')}
+                </label>
+                <select
+                  value={slot.logSeverity}
+                  onChange={(e) => onUpdate({ logSeverity: e.target.value })}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                >
+                  {['ERROR', 'WARN', 'INFO', 'DEBUG'].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {isObsTraces && (
+              <div>
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  {t('governance.dashboardBuilder.minDurationMs', 'Min Duration (ms)')}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={slot.minDurationMs}
+                  onChange={(e) => onUpdate({ minDurationMs: e.target.value })}
+                  placeholder="100"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Visualization section for time-series obs widgets */}
+        {(slot.type === 'obs-metrics' || slot.type === 'obs-error-rate') && (
+          <>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                Visualization
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Chart Type</label>
+              <div className="flex gap-1">
+                {(['line', 'bar', 'area', 'step'] as const).map(ct => (
+                  <button
+                    key={ct}
+                    type="button"
+                    onClick={() => onUpdate({ chartType: ct })}
+                    className={`flex-1 rounded border text-xs py-1 capitalize transition-colors ${
+                      (slot.chartType || 'area') === ct
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {ct}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Min</label>
+                <input
+                  type="number"
+                  value={slot.yAxisMin}
+                  onChange={(e) => onUpdate({ yAxisMin: e.target.value })}
+                  placeholder="auto"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Max</label>
+                <input
+                  type="number"
+                  value={slot.yAxisMax}
+                  onChange={(e) => onUpdate({ yAxisMax: e.target.value })}
+                  placeholder="auto"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <input
+                type="text"
+                value={slot.unit}
+                onChange={(e) => onUpdate({ unit: e.target.value })}
+                placeholder="ms, %, req/s, $..."
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Thresholds section */}
+        {(slot.type === 'obs-metrics' || slot.type === 'obs-error-rate' || slot.type === 'obs-bar-gauge') && (() => {
+          const thresholds: Array<{ value: number; color: string; label?: string }> = (() => {
+            try { return JSON.parse(slot.thresholds || '[]'); } catch { return []; }
+          })();
+
+          const updateThresholds = (updated: typeof thresholds) => {
+            onUpdate({ thresholds: JSON.stringify(updated) });
+          };
+
+          const THRESHOLD_COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444', '#8b5cf6', '#6366f1'];
+
+          return (
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Thresholds
+                </p>
+                <button
+                  type="button"
+                  onClick={() => updateThresholds([...thresholds, { value: 0, color: '#ef4444', label: '' }])}
+                  className="text-xs text-blue-500 hover:text-blue-400"
+                >
+                  + Add
+                </button>
+              </div>
+              {thresholds.map((threshold, i) => (
+                <div key={i} className="flex gap-1.5 items-center mb-1.5">
+                  <input
+                    type="number"
+                    value={threshold.value}
+                    onChange={(e) => {
+                      const updated = [...thresholds];
+                      updated[i] = { ...threshold, value: parseFloat(e.target.value) || 0 };
+                      updateThresholds(updated);
+                    }}
+                    className="w-16 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none"
+                    placeholder="value"
+                  />
+                  <div className="flex gap-1">
+                    {THRESHOLD_COLORS.map(color => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => {
+                          const updated = [...thresholds];
+                          updated[i] = { ...threshold, color };
+                          updateThresholds(updated);
+                        }}
+                        className={`w-5 h-5 rounded-full border-2 transition-transform ${threshold.color === color ? 'border-white scale-110' : 'border-transparent'}`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => updateThresholds(thresholds.filter((_, j) => j !== i))}
+                    className="text-gray-400 hover:text-red-400 text-xs ml-auto"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {thresholds.length === 0 && (
+                <p className="text-xs text-gray-400 italic">No thresholds configured</p>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Pie / Donut chart options */}
+        {slot.type === 'obs-pie-chart' && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Chart Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Group By</label>
+              <select
+                value={slot.groupBy || 'service'}
+                onChange={(e) => onUpdate({ groupBy: e.target.value })}
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              >
+                {['service', 'team', 'severity', 'domain'].map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="checkbox"
+                id={`donut-${slot.tempId}`}
+                checked={slot.donut}
+                onChange={(e) => onUpdate({ donut: e.target.checked })}
+                className="rounded"
+              />
+              <label htmlFor={`donut-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Donut style</label>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="checkbox"
+                id={`labels-${slot.tempId}`}
+                checked={slot.showDataLabels}
+                onChange={(e) => onUpdate({ showDataLabels: e.target.checked })}
+                className="rounded"
+              />
+              <label htmlFor={`labels-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Show labels</label>
+            </div>
+            <div className="mt-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Color Scheme</label>
+              <select
+                value={slot.colorScheme || 'rainbow'}
+                onChange={(e) => onUpdate({ colorScheme: e.target.value })}
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              >
+                {['rainbow', 'blue', 'green', 'red', 'purple'].map(cs => (
+                  <option key={cs} value={cs}>{cs}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Treemap and heatmap-calendar options */}
+        {(slot.type === 'obs-treemap' || slot.type === 'obs-heatmap-calendar') && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Data Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {slot.type === 'obs-treemap' ? 'Group By' : 'Metric'}
+              </label>
+              {slot.type === 'obs-treemap' ? (
+                <select
+                  value={slot.groupBy || 'service'}
+                  onChange={(e) => onUpdate({ groupBy: e.target.value })}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                >
+                  {['service', 'team', 'domain'].map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+              ) : (
+                <select
+                  value={slot.metricName || 'incidents'}
+                  onChange={(e) => onUpdate({ metricName: e.target.value })}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                >
+                  {['incidents', 'deployments', 'errors', 'changes'].map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Histogram options */}
+        {slot.type === 'obs-histogram' && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Histogram Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bucket Size</label>
+              <input
+                type="number"
+                min={1}
+                value={slot.bucketSize}
+                onChange={(e) => onUpdate({ bucketSize: e.target.value })}
+                placeholder="50"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              />
+            </div>
+            <div className="mt-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <input
+                type="text"
+                value={slot.unit}
+                onChange={(e) => onUpdate({ unit: e.target.value })}
+                placeholder="ms"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Metadata Accordion ─────────────────────────────────────────────────────
+
+interface MetaAccordionProps {
+  name: string;
+  description: string;
+  layout: string;
+  persona: string;
+  tags: string;
+  onChangeName: (v: string) => void;
+  onChangeDescription: (v: string) => void;
+  onChangeLayout: (v: string) => void;
+  onChangePersona: (v: string) => void;
+  onChangeTags: (v: string) => void;
+}
+
+function MetaAccordion({
+  name, description, layout, persona, tags,
+  onChangeName, onChangeDescription, onChangeLayout, onChangePersona, onChangeTags,
+}: MetaAccordionProps) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white text-left flex items-center justify-between hover:border-accent transition-colors"
-        aria-label={t('governance.dashboardBuilder.widgetPickerOpen', 'Open widget picker')}
-        aria-expanded={open}
-        aria-haspopup="dialog"
+        className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-accent transition-colors"
       >
-        <span className="truncate">{t(WIDGET_META[selected].labelKey, selected)}</span>
-        <ChevronDown
-          size={12}
-          className={`shrink-0 ml-1 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
-        />
+        <span>{t('governance.dashboardBuilder.metadata', 'Dashboard Metadata')}</span>
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
       </button>
 
       {open && (
-        <div
-          className="absolute top-full left-0 z-50 mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl p-3 w-72"
-          role="dialog"
-          aria-label={t('governance.dashboardBuilder.widgetPickerPanel', 'Widget picker')}
-        >
-          {/* Search input */}
-          <div className="relative mb-2">
-            <Search
-              size={11}
-              className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-            />
+        <div className="mt-3 space-y-3">
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('governance.customDashboards.dashboardName', 'Name')}
+            </label>
             <input
-              autoFocus
               type="text"
-              placeholder={t('governance.dashboardBuilder.widgetSearch', 'Search widgets…')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs pl-6 pr-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              value={name}
+              onChange={(e) => onChangeName(e.target.value)}
+              maxLength={100}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
             />
           </div>
-
-          {/* Persona filter chips */}
-          <div className="flex flex-wrap gap-1 mb-2">
-            <button
-              type="button"
-              onClick={() => setPersonaFilter('')}
-              className={`rounded-full px-2 py-0.5 text-[9px] font-medium transition-colors ${
-                !personaFilter
-                  ? 'bg-accent text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
-              }`}
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('governance.customDashboards.description', 'Description')}
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => onChangeDescription(e.target.value)}
+              rows={2}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('governance.customDashboards.layout', 'Layout')}
+            </label>
+            <select
+              value={layout}
+              onChange={(e) => onChangeLayout(e.target.value)}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
             >
-              {t('governance.dashboardBuilder.allPersonas', 'All')}
-            </button>
-            {PICKER_PERSONAS.map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPersonaFilter(personaFilter === p ? '' : p)}
-                className={`rounded-full px-2 py-0.5 text-[9px] font-medium transition-colors ${
-                  personaFilter === p
-                    ? 'bg-accent text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+              {LAYOUTS.map((l) => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
           </div>
-
-          {/* Widget cards grid */}
-          <div
-            className="max-h-52 overflow-y-auto grid grid-cols-2 gap-1"
-            role="listbox"
-            aria-label={t('governance.dashboardBuilder.widgetPickerPanel', 'Widget picker')}
-          >
-            {filtered.map((wt) => {
-              const meta = WIDGET_META[wt];
-              const isSelected = wt === selected;
-              return (
-                <button
-                  key={wt}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  onClick={() => {
-                    onSelect(wt);
-                    setOpen(false);
-                    setSearch('');
-                    setPersonaFilter('');
-                  }}
-                  className={`text-left rounded p-2 text-xs transition-colors border ${
-                    isSelected
-                      ? 'bg-accent text-white border-accent'
-                      : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-transparent hover:border-accent/30 hover:bg-accent/5'
-                  }`}
-                  title={meta.personas.join(', ')}
-                >
-                  <div className="font-medium truncate leading-tight">
-                    {t(meta.labelKey, wt)}
-                  </div>
-                  <div
-                    className={`text-[8px] mt-0.5 truncate ${
-                      isSelected ? 'text-white/70' : 'text-gray-400'
-                    }`}
-                  >
-                    {meta.defaultWidth}×{meta.defaultHeight} ·{' '}
-                    {meta.personas.slice(0, 2).join(', ')}
-                    {meta.personas.length > 2 ? ` +${meta.personas.length - 2}` : ''}
-                  </div>
-                </button>
-              );
-            })}
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('governance.dashboardBuilder.persona', 'Persona')}
+            </label>
+            <select
+              value={persona}
+              onChange={(e) => onChangePersona(e.target.value)}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            >
+              {PERSONAS.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
           </div>
-
-          {filtered.length === 0 && (
-            <div className="text-center text-xs text-gray-400 py-3">
-              {t('governance.dashboardBuilder.noWidgetsFound', 'No widgets match the filter')}
-            </div>
-          )}
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t('governance.dashboardBuilder.tags', 'Tags (comma-separated)')}
+            </label>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => onChangeTags(e.target.value)}
+              placeholder="sre, dora, executive"
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            />
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
+// ── Grid canvas wrapper (width-aware) ──────────────────────────────────────
+
+interface GridCanvasProps {
+  slots: BuilderSlot[];
+  isReadOnly: boolean;
+  isPreview: boolean;
+  activeConfigId: string | null;
+  draggingType: WidgetType | null;
+  onLayoutChange: (layout: Layout) => void;
+  onDrop: (layout: Layout, item: LayoutItem | undefined, e: Event) => void;
+  onDropDragOver: (e: DragEvent) => { w: number; h: number } | false | void;
+  onConfigOpen: (tempId: string) => void;
+  onRemove: (tempId: string) => void;
+}
+
+function GridCanvas({
+  slots,
+  isReadOnly,
+  isPreview,
+  activeConfigId,
+  draggingType,
+  onLayoutChange,
+  onDrop,
+  onDropDragOver,
+  onConfigOpen,
+  onRemove,
+}: GridCanvasProps) {
+  const { t } = useTranslation();
+  const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
+  const rowHeight = isPreview ? 40 : 60;
+
+  const layout = slotsToLayout(slots);
+
+  const slotMap = new Map(slots.map((s) => [s.tempId, s]));
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex-1 min-h-[600px] relative rounded-xl overflow-hidden"
+      style={{
+        background: 'var(--grid-canvas-bg, #f8fafc)',
+        backgroundImage: `
+          radial-gradient(circle, #cbd5e1 1px, transparent 1px)
+        `,
+        backgroundSize: '24px 24px',
+      }}
+    >
+      {slots.length === 0 && !draggingType && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none select-none z-10">
+          <LayoutGrid size={48} className="mb-3 opacity-30" />
+          <p className="text-sm font-medium opacity-60">
+            {t('governance.dashboardBuilder.canvasEmpty', 'Drag widgets from the palette to build your dashboard')}
+          </p>
+        </div>
+      )}
+
+      {mounted && (
+        <GridLayout
+          width={width}
+          layout={layout}
+          gridConfig={{ cols: 12, rowHeight, margin: [8, 8], containerPadding: [12, 12] }}
+          dragConfig={{ enabled: !isReadOnly, bounded: false }}
+          resizeConfig={{ enabled: !isReadOnly }}
+          dropConfig={{
+            enabled: !isReadOnly,
+            defaultItem: { w: 2, h: 2 },
+            onDragOver: onDropDragOver,
+          }}
+          onLayoutChange={onLayoutChange}
+          onDrop={onDrop}
+          autoSize
+        >
+          {slots.map((slot) => {
+            const meta = WIDGET_META[slot.type];
+            const label = slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type);
+            const isConfigOpen = activeConfigId === slot.tempId;
+
+            return (
+              <div
+                key={slot.tempId}
+                className={`group relative bg-white dark:bg-gray-800 border rounded-lg shadow-sm overflow-hidden flex flex-col items-center justify-center transition-shadow ${
+                  isConfigOpen
+                    ? 'border-accent shadow-accent/20 shadow-md'
+                    : 'border-gray-200 dark:border-gray-700 hover:shadow-md'
+                }`}
+              >
+                {/* Drag handle area (non-button area = full card minus buttons) */}
+                <div className="drag-handle absolute inset-0 cursor-grab active:cursor-grabbing" />
+
+                {/* Widget content */}
+                <div className="relative z-10 flex flex-col items-center gap-1 px-3 pointer-events-none select-none">
+                  <span className="text-2xl">{widgetIcon(slot.type)}</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 text-center leading-tight line-clamp-2">
+                    {label}
+                  </span>
+                  <span className="text-[9px] text-gray-400 tabular-nums">
+                    {slot.w}×{slot.h}
+                  </span>
+                </div>
+
+                {/* Action buttons — shown on hover */}
+                {!isReadOnly && (
+                  <div className="absolute top-1.5 right-1.5 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onConfigOpen(slot.tempId); }}
+                      className="p-1 rounded bg-white/90 dark:bg-gray-700/90 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-accent hover:border-accent transition-colors shadow-sm"
+                      aria-label={t('governance.dashboardBuilder.configWidget', 'Configure widget')}
+                      title="Configure"
+                    >
+                      <Settings size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onRemove(slot.tempId); }}
+                      className="p-1 rounded bg-white/90 dark:bg-gray-700/90 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-500 hover:border-red-400 transition-colors shadow-sm"
+                      aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
+                      title="Remove"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </GridLayout>
+      )}
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────
 
 export function DashboardBuilderPage() {
   const { t } = useTranslation();
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
-  const TENANT_ID = 'default';
   const importInputRef = useRef<HTMLInputElement>(null);
 
-  const { data, isLoading, isError, refetch } = useGetDashboard(dashboardId ?? '', TENANT_ID);
+  // ── Remote data ──────────────────────────────────────────────────────────
+  const { data, isLoading, isError, refetch } = useGetDashboard(dashboardId ?? '');
   const updateMutation = useUpdateDashboard(dashboardId ?? '');
 
+  // ── Local editor state ───────────────────────────────────────────────────
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [layout, setLayout] = useState<string>('two-column');
+  const [persona, setPersona] = useState<string>('Engineer');
+  const [tags, setTags] = useState<string>(''); // comma-separated raw string
   const [slots, setSlots] = useState<BuilderSlot[]>([]);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  const [showPreview, setShowPreview] = useState(true);
-  const [importError, setImportError] = useState<string | null>(null);
 
-  // Initialize state from loaded dashboard
+  // UI state
+  const [isPreview, setIsPreview] = useState(false);
+  const [activeConfigId, setActiveConfigId] = useState<string | null>(null);
+  const [draggingType, setDraggingType] = useState<WidgetType | null>(null);
+  const [paletteSearch, setPaletteSearch] = useState('');
+  const [paletteCategory, setPaletteCategory] = useState<WidgetCategory>('all');
+
+  // Feedback
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState(false);
+
+  // ── Seed from API ────────────────────────────────────────────────────────
   if (data && !initialized) {
     setName(data.name);
     setDescription(data.description ?? '');
-    setLayout(data.layout);
-    setSlots(data.widgets.map(widgetFromDetail));
+    setLayout(data.layout ?? 'two-column');
+    setPersona(data.persona ?? 'Engineer');
+    setTags((data.tags ?? []).join(', '));
+    setSlots(data.widgets.map(widgetFromSlot));
     setInitialized(true);
   }
 
-  const maxCols = MAX_COLS[layout] ?? 4;
+  const isReadOnly = Boolean(data?.isSystem);
 
-  const addSlot = () => {
-    const meta = WIDGET_META['dora-metrics'];
-    setSlots((prev) => [
-      ...prev,
-      {
-        tempId: makeSlotId(),
-        type: 'dora-metrics',
-        posX: 0,
-        posY: prev.length * 2,
-        width: meta.defaultWidth,
-        height: meta.defaultHeight,
+  // ── Palette filtering ────────────────────────────────────────────────────
+  const paletteWidgets = ALL_WIDGET_TYPES.filter((wt) => {
+    const meta = WIDGET_META[wt];
+    if (!meta) return false;
+    const label = t(meta.labelKey, wt).toLowerCase();
+    const matchSearch = !paletteSearch || label.includes(paletteSearch.toLowerCase());
+    const matchCat = paletteCategory === 'all' || meta.category === paletteCategory;
+    return matchSearch && matchCat;
+  });
+
+  // ── Slot operations ──────────────────────────────────────────────────────
+  const addWidget = useCallback((type: WidgetType) => {
+    const meta = WIDGET_META[type];
+    const newSlot: BuilderSlot = {
+      tempId: makeTempId(),
+      type,
+      x: 0,
+      y: slots.length > 0 ? Math.max(...slots.map((s) => s.y + s.h)) : 0,
+      w: meta?.defaultWidth ?? 2,
+      h: meta?.defaultHeight ?? 2,
+      serviceId: '',
+      teamId: '',
+      timeRange: '24h',
+      customTitle: '',
+      metric: 'incidents-open',
+      content: '',
+      nqlQuery: '',
+      renderHint: 'table',
+      metricName: '',
+      otelEnvironment: '',
+      logSeverity: 'ERROR',
+      minDurationMs: '',
+      chartType: '',
+      unit: '',
+      colorScheme: '',
+      donut: false,
+      showDataLabels: false,
+      legendPosition: '',
+      yAxisMin: '',
+      yAxisMax: '',
+      groupBy: '',
+      thresholds: '[]',
+      bucketSize: '',
+    };
+    setSlots((prev) => [...prev, newSlot]);
+    setActiveConfigId(newSlot.tempId);
+  }, [slots]);
+
+  const removeSlot = useCallback((tempId: string) => {
+    setSlots((prev) => prev.filter((s) => s.tempId !== tempId));
+    setActiveConfigId((id) => (id === tempId ? null : id));
+  }, []);
+
+  const updateSlot = useCallback((tempId: string, patch: Partial<BuilderSlot>) => {
+    setSlots((prev) => prev.map((s) => (s.tempId === tempId ? { ...s, ...patch } : s)));
+  }, []);
+
+  // ── Layout change from react-grid-layout ─────────────────────────────────
+  const handleLayoutChange = useCallback((rglLayout: Layout) => {
+    setSlots((prev) =>
+      prev.map((slot) => {
+        const item = rglLayout.find((li) => li.i === slot.tempId);
+        if (!item) return slot;
+        return { ...slot, x: item.x, y: item.y, w: item.w, h: item.h };
+      })
+    );
+  }, []);
+
+  // ── Drop from palette ────────────────────────────────────────────────────
+  const handleDrop = useCallback(
+    (rglLayout: Layout, item: LayoutItem | undefined, e: Event) => {
+      const dragEvent = e as DragEvent;
+      const type = dragEvent.dataTransfer?.getData('application/x-widget-type') as WidgetType | undefined;
+      if (!type || !item) return;
+
+      const meta = WIDGET_META[type];
+      const newSlot: BuilderSlot = {
+        tempId: makeTempId(),
+        type,
+        x: item.x,
+        y: item.y,
+        w: meta?.defaultWidth ?? 2,
+        h: meta?.defaultHeight ?? 2,
         serviceId: '',
         teamId: '',
         timeRange: '24h',
         customTitle: '',
         metric: 'incidents-open',
         content: '',
-      },
-    ]);
-  };
-
-  const removeSlot = (tempId: string) => {
-    setSlots((prev) => prev.filter((s) => s.tempId !== tempId));
-  };
-
-  const duplicateSlot = (tempId: string) => {
-    setSlots((prev) => {
-      const source = prev.find((s) => s.tempId === tempId);
-      if (!source) return prev;
-      const newSlot: BuilderSlot = {
-        ...source,
-        tempId: makeSlotId(),
-        existingWidgetId: null,
-        posY: source.posY + source.height,
+        nqlQuery: '',
+        renderHint: 'table',
+        metricName: '',
+        otelEnvironment: '',
+        logSeverity: 'ERROR',
+        minDurationMs: '',
+        chartType: '',
+        unit: '',
+        colorScheme: '',
+        donut: false,
+        showDataLabels: false,
+        legendPosition: '',
+        yAxisMin: '',
+        yAxisMax: '',
+        groupBy: '',
+        thresholds: '[]',
+        bucketSize: '',
       };
-      return [...prev, newSlot];
-    });
-  };
+      setSlots((prev) => [...prev, newSlot]);
+      setDraggingType(null);
+      setActiveConfigId(newSlot.tempId);
+    },
+    []
+  );
 
-  const updateSlot = (tempId: string, patch: Partial<BuilderSlot>) => {
-    setSlots((prev) => prev.map((s) => (s.tempId === tempId ? { ...s, ...patch } : s)));
-  };
+  const handleDropDragOver = useCallback(
+    (_e: DragEvent): { w: number; h: number } | false | void => {
+      if (!draggingType) return false;
+      const meta = WIDGET_META[draggingType];
+      return { w: meta?.defaultWidth ?? 2, h: meta?.defaultHeight ?? 2 };
+    },
+    [draggingType]
+  );
 
-  /** Auto-arrange: reflows all slots into a tidy grid with no position overlaps */
+  // ── Auto-arrange ─────────────────────────────────────────────────────────
   const handleAutoArrange = () => {
-    const cols = maxCols;
-    let curX = 0;
-    let curY = 0;
-    let rowH = 0;
-    const arranged = slots.map((slot) => {
-      const w = Math.min(slot.width, cols);
-      if (curX + w > cols) {
-        curX = 0;
-        curY += rowH;
-        rowH = 0;
-      }
-      const placed = { ...slot, posX: curX, posY: curY, width: w };
-      curX += w;
-      rowH = Math.max(rowH, slot.height);
-      return placed;
-    });
-    setSlots(arranged);
+    setSlots(autoArrange(slots));
   };
 
-  /** Export: downloads current dashboard config as a JSON file */
+  // ── Export / Import JSON ─────────────────────────────────────────────────
   const handleExportJson = () => {
     const payload = {
-      version: 1,
+      version: 2,
       name,
       description,
       layout,
+      persona,
+      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
       widgets: slots.map((s) => ({
         type: s.type,
-        posX: s.posX,
-        posY: s.posY,
-        width: s.width,
-        height: s.height,
+        posX: s.x,
+        posY: s.y,
+        width: s.w,
+        height: s.h,
         serviceId: s.serviceId || null,
         teamId: s.teamId || null,
         timeRange: s.timeRange || null,
         customTitle: s.customTitle || null,
         metric: s.metric || null,
         content: s.content || null,
+        nqlQuery: s.nqlQuery || null,
+        renderHint: s.renderHint || null,
+        metricName: s.metricName || null,
+        otelEnvironment: s.otelEnvironment || null,
+        logSeverity: s.logSeverity || null,
+        minDurationMs: s.minDurationMs ? Number(s.minDurationMs) : null,
+        chartType: s.chartType || null,
+        unit: s.unit || null,
+        colorScheme: s.colorScheme || null,
+        donut: s.donut || null,
+        showDataLabels: s.showDataLabels || null,
+        legendPosition: s.legendPosition || null,
+        yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
+        yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
+        groupBy: s.groupBy || null,
+        thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
+        bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
       })),
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -522,7 +1259,6 @@ export function DashboardBuilderPage() {
     URL.revokeObjectURL(url);
   };
 
-  /** Import: parses a JSON file and populates slots */
   const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImportError(null);
     const file = e.target.files?.[0];
@@ -531,39 +1267,59 @@ export function DashboardBuilderPage() {
     reader.onload = (ev) => {
       try {
         const json = JSON.parse(ev.target?.result as string);
-        if (!Array.isArray(json.widgets)) throw new Error('Invalid format');
+        if (!Array.isArray(json.widgets)) throw new Error('Missing widgets array');
         if (json.name) setName(json.name);
         if (json.description) setDescription(json.description);
         if (json.layout) setLayout(json.layout);
+        if (json.persona) setPersona(json.persona);
+        if (Array.isArray(json.tags)) setTags(json.tags.join(', '));
         setSlots(
-          json.widgets.map((w: Record<string, unknown>) => ({
-            tempId: makeSlotId(),
+          (json.widgets as Record<string, unknown>[]).map((w) => ({
+            tempId: makeTempId(),
             existingWidgetId: null,
             type: (w.type as WidgetType) ?? 'dora-metrics',
-            posX: Number(w.posX ?? 0),
-            posY: Number(w.posY ?? 0),
-            width: Number(w.width ?? 2),
-            height: Number(w.height ?? 2),
+            x: Number(w.posX ?? 0),
+            y: Number(w.posY ?? 0),
+            w: Number(w.width ?? 2),
+            h: Number(w.height ?? 2),
             serviceId: String(w.serviceId ?? ''),
             teamId: String(w.teamId ?? ''),
             timeRange: String(w.timeRange ?? '24h'),
             customTitle: String(w.customTitle ?? ''),
             metric: String(w.metric ?? ''),
             content: String(w.content ?? ''),
+            nqlQuery: String(w.nqlQuery ?? ''),
+            renderHint: String(w.renderHint ?? 'table'),
+            metricName: String(w.metricName ?? ''),
+            otelEnvironment: String(w.otelEnvironment ?? ''),
+            logSeverity: String(w.logSeverity ?? 'ERROR'),
+            minDurationMs: w.minDurationMs != null ? String(w.minDurationMs) : '',
+            chartType: '',
+            unit: '',
+            colorScheme: '',
+            donut: false,
+            showDataLabels: false,
+            legendPosition: '',
+            yAxisMin: '',
+            yAxisMax: '',
+            groupBy: '',
+            thresholds: '[]',
+            bucketSize: '',
           }))
         );
-      } catch {
-        setImportError(t('governance.dashboardBuilder.importError', 'Invalid dashboard JSON file.'));
+      } catch (err) {
+        setImportError(
+          t('governance.dashboardBuilder.importError', 'Invalid dashboard JSON file.')
+        );
       }
     };
     reader.readAsText(file);
-    // reset file input so the same file can be re-imported
     e.target.value = '';
   };
 
+  // ── Save ─────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     setSaveError(null);
-    setSaveSuccess(false);
     try {
       await updateMutation.mutateAsync({
         dashboardId,
@@ -571,83 +1327,124 @@ export function DashboardBuilderPage() {
         name,
         description: description || null,
         layout,
+        tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         widgets: slots.map((s) => ({
           existingWidgetId: s.existingWidgetId ?? null,
           type: s.type,
-          posX: s.posX,
-          posY: s.posY,
-          width: s.width,
-          height: s.height,
+          posX: s.x,
+          posY: s.y,
+          width: s.w,
+          height: s.h,
           serviceId: s.serviceId || null,
           teamId: s.teamId || null,
           timeRange: s.timeRange || null,
           customTitle: s.customTitle || null,
           metric: s.metric || null,
           content: s.content || null,
+          nqlQuery: s.nqlQuery || null,
+          renderHint: s.renderHint || null,
+          chartType: s.chartType || null,
+          unit: s.unit || null,
+          colorScheme: s.colorScheme || null,
+          donut: s.donut || null,
+          showDataLabels: s.showDataLabels || null,
+          legendPosition: s.legendPosition || null,
+          yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
+          yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
+          groupBy: s.groupBy || null,
+          thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
+          bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
         })),
       });
-      setSaveSuccess(true);
       navigate(`/governance/dashboards/${dashboardId}`);
     } catch {
       setSaveError(t('governance.dashboardBuilder.saveError', 'Failed to save dashboard.'));
     }
   };
 
+  // ── Guards ───────────────────────────────────────────────────────────────
   if (!dashboardId) {
-    return <PageErrorState message={t('governance.dashboardView.notFound', 'Dashboard not found')} onRetry={() => navigate('/governance/custom-dashboards')} />;
+    return (
+      <PageErrorState
+        message={t('governance.dashboardView.notFound', 'Dashboard not found')}
+        onRetry={() => navigate('/governance/custom-dashboards')}
+      />
+    );
+  }
+  if (isLoading) {
+    return <PageLoadingState message={t('governance.dashboardBuilder.loading', 'Loading dashboard editor...')} />;
+  }
+  if (isError) {
+    return <PageErrorState message={t('governance.dashboardBuilder.error', 'Failed to load dashboard')} onRetry={() => refetch()} />;
   }
 
-  if (isLoading) return <PageLoadingState message={t('governance.dashboardBuilder.loading', 'Loading dashboard editor...')} />;
-  if (isError) return <PageErrorState message={t('governance.dashboardBuilder.error', 'Failed to load dashboard')} onRetry={() => refetch()} />;
-
-  const isReadOnly = data?.isSystem;
-
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <PageContainer>
-      {/* Header */}
-      <div className="flex flex-col gap-3 mb-6">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden">
+
+      {/* ── Toolbar ────────────────────────────────────────────────────────── */}
+      <header className="shrink-0 flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm z-30">
         <Link
           to={`/governance/dashboards/${dashboardId}`}
-          className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-accent transition-colors shrink-0"
+          aria-label={t('governance.dashboardBuilder.backToView', 'Back to Dashboard')}
         >
-          <ArrowLeft size={14} />
-          {t('governance.dashboardBuilder.backToView', 'Back to Dashboard')}
+          <ArrowLeft size={16} />
         </Link>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <LayoutGrid size={20} className="text-accent" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              {t('governance.dashboardBuilder.title', 'Edit Dashboard')}
-            </h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => setShowPreview((v) => !v)}
-              aria-label={t('governance.dashboardBuilder.togglePreview', 'Toggle preview')}
+
+        {/* Inline title edit */}
+        <div className="flex-1 min-w-0">
+          {editingTitle && !isReadOnly ? (
+            <input
+              autoFocus
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => setEditingTitle(false)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === 'Escape') setEditingTitle(false); }}
+              maxLength={100}
+              className="w-full max-w-sm text-sm font-semibold bg-transparent border-b border-accent text-gray-900 dark:text-white focus:outline-none"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => !isReadOnly && setEditingTitle(true)}
+              className={`text-sm font-semibold text-gray-900 dark:text-white truncate max-w-sm text-left ${!isReadOnly ? 'hover:text-accent cursor-text' : 'cursor-default'}`}
+              title={isReadOnly ? undefined : t('governance.dashboardBuilder.clickToEditTitle', 'Click to edit title')}
             >
-              <Eye size={14} className="mr-1" />
-              {showPreview
-                ? t('governance.dashboardBuilder.hidePreview', 'Hide Preview')
-                : t('governance.dashboardBuilder.showPreview', 'Show Preview')}
-            </Button>
+              {name || t('governance.dashboardBuilder.untitled', 'Untitled Dashboard')}
+            </button>
+          )}
+        </div>
 
-            {/* Export JSON */}
-            {!isReadOnly && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleExportJson}
-                aria-label={t('governance.dashboardBuilder.exportJson', 'Export JSON')}
-              >
-                <Download size={14} className="mr-1" />
-                {t('governance.dashboardBuilder.exportJson', 'Export JSON')}
+        {isReadOnly && (
+          <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-0.5 rounded shrink-0">
+            {t('governance.dashboardBuilder.systemReadOnly', 'Read-only')}
+          </span>
+        )}
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Preview toggle */}
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setIsPreview((v) => !v)}
+            aria-label={t('governance.dashboardBuilder.togglePreview', 'Toggle preview mode')}
+          >
+            {isPreview ? <EyeOff size={13} className="mr-1" /> : <Eye size={13} className="mr-1" />}
+            {isPreview
+              ? t('governance.dashboardBuilder.editMode', 'Edit')
+              : t('governance.dashboardBuilder.previewMode', 'Preview')}
+          </Button>
+
+          {!isReadOnly && (
+            <>
+              <Button size="sm" variant="secondary" onClick={handleExportJson}>
+                <Download size={13} className="mr-1" />
+                {t('governance.dashboardBuilder.exportJson', 'Export')}
               </Button>
-            )}
 
-            {/* Import JSON — hidden file input triggered by button */}
-            {!isReadOnly && (
               <>
                 <input
                   ref={importInputRef}
@@ -657,397 +1454,166 @@ export function DashboardBuilderPage() {
                   aria-hidden="true"
                   onChange={handleImportJson}
                 />
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => importInputRef.current?.click()}
-                  aria-label={t('governance.dashboardBuilder.importJson', 'Import JSON')}
-                >
-                  <Upload size={14} className="mr-1" />
-                  {t('governance.dashboardBuilder.importJson', 'Import JSON')}
+                <Button size="sm" variant="secondary" onClick={() => importInputRef.current?.click()}>
+                  <Upload size={13} className="mr-1" />
+                  {t('governance.dashboardBuilder.importJson', 'Import')}
                 </Button>
               </>
-            )}
 
-            {/* Auto-arrange */}
-            {!isReadOnly && slots.length > 0 && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleAutoArrange}
-                aria-label={t('governance.dashboardBuilder.autoArrange', 'Auto-arrange')}
-              >
-                <Shuffle size={14} className="mr-1" />
-                {t('governance.dashboardBuilder.autoArrange', 'Auto-arrange')}
-              </Button>
-            )}
+              {slots.length > 0 && (
+                <Button size="sm" variant="secondary" onClick={handleAutoArrange}>
+                  <Shuffle size={13} className="mr-1" />
+                  {t('governance.dashboardBuilder.autoArrange', 'Auto-arrange')}
+                </Button>
+              )}
 
-            {!isReadOnly && (
               <Button onClick={handleSave} disabled={updateMutation.isPending}>
-                <Save size={14} className="mr-1" />
-                {t('governance.dashboardBuilder.save', 'Save Dashboard')}
+                <Save size={13} className="mr-1" />
+                {t('governance.dashboardBuilder.save', 'Save')}
               </Button>
-            )}
-          </div>
-        </div>
-        {isReadOnly && (
-          <p className="text-sm text-yellow-600 dark:text-yellow-400">
-            {t('governance.dashboardBuilder.systemReadOnly', 'This is a system dashboard and cannot be edited.')}
-          </p>
-        )}
-      </div>
-
-      {/* Dashboard metadata */}
-      {!isReadOnly && (
-        <Card className="mb-6">
-          <CardBody>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('governance.customDashboards.dashboardName', 'Dashboard Name')}
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={100}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('governance.customDashboards.layout', 'Layout')}
-                </label>
-                <select
-                  value={layout}
-                  onChange={(e) => setLayout(e.target.value)}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                >
-                  {LAYOUTS.map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('governance.customDashboards.description', 'Description')}
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Widget slots + live preview */}
-      {importError && (
-        <div className="mb-4 rounded border border-red-300 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm text-red-700 dark:text-red-300" role="alert">
-          {importError}
-        </div>
-      )}
-      {saveError && (
-        <div className="mb-4 rounded border border-red-300 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm text-red-700 dark:text-red-300" role="alert">
-          {saveError}
-        </div>
-      )}
-
-      <div className={`flex gap-6 ${showPreview ? 'lg:flex-row' : ''} flex-col`}>
-        {/* Left: slot editor */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-              {t('governance.dashboardBuilder.widgets', 'Widgets')} ({slots.length})
-            </h2>
-            {!isReadOnly && (
-              <Button size="sm" variant="secondary" onClick={addSlot} disabled={slots.length >= 20}>
-                <Plus size={14} className="mr-1" />
-                {t('governance.dashboardBuilder.addWidget', 'Add Widget')}
-              </Button>
-            )}
-          </div>
-
-          {slots.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center text-sm text-gray-400">
-              {t('governance.dashboardBuilder.noWidgets', 'No widgets yet. Click "Add Widget" to start building.')}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {slots.map((slot, index) => (
-                <Card key={slot.tempId}>
-                  <CardBody>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-mono text-gray-400 pt-2 w-5 shrink-0">{index + 1}</span>
-                      <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-4">
-                        {/* Widget type — visual picker */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.widgetType', 'Widget Type')}
-                          </label>
-                          <WidgetPickerPanel
-                            selected={slot.type}
-                            onSelect={(type) => {
-                              const meta = WIDGET_META[type];
-                              updateSlot(slot.tempId, {
-                                type,
-                                width: meta.defaultWidth,
-                                height: meta.defaultHeight,
-                              });
-                            }}
-                            disabled={isReadOnly}
-                          />
-                        </div>
-
-                        {/* Position */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.position', 'Position (col, row)')}
-                          </label>
-                          <div className="flex gap-1">
-                            <input
-                              type="number"
-                              min={0}
-                              max={maxCols - 1}
-                              value={slot.posX}
-                              onChange={(e) => updateSlot(slot.tempId, { posX: Number(e.target.value) })}
-                              disabled={isReadOnly}
-                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                              placeholder="Col"
-                              aria-label={t('governance.dashboardBuilder.col', 'Column')}
-                            />
-                            <input
-                              type="number"
-                              min={0}
-                              value={slot.posY}
-                              onChange={(e) => updateSlot(slot.tempId, { posY: Number(e.target.value) })}
-                              disabled={isReadOnly}
-                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                              placeholder="Row"
-                              aria-label={t('governance.dashboardBuilder.row', 'Row')}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Size */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.size', 'Size (w × h)')}
-                          </label>
-                          <div className="flex gap-1">
-                            <input
-                              type="number"
-                              min={1}
-                              max={maxCols}
-                              value={slot.width}
-                              onChange={(e) => updateSlot(slot.tempId, { width: Number(e.target.value) })}
-                              disabled={isReadOnly}
-                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                              aria-label={t('governance.dashboardBuilder.width', 'Width')}
-                            />
-                            <input
-                              type="number"
-                              min={1}
-                              value={slot.height}
-                              onChange={(e) => updateSlot(slot.tempId, { height: Number(e.target.value) })}
-                              disabled={isReadOnly}
-                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                              aria-label={t('governance.dashboardBuilder.height', 'Height')}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Size presets */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.sizePresets', 'Quick Size')}
-                          </label>
-                          <div className="flex gap-1 flex-wrap">
-                            {SIZE_PRESETS.map((preset) => {
-                              const isActive =
-                                slot.width === preset.width && slot.height === preset.height;
-                              return (
-                                <button
-                                  key={preset.label}
-                                  type="button"
-                                  onClick={() =>
-                                    updateSlot(slot.tempId, {
-                                      width: preset.width,
-                                      height: preset.height,
-                                    })
-                                  }
-                                  disabled={isReadOnly}
-                                  aria-pressed={isActive}
-                                  className={`rounded px-2 py-0.5 text-[10px] font-semibold transition-colors disabled:opacity-50 ${
-                                    isActive
-                                      ? 'bg-accent text-white'
-                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
-                                  }`}
-                                  title={`${preset.width}×${preset.height}`}
-                                >
-                                  {t(preset.labelKey, preset.label)}{' '}
-                                  <span className="font-normal opacity-70">
-                                    {preset.width}×{preset.height}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Custom title */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.customTitle', 'Custom Title')}
-                          </label>
-                          <input
-                            type="text"
-                            value={slot.customTitle}
-                            onChange={(e) => updateSlot(slot.tempId, { customTitle: e.target.value })}
-                            disabled={isReadOnly}
-                            maxLength={80}
-                            placeholder={t('governance.dashboardBuilder.customTitlePlaceholder', 'Optional override')}
-                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          />
-                        </div>
-
-                        {/* Time range override */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.timeRangeOverride', 'Time Range Override')}
-                          </label>
-                          <select
-                            value={slot.timeRange}
-                            onChange={(e) => updateSlot(slot.tempId, { timeRange: e.target.value })}
-                            disabled={isReadOnly}
-                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          >
-                            {TIME_RANGE_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {t(opt.labelKey, opt.value)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Service filter */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            {t('governance.dashboardBuilder.serviceFilter', 'Service Filter')}
-                          </label>
-                          <input
-                            type="text"
-                            value={slot.serviceId}
-                            onChange={(e) => updateSlot(slot.tempId, { serviceId: e.target.value })}
-                            disabled={isReadOnly}
-                            placeholder={t('governance.dashboardBuilder.serviceFilterPlaceholder', 'All services')}
-                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          />
-                        </div>
-
-                         {/* Stat metric selector — only for 'stat' widget type */}
-                         {slot.type === 'stat' && (
-                           <div>
-                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                               {t('governance.dashboardBuilder.statMetric', 'KPI Metric')}
-                             </label>
-                             <select
-                               value={slot.metric || 'incidents-open'}
-                               onChange={(e) => updateSlot(slot.tempId, { metric: e.target.value })}
-                               disabled={isReadOnly}
-                               className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                             >
-                               {STAT_METRIC_OPTIONS.map((opt) => (
-                                 <option key={opt.value} value={opt.value}>
-                                   {t(opt.labelKey, opt.value)}
-                                 </option>
-                               ))}
-                             </select>
-                           </div>
-                         )}
-
-                         {/* Content textarea — only for 'text-markdown' widget type */}
-                         {slot.type === 'text-markdown' && (
-                           <div className="sm:col-span-3">
-                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                               {t('governance.dashboardBuilder.textContent', 'Content (Markdown)')}
-                             </label>
-                             <textarea
-                               value={slot.content}
-                               onChange={(e) => updateSlot(slot.tempId, { content: e.target.value })}
-                               disabled={isReadOnly}
-                               rows={4}
-                               maxLength={2000}
-                               placeholder={t('governance.dashboardBuilder.textContentPlaceholder', 'Supports **bold**, *italic*, # headings, - lists, [label](url)')}
-                               className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono disabled:opacity-50 resize-y"
-                             />
-                             <p className="mt-1 text-[10px] text-gray-400">
-                               {slot.content.length}/2000
-                             </p>
-                           </div>
-                         )}
-                      </div>
-
-                      {!isReadOnly && (
-                        <div className="flex flex-col gap-1 shrink-0 mt-1">
-                          <button
-                            onClick={() => duplicateSlot(slot.tempId)}
-                            className="p-1 text-gray-400 hover:text-accent transition-colors"
-                            aria-label={t('governance.dashboardBuilder.duplicateWidget', 'Duplicate widget')}
-                            title={t('governance.dashboardBuilder.duplicateWidget', 'Duplicate widget')}
-                          >
-                            <Copy size={14} />
-                          </button>
-                          <button
-                            onClick={() => removeSlot(slot.tempId)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                            aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
+            </>
           )}
         </div>
+      </header>
 
-      {/* Right: live preview */}
-        {showPreview && (
-          <div className="lg:w-72 shrink-0">
-            <div className="sticky top-4">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                {t('governance.dashboardBuilder.previewTitle', 'Live Preview')}
-              </h2>
-              <GridPreview slots={slots} layout={layout} />
-              <p className="mt-1 text-xs text-gray-400">
-                {t('governance.dashboardBuilder.previewHint', 'Updates as you configure widgets')}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {saveSuccess && (
-        <p className="mt-4 text-sm text-green-600 dark:text-green-400">
-          {t('governance.dashboardBuilder.saveSuccess', 'Dashboard saved successfully.')}
-        </p>
-      )}
-
-      {!isReadOnly && slots.length > 0 && (
-        <div className="mt-6">
-          <Button onClick={handleSave} disabled={updateMutation.isPending}>
-            <Save size={14} className="mr-1" />
-            {t('governance.dashboardBuilder.save', 'Save Dashboard')}
-          </Button>
+      {/* ── Error banners ──────────────────────────────────────────────────── */}
+      {(saveError || importError) && (
+        <div
+          className="shrink-0 px-4 py-2 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300 flex items-center justify-between"
+          role="alert"
+        >
+          <span>{saveError ?? importError}</span>
+          <button
+            type="button"
+            onClick={() => { setSaveError(null); setImportError(null); }}
+            className="ml-3 text-red-400 hover:text-red-600"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
-    </PageContainer>
+
+      {/* ── Body (sidebar + canvas) ────────────────────────────────────────── */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+
+        {/* ── Left sidebar: palette ──────────────────────────────────────── */}
+        {!isPreview && (
+          <aside className="w-60 shrink-0 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Search */}
+            <div className="px-3 pt-3 pb-2 shrink-0">
+              <div className="relative">
+                <Search
+                  size={11}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                />
+                <input
+                  type="text"
+                  placeholder={t('governance.dashboardBuilder.searchWidgets', 'Search widgets…')}
+                  value={paletteSearch}
+                  onChange={(e) => setPaletteSearch(e.target.value)}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs pl-6 pr-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+            </div>
+
+            {/* Category tabs */}
+            <div className="px-3 pb-2 shrink-0 flex flex-wrap gap-1">
+              {WIDGET_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => setPaletteCategory(cat.value)}
+                  className={`rounded-full px-2 py-0.5 text-[9px] font-semibold transition-colors ${
+                    paletteCategory === cat.value
+                      ? 'bg-accent text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
+                  }`}
+                >
+                  {t(cat.labelKey, cat.value)}
+                </button>
+              ))}
+            </div>
+
+            {/* Widget cards */}
+            <div className="flex-1 overflow-y-auto px-3 pb-3">
+              {paletteWidgets.length === 0 ? (
+                <p className="text-xs text-gray-400 text-center py-6">
+                  {t('governance.dashboardBuilder.noWidgetsFound', 'No widgets match the filter')}
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {paletteWidgets.map((type) => {
+                    const meta = WIDGET_META[type];
+                    if (!meta) return null;
+                    return (
+                      <PaletteCard
+                        key={type}
+                        type={type}
+                        label={t(meta.labelKey, type)}
+                        meta={meta}
+                        onAdd={addWidget}
+                        onDragStart={setDraggingType}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Metadata accordion */}
+            {!isReadOnly && (
+              <div className="px-3 pb-3 shrink-0">
+                <MetaAccordion
+                  name={name}
+                  description={description}
+                  layout={layout}
+                  persona={persona}
+                  tags={tags}
+                  onChangeName={setName}
+                  onChangeDescription={setDescription}
+                  onChangeLayout={setLayout}
+                  onChangePersona={setPersona}
+                  onChangeTags={setTags}
+                />
+              </div>
+            )}
+          </aside>
+        )}
+
+        {/* ── Grid canvas ─────────────────────────────────────────────────── */}
+        <main
+          className="flex-1 overflow-auto p-4"
+          onDragLeave={() => {
+            // Reset dragging indicator when leaving the canvas entirely
+          }}
+        >
+          <GridCanvas
+            slots={slots}
+            isReadOnly={isReadOnly || isPreview}
+            isPreview={isPreview}
+            activeConfigId={activeConfigId}
+            draggingType={draggingType}
+            onLayoutChange={handleLayoutChange}
+            onDrop={handleDrop}
+            onDropDragOver={handleDropDragOver}
+            onConfigOpen={(id) => setActiveConfigId((cur) => (cur === id ? null : id))}
+            onRemove={removeSlot}
+          />
+        </main>
+      </div>
+
+      {/* ── Widget config drawer ───────────────────────────────────────────── */}
+      {activeConfigId && !isPreview && (() => {
+        const slot = slots.find((s) => s.tempId === activeConfigId);
+        if (!slot) return null;
+        return (
+          <ConfigDrawer
+            slot={slot}
+            onUpdate={(patch) => updateSlot(activeConfigId, patch)}
+            onClose={() => setActiveConfigId(null)}
+          />
+        );
+      })()}
+    </div>
   );
 }

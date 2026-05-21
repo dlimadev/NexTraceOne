@@ -140,6 +140,9 @@ public static class DependencyInjection
         // Ingestion Observability — DLQ stats da bb_dead_letter_messages para dashboard de ingestão
         services.AddScoped<IIngestionObservabilityProvider, IngestionObservabilityProvider>();
 
+        // Dashboard Observability Reader — abstracção de leitura de métricas/logs/traces/erros para widgets
+        services.AddScoped<IDashboardObservabilityReader, DashboardObservabilityReader>();
+
         // NQL Query Governance — Wave V3.2
         services.AddScoped<IQueryGovernanceService, DefaultQueryGovernanceService>();
 

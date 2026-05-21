@@ -51,6 +51,7 @@ const NQL_SOURCES = [
   'knowledge.docs',
   'finops.costs',
   'governance.teams', 'governance.domains',
+  'telemetry.logs', 'telemetry.metrics', 'telemetry.traces', 'telemetry.errors',
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────
