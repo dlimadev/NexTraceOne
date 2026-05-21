@@ -78,6 +78,11 @@ const WIDGET_ICONS: Record<string, string> = {
   'obs-traces':            '🔗',
   'obs-error-rate':        '🚦',
   'obs-service-map':       '🗺️',
+  'obs-pie-chart':         '🥧',
+  'obs-bar-gauge':         '📊',
+  'obs-heatmap-calendar':  '🗓️',
+  'obs-treemap':           '🟩',
+  'obs-histogram':         '📉',
 };
 
 function widgetIcon(type: string): string {
@@ -126,6 +131,18 @@ interface BuilderSlot {
   otelEnvironment: string;
   logSeverity: string;
   minDurationMs: string;
+  // Visualization
+  chartType: string;
+  unit: string;
+  colorScheme: string;
+  donut: boolean;
+  showDataLabels: boolean;
+  legendPosition: string;
+  yAxisMin: string;
+  yAxisMax: string;
+  groupBy: string;
+  thresholds: string;
+  bucketSize: string;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -155,6 +172,17 @@ function widgetFromSlot(w: WidgetSlot): BuilderSlot {
     otelEnvironment: '',
     logSeverity: 'ERROR',
     minDurationMs: '',
+    chartType: '',
+    unit: '',
+    colorScheme: '',
+    donut: false,
+    showDataLabels: false,
+    legendPosition: '',
+    yAxisMin: '',
+    yAxisMax: '',
+    groupBy: '',
+    thresholds: '[]',
+    bucketSize: '',
   };
 }
 
@@ -295,7 +323,10 @@ interface ConfigDrawerProps {
 
 function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
   const { t } = useTranslation();
-  const isOtel = slot.type.startsWith('obs-');
+  const isObsEnv = slot.type.startsWith('obs-');
+  const isObsLogs = slot.type === 'obs-logs';
+  const isObsTraces = slot.type === 'obs-traces';
+  const isObsMetricsType = slot.type === 'obs-metrics';
 
   return (
     <div
@@ -837,6 +868,17 @@ export function DashboardBuilderPage() {
       otelEnvironment: '',
       logSeverity: 'ERROR',
       minDurationMs: '',
+      chartType: '',
+      unit: '',
+      colorScheme: '',
+      donut: false,
+      showDataLabels: false,
+      legendPosition: '',
+      yAxisMin: '',
+      yAxisMax: '',
+      groupBy: '',
+      thresholds: '[]',
+      bucketSize: '',
     };
     setSlots((prev) => [...prev, newSlot]);
     setActiveConfigId(newSlot.tempId);
@@ -889,6 +931,17 @@ export function DashboardBuilderPage() {
         otelEnvironment: '',
         logSeverity: 'ERROR',
         minDurationMs: '',
+        chartType: '',
+        unit: '',
+        colorScheme: '',
+        donut: false,
+        showDataLabels: false,
+        legendPosition: '',
+        yAxisMin: '',
+        yAxisMax: '',
+        groupBy: '',
+        thresholds: '[]',
+        bucketSize: '',
       };
       setSlots((prev) => [...prev, newSlot]);
       setDraggingType(null);
@@ -938,6 +991,17 @@ export function DashboardBuilderPage() {
         otelEnvironment: s.otelEnvironment || null,
         logSeverity: s.logSeverity || null,
         minDurationMs: s.minDurationMs ? Number(s.minDurationMs) : null,
+        chartType: s.chartType || null,
+        unit: s.unit || null,
+        colorScheme: s.colorScheme || null,
+        donut: s.donut || null,
+        showDataLabels: s.showDataLabels || null,
+        legendPosition: s.legendPosition || null,
+        yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
+        yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
+        groupBy: s.groupBy || null,
+        thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
+        bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
       })),
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -984,6 +1048,17 @@ export function DashboardBuilderPage() {
             otelEnvironment: String(w.otelEnvironment ?? ''),
             logSeverity: String(w.logSeverity ?? 'ERROR'),
             minDurationMs: w.minDurationMs != null ? String(w.minDurationMs) : '',
+            chartType: '',
+            unit: '',
+            colorScheme: '',
+            donut: false,
+            showDataLabels: false,
+            legendPosition: '',
+            yAxisMin: '',
+            yAxisMax: '',
+            groupBy: '',
+            thresholds: '[]',
+            bucketSize: '',
           }))
         );
       } catch (err) {
@@ -1022,6 +1097,17 @@ export function DashboardBuilderPage() {
           content: s.content || null,
           nqlQuery: s.nqlQuery || null,
           renderHint: s.renderHint || null,
+          chartType: s.chartType || null,
+          unit: s.unit || null,
+          colorScheme: s.colorScheme || null,
+          donut: s.donut || null,
+          showDataLabels: s.showDataLabels || null,
+          legendPosition: s.legendPosition || null,
+          yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
+          yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
+          groupBy: s.groupBy || null,
+          thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
+          bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
         })),
       });
       navigate(`/governance/dashboards/${dashboardId}`);

@@ -35,6 +35,11 @@ export type WidgetType =
   | 'obs-traces'
   | 'obs-error-rate'
   | 'obs-service-map'
+  | 'obs-pie-chart'
+  | 'obs-bar-gauge'
+  | 'obs-heatmap-calendar'
+  | 'obs-treemap'
+  | 'obs-histogram'
   // Extended widget types used in drill routes
   | 'incident-count'
   | 'mttr-widget'
@@ -78,6 +83,11 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'obs-traces',
   'obs-error-rate',
   'obs-service-map',
+  'obs-pie-chart',
+  'obs-bar-gauge',
+  'obs-heatmap-calendar',
+  'obs-treemap',
+  'obs-histogram',
 ];
 
 export interface WidgetConfig {
@@ -99,6 +109,24 @@ export interface WidgetConfig {
   logSeverity?: string | null;
   /** Observability widget: minimum trace duration in ms */
   minDurationMs?: number | null;
+  // Visualization overrides
+  chartType?: 'line' | 'bar' | 'area' | 'step' | null;
+  fillOpacity?: number | null;
+  lineWidth?: number | null;
+  showDataLabels?: boolean | null;
+  legendPosition?: 'bottom' | 'right' | 'hidden' | null;
+  yAxisMin?: number | null;
+  yAxisMax?: number | null;
+  unit?: string | null;
+  colorScheme?: 'blue' | 'green' | 'red' | 'purple' | 'rainbow' | null;
+  // Pie/Donut specific
+  donut?: boolean | null;
+  // Thresholds (value → color mapping)
+  thresholds?: Array<{ value: number; color: string; label?: string }> | null;
+  // Data grouping
+  groupBy?: string | null;
+  // Distribution/Histogram
+  bucketSize?: number | null;
 }
 
 export interface WidgetSlot {
@@ -378,6 +406,46 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     personas: ['Architect', 'TechLead'],
     category: 'observability',
   },
+  'obs-pie-chart': {
+    type: 'obs-pie-chart',
+    labelKey: 'governance.customDashboards.widgets.obsPieChart',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'FinOps', 'Auditor'],
+    category: 'observability',
+  },
+  'obs-bar-gauge': {
+    type: 'obs-bar-gauge',
+    labelKey: 'governance.customDashboards.widgets.obsBarGauge',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'observability',
+  },
+  'obs-heatmap-calendar': {
+    type: 'obs-heatmap-calendar',
+    labelKey: 'governance.customDashboards.widgets.obsHeatmapCalendar',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'observability',
+  },
+  'obs-treemap': {
+    type: 'obs-treemap',
+    labelKey: 'governance.customDashboards.widgets.obsTreemap',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Executive', 'Architect', 'FinOps', 'TechLead'],
+    category: 'observability',
+  },
+  'obs-histogram': {
+    type: 'obs-histogram',
+    labelKey: 'governance.customDashboards.widgets.obsHistogram',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect'],
+    category: 'observability',
+  },
   // Extended widget types
   'incident-count': {
     type: 'incident-count',
@@ -550,6 +618,10 @@ export const NQL_RENDER_HINTS = [
   { value: 'area',    labelKey: 'nqlEditor.renderHintArea' },
   { value: 'stat',    labelKey: 'nqlEditor.renderHintStat' },
   { value: 'heatmap', labelKey: 'nqlEditor.renderHintHeatmap' },
+  { value: 'pie',     labelKey: 'nqlEditor.renderHintPie' },
+  { value: 'gauge',   labelKey: 'nqlEditor.renderHintGauge' },
+  { value: 'scatter', labelKey: 'nqlEditor.renderHintScatter' },
+  { value: 'treemap', labelKey: 'nqlEditor.renderHintTreemap' },
 ] as const;
 
 export type NqlRenderHint = (typeof NQL_RENDER_HINTS)[number]['value'];
