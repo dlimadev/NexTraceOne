@@ -4574,7 +4574,12 @@
         "contractCoverage": "Contract Coverage",
         "blastRadius": "Blast Radius",
         "teamHealth": "Team Health",
-        "releaseCalendar": "Release Calendar"
+        "releaseCalendar": "Release Calendar",
+        "obsMetrics": "Metrics Chart",
+        "obsLogs": "Log Stream",
+        "obsTraces": "Distributed Traces",
+        "obsErrorRate": "Error Rate",
+        "obsServiceMap": "Service Health Map"
       },
       "cloneDashboard": "Clone",
       "cloneTitle": "Clone Dashboard",

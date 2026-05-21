@@ -97,12 +97,12 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'team-health': TeamHealthWidget,
   'release-calendar': ReleaseCalendarWidget,
   'query-widget': QueryWidget,
-  // OTel observability widgets
-  'otel-metrics': OtelMetricsWidget,
-  'otel-logs': OtelLogsWidget,
-  'otel-traces': OtelTracesWidget,
-  'otel-error-rate': OtelErrorRateWidget,
-  'otel-service-map': OtelServiceMapWidget,
+  // Observability widgets
+  'obs-metrics': OtelMetricsWidget,
+  'obs-logs': OtelLogsWidget,
+  'obs-traces': OtelTracesWidget,
+  'obs-error-rate': OtelErrorRateWidget,
+  'obs-service-map': OtelServiceMapWidget,
   // Extended widget types - placeholder components
   'incident-count': StatWidget,
   'mttr-widget': StatWidget,

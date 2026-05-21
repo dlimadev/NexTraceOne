@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
@@ -71,6 +72,7 @@ public sealed class DashboardsAndDebtEndpointModule
         MapMonitorEndpoints(app);
         MapTemplatesEndpoints(app);
         MapPersonaHomeEndpoints(app);
+        MapObservabilityEndpoints(app);
     }
 
     private static void MapDashboardEndpoints(IEndpointRouteBuilder app)
@@ -637,5 +639,111 @@ public sealed class DashboardsAndDebtEndpointModule
             var result = await sender.Send(new GetPersonaHomeFeature.Query(tenantId, userId, persona), ct);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
+    }
+
+    // ── Dashboard Observability Widget Endpoints ──────────────────────────────
+    // Os widgets do frontend chamam estes endpoints — nunca os endpoints /telemetry/* brutos.
+    // O backend roteia para Elastic ou ClickHouse de forma transparente via IDashboardObservabilityReader.
+
+    private static void MapObservabilityEndpoints(IEndpointRouteBuilder app)
+    {
+        var obs = app.MapGroup("/api/v1/governance/observability");
+
+        // GET /api/v1/governance/observability/logs
+        obs.MapGet("/logs", async (
+            [FromQuery] string? serviceName,
+            [FromQuery] string? environment,
+            [FromQuery] string? severity,
+            [FromQuery] string? search,
+            [FromQuery] string? timeRange,
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            var (from, until) = ResolveTimeRange(timeRange);
+            var result = await reader.QueryLogsAsync(
+                new DashboardLogsRequest(serviceName, environment, severity, search, from, until, 200), ct);
+            return Results.Ok(result);
+        }).RequirePermission("operations:telemetry:read");
+
+        // GET /api/v1/governance/observability/metrics
+        obs.MapGet("/metrics", async (
+            [FromQuery] string metricName,
+            [FromQuery] string? serviceName,
+            [FromQuery] string? environment,
+            [FromQuery] string? timeRange,
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            var (from, until) = ResolveTimeRange(timeRange);
+            var result = await reader.QueryMetricsAsync(
+                new DashboardMetricsRequest(serviceName, environment, metricName, from, until), ct);
+            return Results.Ok(result);
+        }).RequirePermission("operations:telemetry:read");
+
+        // GET /api/v1/governance/observability/traces
+        obs.MapGet("/traces", async (
+            [FromQuery] string? serviceName,
+            [FromQuery] string? environment,
+            [FromQuery] double? minDurationMs,
+            [FromQuery] bool? hasErrors,
+            [FromQuery] string? timeRange,
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            var (from, until) = ResolveTimeRange(timeRange);
+            var result = await reader.QueryTracesAsync(
+                new DashboardTracesRequest(serviceName, environment, minDurationMs, hasErrors, from, until), ct);
+            return Results.Ok(result);
+        }).RequirePermission("operations:telemetry:read");
+
+        // GET /api/v1/governance/observability/errors
+        obs.MapGet("/errors", async (
+            [FromQuery] string? environment,
+            [FromQuery] int top,
+            [FromQuery] string? timeRange,
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            var (from, until) = ResolveTimeRange(timeRange);
+            var result = await reader.QueryTopErrorsAsync(
+                new DashboardErrorsRequest(environment, from, until, top > 0 ? top : 10), ct);
+            return Results.Ok(result);
+        }).RequirePermission("operations:telemetry:read");
+
+        // GET /api/v1/governance/observability/service-health
+        obs.MapGet("/service-health", async (
+            [FromQuery] string? environment,
+            [FromQuery] string? timeRange,
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            var (from, until) = ResolveTimeRange(timeRange);
+            var result = await reader.QueryServiceHealthAsync(
+                new DashboardServiceHealthRequest(environment, from, until), ct);
+            return Results.Ok(result);
+        }).RequirePermission("operations:telemetry:read");
+
+        // GET /api/v1/governance/observability/backend-info
+        obs.MapGet("/backend-info", async (
+            [FromServices] IDashboardObservabilityReader reader,
+            CancellationToken ct) =>
+        {
+            await Task.CompletedTask;
+            return Results.Ok(new { backendName = reader.BackendName });
+        }).RequirePermission("operations:telemetry:read");
+    }
+
+    /// <summary>Resolve um identificador de intervalo de tempo relativo em DateTimeOffset absolutos.</summary>
+    private static (DateTimeOffset from, DateTimeOffset until) ResolveTimeRange(string? timeRange)
+    {
+        var now = DateTimeOffset.UtcNow;
+        return timeRange switch
+        {
+            "1h"  => (now.AddHours(-1), now),
+            "6h"  => (now.AddHours(-6), now),
+            "7d"  => (now.AddDays(-7), now),
+            "30d" => (now.AddDays(-30), now),
+            _     => (now.AddHours(-24), now), // padrão: 24 horas
+        };
     }
 }

@@ -75,7 +75,7 @@ const PERSONAS = [
 const WIDGET_IDS = [
   'dora-metrics', 'service-scorecard', 'incident-summary', 'change-confidence',
   'cost-trend', 'reliability-slo', 'knowledge-graph', 'on-call-status',
-  'otel-metrics', 'otel-logs', 'otel-traces', 'otel-error-rate',
+  'obs-metrics', 'obs-logs', 'obs-traces', 'obs-error-rate',
 ] as const;
 
 const WIDGET_DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
@@ -87,10 +87,10 @@ const WIDGET_DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
   'reliability-slo':   { w: 2, h: 2 },
   'knowledge-graph':   { w: 3, h: 3 },
   'on-call-status':    { w: 2, h: 1 },
-  'otel-metrics':      { w: 3, h: 2 },
-  'otel-logs':         { w: 3, h: 3 },
-  'otel-traces':       { w: 3, h: 3 },
-  'otel-error-rate':   { w: 2, h: 2 },
+  'obs-metrics':       { w: 3, h: 2 },
+  'obs-logs':          { w: 3, h: 3 },
+  'obs-traces':        { w: 3, h: 3 },
+  'obs-error-rate':    { w: 2, h: 2 },
 };
 
 const PERSONA_VARIANT: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
@@ -112,10 +112,10 @@ const WIDGET_KEY_MAP: Record<string, string> = {
   'reliability-slo': 'reliabilitySlo',
   'knowledge-graph': 'knowledgeGraph',
   'on-call-status': 'onCallStatus',
-  'otel-metrics': 'otelMetrics',
-  'otel-logs': 'otelLogs',
-  'otel-traces': 'otelTraces',
-  'otel-error-rate': 'otelErrorRate',
+  'obs-metrics': 'obsMetrics',
+  'obs-logs': 'obsLogs',
+  'obs-traces': 'obsTraces',
+  'obs-error-rate': 'obsErrorRate',
 };
 
 const LIFECYCLE_COLORS: Record<string, string> = {

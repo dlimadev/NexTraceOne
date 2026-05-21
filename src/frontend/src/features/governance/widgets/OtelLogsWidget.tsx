@@ -1,11 +1,11 @@
 /**
- * OtelLogsWidget — exibe stream de logs estruturados OpenTelemetry.
- * Dados via GET /api/v1/telemetry/logs.
+ * ObsLogsWidget — exibe stream de logs estruturados.
+ * Dados via GET /api/v1/governance/observability/logs.
  * Clicar numa linha de log aplica cross-filter pelo serviço do log.
  */
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { ScrollText } from 'lucide-react';
+import { ScrollText, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
@@ -13,33 +13,18 @@ import client from '../../../api/client';
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface LogEntry {
-  id: string;
   timestamp: string;
   severity: string;
+  serviceName: string;
   message: string;
-  serviceName?: string;
+  traceId?: string;
   environment?: string;
-  attributes?: Record<string, unknown>;
 }
 
-interface LogsResponseWrapped {
-  items?: LogEntry[];
-}
-
-// ── Time range helper ──────────────────────────────────────────────────────
-
-function resolveTimeRange(timeRange: string): { from: string; until: string } {
-  const until = new Date();
-  const from = new Date(until);
-  switch (timeRange) {
-    case '1h':  from.setHours(from.getHours() - 1); break;
-    case '6h':  from.setHours(from.getHours() - 6); break;
-    case '24h': from.setHours(from.getHours() - 24); break;
-    case '7d':  from.setDate(from.getDate() - 7); break;
-    case '30d': from.setDate(from.getDate() - 30); break;
-    default:    from.setHours(from.getHours() - 24);
-  }
-  return { from: from.toISOString(), until: until.toISOString() };
+interface DashboardLogsResult {
+  entries: LogEntry[];
+  totalCount: number;
+  isBackendAvailable: boolean;
 }
 
 // ── Severity styling ───────────────────────────────────────────────────────
@@ -71,33 +56,27 @@ export function OtelLogsWidget({
   const { t } = useTranslation();
 
   const serviceName = config.serviceId ?? undefined;
-  const level = config.logSeverity ?? undefined;
-  const environment = config.otelEnvironment ?? environmentId ?? undefined;
-  const { from, until } = resolveTimeRange(timeRange);
+  const severity = config.logSeverity ?? undefined;
+  const environment = environmentId ?? config.serviceId ?? undefined;
 
   const displayTitle =
-    title ?? t('governance.customDashboards.widgets.otelLogs', 'OTel Logs');
+    title ??
+    config.customTitle ??
+    t('governance.customDashboards.widgets.obsLogs', 'Log Stream');
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['widget-otel-logs', serviceName, level, environment, timeRange],
-    queryFn: (): Promise<LogEntry[]> =>
+    queryKey: ['widget-obs-logs', serviceName, severity, environment, timeRange],
+    queryFn: (): Promise<DashboardLogsResult> =>
       client
-        .get<LogsResponseWrapped | LogEntry[]>('/telemetry/logs', {
+        .get<DashboardLogsResult>('/governance/observability/logs', {
           params: {
             serviceName,
-            level,
+            severity,
             environment,
-            from,
-            until,
-            limit: 50,
+            timeRange,
           },
         })
-        .then((r) => {
-          // API may return array directly or wrapped in { items: [...] }
-          const raw = r.data;
-          if (Array.isArray(raw)) return raw;
-          return raw.items ?? [];
-        }),
+        .then((r) => r.data),
   });
 
   return (
@@ -108,9 +87,9 @@ export function OtelLogsWidget({
         <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
           {displayTitle}
         </span>
-        {level && (
-          <span className={`ml-auto text-[9px] px-1 py-0.5 rounded font-medium ${severityBadgeClass(level)}`}>
-            {level}
+        {severity && (
+          <span className={`ml-auto text-[9px] px-1 py-0.5 rounded font-medium ${severityBadgeClass(severity)}`}>
+            {severity}
           </span>
         )}
       </div>
@@ -135,10 +114,17 @@ export function OtelLogsWidget({
             {t('common.retry', 'Retry')}
           </button>
         </div>
-      ) : (data ?? []).length === 0 ? (
+      ) : data && !data.isBackendAvailable ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('obs.backendNotConfigured', 'Backend not configured')}
+          </span>
+        </div>
+      ) : (data?.entries ?? []).length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <span className="text-xs text-gray-400 dark:text-gray-500">
-            {t('governance.otelLogs.noData', 'No log entries')}
+            {t('obs.logs.noData', 'No log entries')}
           </span>
         </div>
       ) : (
@@ -147,23 +133,23 @@ export function OtelLogsWidget({
             <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
               <tr className="text-gray-500 dark:text-gray-400">
                 <th className="text-left pb-1 pr-1.5 font-medium whitespace-nowrap">
-                  {t('governance.otelLogs.colTime', 'Time')}
+                  {t('obs.logs.colTime', 'Timestamp')}
                 </th>
                 <th className="text-left pb-1 pr-1.5 font-medium">
-                  {t('governance.otelLogs.colLevel', 'Level')}
+                  {t('obs.logs.colLevel', 'Level')}
                 </th>
                 <th className="text-left pb-1 pr-1.5 font-medium">
-                  {t('governance.otelLogs.colMessage', 'Message')}
+                  {t('obs.logs.colService', 'Service')}
                 </th>
                 <th className="text-left pb-1 font-medium">
-                  {t('governance.otelLogs.colService', 'Service')}
+                  {t('obs.logs.colMessage', 'Message')}
                 </th>
               </tr>
             </thead>
             <tbody>
-              {(data ?? []).map((entry) => (
+              {(data?.entries ?? []).map((entry, idx) => (
                 <tr
-                  key={entry.id}
+                  key={`${entry.timestamp}-${idx}`}
                   className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                   onClick={() => {
                     if (entry.serviceName && onCrossFilter) {
@@ -186,11 +172,11 @@ export function OtelLogsWidget({
                       {entry.severity.toUpperCase().slice(0, 5)}
                     </span>
                   </td>
-                  <td className="py-0.5 pr-1.5 max-w-[160px] truncate text-gray-700 dark:text-gray-300">
-                    {entry.message}
-                  </td>
-                  <td className="py-0.5 text-gray-500 dark:text-gray-400 truncate max-w-[80px]">
+                  <td className="py-0.5 pr-1.5 text-gray-500 dark:text-gray-400 truncate max-w-[80px]">
                     {entry.serviceName ?? '—'}
+                  </td>
+                  <td className="py-0.5 max-w-[160px] truncate text-gray-700 dark:text-gray-300">
+                    {entry.message}
                   </td>
                 </tr>
               ))}

@@ -1,95 +1,75 @@
 /**
- * OtelServiceMapWidget — exibe mapa de dependências entre serviços via ECharts.
- * Dados via GET /api/v1/telemetry/traces (extrai serviços únicos + adjacências)
- * e GET /api/v1/telemetry/health (informação do provider).
+ * ObsServiceMapWidget — exibe mapa de saúde de serviços via ECharts.
+ * Dados via GET /api/v1/governance/observability/service-health
+ * e GET /api/v1/governance/observability/backend-info (informação do backend).
  * Fallback para lista simples caso o ECharts não consiga renderizar.
  */
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Network, AlertCircle } from 'lucide-react';
+import { Network, AlertCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-interface TraceEntry {
-  traceId: string;
+interface ServiceHealthEntry {
   serviceName: string;
-  operationName: string;
-  durationMs: number;
-  hasErrors: boolean;
-  startTime: string;
+  healthStatus: 'healthy' | 'degraded' | 'critical';
+  errorRate: number;
+  avgLatencyMs: number;
+  traceCount: number;
 }
 
-type TracesResponse = TraceEntry[];
+interface DashboardServiceHealthResult {
+  services: ServiceHealthEntry[];
+  isBackendAvailable: boolean;
+}
 
-interface HealthResponse {
-  provider?: string;
-  status?: string;
+interface BackendInfoResponse {
+  backendName?: string;
   [key: string]: unknown;
 }
 
 interface ServiceNode {
   name: string;
-  errorCount: number;
+  healthStatus: 'healthy' | 'degraded' | 'critical';
+  errorRate: number;
   traceCount: number;
 }
 
-// ── Time range helper ──────────────────────────────────────────────────────
-
-function resolveTimeRange(timeRange: string): { from: string; until: string } {
-  const until = new Date();
-  const from = new Date(until);
-  switch (timeRange) {
-    case '1h':  from.setHours(from.getHours() - 1); break;
-    case '6h':  from.setHours(from.getHours() - 6); break;
-    case '24h': from.setHours(from.getHours() - 24); break;
-    case '7d':  from.setDate(from.getDate() - 7); break;
-    case '30d': from.setDate(from.getDate() - 30); break;
-    default:    from.setHours(from.getHours() - 24);
-  }
-  return { from: from.toISOString(), until: until.toISOString() };
-}
-
-// ── Service colour by error rate ───────────────────────────────────────────
+// ── Service colour by health status ───────────────────────────────────────
 
 function serviceNodeColor(node: ServiceNode): string {
-  if (node.traceCount === 0) return '#6b7280';
-  const errorRate = node.errorCount / node.traceCount;
-  if (errorRate > 0.1) return '#ef4444';
-  if (errorRate > 0.02) return '#f59e0b';
-  return '#10b981';
+  switch (node.healthStatus) {
+    case 'critical':  return '#ef4444';
+    case 'degraded':  return '#f59e0b';
+    case 'healthy':   return '#10b981';
+    default: {
+      // Fallback: derive from error rate if healthStatus is unknown
+      if (node.traceCount === 0) return '#6b7280';
+      if (node.errorRate > 0.1) return '#ef4444';
+      if (node.errorRate > 0.02) return '#f59e0b';
+      return '#10b981';
+    }
+  }
 }
 
-// ── Build adjacency from traces ────────────────────────────────────────────
+// ── Build graph from service health entries ────────────────────────────────
 
-function buildGraph(traces: TraceEntry[]): {
+function buildGraph(services: ServiceHealthEntry[]): {
   nodes: ServiceNode[];
   edges: Array<{ source: string; target: string }>;
 } {
-  const serviceMap = new Map<string, ServiceNode>();
+  const nodes: ServiceNode[] = services.map((s) => ({
+    name: s.serviceName,
+    healthStatus: s.healthStatus,
+    errorRate: s.errorRate,
+    traceCount: s.traceCount,
+  }));
 
-  for (const trace of traces) {
-    const svc = trace.serviceName;
-    if (!svc) continue;
-    const existing = serviceMap.get(svc);
-    if (existing) {
-      existing.traceCount++;
-      if (trace.hasErrors) existing.errorCount++;
-    } else {
-      serviceMap.set(svc, {
-        name: svc,
-        traceCount: 1,
-        errorCount: trace.hasErrors ? 1 : 0,
-      });
-    }
-  }
-
-  const nodes = Array.from(serviceMap.values());
-
-  // Build synthetic edges: consecutive unique services form a ring dependency
+  // Build synthetic edges: consecutive services form a ring dependency
   // to illustrate adjacency when no explicit call-graph data is available.
   const edges: Array<{ source: string; target: string }> = [];
   if (nodes.length >= 2) {
@@ -203,7 +183,7 @@ function ServiceMapFallbackList({ nodes }: { nodes: ServiceNode[] }): React.Reac
     <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-1">
       {nodes.length === 0 ? (
         <span className="text-xs text-gray-400 dark:text-gray-500 self-center mt-4">
-          {t('governance.otelServiceMap.noServices', 'No services')}
+          {t('obs.serviceMap.noServices', 'No services')}
         </span>
       ) : (
         nodes.map((node) => (
@@ -220,7 +200,7 @@ function ServiceMapFallbackList({ nodes }: { nodes: ServiceNode[] }): React.Reac
               {node.name}
             </span>
             <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
-              {node.traceCount} {t('governance.otelServiceMap.traces', 'traces')}
+              {node.traceCount} {t('obs.serviceMap.traces', 'traces')}
             </span>
           </div>
         ))
@@ -239,39 +219,40 @@ export function OtelServiceMapWidget({
 }: WidgetProps): React.ReactElement {
   const { t } = useTranslation();
 
-  const environment = config.otelEnvironment ?? environmentId ?? undefined;
-  const { from, until } = resolveTimeRange(timeRange);
+  const environment = environmentId ?? config.serviceId ?? undefined;
 
   const displayTitle =
-    title ?? t('governance.customDashboards.widgets.otelServiceMap', 'Service Map');
+    title ??
+    config.customTitle ??
+    t('governance.customDashboards.widgets.obsServiceMap', 'Service Health Map');
 
-  // Fetch traces to derive service graph
+  // Fetch service health data
   const {
-    data: tracesData,
-    isLoading: tracesLoading,
-    isError: tracesError,
+    data: healthData,
+    isLoading: healthLoading,
+    isError: healthError,
     refetch,
   } = useQuery({
-    queryKey: ['widget-otel-service-map-traces', environment, timeRange],
-    queryFn: (): Promise<TracesResponse> =>
+    queryKey: ['widget-obs-service-map', environment, timeRange],
+    queryFn: (): Promise<DashboardServiceHealthResult> =>
       client
-        .get<TracesResponse>('/telemetry/traces', {
-          params: { environment, from, until, limit: 50 },
+        .get<DashboardServiceHealthResult>('/governance/observability/service-health', {
+          params: { environment, timeRange },
         })
         .then((r) => r.data),
   });
 
-  // Fetch health for provider info
-  const { data: healthData } = useQuery({
-    queryKey: ['widget-otel-health'],
-    queryFn: (): Promise<HealthResponse> =>
+  // Fetch backend info for footer label
+  const { data: backendInfo } = useQuery({
+    queryKey: ['widget-obs-backend-info'],
+    queryFn: (): Promise<BackendInfoResponse> =>
       client
-        .get<HealthResponse>('/telemetry/health')
+        .get<BackendInfoResponse>('/governance/observability/backend-info')
         .then((r) => r.data),
     staleTime: 60_000,
   });
 
-  if (tracesLoading) {
+  if (healthLoading) {
     return (
       <div className="h-full flex flex-col gap-1 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
@@ -285,7 +266,7 @@ export function OtelServiceMapWidget({
     );
   }
 
-  if (tracesError) {
+  if (healthError) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-2 p-2">
         <AlertCircle size={18} className="text-red-400" />
@@ -303,10 +284,28 @@ export function OtelServiceMapWidget({
     );
   }
 
-  const { nodes, edges } = buildGraph(tracesData ?? []);
-  const providerLabel = healthData?.provider
-    ? String(healthData.provider)
-    : null;
+  // Backend not configured — neutral info state
+  if (healthData && !healthData.isBackendAvailable) {
+    return (
+      <div className="h-full flex flex-col gap-1 p-2">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Network size={13} className="text-indigo-500 shrink-0" />
+          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+            {displayTitle}
+          </span>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('obs.backendNotConfigured', 'Backend not configured')}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  const { nodes, edges } = buildGraph(healthData?.services ?? []);
+  const backendName = backendInfo?.backendName ? String(backendInfo.backendName) : null;
 
   return (
     <div className="h-full flex flex-col gap-1 p-2">
@@ -317,7 +316,7 @@ export function OtelServiceMapWidget({
           {displayTitle}
         </span>
         <span className="ml-auto text-[10px] text-gray-400 dark:text-gray-500">
-          {nodes.length} {t('governance.otelServiceMap.services', 'services')}
+          {nodes.length} {t('obs.serviceMap.services', 'services')}
         </span>
       </div>
 
@@ -325,7 +324,7 @@ export function OtelServiceMapWidget({
       {nodes.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <span className="text-xs text-gray-400 dark:text-gray-500">
-            {t('governance.otelServiceMap.noData', 'No service data')}
+            {t('obs.serviceMap.noData', 'No service data')}
           </span>
         </div>
       ) : (
@@ -334,10 +333,10 @@ export function OtelServiceMapWidget({
         </div>
       )}
 
-      {/* Footer — provider info */}
-      {providerLabel && (
+      {/* Footer — observability backend info */}
+      {backendName && (
         <div className="shrink-0 text-[9px] text-gray-400 dark:text-gray-500 text-right">
-          {t('governance.otelServiceMap.provider', 'Provider')}: {providerLabel}
+          {t('obs.backendInfo', 'Data: {{backend}}', { backend: backendName })}
         </div>
       )}
     </div>

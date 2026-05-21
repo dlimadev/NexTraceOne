@@ -1,12 +1,13 @@
 /**
- * OtelTracesWidget — exibe lista de traces distribuídos OpenTelemetry.
- * Dados via GET /api/v1/telemetry/traces e GET /api/v1/telemetry/traces/{traceId}.
+ * ObsTracesWidget — exibe lista de traces distribuídos.
+ * Dados via GET /api/v1/governance/observability/traces
+ * e GET /api/v1/telemetry/traces/{traceId} para detalhe de spans.
  * Clicar num trace expande a vista de detalhe com spans.
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { GitBranch, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { GitBranch, ArrowLeft, CheckCircle, XCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
@@ -20,9 +21,13 @@ interface TraceEntry {
   durationMs: number;
   hasErrors: boolean;
   startTime: string;
+  spanCount: number;
 }
 
-type TracesResponse = TraceEntry[];
+interface DashboardTracesResult {
+  traces: TraceEntry[];
+  isBackendAvailable: boolean;
+}
 
 interface SpanEntry {
   spanId: string;
@@ -37,22 +42,6 @@ interface SpanEntry {
 interface TraceDetailResponse {
   traceId: string;
   spans: SpanEntry[];
-}
-
-// ── Time range helper ──────────────────────────────────────────────────────
-
-function resolveTimeRange(timeRange: string): { from: string; until: string } {
-  const until = new Date();
-  const from = new Date(until);
-  switch (timeRange) {
-    case '1h':  from.setHours(from.getHours() - 1); break;
-    case '6h':  from.setHours(from.getHours() - 6); break;
-    case '24h': from.setHours(from.getHours() - 24); break;
-    case '7d':  from.setDate(from.getDate() - 7); break;
-    case '30d': from.setDate(from.getDate() - 30); break;
-    default:    from.setHours(from.getHours() - 24);
-  }
-  return { from: from.toISOString(), until: until.toISOString() };
 }
 
 // ── Duration colour ────────────────────────────────────────────────────────
@@ -75,7 +64,7 @@ function TraceDetail({
   const { t } = useTranslation();
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['widget-otel-trace-detail', traceId],
+    queryKey: ['widget-obs-trace-detail', traceId],
     queryFn: (): Promise<TraceDetailResponse> =>
       client
         .get<TraceDetailResponse>(`/telemetry/traces/${traceId}`)
@@ -89,10 +78,10 @@ function TraceDetail({
         type="button"
         onClick={onBack}
         className="flex items-center gap-1 text-[10px] text-blue-500 hover:text-blue-400 transition-colors shrink-0"
-        aria-label={t('governance.otelTraces.backToList', 'Back to traces')}
+        aria-label={t('obs.traces.backToList', 'Back to traces')}
       >
         <ArrowLeft size={11} />
-        {t('governance.otelTraces.backToList', 'Back')}
+        {t('obs.traces.backToList', 'Back')}
       </button>
       <span className="text-[10px] font-mono text-gray-500 dark:text-gray-400 truncate shrink-0">
         {traceId}
@@ -123,13 +112,13 @@ function TraceDetail({
             <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
               <tr className="text-gray-500 dark:text-gray-400">
                 <th className="text-left pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colOperation', 'Operation')}
+                  {t('obs.traces.colOperation', 'Operation')}
                 </th>
                 <th className="text-left pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colService', 'Service')}
+                  {t('obs.traces.colService', 'Service')}
                 </th>
                 <th className="text-right pb-1 font-medium">
-                  {t('governance.otelTraces.colDuration', 'ms')}
+                  {t('obs.traces.colDuration', 'ms')}
                 </th>
               </tr>
             </thead>
@@ -144,7 +133,7 @@ function TraceDetail({
                       <XCircle
                         size={9}
                         className="inline-block mr-0.5 text-red-500 shrink-0"
-                        aria-label={t('governance.otelTraces.errorSpan', 'Error')}
+                        aria-label={t('obs.traces.errorSpan', 'Error')}
                       />
                     )}
                     {span.operationName}
@@ -177,25 +166,24 @@ export function OtelTracesWidget({
   const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
 
   const serviceName = config.serviceId ?? undefined;
-  const environment = config.otelEnvironment ?? environmentId ?? undefined;
+  const environment = environmentId ?? config.serviceId ?? undefined;
   const minDurationMs = config.minDurationMs ?? undefined;
-  const { from, until } = resolveTimeRange(timeRange);
 
   const displayTitle =
-    title ?? t('governance.customDashboards.widgets.otelTraces', 'OTel Traces');
+    title ??
+    config.customTitle ??
+    t('governance.customDashboards.widgets.obsTraces', 'Distributed Traces');
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['widget-otel-traces', serviceName, environment, minDurationMs, timeRange],
-    queryFn: (): Promise<TracesResponse> =>
+    queryKey: ['widget-obs-traces', serviceName, environment, minDurationMs, timeRange],
+    queryFn: (): Promise<DashboardTracesResult> =>
       client
-        .get<TracesResponse>('/telemetry/traces', {
+        .get<DashboardTracesResult>('/governance/observability/traces', {
           params: {
             serviceName,
             environment,
-            from,
-            until,
+            timeRange,
             minDurationMs,
-            limit: 20,
           },
         })
         .then((r) => r.data),
@@ -242,10 +230,17 @@ export function OtelTracesWidget({
             {t('common.retry', 'Retry')}
           </button>
         </div>
-      ) : (data ?? []).length === 0 ? (
+      ) : data && !data.isBackendAvailable ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('obs.backendNotConfigured', 'Backend not configured')}
+          </span>
+        </div>
+      ) : (data?.traces ?? []).length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <span className="text-xs text-gray-400 dark:text-gray-500">
-            {t('governance.otelTraces.noData', 'No traces')}
+            {t('obs.traces.noData', 'No traces')}
           </span>
         </div>
       ) : (
@@ -254,29 +249,29 @@ export function OtelTracesWidget({
             <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
               <tr className="text-gray-500 dark:text-gray-400">
                 <th className="text-left pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colId', 'Trace ID')}
+                  {t('obs.traces.colId', 'Trace ID')}
                 </th>
                 <th className="text-left pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colService', 'Service')}
+                  {t('obs.traces.colService', 'Service')}
                 </th>
                 <th className="text-left pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colOperation', 'Operation')}
+                  {t('obs.traces.colOperation', 'Operation')}
                 </th>
                 <th className="text-right pb-1 pr-1 font-medium">
-                  {t('governance.otelTraces.colDuration', 'ms')}
+                  {t('obs.traces.colDuration', 'ms')}
                 </th>
                 <th className="text-center pb-1 font-medium">
-                  {t('governance.otelTraces.colStatus', 'OK')}
+                  {t('obs.traces.colStatus', 'OK')}
                 </th>
               </tr>
             </thead>
             <tbody>
-              {(data ?? []).map((trace) => (
+              {(data?.traces ?? []).map((trace) => (
                 <tr
                   key={trace.traceId}
                   className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedTraceId(trace.traceId)}
-                  aria-label={`${t('governance.otelTraces.openTrace', 'Open trace')} ${trace.traceId}`}
+                  aria-label={`${t('obs.traces.openTrace', 'Open trace')} ${trace.traceId}`}
                 >
                   <td className="py-0.5 pr-1 font-mono text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {trace.traceId.slice(0, 8)}
@@ -295,13 +290,13 @@ export function OtelTracesWidget({
                       <XCircle
                         size={10}
                         className="inline-block text-red-500"
-                        aria-label={t('governance.otelTraces.hasErrors', 'Has errors')}
+                        aria-label={t('obs.traces.hasErrors', 'Has errors')}
                       />
                     ) : (
                       <CheckCircle
                         size={10}
                         className="inline-block text-emerald-500"
-                        aria-label={t('governance.otelTraces.ok', 'OK')}
+                        aria-label={t('obs.traces.ok', 'OK')}
                       />
                     )}
                   </td>

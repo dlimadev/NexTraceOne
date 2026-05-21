@@ -73,11 +73,11 @@ const WIDGET_ICONS: Record<string, string> = {
   'team-health':           '💪',
   'release-calendar':      '📆',
   'query-widget':          '🔍',
-  'otel-metrics':          '📡',
-  'otel-logs':             '📜',
-  'otel-traces':           '🔗',
-  'otel-error-rate':       '🚦',
-  'otel-service-map':      '🗺️',
+  'obs-metrics':           '📡',
+  'obs-logs':              '📜',
+  'obs-traces':            '🔗',
+  'obs-error-rate':        '🚦',
+  'obs-service-map':       '🗺️',
 };
 
 function widgetIcon(type: string): string {
@@ -295,7 +295,7 @@ interface ConfigDrawerProps {
 
 function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
   const { t } = useTranslation();
-  const isOtel = slot.type.startsWith('otel-');
+  const isOtel = slot.type.startsWith('obs-');
 
   return (
     <div
@@ -456,10 +456,10 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
           </>
         )}
 
-        {/* Conditional: OTel widgets */}
+        {/* Conditional: Observability widgets */}
         {isOtel && (
           <>
-            {slot.type === 'otel-metrics' && (
+            {slot.type === 'obs-metrics' && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.metricName', 'Metric Name')}
@@ -485,7 +485,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
               />
             </div>
-            {slot.type === 'otel-logs' && (
+            {slot.type === 'obs-logs' && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.logSeverity', 'Log Severity')}
@@ -501,7 +501,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 </select>
               </div>
             )}
-            {slot.type === 'otel-traces' && (
+            {slot.type === 'obs-traces' && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.minDurationMs', 'Min Duration (ms)')}

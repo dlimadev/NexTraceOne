@@ -5831,7 +5831,12 @@
         "contractCoverage": "Cobertura de Contratos",
         "blastRadius": "Blast Radius",
         "teamHealth": "Salud del Equipo",
-        "releaseCalendar": "Calendario de Releases"
+        "releaseCalendar": "Calendario de Releases",
+        "obsMetrics": "Gráfico de Métricas",
+        "obsLogs": "Stream de Logs",
+        "obsTraces": "Trazas Distribuidas",
+        "obsErrorRate": "Tasa de Errores",
+        "obsServiceMap": "Mapa de Salud de Servicios"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",

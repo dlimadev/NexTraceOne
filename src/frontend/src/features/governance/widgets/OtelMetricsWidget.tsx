@@ -1,6 +1,6 @@
 /**
- * OtelMetricsWidget — exibe série temporal de uma métrica OpenTelemetry via AreaChart.
- * Dados via GET /api/v1/telemetry/metrics.
+ * ObsMetricsWidget — exibe série temporal de uma métrica de observabilidade via AreaChart.
+ * Dados via GET /api/v1/governance/observability/metrics.
  * Suporta filtro por metricName, serviceName e environment derivados do config do widget.
  */
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Activity } from 'lucide-react';
+import { Activity, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
@@ -23,26 +23,14 @@ import client from '../../../api/client';
 interface MetricDataPoint {
   timestamp: string;
   value: number;
-  serviceName: string;
   metricName: string;
+  serviceName?: string;
 }
 
-type MetricsResponse = MetricDataPoint[];
-
-// ── Time range helper ──────────────────────────────────────────────────────
-
-function resolveTimeRange(timeRange: string): { from: string; until: string } {
-  const until = new Date();
-  const from = new Date(until);
-  switch (timeRange) {
-    case '1h':  from.setHours(from.getHours() - 1); break;
-    case '6h':  from.setHours(from.getHours() - 6); break;
-    case '24h': from.setHours(from.getHours() - 24); break;
-    case '7d':  from.setDate(from.getDate() - 7); break;
-    case '30d': from.setDate(from.getDate() - 30); break;
-    default:    from.setHours(from.getHours() - 24);
-  }
-  return { from: from.toISOString(), until: until.toISOString() };
+interface DashboardMetricsResult {
+  points: MetricDataPoint[];
+  metricName: string;
+  isBackendAvailable: boolean;
 }
 
 // ── Chart label helper ────────────────────────────────────────────────────
@@ -81,24 +69,23 @@ export function OtelMetricsWidget({
 
   const metricName = config.metricName ?? 'http.server.duration';
   const serviceName = config.serviceId ?? undefined;
-  const environment = config.otelEnvironment ?? environmentId ?? undefined;
-  const { from, until } = resolveTimeRange(timeRange);
+  const environment = environmentId ?? config.serviceId ?? 'production';
 
   const displayTitle =
     title ??
-    t('governance.customDashboards.widgets.otelMetrics', 'OTel Metrics');
+    config.customTitle ??
+    t('governance.customDashboards.widgets.obsMetrics', 'Metrics');
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['widget-otel-metrics', metricName, serviceName, environment, timeRange],
-    queryFn: (): Promise<MetricsResponse> =>
+    queryKey: ['widget-obs-metrics', metricName, serviceName, environment, timeRange],
+    queryFn: (): Promise<DashboardMetricsResult> =>
       client
-        .get<MetricsResponse>('/telemetry/metrics', {
+        .get<DashboardMetricsResult>('/governance/observability/metrics', {
           params: {
             metricName,
             serviceName,
             environment,
-            from,
-            until,
+            timeRange,
           },
         })
         .then((r) => r.data),
@@ -133,14 +120,28 @@ export function OtelMetricsWidget({
     );
   }
 
-  const points = data ?? [];
+  // Backend not configured — neutral info state
+  if (data && !data.isBackendAvailable) {
+    return (
+      <WidgetShell title={displayTitle}>
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('obs.backendNotConfigured', 'Backend not configured')}
+          </span>
+        </div>
+      </WidgetShell>
+    );
+  }
+
+  const points = data?.points ?? [];
 
   if (points.length === 0) {
     return (
       <WidgetShell title={displayTitle}>
         <div className="flex-1 flex items-center justify-center">
           <span className="text-xs text-gray-400 dark:text-gray-500">
-            {t('governance.otelMetrics.noData', 'No metric data')}
+            {t('obs.metrics.noData', 'No metric data')}
           </span>
         </div>
       </WidgetShell>
@@ -152,7 +153,7 @@ export function OtelMetricsWidget({
     value: p.value,
   }));
 
-  const subtitle = [metricName, serviceName].filter(Boolean).join(' · ');
+  const subtitle = serviceName ?? undefined;
 
   return (
     <WidgetShell title={displayTitle}>
@@ -165,7 +166,7 @@ export function OtelMetricsWidget({
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
             <defs>
-              <linearGradient id="otelMetricFill" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="obsMetricFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
               </linearGradient>
@@ -198,7 +199,7 @@ export function OtelMetricsWidget({
               dataKey="value"
               stroke="#3b82f6"
               strokeWidth={1.5}
-              fill="url(#otelMetricFill)"
+              fill="url(#obsMetricFill)"
               dot={false}
               activeDot={{ r: 3 }}
             />

@@ -1,40 +1,29 @@
 /**
- * OtelErrorRateWidget — exibe contagem de erros e top erros OpenTelemetry.
- * Dados via GET /api/v1/telemetry/errors/top.
+ * ObsErrorRateWidget — exibe contagem de erros e top erros de observabilidade.
+ * Dados via GET /api/v1/governance/observability/errors.
  * Estado verde "All Clear" quando sem erros; vermelho/laranja com erros.
  */
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-interface TopError {
+interface ErrorEntry {
   message: string;
-  count: number;
   serviceName: string;
+  count: number;
   severity: string;
+  lastSeen: string;
 }
 
-type TopErrorsResponse = TopError[];
-
-// ── Time range helper ──────────────────────────────────────────────────────
-
-function resolveTimeRange(timeRange: string): { from: string; until: string } {
-  const until = new Date();
-  const from = new Date(until);
-  switch (timeRange) {
-    case '1h':  from.setHours(from.getHours() - 1); break;
-    case '6h':  from.setHours(from.getHours() - 6); break;
-    case '24h': from.setHours(from.getHours() - 24); break;
-    case '7d':  from.setDate(from.getDate() - 7); break;
-    case '30d': from.setDate(from.getDate() - 30); break;
-    default:    from.setHours(from.getHours() - 24);
-  }
-  return { from: from.toISOString(), until: until.toISOString() };
+interface DashboardErrorsResult {
+  errors: ErrorEntry[];
+  totalErrorCount: number;
+  isBackendAvailable: boolean;
 }
 
 // ── Count bar helpers ──────────────────────────────────────────────────────
@@ -54,21 +43,21 @@ export function OtelErrorRateWidget({
 }: WidgetProps): React.ReactElement {
   const { t } = useTranslation();
 
-  const environment = config.otelEnvironment ?? environmentId ?? 'production';
-  const { from, until } = resolveTimeRange(timeRange);
+  const environment = environmentId ?? config.serviceId ?? 'production';
 
   const displayTitle =
-    title ?? t('governance.customDashboards.widgets.otelErrorRate', 'OTel Error Rate');
+    title ??
+    config.customTitle ??
+    t('governance.customDashboards.widgets.obsErrorRate', 'Error Rate');
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['widget-otel-error-rate', environment, timeRange],
-    queryFn: (): Promise<TopErrorsResponse> =>
+    queryKey: ['widget-obs-error-rate', environment, timeRange],
+    queryFn: (): Promise<DashboardErrorsResult> =>
       client
-        .get<TopErrorsResponse>('/telemetry/errors/top', {
+        .get<DashboardErrorsResult>('/governance/observability/errors', {
           params: {
             environment,
-            from,
-            until,
+            timeRange,
             top: 5,
           },
         })
@@ -111,8 +100,28 @@ export function OtelErrorRateWidget({
     );
   }
 
-  const errors = data ?? [];
-  const totalErrors = errors.reduce((sum, e) => sum + e.count, 0);
+  // Backend not configured — neutral info state
+  if (data && !data.isBackendAvailable) {
+    return (
+      <div className="h-full flex flex-col gap-2 p-2">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <AlertTriangle size={13} className="text-orange-500 shrink-0" />
+          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+            {displayTitle}
+          </span>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('obs.backendNotConfigured', 'Backend not configured')}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  const errors = data?.errors ?? [];
+  const totalErrors = data?.totalErrorCount ?? errors.reduce((sum, e) => sum + e.count, 0);
   const maxCount = Math.max(...errors.map((e) => e.count), 1);
   const hasErrors = totalErrors > 0;
 
@@ -142,19 +151,19 @@ export function OtelErrorRateWidget({
             <AlertTriangle size={14} className="text-red-500 shrink-0" />
             <span
               className="text-2xl font-bold tabular-nums text-red-600 dark:text-red-400 leading-none"
-              aria-label={t('governance.otelErrors.totalCount', 'Total error count')}
+              aria-label={t('obs.errors.totalCount', 'Total error count')}
             >
               {totalErrors.toLocaleString()}
             </span>
             <span className="text-xs text-red-500 dark:text-red-400 ml-auto">
-              {t('governance.otelErrors.errorsLabel', 'errors')}
+              {t('obs.errors.errorsLabel', 'errors')}
             </span>
           </>
         ) : (
           <>
             <CheckCircle size={14} className="text-emerald-500 shrink-0" />
             <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-              {t('governance.otelErrors.allClear', 'All Clear')}
+              {t('obs.errors.allClear', 'All Clear')}
             </span>
           </>
         )}
@@ -174,7 +183,7 @@ export function OtelErrorRateWidget({
                 </span>
                 <span
                   className="text-[10px] font-semibold tabular-nums text-red-600 dark:text-red-400 shrink-0"
-                  aria-label={`${error.count} ${t('governance.otelErrors.occurrences', 'occurrences')}`}
+                  aria-label={`${error.count} ${t('obs.errors.occurrences', 'occurrences')}`}
                 >
                   ×{error.count}
                 </span>

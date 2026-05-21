@@ -29,12 +29,12 @@ export type WidgetType =
   | 'team-health'
   | 'release-calendar'
   | 'query-widget'
-  // OTel observability widgets
-  | 'otel-metrics'
-  | 'otel-logs'
-  | 'otel-traces'
-  | 'otel-error-rate'
-  | 'otel-service-map'
+  // Observability widgets
+  | 'obs-metrics'
+  | 'obs-logs'
+  | 'obs-traces'
+  | 'obs-error-rate'
+  | 'obs-service-map'
   // Extended widget types used in drill routes
   | 'incident-count'
   | 'mttr-widget'
@@ -73,11 +73,11 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'team-health',
   'release-calendar',
   'query-widget',
-  'otel-metrics',
-  'otel-logs',
-  'otel-traces',
-  'otel-error-rate',
-  'otel-service-map',
+  'obs-metrics',
+  'obs-logs',
+  'obs-traces',
+  'obs-error-rate',
+  'obs-service-map',
 ];
 
 export interface WidgetConfig {
@@ -93,13 +93,11 @@ export interface WidgetConfig {
   nqlQuery?: string | null;
   /** QueryWidget (V3.2): render hint override (table|line|bar|area|stat|heatmap) */
   renderHint?: string | null;
-  /** OTel widget: metric name to display */
+  /** Observability widget: metric name to display */
   metricName?: string | null;
-  /** OTel widget: environment filter */
-  otelEnvironment?: string | null;
-  /** OTel widget: log severity filter (ERROR, WARN, INFO) */
+  /** Observability widget: log severity filter (ERROR, WARN, INFO) */
   logSeverity?: string | null;
-  /** OTel widget: minimum trace duration in ms */
+  /** Observability widget: minimum trace duration in ms */
   minDurationMs?: number | null;
 }
 
@@ -339,42 +337,42 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
     category: 'customQuery',
   },
-  // OTel observability widgets
-  'otel-metrics': {
-    type: 'otel-metrics',
-    labelKey: 'governance.customDashboards.widgets.otelMetrics',
+  // Observability widgets
+  'obs-metrics': {
+    type: 'obs-metrics',
+    labelKey: 'governance.customDashboards.widgets.obsMetrics',
     defaultWidth: 3,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
     category: 'observability',
   },
-  'otel-logs': {
-    type: 'otel-logs',
-    labelKey: 'governance.customDashboards.widgets.otelLogs',
+  'obs-logs': {
+    type: 'obs-logs',
+    labelKey: 'governance.customDashboards.widgets.obsLogs',
     defaultWidth: 3,
     defaultHeight: 3,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
     category: 'observability',
   },
-  'otel-traces': {
-    type: 'otel-traces',
-    labelKey: 'governance.customDashboards.widgets.otelTraces',
+  'obs-traces': {
+    type: 'obs-traces',
+    labelKey: 'governance.customDashboards.widgets.obsTraces',
     defaultWidth: 3,
     defaultHeight: 3,
     personas: ['Engineer', 'TechLead', 'Architect'],
     category: 'observability',
   },
-  'otel-error-rate': {
-    type: 'otel-error-rate',
-    labelKey: 'governance.customDashboards.widgets.otelErrorRate',
+  'obs-error-rate': {
+    type: 'obs-error-rate',
+    labelKey: 'governance.customDashboards.widgets.obsErrorRate',
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
     category: 'observability',
   },
-  'otel-service-map': {
-    type: 'otel-service-map',
-    labelKey: 'governance.customDashboards.widgets.otelServiceMap',
+  'obs-service-map': {
+    type: 'obs-service-map',
+    labelKey: 'governance.customDashboards.widgets.obsServiceMap',
     defaultWidth: 3,
     defaultHeight: 3,
     personas: ['Architect', 'TechLead'],
