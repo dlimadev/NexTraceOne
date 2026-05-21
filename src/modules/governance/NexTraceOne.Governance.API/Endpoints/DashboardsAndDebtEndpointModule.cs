@@ -47,6 +47,7 @@ using ListDashboardTemplatesFeature = NexTraceOne.Governance.Application.Feature
 using InstantiateTemplateFeature = NexTraceOne.Governance.Application.Features.InstantiateTemplate.InstantiateTemplate;
 using GetPersonaHomeFeature = NexTraceOne.Governance.Application.Features.GetPersonaHome.GetPersonaHome;
 using ListScheduledDashboardReportsFeature = NexTraceOne.Governance.Application.Features.ListScheduledDashboardReports.ListScheduledDashboardReports;
+using NexTraceOne.Governance.Application.Features.GetDashboardBatchQuery;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -209,6 +210,17 @@ public sealed class DashboardsAndDebtEndpointModule
             var result = await sender.Send(cmd, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:write");
+
+        // Batch widget query — substitui N pedidos individuais por 1 chamada agregada
+        group.MapPost("/batch-query", async (
+            GetDashboardBatchQuery.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
     }
 
     private static void MapNqlEndpoints(IEndpointRouteBuilder app)

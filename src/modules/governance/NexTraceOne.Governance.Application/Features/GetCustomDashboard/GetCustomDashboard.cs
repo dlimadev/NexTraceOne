@@ -68,7 +68,8 @@ public static class GetCustomDashboard
                 LastModifiedAt: dashboard.UpdatedAt,
                 IsShared: dashboard.IsShared,
                 IsSystem: dashboard.IsSystem,
-                TeamId: dashboard.TeamId));
+                TeamId: dashboard.TeamId,
+                Tags: dashboard.Tags));
         }
     }
 
@@ -98,5 +99,6 @@ public static class GetCustomDashboard
         DateTimeOffset LastModifiedAt,
         bool IsShared,
         bool IsSystem,
-        string? TeamId);
+        string? TeamId,
+        IReadOnlyList<string> Tags);
 }

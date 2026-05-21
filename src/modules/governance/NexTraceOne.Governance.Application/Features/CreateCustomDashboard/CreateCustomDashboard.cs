@@ -39,7 +39,8 @@ public static class CreateCustomDashboard
         IReadOnlyList<WidgetInput> Widgets,
         string Persona,
         string? TeamId = null,
-        bool IsSystem = false) : ICommand<Response>;
+        bool IsSystem = false,
+        IReadOnlyList<string>? Tags = null) : ICommand<Response>;
 
     /// <summary>Validação do comando de criação de dashboard customizado.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -96,7 +97,8 @@ public static class CreateCustomDashboard
                 userId: request.UserId,
                 now: now,
                 teamId: request.TeamId,
-                isSystem: request.IsSystem);
+                isSystem: request.IsSystem,
+                tags: request.Tags);
 
             await repository.AddAsync(dashboard, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);

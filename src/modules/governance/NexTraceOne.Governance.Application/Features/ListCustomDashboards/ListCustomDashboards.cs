@@ -51,7 +51,8 @@ public static class ListCustomDashboards
                     IsShared: d.IsShared,
                     TeamId: d.TeamId,
                     IsSystem: d.IsSystem,
-                    CreatedAt: d.CreatedAt))
+                    CreatedAt: d.CreatedAt,
+                    Tags: d.Tags))
                 .ToList();
 
             return Result<Response>.Success(new Response(
@@ -75,5 +76,6 @@ public static class ListCustomDashboards
         bool IsShared,
         string? TeamId,
         bool IsSystem,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt,
+        IReadOnlyList<string> Tags);
 }

@@ -160,6 +160,10 @@ internal sealed class DefaultQueryGovernanceService(
             NqlEntity.OperationsIncidents => SimOperationsIncidents(limit),
             NqlEntity.KnowledgeDocs => SimKnowledgeDocs(limit),
             NqlEntity.FinOpsCosts => SimFinOpsCosts(limit),
+            NqlEntity.TelemetryLogs => SimTelemetryLogs(limit),
+            NqlEntity.TelemetryMetrics => SimTelemetryMetrics(limit),
+            NqlEntity.TelemetryTraces => SimTelemetryTraces(limit),
+            NqlEntity.TelemetryErrors => SimTelemetryErrors(limit),
             _ => (new[] { "id", "name" }, Array.Empty<IReadOnlyList<object?>>())
         };
 
@@ -248,10 +252,75 @@ internal sealed class DefaultQueryGovernanceService(
         return (cols, data.Take(limit).Select(r => (IReadOnlyList<object?>)r).ToArray());
     }
 
+    private static (string[] Cols, IReadOnlyList<object?>[] Rows) SimTelemetryLogs(int limit)
+    {
+        var cols = new[] { "timestamp", "severity", "service", "message", "trace_id" };
+        var now = DateTimeOffset.UtcNow;
+        var data = new[]
+        {
+            new object?[] { now.AddMinutes(-1).ToString("o"), "ERROR", "payment-service", "Connection timeout to database", "abc123def456" },
+            new object?[] { now.AddMinutes(-3).ToString("o"), "WARN",  "user-service",    "Slow query detected (2340ms)",   "def456abc789" },
+            new object?[] { now.AddMinutes(-5).ToString("o"), "INFO",  "gateway-service", "Request processed successfully", "ghi789jkl012" },
+            new object?[] { now.AddMinutes(-7).ToString("o"), "ERROR", "payment-service", "Payment processing failed: card declined", "mno345pqr678" },
+            new object?[] { now.AddMinutes(-10).ToString("o"), "INFO", "notification-service", "Email sent to user@example.com", null },
+        };
+        return (cols, data.Take(limit).Select(r => (IReadOnlyList<object?>)r).ToArray());
+    }
+
+    private static (string[] Cols, IReadOnlyList<object?>[] Rows) SimTelemetryMetrics(int limit)
+    {
+        var cols = new[] { "timestamp", "metric_name", "service", "value", "unit" };
+        var now = DateTimeOffset.UtcNow;
+        var data = new[]
+        {
+            new object?[] { now.AddMinutes(-1).ToString("o"),  "http.server.duration", "payment-service", 124.5, "ms" },
+            new object?[] { now.AddMinutes(-2).ToString("o"),  "http.server.duration", "user-service",     89.2, "ms" },
+            new object?[] { now.AddMinutes(-3).ToString("o"),  "db.connection.pool.size", "payment-service", 12, "connections" },
+            new object?[] { now.AddMinutes(-4).ToString("o"),  "process.cpu.time",     "gateway-service",  0.34, "s" },
+            new object?[] { now.AddMinutes(-5).ToString("o"),  "http.server.request_count", "payment-service", 1450, "requests" },
+            new object?[] { now.AddMinutes(-6).ToString("o"),  "jvm.memory.used",      "user-service",  512000000, "bytes" },
+        };
+        return (cols, data.Take(limit).Select(r => (IReadOnlyList<object?>)r).ToArray());
+    }
+
+    private static (string[] Cols, IReadOnlyList<object?>[] Rows) SimTelemetryTraces(int limit)
+    {
+        var cols = new[] { "trace_id", "service", "operation", "duration_ms", "status", "start_time" };
+        var now = DateTimeOffset.UtcNow;
+        var data = new[]
+        {
+            new object?[] { "abc123def456", "payment-service", "POST /payments",       2340, "ERROR", now.AddMinutes(-1).ToString("o") },
+            new object?[] { "def456abc789", "user-service",    "GET /users/{id}",        89, "OK",    now.AddMinutes(-2).ToString("o") },
+            new object?[] { "ghi789jkl012", "gateway-service", "POST /api/v1/orders",   567, "OK",    now.AddMinutes(-3).ToString("o") },
+            new object?[] { "jkl012mno345", "analytics-service","GET /metrics/aggregate", 4521, "OK", now.AddMinutes(-5).ToString("o") },
+            new object?[] { "mno345pqr678", "payment-service", "POST /payments",       1203, "ERROR", now.AddMinutes(-8).ToString("o") },
+        };
+        return (cols, data.Take(limit).Select(r => (IReadOnlyList<object?>)r).ToArray());
+    }
+
+    private static (string[] Cols, IReadOnlyList<object?>[] Rows) SimTelemetryErrors(int limit)
+    {
+        var cols = new[] { "message", "service", "count", "severity", "last_seen" };
+        var now = DateTimeOffset.UtcNow;
+        var data = new[]
+        {
+            new object?[] { "Connection timeout to database", "payment-service", 47, "ERROR", now.AddMinutes(-1).ToString("o") },
+            new object?[] { "Payment processing failed: card declined", "payment-service", 23, "ERROR", now.AddMinutes(-8).ToString("o") },
+            new object?[] { "Slow query detected (>2000ms)", "user-service",    12, "WARN",  now.AddMinutes(-3).ToString("o") },
+            new object?[] { "Redis connection lost",          "gateway-service",  5, "ERROR", now.AddMinutes(-30).ToString("o") },
+            new object?[] { "HTTP 503 from upstream",         "analytics-service", 3, "ERROR", now.AddMinutes(-45).ToString("o") },
+        };
+        return (cols, data.Take(limit).Select(r => (IReadOnlyList<object?>)r).ToArray());
+    }
+
     private static string[] GetColumns(NqlEntity entity) => entity switch
     {
-        NqlEntity.GovernanceTeams   => ["name", "slug", "status", "member_count"],
-        NqlEntity.GovernanceDomains => ["name", "criticality", "team_count"],
-        _                           => ["id"]
+        NqlEntity.GovernanceTeams    => ["name", "slug", "status", "member_count"],
+        NqlEntity.GovernanceDomains  => ["name", "criticality", "team_count"],
+        NqlEntity.TelemetryLogs      => ["timestamp", "severity", "service", "message", "trace_id"],
+        NqlEntity.TelemetryMetrics   => ["timestamp", "metric_name", "service", "value", "unit"],
+        NqlEntity.TelemetryTraces    => ["trace_id", "service", "operation", "duration_ms", "status", "start_time"],
+        NqlEntity.TelemetryErrors    => ["message", "service", "count", "severity", "last_seen"],
+        _                            => ["id"]
     };
 }

@@ -93,6 +93,19 @@ internal sealed class CustomDashboardConfiguration : IEntityTypeConfiguration<Cu
         builder.Property(x => x.TeamId)
             .HasMaxLength(100);
 
+        // Tags: lista de strings serializada como JSONB para suporte a filtragem e categorização
+        builder.Property(x => x.Tags)
+            .HasColumnType("jsonb")
+            .HasDefaultValueSql("'[]'::jsonb")
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, _jsonOptions),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, _jsonOptions)
+                     ?? new List<string>(),
+                new ValueComparer<IReadOnlyList<string>>(
+                    (a, b) => a != null && b != null && a.SequenceEqual(b),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()));
+
         builder.Property(x => x.TenantId)
             .HasColumnName("tenant_id")
             .HasMaxLength(100)
