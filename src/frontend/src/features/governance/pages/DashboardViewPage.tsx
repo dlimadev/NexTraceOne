@@ -66,6 +66,11 @@ import { OtelLogsWidget } from '../widgets/OtelLogsWidget';
 import { OtelTracesWidget } from '../widgets/OtelTracesWidget';
 import { OtelErrorRateWidget } from '../widgets/OtelErrorRateWidget';
 import { OtelServiceMapWidget } from '../widgets/OtelServiceMapWidget';
+import { PieChartWidget } from '../widgets/PieChartWidget';
+import { BarGaugeWidget } from '../widgets/BarGaugeWidget';
+import { HeatmapCalendarWidget } from '../widgets/HeatmapCalendarWidget';
+import { TreemapWidget } from '../widgets/TreemapWidget';
+import { HistogramWidget } from '../widgets/HistogramWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -103,6 +108,11 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'obs-traces': OtelTracesWidget,
   'obs-error-rate': OtelErrorRateWidget,
   'obs-service-map': OtelServiceMapWidget,
+  'obs-pie-chart': PieChartWidget,
+  'obs-bar-gauge': BarGaugeWidget,
+  'obs-heatmap-calendar': HeatmapCalendarWidget,
+  'obs-treemap': TreemapWidget,
+  'obs-histogram': HistogramWidget,
   // Extended widget types - placeholder components
   'incident-count': StatWidget,
   'mttr-widget': StatWidget,

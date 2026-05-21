@@ -1,6 +1,19 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as RechartsTooltip,
+  Legend,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
 import client from '../../../api/client';
 import { NqlEditor, NqlResultViewer } from '../components/NqlEditor';
 import type { WidgetProps } from './WidgetRegistry';
@@ -18,6 +31,131 @@ interface NqlExecuteResponse {
   executionMs: number;
   parsedEntity: string;
   appliedLimit: number;
+}
+
+// ── Render hint palette ───────────────────────────────────────────────────
+
+const PIE_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f97316', '#14b8a6'];
+
+interface NqlResultRendererProps {
+  result: NqlExecuteResponse;
+  renderHint: string;
+}
+
+function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
+  const effectiveHint = renderHint || result.renderHint || 'table';
+
+  if (effectiveHint === 'pie') {
+    const data = result.rows
+      .map((row) => ({ name: String(row[0] ?? ''), value: Number(row[1] ?? 0) }))
+      .filter((d) => d.value > 0);
+    if (data.length === 0) return <NqlResultViewer result={result} />;
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <PieChart>
+          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+            {data.map((_, i) => (
+              <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+            ))}
+          </Pie>
+          <RechartsTooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (effectiveHint === 'gauge') {
+    const raw = result.rows[0]?.[0];
+    const val = Number(raw ?? 0);
+    const pct = Math.min(100, Math.max(0, val));
+    const color = pct >= 80 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#10b981';
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-2 py-4">
+        <span className="text-3xl font-bold text-neutral-100 tabular-nums">{val.toLocaleString()}</span>
+        {result.columns[0] && (
+          <span className="text-xs text-neutral-400">{result.columns[0]}</span>
+        )}
+        <div className="w-full max-w-[200px] h-3 rounded-full bg-neutral-800 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{ width: `${pct}%`, backgroundColor: color }}
+          />
+        </div>
+        <span className="text-xs text-neutral-500">{pct.toFixed(1)}%</span>
+      </div>
+    );
+  }
+
+  if (effectiveHint === 'scatter') {
+    const xCol = result.columns[0] ?? 'x';
+    const yCol = result.columns[1] ?? 'y';
+    const zCol = result.columns[2];
+    const data = result.rows.map((row) => ({
+      x: Number(row[0] ?? 0),
+      y: Number(row[1] ?? 0),
+      z: zCol != null ? String(row[2] ?? '') : undefined,
+    }));
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <ScatterChart>
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis dataKey="x" name={xCol} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+          <YAxis dataKey="y" name={yCol} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+          <RechartsTooltip
+            cursor={{ strokeDasharray: '3 3' }}
+            content={({ payload }) => {
+              if (!payload?.length) return null;
+              const d = payload[0]?.payload as { x: number; y: number; z?: string };
+              return (
+                <div className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-xs text-neutral-200">
+                  <p>{xCol}: {d.x}</p>
+                  <p>{yCol}: {d.y}</p>
+                  {zCol && d.z != null && <p>{zCol}: {d.z}</p>}
+                </div>
+              );
+            }}
+          />
+          <Scatter data={data} fill="#6366f1" />
+        </ScatterChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (effectiveHint === 'treemap') {
+    const data = result.rows.map((row) => ({
+      name: String(row[0] ?? ''),
+      value: Number(row[1] ?? 0),
+    })).filter((d) => d.value > 0);
+    if (data.length === 0) return <NqlResultViewer result={result} />;
+    const total = data.reduce((s, d) => s + d.value, 0);
+    return (
+      <div className="flex flex-wrap gap-1 p-2 h-full content-start overflow-hidden">
+        {data.map((item, i) => {
+          const pct = total > 0 ? (item.value / total) * 100 : 0;
+          const minW = Math.max(pct * 1.5, 10);
+          return (
+            <div
+              key={i}
+              className="flex items-center justify-center rounded text-[9px] font-medium text-white overflow-hidden"
+              style={{
+                backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
+                minWidth: `${minW}%`,
+                flexGrow: pct,
+                height: pct > 20 ? '48%' : '22%',
+                padding: '2px 4px',
+              }}
+              title={`${item.name}: ${item.value}`}
+            >
+              <span className="truncate">{item.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return <NqlResultViewer result={result} />;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -125,7 +263,7 @@ export function QueryWidget({ widgetId, config, environmentId, timeRange, title 
             </div>
           )}
 
-          {result && <NqlResultViewer result={result} />}
+          {result && <NqlResultRenderer result={result} renderHint={renderHint} />}
         </div>
       )}
 

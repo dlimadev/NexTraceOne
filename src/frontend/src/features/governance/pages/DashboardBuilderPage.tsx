@@ -488,9 +488,9 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
         )}
 
         {/* Conditional: Observability widgets */}
-        {isOtel && (
+        {isObsEnv && (
           <>
-            {slot.type === 'obs-metrics' && (
+            {isObsMetricsType && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.metricName', 'Metric Name')}
@@ -516,7 +516,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
               />
             </div>
-            {slot.type === 'obs-logs' && (
+            {isObsLogs && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.logSeverity', 'Log Severity')}
@@ -532,7 +532,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 </select>
               </div>
             )}
-            {slot.type === 'obs-traces' && (
+            {isObsTraces && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                   {t('governance.dashboardBuilder.minDurationMs', 'Min Duration (ms)')}
@@ -548,6 +548,252 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
               </div>
             )}
           </>
+        )}
+
+        {/* Visualization section for time-series obs widgets */}
+        {(slot.type === 'obs-metrics' || slot.type === 'obs-error-rate') && (
+          <>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                Visualization
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Chart Type</label>
+              <div className="flex gap-1">
+                {(['line', 'bar', 'area', 'step'] as const).map(ct => (
+                  <button
+                    key={ct}
+                    type="button"
+                    onClick={() => onUpdate({ chartType: ct })}
+                    className={`flex-1 rounded border text-xs py-1 capitalize transition-colors ${
+                      (slot.chartType || 'area') === ct
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {ct}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Min</label>
+                <input
+                  type="number"
+                  value={slot.yAxisMin}
+                  onChange={(e) => onUpdate({ yAxisMin: e.target.value })}
+                  placeholder="auto"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Max</label>
+                <input
+                  type="number"
+                  value={slot.yAxisMax}
+                  onChange={(e) => onUpdate({ yAxisMax: e.target.value })}
+                  placeholder="auto"
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <input
+                type="text"
+                value={slot.unit}
+                onChange={(e) => onUpdate({ unit: e.target.value })}
+                placeholder="ms, %, req/s, $..."
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Thresholds section */}
+        {(slot.type === 'obs-metrics' || slot.type === 'obs-error-rate' || slot.type === 'obs-bar-gauge') && (() => {
+          const thresholds: Array<{ value: number; color: string; label?: string }> = (() => {
+            try { return JSON.parse(slot.thresholds || '[]'); } catch { return []; }
+          })();
+
+          const updateThresholds = (updated: typeof thresholds) => {
+            onUpdate({ thresholds: JSON.stringify(updated) });
+          };
+
+          const THRESHOLD_COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444', '#8b5cf6', '#6366f1'];
+
+          return (
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Thresholds
+                </p>
+                <button
+                  type="button"
+                  onClick={() => updateThresholds([...thresholds, { value: 0, color: '#ef4444', label: '' }])}
+                  className="text-xs text-blue-500 hover:text-blue-400"
+                >
+                  + Add
+                </button>
+              </div>
+              {thresholds.map((threshold, i) => (
+                <div key={i} className="flex gap-1.5 items-center mb-1.5">
+                  <input
+                    type="number"
+                    value={threshold.value}
+                    onChange={(e) => {
+                      const updated = [...thresholds];
+                      updated[i] = { ...threshold, value: parseFloat(e.target.value) || 0 };
+                      updateThresholds(updated);
+                    }}
+                    className="w-16 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none"
+                    placeholder="value"
+                  />
+                  <div className="flex gap-1">
+                    {THRESHOLD_COLORS.map(color => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => {
+                          const updated = [...thresholds];
+                          updated[i] = { ...threshold, color };
+                          updateThresholds(updated);
+                        }}
+                        className={`w-5 h-5 rounded-full border-2 transition-transform ${threshold.color === color ? 'border-white scale-110' : 'border-transparent'}`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => updateThresholds(thresholds.filter((_, j) => j !== i))}
+                    className="text-gray-400 hover:text-red-400 text-xs ml-auto"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {thresholds.length === 0 && (
+                <p className="text-xs text-gray-400 italic">No thresholds configured</p>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Pie / Donut chart options */}
+        {slot.type === 'obs-pie-chart' && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Chart Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Group By</label>
+              <select
+                value={slot.groupBy || 'service'}
+                onChange={(e) => onUpdate({ groupBy: e.target.value })}
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              >
+                {['service', 'team', 'severity', 'domain'].map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="checkbox"
+                id={`donut-${slot.tempId}`}
+                checked={slot.donut}
+                onChange={(e) => onUpdate({ donut: e.target.checked })}
+                className="rounded"
+              />
+              <label htmlFor={`donut-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Donut style</label>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                type="checkbox"
+                id={`labels-${slot.tempId}`}
+                checked={slot.showDataLabels}
+                onChange={(e) => onUpdate({ showDataLabels: e.target.checked })}
+                className="rounded"
+              />
+              <label htmlFor={`labels-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Show labels</label>
+            </div>
+            <div className="mt-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Color Scheme</label>
+              <select
+                value={slot.colorScheme || 'rainbow'}
+                onChange={(e) => onUpdate({ colorScheme: e.target.value })}
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              >
+                {['rainbow', 'blue', 'green', 'red', 'purple'].map(cs => (
+                  <option key={cs} value={cs}>{cs}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Treemap and heatmap-calendar options */}
+        {(slot.type === 'obs-treemap' || slot.type === 'obs-heatmap-calendar') && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Data Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {slot.type === 'obs-treemap' ? 'Group By' : 'Metric'}
+              </label>
+              {slot.type === 'obs-treemap' ? (
+                <select
+                  value={slot.groupBy || 'service'}
+                  onChange={(e) => onUpdate({ groupBy: e.target.value })}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                >
+                  {['service', 'team', 'domain'].map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+              ) : (
+                <select
+                  value={slot.metricName || 'incidents'}
+                  onChange={(e) => onUpdate({ metricName: e.target.value })}
+                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                >
+                  {['incidents', 'deployments', 'errors', 'changes'].map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Histogram options */}
+        {slot.type === 'obs-histogram' && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Histogram Options
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bucket Size</label>
+              <input
+                type="number"
+                min={1}
+                value={slot.bucketSize}
+                onChange={(e) => onUpdate({ bucketSize: e.target.value })}
+                placeholder="50"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              />
+            </div>
+            <div className="mt-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <input
+                type="text"
+                value={slot.unit}
+                onChange={(e) => onUpdate({ unit: e.target.value })}
+                placeholder="ms"
+                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

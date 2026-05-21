@@ -76,6 +76,7 @@ const WIDGET_IDS = [
   'dora-metrics', 'service-scorecard', 'incident-summary', 'change-confidence',
   'cost-trend', 'reliability-slo', 'knowledge-graph', 'on-call-status',
   'obs-metrics', 'obs-logs', 'obs-traces', 'obs-error-rate',
+  'obs-pie-chart', 'obs-bar-gauge', 'obs-heatmap-calendar', 'obs-treemap', 'obs-histogram',
 ] as const;
 
 const WIDGET_DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
@@ -87,10 +88,15 @@ const WIDGET_DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
   'reliability-slo':   { w: 2, h: 2 },
   'knowledge-graph':   { w: 3, h: 3 },
   'on-call-status':    { w: 2, h: 1 },
-  'obs-metrics':       { w: 3, h: 2 },
-  'obs-logs':          { w: 3, h: 3 },
-  'obs-traces':        { w: 3, h: 3 },
-  'obs-error-rate':    { w: 2, h: 2 },
+  'obs-metrics':           { w: 3, h: 2 },
+  'obs-logs':              { w: 3, h: 3 },
+  'obs-traces':            { w: 3, h: 3 },
+  'obs-error-rate':        { w: 2, h: 2 },
+  'obs-pie-chart':         { w: 2, h: 2 },
+  'obs-bar-gauge':         { w: 2, h: 2 },
+  'obs-heatmap-calendar':  { w: 3, h: 2 },
+  'obs-treemap':           { w: 3, h: 2 },
+  'obs-histogram':         { w: 2, h: 2 },
 };
 
 const PERSONA_VARIANT: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
@@ -116,6 +122,11 @@ const WIDGET_KEY_MAP: Record<string, string> = {
   'obs-logs': 'obsLogs',
   'obs-traces': 'obsTraces',
   'obs-error-rate': 'obsErrorRate',
+  'obs-pie-chart': 'obsPieChart',
+  'obs-bar-gauge': 'obsBarGauge',
+  'obs-heatmap-calendar': 'obsHeatmapCalendar',
+  'obs-treemap': 'obsTreemap',
+  'obs-histogram': 'obsHistogram',
 };
 
 const LIFECYCLE_COLORS: Record<string, string> = {
