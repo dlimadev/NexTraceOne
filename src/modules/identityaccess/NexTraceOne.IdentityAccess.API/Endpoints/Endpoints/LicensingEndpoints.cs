@@ -65,6 +65,6 @@ internal static class LicensingEndpoints
         {
             var result = await sender.Send(command, ct);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous(); // Auth via API Key header processada antes deste handler
+        }).RequireAuthorization(); // Requer autenticação via API Key (X-Api-Key) ou JWT
     }
 }

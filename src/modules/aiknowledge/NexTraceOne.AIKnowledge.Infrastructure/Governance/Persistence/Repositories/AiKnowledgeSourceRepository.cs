@@ -26,16 +26,17 @@ internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context)
     public async Task PersistVectorAsync(
         AIKnowledgeSourceId sourceId, float[] embedding, CancellationToken ct)
     {
-        // Persiste o vetor na coluna pgvector via raw SQL (E-A01).
+        // Persiste o vetor na coluna pgvector via SQL parametrizado (E-A01).
         // A coluna EmbeddingVector é do tipo vector(768) — não mapeada pelo EF Core model.
-        var vectorLiteral = $"[{string.Join(",", embedding)}]";
-        var sql = $"""
+        // ExecuteSqlInterpolatedAsync converte os interpolados em parâmetros ADO.NET automaticamente.
+        var vectorLiteral = $"[{string.Join(",", embedding.Select(static f => f.ToString("G", System.Globalization.CultureInfo.InvariantCulture)))}]";
+        await context.Database.ExecuteSqlInterpolatedAsync(
+            $"""
             UPDATE aik_knowledge_sources
-            SET "EmbeddingVector" = '{vectorLiteral}'::vector
-            WHERE "Id" = '{sourceId.Value}'
-            """;
-
-        await context.Database.ExecuteSqlRawAsync(sql, ct);
+            SET "EmbeddingVector" = {vectorLiteral}::vector
+            WHERE "Id" = {sourceId.Value}
+            """,
+            ct);
     }
 
     /// <inheritdoc/>
@@ -44,16 +45,18 @@ internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context)
     {
         // Verifica se pgvector está disponível antes de usar o operador <=>.
         // Fallback silencioso: retorna lista vazia (DocumentRetrievalService usa cosine em memória).
+        // Usa parâmetros ADO.NET para prevenir SQL injection.
         try
         {
-            var vectorLiteral = $"[{string.Join(",", queryEmbedding)}]";
-            var sql = $"""
-                SELECT "Id", (1.0 - ("EmbeddingVector" <=> '{vectorLiteral}'::vector)) AS score
+            var vectorLiteral = $"[{string.Join(",", queryEmbedding.Select(static f => f.ToString("G", System.Globalization.CultureInfo.InvariantCulture)))}]";
+
+            const string sql = """
+                SELECT "Id", (1.0 - ("EmbeddingVector" <=> @vector::vector)) AS score
                 FROM aik_knowledge_sources
                 WHERE "IsActive" = true
                   AND "EmbeddingVector" IS NOT NULL
-                ORDER BY "EmbeddingVector" <=> '{vectorLiteral}'::vector
-                LIMIT {maxResults}
+                ORDER BY "EmbeddingVector" <=> @vector::vector
+                LIMIT @maxResults
                 """;
 
             var results = new List<(AIKnowledgeSourceId, double)>();
@@ -63,6 +66,16 @@ internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context)
 
             if (command.Connection!.State != System.Data.ConnectionState.Open)
                 await command.Connection.OpenAsync(ct);
+
+            var vectorParam = command.CreateParameter();
+            vectorParam.ParameterName = "vector";
+            vectorParam.Value = vectorLiteral;
+            command.Parameters.Add(vectorParam);
+
+            var limitParam = command.CreateParameter();
+            limitParam.ParameterName = "maxResults";
+            limitParam.Value = maxResults;
+            command.Parameters.Add(limitParam);
 
             await using var reader = await command.ExecuteReaderAsync(ct);
             while (await reader.ReadAsync(ct))

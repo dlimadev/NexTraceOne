@@ -19,7 +19,7 @@ public static class IdentityErrors
 
     /// <summary>Conta bloqueada por tentativas inválidas.</summary>
     public static Error AccountLocked(DateTimeOffset? lockoutEnd)
-        => Error.Forbidden("Identity.Auth.AccountLocked", "The account is locked until '{0:O}'.", lockoutEnd ?? DateTimeOffset.MinValue);
+        => Error.Forbidden("Identity.Auth.AccountLocked", "The account is temporarily locked due to excessive failed attempts. Please try again later.");
 
     /// <summary>Conta desativada.</summary>
     public static Error AccountDeactivated(Guid userId)
