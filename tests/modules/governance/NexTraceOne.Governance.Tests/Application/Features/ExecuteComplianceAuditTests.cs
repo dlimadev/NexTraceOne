@@ -62,7 +62,9 @@ public sealed class ExecuteComplianceAuditTests
         result.Value.PassedCount.Should().BeGreaterThan(0);
 
         // Only RiskReportGenerated should be published — no ComplianceGapsDetected
-        await _eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
+        await _eventBus.Received(1).PublishAsync(
+            Arg.Any<NexTraceOne.Governance.Contracts.IntegrationEvents.RiskReportGenerated>(),
+            Arg.Any<CancellationToken>());
         await _gapRepo.DidNotReceive().AddAsync(Arg.Any<ComplianceGap>(), Arg.Any<CancellationToken>());
     }
 
@@ -210,7 +212,12 @@ public sealed class ExecuteComplianceAuditTests
         result.Value.FailedCount.Should().Be(2);
 
         // Both ComplianceGapsDetected and RiskReportGenerated must be published
-        await _eventBus.Received(2).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
+        await _eventBus.Received(1).PublishAsync(
+            Arg.Any<NexTraceOne.Governance.Contracts.IntegrationEvents.ComplianceGapsDetected>(),
+            Arg.Any<CancellationToken>());
+        await _eventBus.Received(1).PublishAsync(
+            Arg.Any<NexTraceOne.Governance.Contracts.IntegrationEvents.RiskReportGenerated>(),
+            Arg.Any<CancellationToken>());
         await _gapRepo.Received(2).AddAsync(Arg.Any<ComplianceGap>(), Arg.Any<CancellationToken>());
     }
 }
