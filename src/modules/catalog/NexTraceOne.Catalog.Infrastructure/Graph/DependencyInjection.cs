@@ -118,13 +118,19 @@ public static class DependencyInjection
             EfVulnerabilityExposureReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
             NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
+        // ISupplyChainRiskReader — cruza ContractsDbContext (SbomRecords) + CatalogGraphDbContext (ServiceAssets)
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
-            NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
+            EfSupplyChainRiskReader>();
 
         // ── Wave AQ.2 — Code Quality & Static Analysis (EF Core real reader) ──
         // ICodeQualityRepository registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICodeQualityReader,
             EfCodeQualityReader>();
+
+        // ── Wave AE.1 — Contract Test Coverage Report (EF Core real reader) ─────
+        // Cruza ContractsDbContext (ContractVerifications, ConsumerExpectations) + CatalogGraphDbContext (ServiceAssets)
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractTestReader,
+            EfContractTestReader>();
 
         // ── Wave AQ — Data Observability & Schema Quality null readers ───────
         // IDataContractRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
@@ -133,11 +139,11 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
             NexTraceOne.Catalog.Application.Contracts.NullSchemaEvolutionSafetyReader>();
 
-        // ── Wave AR — Service Topology Intelligence null readers ─────────────
+        // ── Wave AR — Service Topology Intelligence (EF Core real readers) ──────
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IServiceTopologyReader,
-            NexTraceOne.Catalog.Application.Contracts.NullServiceTopologyReader>();
+            EfServiceTopologyReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICriticalPathReader,
-            NexTraceOne.Catalog.Application.Contracts.NullCriticalPathReader>();
+            EfCriticalPathReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyVersionAlignmentReader,
             NexTraceOne.Catalog.Application.Contracts.NullDependencyVersionAlignmentReader>();
 

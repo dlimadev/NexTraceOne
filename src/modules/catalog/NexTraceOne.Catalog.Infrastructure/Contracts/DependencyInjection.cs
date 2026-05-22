@@ -118,8 +118,8 @@ public static class DependencyInjection
         // ── Wave AB.2 — Contract Lineage Report (null reader) ─────────────
         services.AddScoped<IContractVersionHistoryReader, NullContractVersionHistoryReader>();
 
-        // ── Wave AE.1 — Contract Test Coverage Report (null reader) ───────
-        services.AddScoped<IContractTestReader, NexTraceOne.Catalog.Application.Contracts.NullContractTestReader>();
+        // ── Wave AE.1 — Contract Test Coverage Report ──────────────────────
+        // EfContractTestReader registado em Graph/DependencyInjection (cruza ContractsDbContext + CatalogGraphDbContext)
 
         // ── Wave AE.2 — Schema Breaking Change Impact Report (null reader) ─
         services.AddScoped<IBreakingChangeImpactReader, NexTraceOne.Catalog.Application.Contracts.NullBreakingChangeImpactReader>();
