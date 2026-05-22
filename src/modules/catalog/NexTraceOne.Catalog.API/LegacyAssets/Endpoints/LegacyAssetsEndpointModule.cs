@@ -1,6 +1,12 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.Catalog.Domain.LegacyAssets.Enums;
+using GetLegacyImpactPropagationFeature = NexTraceOne.Catalog.Application.LegacyAssets.Features.GetLegacyImpactPropagation.GetLegacyImpactPropagation;
 
 namespace NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 
@@ -40,5 +46,19 @@ public sealed class LegacyAssetsEndpointModule
         // ── Legacy contract governance ───────────────────────────────────
         ImportCopybookLayoutEndpoint.Map(group);
         DiffCopybookVersionsEndpoint.Map(group);
+
+        // ── Análise de impacto no grafo legacy ──────────────────────────
+        group.MapGet("/{assetId:guid}/impact", async (
+            Guid assetId,
+            MainframeAssetType assetType,
+            int maxDepth,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetLegacyImpactPropagationFeature.Query(assetId, assetType, maxDepth == 0 ? 3 : maxDepth);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:legacy-assets:read");
     }
 }

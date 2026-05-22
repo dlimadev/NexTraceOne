@@ -19,7 +19,9 @@ internal sealed class ComplianceNotificationHandler(
     : IIntegrationEventHandler<IntegrationEvents.ComplianceCheckFailedIntegrationEvent>,
       IIntegrationEventHandler<IntegrationEvents.PolicyViolatedIntegrationEvent>,
       IIntegrationEventHandler<IntegrationEvents.EvidenceExpiringIntegrationEvent>,
-      IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>
+      IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>,
+      IIntegrationEventHandler<IntegrationEvents.RiskReportGenerated>,
+      IIntegrationEventHandler<IntegrationEvents.ComplianceGapsDetected>
 {
     public async Task HandleAsync(
         IntegrationEvents.ComplianceCheckFailedIntegrationEvent @event,
@@ -178,6 +180,80 @@ internal sealed class ComplianceNotificationHandler(
             SourceEntityId = @event.ServiceName,
             ActionUrl = $"/finops/budgets?service={Uri.EscapeDataString(@event.ServiceName)}",
             RequiresAction = @event.ThresholdPercent >= 90,
+            TenantId = @event.TenantId,
+            RecipientUserIds = [@event.OwnerUserId.Value],
+            PayloadJson = payload
+        }, ct);
+    }
+
+    public async Task HandleAsync(
+        IntegrationEvents.RiskReportGenerated @event,
+        CancellationToken ct = default)
+    {
+        logger.LogInformation(
+            "Processing RiskReportGenerated notification for report {ReportId}, scope {Scope}",
+            @event.ReportId, @event.Scope);
+
+        if (@event.OwnerUserId is null || @event.TenantId is null)
+        {
+            logger.LogWarning("RiskReportGenerated event missing OwnerUserId or TenantId. Skipping.");
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new { @event.ReportId, @event.Scope, GeneratedAt = @event.GeneratedAt.ToString("O") });
+
+        await notificationModule.SubmitAsync(new NotificationRequest
+        {
+            EventType = NotificationType.RiskReportGenerated,
+            Category = nameof(NotificationCategory.Compliance),
+            Severity = nameof(NotificationSeverity.Info),
+            Title = $"Risk report ready — {@event.Scope}",
+            Message = $"A new risk report for scope {@event.Scope} has been generated and is ready for review.",
+            SourceModule = "Governance",
+            SourceEntityType = "RiskReport",
+            SourceEntityId = @event.ReportId,
+            ActionUrl = $"/governance/risk/{@event.ReportId}",
+            RequiresAction = false,
+            TenantId = @event.TenantId,
+            RecipientUserIds = [@event.OwnerUserId.Value],
+            PayloadJson = payload
+        }, ct);
+    }
+
+    public async Task HandleAsync(
+        IntegrationEvents.ComplianceGapsDetected @event,
+        CancellationToken ct = default)
+    {
+        logger.LogInformation(
+            "Processing ComplianceGapsDetected notification for report {ReportId}, {GapCount} gaps",
+            @event.ReportId, @event.GapCount);
+
+        if (@event.OwnerUserId is null || @event.TenantId is null)
+        {
+            logger.LogWarning("ComplianceGapsDetected event missing OwnerUserId or TenantId. Skipping.");
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new
+        {
+            @event.ReportId,
+            @event.GapCount,
+            @event.ScopeId,
+            DetectedAt = @event.DetectedAt.ToString("O")
+        });
+
+        await notificationModule.SubmitAsync(new NotificationRequest
+        {
+            EventType = NotificationType.ComplianceGapsDetected,
+            Category = nameof(NotificationCategory.Compliance),
+            Severity = @event.GapCount >= 5 ? nameof(NotificationSeverity.Warning) : nameof(NotificationSeverity.ActionRequired),
+            Title = $"Compliance gaps detected — {@event.GapCount} gap(s)",
+            Message = $"{@event.GapCount} compliance gap(s) were detected{(@event.ScopeId is not null ? $" in scope {@event.ScopeId}" : string.Empty)}. Review and remediate promptly.",
+            SourceModule = "Governance",
+            SourceEntityType = "ComplianceAudit",
+            SourceEntityId = @event.ReportId,
+            ActionUrl = $"/governance/compliance/{@event.ReportId}",
+            RequiresAction = true,
             TenantId = @event.TenantId,
             RecipientUserIds = [@event.OwnerUserId.Value],
             PayloadJson = payload

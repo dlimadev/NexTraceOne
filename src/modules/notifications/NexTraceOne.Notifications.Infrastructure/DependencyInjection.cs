@@ -141,6 +141,8 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.PolicyViolatedIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.EvidenceExpiringIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>, ComplianceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.RiskReportGenerated>, ComplianceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.ComplianceGapsDetected>, ComplianceNotificationHandler>();
 
         // ── Change Intelligence ──
         services.AddScoped<IIntegrationEventHandler<PromotionCompletedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();

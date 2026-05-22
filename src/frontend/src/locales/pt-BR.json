@@ -3181,6 +3181,50 @@
           "description": "Number of quick actions highlighted per persona in the navigation."
         }
       }
+    },
+    "changegovernance": {
+      "rollback_pattern": {
+        "lookback_days": {
+          "name": "Padrão de Rollback: Dias de Lookback",
+          "description": "Janela de lookback em dias para análise de padrão de rollback (7–180)."
+        },
+        "serial_threshold": {
+          "name": "Padrão de Rollback: Limite Serial",
+          "description": "Contagem mínima de rollbacks para classificar um serviço como padrão 'Serial'."
+        },
+        "systemic_risk_confidence_threshold": {
+          "name": "Padrão de Rollback: Limite de Confiança de Risco Sistémico",
+          "description": "Pontuação média de confiança abaixo da qual um serviço Serial é sinalizado como risco sistémico."
+        }
+      }
+    },
+    "catalog": {
+      "service_coupling_index": {
+        "max_top_services": {
+          "name": "Índice de Acoplamento: Máximo de Serviços",
+          "description": "Número máximo de serviços a devolver em cada ranking de acoplamento."
+        },
+        "hub_threshold": {
+          "name": "Índice de Acoplamento: Limite de Serviço Hub",
+          "description": "Valor do índice de acoplamento acima do qual um serviço é classificado como Serviço Hub."
+        }
+      }
+    },
+    "operationalintelligence": {
+      "anomaly_detection": {
+        "lookback_days": {
+          "name": "Detecção de Anomalias: Dias de Lookback",
+          "description": "Janela de lookback em dias para agregação de detecção de anomalias (7–90)."
+        },
+        "max_top_services": {
+          "name": "Detecção de Anomalias: Máximo de Serviços",
+          "description": "Número máximo de serviços a devolver nos rankings de anomalias."
+        },
+        "dense_threshold": {
+          "name": "Detecção de Anomalias: Limite Denso",
+          "description": "Número mínimo de tipos de anomalias distintos para classificar um serviço como 'Denso' ou superior."
+        }
+      }
     }
   },
   "configuration": {
@@ -7603,6 +7647,54 @@
       "hint2Title": "Ver Grafo de Dependências",
       "hint3Desc": "Monitorize o estado de fiabilidade dos seus serviços",
       "hint3Title": "Verificar Saúde do Serviço"
+    },
+    "wizard": {
+      "title": "Bem-vindo ao NexTraceOne",
+      "subtitle": "Complete estes passos para configurar a sua plataforma"
+    },
+    "progress": {
+      "label": "Progresso da Configuração Inicial"
+    },
+    "step": {
+      "current": "Atual",
+      "completed": "Concluído"
+    },
+    "actions": {
+      "markComplete": "Marcar como Concluído",
+      "goToStep": "Ir para o Passo",
+      "skipAll": "Ignorar Tudo"
+    },
+    "steps": {
+      "install": {
+        "title": "Instalar Agente",
+        "description": "Instale o agente NexTraceOne no seu ambiente para começar a monitorizar"
+      },
+      "firstSignal": {
+        "title": "Primeiro Sinal",
+        "description": "Registe o seu primeiro serviço e comece a receber sinais de telemetria"
+      },
+      "registerService": {
+        "title": "Registar Serviço",
+        "description": "Adicione mais serviços ao catálogo e configure as suas dependências"
+      },
+      "addContract": {
+        "title": "Adicionar Contrato",
+        "description": "Crie contratos de API para definir interfaces entre serviços"
+      },
+      "setupSlo": {
+        "title": "Configurar SLOs",
+        "description": "Defina Objetivos de Nível de Serviço para monitorizar a fiabilidade dos serviços"
+      }
+    },
+    "messages": {
+      "stepCompleted": "Passo {{step}} concluído com sucesso!",
+      "wizardSkipped": "Assistente ignorado. Pode aceder a ele a qualquer momento a partir do menu."
+    },
+    "errors": {
+      "fetchFailed": "Falha ao carregar estado de configuração inicial",
+      "stepFailed": "Falha ao concluir o passo. Por favor tente novamente.",
+      "skipFailed": "Falha ao ignorar o assistente. Por favor tente novamente.",
+      "noStatus": "Não foi possível obter o estado de configuração inicial"
     }
   },
   "operationalNotes": {
@@ -12973,7 +13065,13 @@
     "label": "Tier Operacional",
     "set": "Definir Tier",
     "setSuccess": "Tier atualizado para {{tier}}",
-    "policy": "Política de Tier",
+    "policy": {
+      "minSlo": "SLO Mínimo (%)",
+      "minMaturity": "Pontuação Mínima de Maturidade",
+      "onCallRequired": "On-Call Obrigatório",
+      "runbookRequired": "Runbook Obrigatório",
+      "monitoringRequired": "Monitorização Obrigatória"
+    },
     "policyTitle": "Requisitos do Tier",
     "tier": {
       "Critical": "Crítico",
@@ -14700,13 +14798,13 @@
   "rollbackPatternReport": {
     "title": "Relatório de Padrão de Rollback",
     "description": "Analisa padrões de rollback por serviço para identificar problemas sistémicos de deployment.",
-    "lookbackDays": "Dias de Retrovisão",
-    "maxTopServices": "Máx. Serviços no Ranking",
+    "lookbackDays": "Dias de Lookback",
+    "maxTopServices": "Máximo de Serviços",
     "totalServicesAnalyzed": "Serviços Analisados",
     "totalReleasesInPeriod": "Releases no Período",
     "totalRollbacksInPeriod": "Rollbacks no Período",
     "globalRollbackRatePct": "Taxa Global de Rollback (%)",
-    "distribution": "Distribuição por Padrão",
+    "distribution": "Distribuição de Padrões",
     "topByRollbackRate": "Top por Taxa de Rollback",
     "topSerialServices": "Top Serviços Seriais",
     "patterns": {
@@ -14728,12 +14826,12 @@
   "serviceCouplingIndexReport": {
     "title": "Relatório de Índice de Acoplamento de Serviços",
     "description": "Analisa relações de fan-in e fan-out para identificar hub services e riscos arquiteturais.",
-    "maxTopServices": "Máx. Serviços no Ranking",
+    "maxTopServices": "Máximo de Serviços",
     "totalServicesAnalyzed": "Serviços Analisados",
-    "avgCouplingIndex": "Índice de Acoplamento Médio",
+    "avgCouplingIndex": "Índice Médio de Acoplamento",
     "isolatedServicePct": "Serviços Isolados (%)",
     "distribution": "Distribuição por Tier",
-    "topHubServices": "Top Hub Services",
+    "topHubServices": "Top Serviços Hub",
     "topHighlyCoupledServices": "Top Serviços Altamente Acoplados",
     "tiers": {
       "Isolated": "Isolado",
@@ -14753,18 +14851,18 @@
   "anomalyDetectionSummaryReport": {
     "title": "Relatório Sumário de Deteção de Anomalias",
     "description": "Agrega sinais de anomalia de 5 fontes para identificar serviços com múltiplos problemas simultâneos.",
-    "lookbackDays": "Dias de Retrovisão",
-    "maxTopServices": "Máx. Serviços no Ranking",
+    "lookbackDays": "Dias de Lookback",
+    "maxTopServices": "Máximo de Serviços",
     "totalServicesWithAnomalies": "Serviços com Anomalias",
     "multiAnomalyServices": "Serviços Multi-Anomalia",
     "topByAnomalyCount": "Top por Contagem de Anomalias",
-    "anomalyTimeline": "Timeline de Anomalias (30 dias)",
+    "anomalyTimeline": "Linha do Tempo de Anomalias (30 dias)",
     "typeDistribution": "Distribuição por Tipo de Anomalia",
     "typeLabels": {
       "wasteSignal": "Sinais de Desperdício",
-      "driftFinding": "Findings de Drift",
+      "driftFinding": "Desvios Detectados",
       "sloBreach": "Violações de SLO",
-      "chaosFailure": "Falhas de Chaos",
+      "chaosFailure": "Falhas de Caos",
       "vulnerability": "Vulnerabilidades"
     },
     "densityLevels": {

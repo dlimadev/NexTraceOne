@@ -19,6 +19,8 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestFeatureFlagState;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestSbomRecord;
+using NexTraceOne.Catalog.Application.Contracts.Features.IngestCodeQualityRecord;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetCodeQualityReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeContractHealthDashboard;
@@ -158,6 +160,11 @@ public static class DependencyInjection
 
         // ── Wave AO — Supply Chain & Dependency Provenance ─────────────────
         services.AddTransient<IValidator<IngestSbomRecord.Command>, IngestSbomRecord.Validator>();
+
+        // ── Wave AQ.2 — Code Quality & Static Analysis ─────────────────────
+        services.AddTransient<IValidator<IngestCodeQualityRecord.Command>, IngestCodeQualityRecord.Validator>();
+        services.AddTransient<IValidator<GetCodeQualityReport.Query>, GetCodeQualityReport.Validator>();
+        services.AddSingleton<ICodeQualityReader, NullCodeQualityReader>();
         services.AddTransient<IValidator<GetSbomCoverageReport.Query>, GetSbomCoverageReport.Validator>();
         services.AddTransient<IValidator<GetDependencyProvenanceReport.Query>, GetDependencyProvenanceReport.Validator>();
         services.AddTransient<IValidator<GetSupplyChainRiskReport.Query>, GetSupplyChainRiskReport.Validator>();

@@ -65,14 +65,14 @@ export function ContractPlaygroundPage() {
       await new Promise((r) => setTimeout(r, 100 + Math.random() * 200));
       const duration = Math.round(performance.now() - start);
 
-      const mockBody = contractDetail?.spec
+      const previewBody = contractDetail?.spec
         ? generateMockResponse(contractDetail.spec, request.path, request.method)
         : '{}';
 
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', 'X-Mock': 'true' },
-        body: mockBody,
+        body: previewBody,
         durationMs: duration,
       } satisfies PlaygroundResponse;
     },

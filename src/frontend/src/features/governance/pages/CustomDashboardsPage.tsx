@@ -199,9 +199,9 @@ const useDeleteDashboard = () => {
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function SharingIcon({ isShared, isSystem }: { isShared: boolean; isSystem: boolean }) {
-  if (isSystem) return <Globe size={11} className="text-blue-500" title="System dashboard" />;
-  if (isShared) return <Users size={11} className="text-green-500" title="Shared" />;
-  return <Lock size={11} className="text-gray-400" title="Private" />;
+  if (isSystem) return <Globe size={11} className="text-blue-500" aria-label="System dashboard" />;
+  if (isShared) return <Users size={11} className="text-green-500" aria-label="Shared" />;
+  return <Lock size={11} className="text-gray-400" aria-label="Private" />;
 }
 
 function DashboardCard({

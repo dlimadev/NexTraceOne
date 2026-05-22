@@ -69,6 +69,9 @@ public sealed class CatalogGraphDbContext(
     /// <summary>Vínculos entre interfaces de serviço e versões de contrato.</summary>
     public DbSet<ContractBinding> ContractBindings => Set<ContractBinding>();
 
+    /// <summary>Estado actual de deployment de cada serviço por ambiente.</summary>
+    public DbSet<AssetDeploymentState> AssetDeploymentStates => Set<AssetDeploymentState>();
+
     /// <summary>Scores de experiência do desenvolvedor por equipa e período.</summary>
     public DbSet<DxScore> DxScores => Set<DxScore>();
 

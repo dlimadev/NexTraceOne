@@ -3166,6 +3166,50 @@
           "description": "Number of quick actions highlighted per persona in the navigation."
         }
       }
+    },
+    "changegovernance": {
+      "rollback_pattern": {
+        "lookback_days": {
+          "name": "Padrão de Rollback: Dias de Lookback",
+          "description": "Janela de lookback em dias para análise de padrão de rollback (7–180)."
+        },
+        "serial_threshold": {
+          "name": "Padrão de Rollback: Limite Serial",
+          "description": "Contagem mínima de rollbacks para classificar um serviço como padrão 'Serial'."
+        },
+        "systemic_risk_confidence_threshold": {
+          "name": "Padrão de Rollback: Limite de Confiança de Risco Sistémico",
+          "description": "Pontuação média de confiança abaixo da qual um serviço Serial é sinalizado como risco sistémico."
+        }
+      }
+    },
+    "catalog": {
+      "service_coupling_index": {
+        "max_top_services": {
+          "name": "Índice de Acoplamento: Máximo de Serviços",
+          "description": "Número máximo de serviços a devolver em cada ranking de acoplamento."
+        },
+        "hub_threshold": {
+          "name": "Índice de Acoplamento: Limite de Serviço Hub",
+          "description": "Valor do índice de acoplamento acima do qual um serviço é classificado como Serviço Hub."
+        }
+      }
+    },
+    "operationalintelligence": {
+      "anomaly_detection": {
+        "lookback_days": {
+          "name": "Deteção de Anomalias: Dias de Lookback",
+          "description": "Janela de lookback em dias para agregação de deteção de anomalias (7–90)."
+        },
+        "max_top_services": {
+          "name": "Deteção de Anomalias: Máximo de Serviços",
+          "description": "Número máximo de serviços a devolver nos rankings de anomalias."
+        },
+        "dense_threshold": {
+          "name": "Deteção de Anomalias: Limite Denso",
+          "description": "Número mínimo de tipos de anomalias distintos para classificar um serviço como 'Denso' ou superior."
+        }
+      }
     }
   },
   "configuration": {
@@ -13018,7 +13062,13 @@
     "label": "Tier Operacional",
     "set": "Definir Tier",
     "setSuccess": "Tier actualizado para {{tier}}",
-    "policy": "Política de Tier",
+    "policy": {
+      "minSlo": "SLO Mínimo (%)",
+      "minMaturity": "Pontuação Mínima de Maturidade",
+      "onCallRequired": "On-Call Obrigatório",
+      "runbookRequired": "Runbook Obrigatório",
+      "monitoringRequired": "Monitorização Obrigatória"
+    },
     "policyTitle": "Requisitos do Tier",
     "tier": {
       "Critical": "Crítico",
@@ -14759,7 +14809,16 @@
       "invalidTenantId": "O ID do tenant é obrigatório.",
       "invalidLookbackDays": "Os dias de retrovisão devem estar entre 7 e 180.",
       "invalidMaxTopServices": "O número máximo de serviços deve estar entre 1 e 100."
-    }
+    },
+    "lookbackDays": "Dias de Lookback",
+    "maxTopServices": "Máximo de Serviços",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "totalReleasesInPeriod": "Releases no Período",
+    "totalRollbacksInPeriod": "Rollbacks no Período",
+    "globalRollbackRatePct": "Taxa Global de Rollback (%)",
+    "distribution": "Distribuição de Padrões",
+    "topByRollbackRate": "Top por Taxa de Rollback",
+    "topSerialServices": "Top Serviços Seriais"
   },
   "serviceCouplingIndexReport": {
     "title": "Relatório de Índice de Acoplamento de Serviços",
@@ -14777,7 +14836,14 @@
     },
     "errors": {
       "invalidMaxTopServices": "O número máximo de serviços deve estar entre 1 e 100."
-    }
+    },
+    "maxTopServices": "Máximo de Serviços",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "avgCouplingIndex": "Índice Médio de Acoplamento",
+    "isolatedServicePct": "Serviços Isolados (%)",
+    "distribution": "Distribuição por Tier",
+    "topHubServices": "Top Serviços Hub",
+    "topHighlyCoupledServices": "Top Serviços Altamente Acoplados"
   },
   "anomalyDetectionSummaryReport": {
     "title": "Relatório Sumário de Deteção de Anomalias",
@@ -14792,6 +14858,20 @@
       "invalidTenantId": "O ID do tenant é obrigatório.",
       "invalidLookbackDays": "Os dias de retrovisão devem estar entre 7 e 90.",
       "invalidMaxTopServices": "O número máximo de serviços deve estar entre 1 e 100."
+    },
+    "lookbackDays": "Dias de Lookback",
+    "maxTopServices": "Máximo de Serviços",
+    "totalServicesWithAnomalies": "Serviços com Anomalias",
+    "multiAnomalyServices": "Serviços Multi-Anomalia",
+    "topByAnomalyCount": "Top por Contagem de Anomalias",
+    "anomalyTimeline": "Linha do Tempo de Anomalias (30 dias)",
+    "typeDistribution": "Distribuição por Tipo de Anomalia",
+    "typeLabels": {
+      "wasteSignal": "Sinais de Desperdício",
+      "driftFinding": "Desvios Detectados",
+      "sloBreach": "Violações de SLO",
+      "chaosFailure": "Falhas de Caos",
+      "vulnerability": "Vulnerabilidades"
     }
   },
   "executiveDashboard": {

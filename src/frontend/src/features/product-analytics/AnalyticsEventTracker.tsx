@@ -13,7 +13,7 @@ function getOrCreateSessionId(): string {
     id = crypto.randomUUID();
   } else {
     const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
+    (crypto as Crypto).getRandomValues(array);
     id = Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
   }
 

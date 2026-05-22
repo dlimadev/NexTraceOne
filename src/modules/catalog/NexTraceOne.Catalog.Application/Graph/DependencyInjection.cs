@@ -38,6 +38,8 @@ using NexTraceOne.Catalog.Application.Services.Features.GetOnboardingHealthRepor
 using NexTraceOne.Catalog.Application.Services.Features.GetUncatalogedServicesReport;
 using NexTraceOne.Catalog.Application.Services.Features.GetCatalogHealthMaintenanceReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractDriftFromRealityReport;
+using NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessScore;
+using NexTraceOne.Catalog.Application.Graph.Features.GetPortfolioCompletenessReport;
 
 namespace NexTraceOne.Catalog.Application.Graph;
 
@@ -114,6 +116,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetUncatalogedServicesReport.Query>, GetUncatalogedServicesReport.Validator>();
         services.AddTransient<IValidator<GetContractDriftFromRealityReport.Query>, GetContractDriftFromRealityReport.Validator>();
         services.AddTransient<IValidator<GetCatalogHealthMaintenanceReport.Query>, GetCatalogHealthMaintenanceReport.Validator>();
+
+        // ── Catalog Completeness ──────────────────────────────────────────
+        services.AddTransient<IValidator<GetCatalogCompletenessScore.Query>, GetCatalogCompletenessScore.Validator>();
+        services.AddTransient<IValidator<GetPortfolioCompletenessReport.Query>, GetPortfolioCompletenessReport.Validator>();
 
         return services;
     }
