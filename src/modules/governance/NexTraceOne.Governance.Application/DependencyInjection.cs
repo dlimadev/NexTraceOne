@@ -72,6 +72,7 @@ using NexTraceOne.Governance.Application.Features.RejectGovernanceWaiver;
 using NexTraceOne.Governance.Application.Features.SimulatePolicyApplication;
 using NexTraceOne.Governance.Application.Features.TransitionEnforcementMode;
 using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
+using NexTraceOne.Governance.Application.Features.ExecuteComplianceAudit;
 using NexTraceOne.Governance.Application.Features.UpdateDomain;
 using NexTraceOne.Governance.Application.Features.UpdateGovernancePack;
 using NexTraceOne.Governance.Application.Features.UpdateTeam;
@@ -98,6 +99,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<UpdateDomain.Command>, UpdateDomain.Validator>();
         services.AddTransient<IValidator<ApproveGovernanceWaiver.Command>, ApproveGovernanceWaiver.Validator>();
         services.AddTransient<IValidator<RunComplianceChecks.Query>, RunComplianceChecks.Validator>();
+        services.AddTransient<IValidator<ExecuteComplianceAudit.Command>, ExecuteComplianceAudit.Validator>();
         services.AddTransient<IValidator<CreateGovernanceWaiver.Command>, CreateGovernanceWaiver.Validator>();
         services.AddTransient<IValidator<UpdateGovernancePack.Command>, UpdateGovernancePack.Validator>();
         services.AddTransient<IValidator<CreateDomain.Command>, CreateDomain.Validator>();

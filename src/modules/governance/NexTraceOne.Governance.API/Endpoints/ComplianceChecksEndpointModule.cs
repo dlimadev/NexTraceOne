@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using RunComplianceChecksFeature = NexTraceOne.Governance.Application.Features.RunComplianceChecks.RunComplianceChecks;
 using GetComplianceGapsFeature = NexTraceOne.Governance.Application.Features.GetComplianceGaps.GetComplianceGaps;
+using ExecuteComplianceAuditFeature = NexTraceOne.Governance.Application.Features.ExecuteComplianceAudit.ExecuteComplianceAudit;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -46,5 +47,15 @@ public sealed class ComplianceChecksEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:compliance:read");
+
+        group.MapPost("/audit", async (
+            ExecuteComplianceAuditFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/governance/risk/{r.ReportId}", localizer);
+        }).RequirePermission("governance:compliance:write");
     }
 }
