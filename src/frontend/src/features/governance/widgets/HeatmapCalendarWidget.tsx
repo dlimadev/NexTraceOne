@@ -3,7 +3,7 @@
  * Visualiza densidade de eventos (incidentes, deploys, etc.) por dia.
  * Dados via GET /api/v1/governance/observability/calendar-heatmap.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import * as echarts from 'echarts';
 import { CalendarDays } from 'lucide-react';
@@ -190,9 +190,20 @@ export function HeatmapCalendarWidget({
 
   // Referência para medir a altura do container
   const containerRef = useRef<HTMLDivElement>(null);
-  const containerHeight = containerRef.current?.clientHeight ?? 300;
-  // Modo compacto para widgets muito pequenos
+  const [containerHeight, setContainerHeight] = useState<number>(300);
   const compact = containerHeight < 160;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   if (isLoading) {
     return (
