@@ -118,6 +118,20 @@ KNOWN_DEBT_FILES=(
   "src/frontend/src/features/product-analytics/pages/PersonaUsagePage.tsx"
   "src/frontend/src/features/product-analytics/pages/ValueTrackingPage.tsx"
   "src/frontend/src/features/product-analytics/pages/JourneyFunnelPage.tsx"
+  # Governance NQL / Dashboard — honest-gap pattern (D-048 a D-054)
+  # IsSimulated mencionado em doc comments descrevendo o fallback gracioso,
+  # não em código de produção que retorna dados falsos.
+  "src/modules/governance/NexTraceOne.Governance.Infrastructure/Persistence/QueryGovernanceService.cs"
+  "src/modules/governance/NexTraceOne.Governance.Application/Features/GetWidgetDelta/GetWidgetDelta.cs"
+  "src/modules/governance/NexTraceOne.Governance.Application/Features/GetPersonaHome/GetPersonaHome.cs"
+  "src/modules/governance/NexTraceOne.Governance.Application/Features/GetDashboardLiveStream/GetDashboardLiveStream.cs"
+  "src/modules/governance/NexTraceOne.Governance.Application/Features/GetDashboardLiveStream/NullDashboardDataBridge.cs"
+  "src/modules/governance/NexTraceOne.Governance.Application/Features/ExecuteNqlQuery/ExecuteNqlQuery.cs"
+  "src/building-blocks/NexTraceOne.BuildingBlocks.Application/Nql/IQueryGovernanceService.cs"
+  # AIKnowledge NLP Routing — stubs fase-gated aguardando ML.NET / OpenAI SDK (D-055 a D-057)
+  "src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Features/NLPRouting/PromptRouting/PromptRouter.cs"
+  "src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Features/NLPRouting/Services/IntelligentRouter.cs"
+  "src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/Services/AIAgents/OpenAILLMProvider.cs"
 )
 
 # ── Funções auxiliares ─────────────────────────────────────────────────────────

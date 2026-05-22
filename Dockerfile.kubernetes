@@ -4,7 +4,7 @@
 # ============================================================================
 
 # Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
 
 # Copiar arquivos de projeto primeiro (cache de layers)
@@ -27,7 +27,7 @@ RUN dotnet publish "NexTraceOne.ApiHost.csproj" \
     /p:UseAppHost=false
 
 # Stage 2: Runtime (imagem mínima)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 
 # Security: Criar usuário não-root
 RUN addgroup -g 1000 -S appgroup && \
