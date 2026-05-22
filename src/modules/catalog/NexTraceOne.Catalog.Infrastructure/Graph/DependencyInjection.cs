@@ -101,8 +101,8 @@ public static class DependencyInjection
         // ── Wave AF.1 — Service Lifecycle Transition Report (EF Core real reader) ──
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IServiceLifecycleReader, EfServiceLifecycleReader>();
 
-        // ── Wave AD.2 — Secrets Exposure Risk Report (null reader) ───────────
-        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ISecretsExposureReader, NexTraceOne.Catalog.Application.Services.NullSecretsExposureReader>();
+        // ── Wave AD.2 — Secrets Exposure Risk Report (EF Core real reader) ──────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ISecretsExposureReader, EfSecretsExposureReader>();
 
         // ── Wave AM — EF Core real readers ────────────────────────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, EfUncatalogedServicesReader>();
@@ -146,16 +146,16 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICriticalPathReader,
             EfCriticalPathReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyVersionAlignmentReader,
-            NexTraceOne.Catalog.Application.Contracts.NullDependencyVersionAlignmentReader>();
+            EfDependencyVersionAlignmentReader>();
 
-        // ── Wave AV — Contract Lifecycle Automation null readers ─────────────
+        // ── Wave AV — Contract Lifecycle Automation EF Core real readers ─────
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationPipelineReader,
-            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationPipelineReader>();
+            EfContractDeprecationPipelineReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IApiVersionStrategyReader,
-            NexTraceOne.Catalog.Application.Contracts.NullApiVersionStrategyReader>();
+            EfApiVersionStrategyReader>();
         // IDeprecationScheduleRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationForecastReader,
-            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationForecastReader>();
+            EfContractDeprecationForecastReader>();
 
         return services;
     }
