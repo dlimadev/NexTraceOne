@@ -85,8 +85,8 @@ public static class DependencyInjection
         services.AddScoped<IServiceInterfaceRepository, ServiceInterfaceRepository>();
         services.AddScoped<IContractBindingRepository, ContractBindingRepository>();
 
-        // ── Wave AB.1 — Knowledge Relation Graph (null reader) ────────────
-        services.AddScoped<IKnowledgeRelationReader, NexTraceOne.Catalog.Application.Graph.Services.NullKnowledgeRelationReader>();
+        // ── Wave AB.1 — Knowledge Relation Graph (EF Core real reader) ──────
+        services.AddScoped<IKnowledgeRelationReader, EfKnowledgeRelationReader>();
 
         // ── Wave AC.1 — Onboarding Health Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IOnboardingHealthReader, NexTraceOne.Catalog.Application.Services.NullOnboardingHealthReader>();
@@ -98,16 +98,16 @@ public static class DependencyInjection
         // ── Wave AF.3 — Migration Progress Report (null reader) ──────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IMigrationProgressReader, NexTraceOne.Catalog.Application.Services.NullMigrationProgressReader>();
 
-        // ── Wave AF.1 — Service Lifecycle Transition Report (null reader) ────
-        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IServiceLifecycleReader, NexTraceOne.Catalog.Application.Services.NullServiceLifecycleReader>();
+        // ── Wave AF.1 — Service Lifecycle Transition Report (EF Core real reader) ──
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IServiceLifecycleReader, EfServiceLifecycleReader>();
 
         // ── Wave AD.2 — Secrets Exposure Risk Report (null reader) ───────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ISecretsExposureReader, NexTraceOne.Catalog.Application.Services.NullSecretsExposureReader>();
 
-        // ── Wave AM — null readers ─────────────────────────────────────────
-        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, NexTraceOne.Catalog.Application.Services.NullUncatalogedServicesReader>();
+        // ── Wave AM — EF Core real readers ────────────────────────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, EfUncatalogedServicesReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
-        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, EfCatalogHealthMaintenanceReader>();
 
         // ── Wave AO — Supply Chain readers ──────────────────────────────────
         // ISbomRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
