@@ -115,7 +115,7 @@ public sealed class IdentityAccessQueryFeaturesTests
         var user = User.CreateLocal(
             Email.Create("bob@corp.com"),
             FullName.Create("Bob", "Builder"),
-            HashedPassword.FromPlainText("P@ssw0rd99!"));
+            HashedPassword.FromPlainText("P@ssw0rd099!"));
         user.RegisterSuccessfulLogin(FixedNow);
 
         var tenantId = TenantId.From(Guid.NewGuid());
@@ -170,7 +170,7 @@ public sealed class IdentityAccessQueryFeaturesTests
         var user = User.CreateLocal(
             Email.Create("solo@corp.com"),
             FullName.Create("Solo", "User"),
-            HashedPassword.FromPlainText("P@ssw0rd!1"));
+            HashedPassword.FromPlainText("P@ssw0rd!!01"));
 
         var userRepo = Substitute.For<IUserRepository>();
         userRepo.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
@@ -207,11 +207,11 @@ public sealed class IdentityAccessQueryFeaturesTests
         var userA = User.CreateLocal(
             Email.Create("alice@corp.com"),
             FullName.Create("Alice", "Smith"),
-            HashedPassword.FromPlainText("P@ssw0rd!1"));
+            HashedPassword.FromPlainText("P@ssw0rd!!01"));
         var userB = User.CreateLocal(
             Email.Create("bob@corp.com"),
             FullName.Create("Bob", "Jones"),
-            HashedPassword.FromPlainText("P@ssw0rd!2"));
+            HashedPassword.FromPlainText("P@ssw0rd!!02"));
 
         var roleId = RoleId.New();
         var role = Role.CreateSystem(roleId, Role.Developer, "Dev");
@@ -335,7 +335,7 @@ public sealed class IdentityAccessQueryFeaturesTests
         var user = User.CreateLocal(
             Email.Create("sess@corp.com"),
             FullName.Create("Session", "User"),
-            HashedPassword.FromPlainText("P@ssw0rd!3"));
+            HashedPassword.FromPlainText("P@ssw0rd!!03"));
 
         var session1 = Session.Create(
             user.Id,
@@ -371,7 +371,7 @@ public sealed class IdentityAccessQueryFeaturesTests
         var user = User.CreateLocal(
             Email.Create("nosess@corp.com"),
             FullName.Create("No", "Sessions"),
-            HashedPassword.FromPlainText("P@ssw0rd!4"));
+            HashedPassword.FromPlainText("P@ssw0rd!!04"));
 
         var userRepo = Substitute.For<IUserRepository>();
         userRepo.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);

@@ -65,6 +65,7 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
 
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             new(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email.Value),
             new(JwtRegisteredClaimNames.Name, user.FullName.Value),
@@ -109,11 +110,10 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     private static string ValidateSigningKey(string key)
     {
         var keyBytes = Encoding.UTF8.GetByteCount(key);
-        if (keyBytes < 16)
+        if (keyBytes < 32)
             throw new InvalidOperationException(
                 $"JWT signing key is too short ({keyBytes * 8} bits). " +
-                "HS256 requires at least 128 bits (16 bytes). " +
-                "Recommended minimum is 256 bits (32 bytes). " +
+                "HS256 requires a minimum of 256 bits (32 bytes) to resist brute-force attacks. " +
                 "Set a longer 'Jwt:Secret' via user-secrets or environment variable.");
         return key;
     }

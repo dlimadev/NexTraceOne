@@ -34,10 +34,10 @@ public sealed class CreateUserTests
 
         userRepository.ExistsAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(false);
         roleRepository.GetByIdAsync(Arg.Any<RoleId>(), Arg.Any<CancellationToken>()).Returns(role);
-        passwordHasher.Hash("P@ssw0rd123").Returns(HashedPassword.FromPlainText("P@ssw0rd123").Value);
+        passwordHasher.Hash("P@ssw0rd123!").Returns(HashedPassword.FromPlainText("P@ssw0rd123!").Value);
 
         var result = await sut.Handle(
-            new CreateUserFeature.Command("alice@example.com", "Alice", "Doe", "P@ssw0rd123", Guid.NewGuid(), role.Id.Value),
+            new CreateUserFeature.Command("alice@example.com", "Alice", "Doe", "P@ssw0rd123!", Guid.NewGuid(), role.Id.Value),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -62,7 +62,7 @@ public sealed class CreateUserTests
         userRepository.ExistsAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(true);
 
         var result = await sut.Handle(
-            new CreateUserFeature.Command("alice@example.com", "Alice", "Doe", "P@ssw0rd123", Guid.NewGuid(), Guid.NewGuid()),
+            new CreateUserFeature.Command("alice@example.com", "Alice", "Doe", "P@ssw0rd123!", Guid.NewGuid(), Guid.NewGuid()),
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();

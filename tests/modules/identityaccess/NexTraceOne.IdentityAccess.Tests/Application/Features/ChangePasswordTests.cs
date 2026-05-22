@@ -23,7 +23,7 @@ public sealed class ChangePasswordTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("OldP@ss123"));
+            HashedPassword.FromPlainText("OldP@ss123!!"));
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);
@@ -38,7 +38,7 @@ public sealed class ChangePasswordTests
         var dateTimeProvider = new TestDateTimeProvider(_now);
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
-        passwordHasher.Verify("OldP@ss123", user.PasswordHash!.Value).Returns(true);
+        passwordHasher.Verify("OldP@ss123!!", user.PasswordHash!.Value).Returns(true);
         passwordHasher.Hash("NewP@ss456").Returns("hashed-new-password");
 
         var sut = new ChangePasswordFeature.Handler(
@@ -46,7 +46,7 @@ public sealed class ChangePasswordTests
             securityEventRepository, securityEventTracker, dateTimeProvider);
 
         var result = await sut.Handle(
-            new ChangePasswordFeature.Command("OldP@ss123", "NewP@ss456"),
+            new ChangePasswordFeature.Command("OldP@ss123!!", "NewP@ss456"),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -63,7 +63,7 @@ public sealed class ChangePasswordTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("OldP@ss123"));
+            HashedPassword.FromPlainText("OldP@ss123!!"));
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);
