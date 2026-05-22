@@ -57,6 +57,17 @@ internal sealed class DiscoveredServiceRepository(CatalogGraphDbContext dbContex
         => await dbContext.DiscoveredServices.CountAsync(
             x => x.Status == DiscoveryStatus.Pending && x.FirstSeenAt >= since, cancellationToken);
 
+    public async Task<IReadOnlyList<DiscoveredService>> ListPendingWithHighTrafficAsync(
+        long minTraceCount,
+        int limit,
+        CancellationToken cancellationToken)
+        => await dbContext.DiscoveredServices
+            .AsNoTracking()
+            .Where(x => x.Status == DiscoveryStatus.Pending && x.TraceCount >= minTraceCount)
+            .OrderByDescending(x => x.TraceCount)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+
     public void Add(DiscoveredService discoveredService)
         => dbContext.DiscoveredServices.Add(discoveredService);
 }

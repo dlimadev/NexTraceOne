@@ -28,6 +28,12 @@ public interface IDiscoveredServiceRepository
     /// <summary>Conta serviços novos (Pending) descobertos numa janela temporal.</summary>
     Task<int> CountNewSinceAsync(DateTimeOffset since, CancellationToken cancellationToken);
 
+    /// <summary>Lista serviços Pending com tráfego elevado, ordenados por TraceCount descendente.</summary>
+    Task<IReadOnlyList<DiscoveredService>> ListPendingWithHighTrafficAsync(
+        long minTraceCount,
+        int limit,
+        CancellationToken cancellationToken);
+
     /// <summary>Adiciona novo serviço descoberto.</summary>
     void Add(DiscoveredService discoveredService);
 }

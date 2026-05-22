@@ -118,6 +118,8 @@ builder.Services.AddConfigurationInfrastructure(builder.Configuration);
 
 builder.Services.Configure<DriftDetectionOptions>(
     builder.Configuration.GetSection(DriftDetectionOptions.SectionName));
+builder.Services.Configure<OtelCatalogBridgeOptions>(
+    builder.Configuration.GetSection(OtelCatalogBridgeOptions.SectionName));
 builder.Services.Configure<ContractConsumerIngestionOptions>(
     builder.Configuration.GetSection(ContractConsumerIngestionOptions.SectionName));
 builder.Services.Configure<BackupOptions>(
@@ -280,6 +282,11 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [DriftDetectionJob.HealthCheckName, TimeSpan.FromMinutes(10)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "otel-catalog-bridge-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [OtelCatalogBridgeJob.HealthCheckName, TimeSpan.FromMinutes(60)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "contract-consumer-ingestion-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
@@ -383,6 +390,7 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<ConfigurationDbContex
 
 builder.Services.AddHostedService<IdentityExpirationJob>();
 builder.Services.AddHostedService<DriftDetectionJob>();
+builder.Services.AddHostedService<OtelCatalogBridgeJob>();
 builder.Services.AddHostedService<CloudBillingIngestionJob>();
 builder.Services.AddHostedService<IncidentProbabilityRefreshJob>();
 builder.Services.AddHostedService<ContractConsumerIngestionJob>();

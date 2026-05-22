@@ -62,6 +62,8 @@ using DetectOwnershipDriftFeature = NexTraceOne.Catalog.Application.Graph.Featur
 using GetOwnershipDriftReportFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipDriftReport.GetOwnershipDriftReport;
 using ReviewServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.ReviewServiceOwnership.ReviewServiceOwnership;
 using ExportToBackstageFeature = NexTraceOne.Catalog.Application.Graph.Features.ExportToBackstage.ExportToBackstage;
+using GetCatalogCompletenessScoreFeature = NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessScore.GetCatalogCompletenessScore;
+using GetPortfolioCompletenessReportFeature = NexTraceOne.Catalog.Application.Graph.Features.GetPortfolioCompletenessReport.GetPortfolioCompletenessReport;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -741,6 +743,30 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetOwnershipDriftReportFeature.Query(teamName, domain, tier);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Catalog Completeness ─────────────────────────────────────────
+
+        group.MapGet("/services/{serviceId:guid}/completeness", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetCatalogCompletenessScoreFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/completeness/portfolio", async (
+            string? domainFilter,
+            string? teamFilter,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPortfolioCompletenessReportFeature.Query(domainFilter, teamFilter);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");

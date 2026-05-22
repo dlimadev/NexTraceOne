@@ -136,3 +136,33 @@ public sealed record ContractBindingDeactivatedIntegrationEvent(
     string BindingEnvironment,
     string DeactivatedBy,
     Guid? TenantId) : IntegrationEventBase("Catalog");
+
+// ── Phase 8: Asset Deployment State & Discovery Events ──
+
+/// <summary>
+/// Publicado quando um deployment de um ServiceAsset é rastreado num ambiente.
+/// Consumidores: módulo de notificações (alertar sobre novos deployments),
+/// módulo de change governance (associar release ao estado do catálogo).
+/// </summary>
+public sealed record ServiceDeployedIntegrationEvent(
+    Guid ServiceAssetId,
+    string ServiceName,
+    string Environment,
+    string ImageTag,
+    string ReleaseName,
+    DateTimeOffset DeployedAt,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando o OtelCatalogBridgeJob detecta um serviço observado em telemetria
+/// que não está registado no catálogo e tem tráfego significativo.
+/// Consumidores: notificações (alertar platform engineers), módulo de knowledge (indexar).
+/// </summary>
+public sealed record UncatalogedServiceDetectedIntegrationEvent(
+    string ServiceName,
+    string ServiceNamespace,
+    string Environment,
+    long TraceCount,
+    DateTimeOffset FirstSeenAt,
+    DateTimeOffset LastSeenAt,
+    Guid? TenantId) : IntegrationEventBase("Catalog");

@@ -17,6 +17,7 @@ using NexTraceOne.Catalog.Infrastructure.Graph.EventHandlers;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Graph.Services;
+using NexTraceOne.Catalog.Infrastructure.Readers;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph;
 
@@ -59,6 +60,9 @@ public static class DependencyInjection
 
         // ── Provider de discovery via telemetria ─────────────────────────
         services.AddScoped<IServiceDiscoveryProvider, OtelServiceDiscoveryProvider>();
+
+        // ── Repositório de estado de deployment por ambiente ─────────────
+        services.AddScoped<IAssetDeploymentStateRepository, AssetDeploymentStateRepository>();
 
         // ── Repositórios de temporalidade, overlays e saved views ────────
         services.AddScoped<IGraphSnapshotRepository, GraphSnapshotRepository>();
@@ -104,10 +108,13 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
 
-        // ── Wave AO — Supply Chain null readers ─────────────────────────────
+        // ── Wave AO — Supply Chain readers ──────────────────────────────────
         // ISbomRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomCoverageReader,
-            NexTraceOne.Catalog.Application.Contracts.NullSbomCoverageReader>();
+            EfSbomCoverageReader>();
+        // IVulnerabilityExposureReader — cruza CatalogGraphDbContext + DependencyGovernanceDbContext
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IVulnerabilityExposureReader,
+            EfVulnerabilityExposureReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
             NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
