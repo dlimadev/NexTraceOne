@@ -21,6 +21,8 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              POST /api/v1/releases/observations     (externalReleaseId no body)
 ///                                              POST /api/v1/releases/rollback         (externalReleaseId no body)
 /// - <see cref="CostIngestEndpoints"/>       — POST /api/v1/costs/snapshots
+/// - <see cref="SonarQubeIngestEndpoints"/>  — POST /api/v1/quality/sonarqube/analysis
+///                                              POST /api/v1/quality/record
 /// - <see cref="IncidentEndpoints"/>         — POST /api/v1/incidents
 ///                                              PATCH /api/v1/incidents/{id}/resolve
 ///
@@ -94,6 +96,11 @@ internal static class IngestionEndpointModule
             .WithTags("FinOps")
             .RequireAuthorization(IngestionApiSecurity.PolicyName);
         CostIngestEndpoints.Map(costs);
+
+        var quality = app.MapGroup("/api/v1/quality")
+            .WithTags("Code Quality")
+            .RequireAuthorization(IngestionApiSecurity.PolicyName);
+        SonarQubeIngestEndpoints.Map(quality);
 
         var incidentsWrite = app.MapGroup("/api/v1/incidents")
             .WithTags("Incidents")

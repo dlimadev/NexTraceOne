@@ -12,6 +12,7 @@ using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterImsTransacti
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterMainframeSystem;
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterZosConnectBinding;
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.SyncLegacyAssets;
+using NexTraceOne.Catalog.Application.LegacyAssets.Features.GetLegacyImpactPropagation;
 using NexTraceOne.Catalog.Infrastructure.LegacyAssets;
 
 namespace NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
@@ -44,6 +45,9 @@ public static class DependencyInjection
 
         // ── Validator de ingestão bulk ───────────────────────────────────
         services.AddTransient<IValidator<SyncLegacyAssets.Command>, SyncLegacyAssets.Validator>();
+
+        // ── Validator de impacto legacy ──────────────────────────────────
+        services.AddTransient<IValidator<GetLegacyImpactPropagation.Query>, GetLegacyImpactPropagation.Validator>();
 
         return services;
     }

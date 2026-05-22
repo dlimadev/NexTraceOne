@@ -148,6 +148,9 @@ public sealed class ContractsDbContext(
     /// <summary>Estado actual de feature flags por serviço e tenant. Wave AS.1.</summary>
     public DbSet<FeatureFlagRecord> FeatureFlagRecords => Set<FeatureFlagRecord>();
 
+    /// <summary>Registos de análise de qualidade de código por serviço. Wave AQ.2.</summary>
+    public DbSet<CodeQualityRecord> CodeQualityRecords => Set<CodeQualityRecord>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

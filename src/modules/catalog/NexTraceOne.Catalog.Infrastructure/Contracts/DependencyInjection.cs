@@ -93,6 +93,9 @@ public static class DependencyInjection
         // ── Wave AO.1: SBOM Supply Chain ──────────────────────────────────────
         services.AddScoped<ISbomRepository, EfSbomRepository>();
 
+        // ── Wave AQ.2: Code Quality & Static Analysis ─────────────────────────
+        services.AddScoped<ICodeQualityRepository, EfCodeQualityRepository>();
+
         // ── Wave AQ.1: Data Contract Records ─────────────────────────────────
         services.AddScoped<IDataContractRepository, EfDataContractRepository>();
 

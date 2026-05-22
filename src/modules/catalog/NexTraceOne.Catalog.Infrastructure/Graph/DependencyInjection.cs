@@ -91,8 +91,9 @@ public static class DependencyInjection
         // ── Wave AC.1 — Onboarding Health Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IOnboardingHealthReader, NexTraceOne.Catalog.Application.Services.NullOnboardingHealthReader>();
 
-        // ── Wave AF.2 — Retirement Readiness Report (null reader) ────────────
-        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IRetirementReadinessReader, NexTraceOne.Catalog.Application.Services.NullRetirementReadinessReader>();
+        // ── Wave AF.2 — Retirement Readiness Report (EF Core real reader) ───────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IRetirementReadinessReader,
+            NexTraceOne.Catalog.Infrastructure.Services.EfRetirementReadinessReader>();
 
         // ── Wave AF.3 — Migration Progress Report (null reader) ──────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IMigrationProgressReader, NexTraceOne.Catalog.Application.Services.NullMigrationProgressReader>();
@@ -119,6 +120,11 @@ public static class DependencyInjection
             NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
             NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
+
+        // ── Wave AQ.2 — Code Quality & Static Analysis (EF Core real reader) ──
+        // ICodeQualityRepository registered in Contracts/DependencyInjection.cs
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICodeQualityReader,
+            EfCodeQualityReader>();
 
         // ── Wave AQ — Data Observability & Schema Quality null readers ───────
         // IDataContractRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
