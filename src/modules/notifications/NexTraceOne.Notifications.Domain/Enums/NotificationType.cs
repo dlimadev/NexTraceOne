@@ -37,6 +37,8 @@ public static class NotificationType
     public const string ComplianceCheckFailed = "ComplianceCheckFailed";
     public const string PolicyViolated = "PolicyViolated";
     public const string EvidenceExpiring = "EvidenceExpiring";
+    public const string RiskReportGenerated = "RiskReportGenerated";
+    public const string ComplianceGapsDetected = "ComplianceGapsDetected";
 
     // ── FinOps / Budget ──
     public const string BudgetExceeded = "BudgetExceeded";
@@ -88,6 +90,8 @@ public static class NotificationType
         ComplianceCheckFailed,
         PolicyViolated,
         EvidenceExpiring,
+        RiskReportGenerated,
+        ComplianceGapsDetected,
         BudgetExceeded,
         BudgetThresholdReached,
         IntegrationFailed,

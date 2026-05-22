@@ -116,8 +116,9 @@ public static class DependencyInjection
         // IVulnerabilityExposureReader — cruza CatalogGraphDbContext + DependencyGovernanceDbContext
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IVulnerabilityExposureReader,
             EfVulnerabilityExposureReader>();
+        // IDependencyProvenanceReader — cruza ContractsDbContext (SbomRecords) por proveniência de componente
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
-            NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
+            EfDependencyProvenanceReader>();
         // ISupplyChainRiskReader — cruza ContractsDbContext (SbomRecords) + CatalogGraphDbContext (ServiceAssets)
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
             EfSupplyChainRiskReader>();
@@ -132,12 +133,12 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractTestReader,
             EfContractTestReader>();
 
-        // ── Wave AQ — Data Observability & Schema Quality null readers ───────
+        // ── Wave AQ — Schema Quality & Evolution Safety (EF Core real readers) ───
         // IDataContractRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaQualityReader,
-            NexTraceOne.Catalog.Application.Contracts.NullSchemaQualityReader>();
+            EfSchemaQualityReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
-            NexTraceOne.Catalog.Application.Contracts.NullSchemaEvolutionSafetyReader>();
+            EfSchemaEvolutionSafetyReader>();
 
         // ── Wave AR — Service Topology Intelligence (EF Core real readers) ──────
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IServiceTopologyReader,

@@ -8,17 +8,26 @@ namespace NexTraceOne.Governance.Contracts;
 /// </summary>
 public static class IntegrationEvents
 {
-    /// <summary>Publicado quando um relatório de risco é gerado.</summary>
+    /// <summary>
+    /// Publicado quando um relatório de risco é gerado.
+    /// Consumidores: módulo de notificações (alertar gestores de risco e owners de domínio).
+    /// </summary>
     public sealed record RiskReportGenerated(
         string ReportId,
         string Scope,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        Guid? OwnerUserId) : IntegrationEventBase("Governance");
 
-    /// <summary>Publicado quando gaps de compliance são detectados.</summary>
+    /// <summary>
+    /// Publicado quando gaps de compliance são detectados numa avaliação.
+    /// Consumidores: módulo de notificações (alertar owners e compliance role).
+    /// </summary>
     public sealed record ComplianceGapsDetected(
         string ReportId,
         int GapCount,
-        DateTimeOffset DetectedAt);
+        DateTimeOffset DetectedAt,
+        string? ScopeId,
+        Guid? OwnerUserId) : IntegrationEventBase("Governance");
 
     /// <summary>
     /// Publicado quando verificações de compliance falham para um serviço.
