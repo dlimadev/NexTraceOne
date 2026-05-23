@@ -23,7 +23,8 @@
     <PackageVersion Include="Microsoft.ML.Tokenizers" Version="2.0.0" />
     <PackageVersion Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" Version="2.0.0" />
     <!-- Security override: transitive dependency from Tokenizers.Data.Cl100kBase -->
-    <PackageVersion Include="Microsoft.Bcl.Memory" Version="9.0.7" />
+    <!-- Upgraded from 9.0.7 (GHSA-73j8-2gch-69rq, High) to 10.0.8 -->
+    <PackageVersion Include="Microsoft.Bcl.Memory" Version="10.0.8" />
   </ItemGroup>
   <ItemGroup Label="GraphQL Federation">
     <PackageVersion Include="HotChocolate.AspNetCore" Version="14.3.1" />
@@ -38,13 +39,14 @@
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />
     <PackageVersion Include="Serilog.Sinks.PostgreSQL" Version="4.1.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-    <PackageVersion Include="OpenTelemetry" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Api" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
+    <!-- Upgraded from 1.12.0 (GHSA-g94r-2vxg-569j + GHSA-4625-4j76-fww9) to 1.15.x -->
+    <PackageVersion Include="OpenTelemetry" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Api" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup Label="Scheduling e Background">
@@ -88,6 +90,7 @@
     <PackageVersion Include="Dapper" Version="2.1.35" />
   </ItemGroup>
   <ItemGroup Label="ElasticSearch">
+    <!-- SECURITY: NEST 7.x é EOL desde Jan 2026. Migração para Elastic.Clients.Elasticsearch 8.x planeada. -->
     <PackageVersion Include="NEST" Version="7.17.5" />
   </ItemGroup>
   <ItemGroup Label="Testes">

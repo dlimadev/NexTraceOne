@@ -16,7 +16,7 @@ public sealed class RevokeSessionTests
     public async Task Handle_Should_RevokeSession_When_SessionExists()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var session = Session.Create(user.Id, RefreshTokenHash.Create("token"), now.AddDays(1), "127.0.0.1", "test");
 
         var sessionRepository = Substitute.For<ISessionRepository>();

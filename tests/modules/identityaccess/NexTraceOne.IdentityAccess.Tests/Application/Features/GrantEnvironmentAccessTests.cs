@@ -26,7 +26,7 @@ public sealed class GrantEnvironmentAccessTests
         var targetUser = User.CreateLocal(
             Email.Create("dev@example.com"),
             FullName.Create("John", "Dev"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
         var environment = Environment.Create(tenantId, "Development", "development", 0, _now);
 
         var currentUser = Substitute.For<ICurrentUser>();
@@ -182,7 +182,7 @@ public sealed class GrantEnvironmentAccessTests
         var targetUser = User.CreateLocal(
             Email.Create("dev@example.com"),
             FullName.Create("John", "Dev"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
         var environment = Environment.Create(tenantId, "Development", "development", 0, _now);
 
         var currentUser = Substitute.For<ICurrentUser>();

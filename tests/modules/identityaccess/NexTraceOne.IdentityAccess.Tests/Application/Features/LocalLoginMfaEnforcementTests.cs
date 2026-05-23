@@ -42,7 +42,7 @@ public sealed class LocalLoginMfaEnforcementTests
 
         // Act
         var result = await sut.Handle(
-            new LocalLoginFeature.Command("mfa-user@example.com", "P@ssw0rd123"),
+            new LocalLoginFeature.Command("mfa-user@example.com", "P@ssw0rd123!"),
             CancellationToken.None);
 
         // Assert: retorna sucesso mas com MfaRequired = true e ChallengeToken
@@ -89,7 +89,7 @@ public sealed class LocalLoginMfaEnforcementTests
 
         // Act
         var result = await sut.Handle(
-            new LocalLoginFeature.Command("user@example.com", "P@ssw0rd123"),
+            new LocalLoginFeature.Command("user@example.com", "P@ssw0rd123!"),
             CancellationToken.None);
 
         // Assert: retorna tokens completos sem MFA challenge

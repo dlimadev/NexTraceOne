@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using FluentValidation;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -22,6 +24,34 @@ public static class ExportPendingTrajectories
         int MaxBatch,
         string ExportDirectoryPath,
         Guid? TenantId) : ICommand<Response>;
+
+    /// <summary>Valida o comando de exportação.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.MaxBatch).InclusiveBetween(1, 1000);
+            RuleFor(x => x.ExportDirectoryPath)
+                .NotEmpty()
+                .Must(BeASafePath)
+                .WithMessage("ExportDirectoryPath must be an absolute path with no directory traversal sequences.");
+        }
+
+        private static bool BeASafePath(string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            if (!Path.IsPathRooted(path)) return false;
+            // Rejeita sequências de traversal antes da normalização
+            if (path.Contains("..")) return false;
+            // GetFullPath canonicaliza; verifica que o resultado ainda é absoluto e igual ao input normalizado
+            try
+            {
+                var full = Path.GetFullPath(path);
+                return full.StartsWith(Path.GetPathRoot(full)!, StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return false; }
+        }
+    }
 
     /// <summary>Handler que exporta as trajectórias pendentes para ficheiros JSON.</summary>
     public sealed class Handler(

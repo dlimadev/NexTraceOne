@@ -23,7 +23,7 @@ public sealed class LogoutTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
 
         var session = Session.Create(
             UserId.From(userId),

@@ -36,7 +36,7 @@ public sealed class SelectTenantTests
     [Fact]
     public async Task Handle_Should_ReturnNewToken_When_UserHasMembership()
     {
-        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var tenant = Tenant.Create("Org Alpha", "alpha", Now);
         var role = Role.CreateSystem(RoleId.New(), Role.Developer, "Dev");
         var membership = TenantMembership.Create(user.Id, tenant.Id, role.Id, Now);
@@ -86,7 +86,7 @@ public sealed class SelectTenantTests
         currentUser.Id.Returns(Guid.NewGuid().ToString());
         currentUser.IsAuthenticated.Returns(true);
 
-        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var userRepo = Substitute.For<IUserRepository>();
         userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
 
@@ -116,7 +116,7 @@ public sealed class SelectTenantTests
     [Fact]
     public async Task Handle_Should_Fail_When_MembershipDoesNotExist()
     {
-        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("alice@test.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var tenant = Tenant.Create("Org", "org", Now);
 
         var currentUser = Substitute.For<ICurrentUser>();
@@ -145,7 +145,7 @@ public sealed class SelectTenantTests
     [Fact]
     public async Task Handle_Should_EmbedPlanCapabilities_When_LicenseExists()
     {
-        var user = User.CreateLocal(Email.Create("dave@test.com"), FullName.Create("Dave", "Smith"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("dave@test.com"), FullName.Create("Dave", "Smith"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var tenant = Tenant.Create("Starter Corp", "starter", Now);
         var role = Role.CreateSystem(RoleId.New(), Role.Developer, "Dev");
         var membership = TenantMembership.Create(user.Id, tenant.Id, role.Id, Now);
@@ -192,7 +192,7 @@ public sealed class SelectTenantTests
     [Fact]
     public async Task Handle_Should_FallBackToEnterprise_When_NoLicenseFound()
     {
-        var user = User.CreateLocal(Email.Create("eve@test.com"), FullName.Create("Eve", "Jones"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("eve@test.com"), FullName.Create("Eve", "Jones"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var tenant = Tenant.Create("Legacy Corp", "legacy", Now);
         var role = Role.CreateSystem(RoleId.New(), Role.Developer, "Dev");
         var membership = TenantMembership.Create(user.Id, tenant.Id, role.Id, Now);

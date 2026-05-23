@@ -73,7 +73,7 @@ public sealed class LoginResponseBuilderTests
     [Fact]
     public async Task CreateLoginResponseAsync_Should_ReturnCompleteResponse()
     {
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), Now);
         var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Admin");
 
@@ -115,7 +115,7 @@ public sealed class LoginResponseBuilderTests
     [Fact]
     public async Task CreateLoginResponseAsync_Should_PassLicenseCapabilities_When_LicenseExists()
     {
-        var user = User.CreateLocal(Email.Create("bob@example.com"), FullName.Create("Bob", "Smith"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("bob@example.com"), FullName.Create("Bob", "Smith"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), Now);
         var role = Role.CreateSystem(membership.RoleId, Role.Developer, "Dev");
         var license = TenantLicense.Provision(membership.TenantId.Value, TenantPlan.Professional, 10, Now, null, Now);
@@ -156,7 +156,7 @@ public sealed class LoginResponseBuilderTests
     [Fact]
     public async Task CreateLoginResponseAsync_Should_FallBackToEnterprise_When_NoLicenseFound()
     {
-        var user = User.CreateLocal(Email.Create("charlie@example.com"), FullName.Create("Charlie", "X"), HashedPassword.FromPlainText("P@ssw0rd123"));
+        var user = User.CreateLocal(Email.Create("charlie@example.com"), FullName.Create("Charlie", "X"), HashedPassword.FromPlainText("P@ssw0rd123!"));
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), Now);
         var role = Role.CreateSystem(membership.RoleId, Role.Developer, "Dev");
 

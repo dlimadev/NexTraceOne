@@ -15,7 +15,7 @@ public sealed class UserTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
 
         user.DomainEvents.Should().ContainSingle().Which.Should().BeOfType<UserCreatedDomainEvent>();
     }
@@ -26,7 +26,7 @@ public sealed class UserTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
         var now = DateTimeOffset.UtcNow;
 
         for (var attempt = 0; attempt < 5; attempt++)
@@ -44,7 +44,7 @@ public sealed class UserTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("P@ssw0rd123"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"));
         var now = DateTimeOffset.UtcNow;
 
         user.RegisterFailedLogin(now);

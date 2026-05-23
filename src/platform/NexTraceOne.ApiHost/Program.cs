@@ -133,7 +133,9 @@ builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddDeveloperExperienceModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
 builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
-builder.Services.AddCatalogGraphQL(includeExceptionDetails: builder.Environment.IsDevelopment())
+builder.Services.AddCatalogGraphQL(
+        includeExceptionDetails: builder.Environment.IsDevelopment(),
+        enableIntrospection: !builder.Environment.IsProduction())
     .AddChangeGovernanceQueryExtension();
 builder.Services.AddGovernanceModule(builder.Configuration);
 builder.Services.AddIntegrationsModule(builder.Configuration);

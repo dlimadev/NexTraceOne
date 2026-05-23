@@ -1,6 +1,7 @@
 using MediatR;
 
 using IngestCodeQualityRecordFeature = NexTraceOne.Catalog.Application.Contracts.Features.IngestCodeQualityRecord.IngestCodeQualityRecord;
+using NexTraceOne.Ingestion.Api.Security;
 
 namespace NexTraceOne.Ingestion.Api.Endpoints;
 
@@ -63,6 +64,7 @@ internal static class SonarQubeIngestEndpoints
         .WithName("PostSonarQubeAnalysis")
         .WithSummary("Ingest SonarQube analysis result via webhook")
         .WithDescription("Receives SonarQube webhook payload and persists the code quality record")
+        .WithWebhookSignature("SonarQube")
         .Produces(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status422UnprocessableEntity)

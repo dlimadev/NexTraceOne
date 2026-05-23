@@ -146,6 +146,7 @@ internal static class CommitIngestEndpoints
         .WithDescription(
             "Records a commit from an external repository (GitHub, GitLab, Azure DevOps, Jenkins) " +
             "into NexTraceOne to enrich Change Advisory, incident correlation and change traceability.")
+        .WithWebhookSignature("Commits")
         .Produces(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)

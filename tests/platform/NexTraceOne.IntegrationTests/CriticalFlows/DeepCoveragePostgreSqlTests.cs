@@ -331,7 +331,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         var user = User.CreateLocal(
             Email.Create("techlead@nextraceone.io"),
             FullName.Create("Carlos", "Mendes"),
-            HashedPassword.FromPlainText("S3cur3Pass!"));
+            HashedPassword.FromPlainText("S3cur3Pass!1"));
 
         var role = Role.CreateCustom(name: "TechLead", description: "Tech lead with approval rights");
 
