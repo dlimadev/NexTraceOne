@@ -24,9 +24,14 @@ public static class CatalogGraphQLExtensions
     /// Quando <c>true</c>, inclui detalhes de exceção nas respostas GraphQL.
     /// Deve ser ativado apenas em Development para facilitar diagnóstico.
     /// </param>
+    /// <param name="enableIntrospection">
+    /// Quando <c>false</c>, desabilita introspection do schema GraphQL.
+    /// Deve ser <c>false</c> em Production para não expor a estrutura interna da API.
+    /// </param>
     public static IRequestExecutorBuilder AddCatalogGraphQL(
         this IServiceCollection services,
-        bool includeExceptionDetails = false)
+        bool includeExceptionDetails = false,
+        bool enableIntrospection = true)
     {
         services.AddScoped<IGraphQLEventPublisher, GraphQLEventPublisher>();
 
@@ -37,7 +42,17 @@ public static class CatalogGraphQLExtensions
             .AddSubscriptionType(descriptor => descriptor.Name("Subscription"))
             .AddTypeExtension<CatalogSubscription>()
             .AddInMemorySubscriptions()
-            .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = includeExceptionDetails);
+            // Limita a profundidade máxima de queries para prevenir ataques de GraphQL bombing.
+            .AddMaxExecutionDepthRule(15)
+            .ModifyRequestOptions(opt =>
+            {
+                opt.IncludeExceptionDetails = includeExceptionDetails;
+                // Limita complexidade de queries a 1000 pontos para prevenir consultas abusivas.
+                opt.Complexity.Enable = true;
+                opt.Complexity.MaximumAllowed = 1_000;
+            })
+            // Desabilita introspection em produção para não expor a estrutura do schema.
+            .ModifyOptions(o => o.EnableSchemaIntrospection = enableIntrospection);
     }
 
     /// <summary>

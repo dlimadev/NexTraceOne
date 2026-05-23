@@ -3,6 +3,8 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
+
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.ActivateUser;
@@ -48,6 +50,10 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        // Origens permitidas para redirecionamento após login (anti open redirect)
+        services.Configure<AllowedOriginsOptions>(
+            configuration.GetSection(AllowedOriginsOptions.SectionName));
 
         // Serviços de aplicação extraídos dos handlers para aderir ao DIP/SRP
         services.AddScoped<ISecurityAuditRecorder, Features.SecurityAuditRecorder>();

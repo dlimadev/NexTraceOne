@@ -50,8 +50,13 @@ internal sealed class LocalDirectoryConnector(
         var maxBytes = Math.Max(1024, config.MaxFileSizeKb * 1024);
         var searchOption = config.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
+        // Canonicaliza o basePath para prevenir escape via symlinks ou '..'
+        var canonicalBase = Path.GetFullPath(config.BasePath);
+        if (!canonicalBase.EndsWith(Path.DirectorySeparatorChar))
+            canonicalBase += Path.DirectorySeparatorChar;
+
         var files = Directory
-            .EnumerateFiles(config.BasePath, "*.*", searchOption)
+            .EnumerateFiles(canonicalBase, "*.*", searchOption)
             .Where(f => extensions.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
             .Take(config.MaxFiles)
             .ToList();
@@ -62,16 +67,21 @@ internal sealed class LocalDirectoryConnector(
             ct.ThrowIfCancellationRequested();
             try
             {
-                var info = new FileInfo(filePath);
+                // Verifica que o ficheiro resolvido está dentro do diretório permitido (anti path traversal).
+                var canonicalFile = Path.GetFullPath(filePath);
+                if (!canonicalFile.StartsWith(canonicalBase, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var info = new FileInfo(canonicalFile);
                 if (info.Length > maxBytes) continue;
 
-                var content = File.ReadAllText(filePath);
-                var relativePath = Path.GetRelativePath(config.BasePath, filePath);
+                var content = File.ReadAllText(canonicalFile);
+                var relativePath = Path.GetRelativePath(config.BasePath, canonicalFile);
 
                 documents.Add(new DataSourceDocument(
                     Title: relativePath,
                     Content: content,
-                    SourceUrl: filePath,
+                    SourceUrl: canonicalFile,
                     Category: "local_directory",
                     PublishedAt: info.LastWriteTimeUtc));
             }

@@ -11,6 +11,8 @@ namespace NexTraceOne.Governance.Application.SecurityGate.Services;
 /// </summary>
 public static class InternalSastScanner
 {
+    // Timeout por linha para prevenir ReDoS em expressões regulares com backtracking excessivo.
+    private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromMilliseconds(200);
     /// <summary>Executa análise SAST num ficheiro e retorna a lista de achados.</summary>
     public static IReadOnlyList<SecurityFinding> Scan(Guid scanResultId, string filePath, string content)
     {
@@ -38,7 +40,7 @@ public static class InternalSastScanner
         // Detects string concatenation with SQL keywords
         var pattern = new Regex(
             @"(?i)(""SELECT\s|""INSERT\s|""UPDATE\s|""DELETE\s|""WHERE\s).*\+|\.ExecuteSqlRaw\(\s*\$",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-001", SecurityCategory.Injection, FindingSeverity.High,
             "Possible SQL injection: string concatenation detected in SQL context.",
@@ -52,7 +54,7 @@ public static class InternalSastScanner
     {
         var pattern = new Regex(
             @"(?i)(password|passwd|pwd|apikey|api_key|secret|connectionstring|conn_string)\s*=\s*""[^""]{4,}""",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-002", SecurityCategory.HardcodedSecrets, FindingSeverity.Critical,
             "Hardcoded credential or secret detected in source code.",
@@ -66,7 +68,7 @@ public static class InternalSastScanner
     {
         var pattern = new Regex(
             @"(?i)MD5\.Create\(\)|SHA1\.Create\(\)|new\s+DESCryptoServiceProvider|new\s+TripleDESCryptoServiceProvider|MD5\.HashData\(|SHA1\.HashData\(",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-003", SecurityCategory.InsecureCrypto, FindingSeverity.High,
             "Weak cryptographic algorithm detected (MD5/SHA1/DES/3DES).",
@@ -98,7 +100,7 @@ public static class InternalSastScanner
     private static IEnumerable<SecurityFinding> DetectCorsMisconfiguration(
         Guid scanId, string filePath, string[] lines)
     {
-        var pattern = new Regex(@"AllowAnyOrigin\(\)", RegexOptions.Compiled);
+        var pattern = new Regex(@"AllowAnyOrigin\(\)", RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-005", SecurityCategory.SecurityMisconfiguration, FindingSeverity.Medium,
             "CORS misconfiguration: AllowAnyOrigin() detected.",
@@ -112,7 +114,7 @@ public static class InternalSastScanner
     {
         var pattern = new Regex(
             @"BinaryFormatter|JavaScriptSerializer|TypeNameHandling\.All|TypeNameHandling\.Objects",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-006", SecurityCategory.InsecureDeserialization, FindingSeverity.High,
             "Insecure deserialization: BinaryFormatter or unsafe JsonSerializer settings detected.",
@@ -151,7 +153,7 @@ public static class InternalSastScanner
     {
         var pattern = new Regex(
             @"dangerouslySetInnerHTML|Html\.Raw\((?!.*HtmlEncoder|.*HtmlEncode)",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-008", SecurityCategory.Xss, FindingSeverity.High,
             "Cross-Site Scripting (XSS): unencoded HTML output detected.",
@@ -165,7 +167,7 @@ public static class InternalSastScanner
     {
         var pattern = new Regex(
             @"(?i)(Log\.(Information|Warning|Error|Debug|Trace|Critical)|logger\.(Log|Information|Warning|Error))\s*\([^)]*\b(password|token|secret|apikey|ssn|creditcard|cvv)\b",
-            RegexOptions.Compiled);
+            RegexOptions.Compiled, RegexMatchTimeout);
         return ScanLines(scanId, filePath, lines, pattern,
             "SAST-009", SecurityCategory.LoggingSensitiveData, FindingSeverity.Medium,
             "Sensitive data logging detected: PII or credentials may be logged.",
@@ -209,7 +211,18 @@ public static class InternalSastScanner
     {
         for (var i = 0; i < lines.Length; i++)
         {
-            if (pattern.IsMatch(lines[i]))
+            bool matched;
+            try
+            {
+                matched = pattern.IsMatch(lines[i]);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // Linha demasiado complexa para análise regex dentro do timeout — ignorar linha.
+                continue;
+            }
+
+            if (matched)
             {
                 yield return SecurityFinding.Create(
                     scanId, ruleId, category, severity,

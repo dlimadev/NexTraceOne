@@ -1,3 +1,4 @@
+using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -68,8 +69,16 @@ internal sealed class SamlService(ILogger<SamlService> logger) : ISamlService
         var xmlBytes = Convert.FromBase64String(samlResponseBase64);
         var xmlString = Encoding.UTF8.GetString(xmlBytes);
 
-        var doc = new XmlDocument { PreserveWhitespace = true };
-        doc.LoadXml(xmlString);
+        // Desabilita processamento de DTD e entidades externas (XXE) por segurança.
+        var xmlSettings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersFromEntities = 0,
+        };
+        var doc = new XmlDocument { PreserveWhitespace = true, XmlResolver = null };
+        using var reader = XmlReader.Create(new StringReader(xmlString), xmlSettings);
+        doc.Load(reader);
 
         ValidateSignature(doc, idpCertificatePem);
 

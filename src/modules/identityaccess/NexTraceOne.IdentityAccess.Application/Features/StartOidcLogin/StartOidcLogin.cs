@@ -2,9 +2,12 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using Microsoft.Extensions.Options;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Domain.Errors;
 
@@ -54,37 +57,45 @@ public static class StartOidcLogin
     /// <summary>Valida o comando de início de fluxo OIDC.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
-        /// <summary>
-        /// Lista de prefixos permitidos para returnTo.
-        /// Previne open redirect para domínios externos maliciosos.
-        /// Configurável via appsettings em implementação futura.
-        /// </summary>
-        private static readonly string[] AllowedReturnToPrefixes = ["/", "http://localhost", "https://localhost"];
+        private readonly string[] _allowedOrigins;
 
-        public Validator()
+        /// <summary>
+        /// Aceita as origens permitidas via DI (Security:AllowedOrigins).
+        /// Paths relativos (começando com '/') são sempre aceites.
+        /// Em development, localhost é aceite por omissão.
+        /// </summary>
+        public Validator(IOptions<AllowedOriginsOptions> allowedOriginsOptions)
         {
+            _allowedOrigins = allowedOriginsOptions.Value.Allowed;
+
             RuleFor(x => x.Provider).NotEmpty().MaximumLength(50);
             RuleFor(x => x.ReturnTo)
                 .Must(BeASafeReturnTo)
                 .When(x => x.ReturnTo is not null)
-                .WithMessage("The returnTo URL must be a relative path or a localhost URL.");
+                .WithMessage("The returnTo URL must be a relative path or a configured allowed origin.");
         }
 
         /// <summary>
         /// Valida que o destino de retorno é seguro.
-        /// Previne open redirect para domínios externos.
+        /// Previne open redirect para domínios externos não configurados.
         /// </summary>
-        private static bool BeASafeReturnTo(string? returnTo)
+        private bool BeASafeReturnTo(string? returnTo)
         {
             if (string.IsNullOrWhiteSpace(returnTo))
                 return true;
 
-            // Rejeita URLs com protocolo duplo (//evil.com)
+            // Rejeita URLs com protocolo duplo (//evil.com) — bypass clássico
             if (returnTo.StartsWith("//", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            return AllowedReturnToPrefixes.Any(prefix =>
-                returnTo.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+            // Paths relativos são sempre seguros (mesma origem do browser)
+            if (returnTo.StartsWith("/", StringComparison.Ordinal) &&
+                !returnTo.StartsWith("//", StringComparison.Ordinal))
+                return true;
+
+            // Verifica contra origens configuradas (carregadas de Security:AllowedOrigins)
+            return _allowedOrigins.Any(origin =>
+                returnTo.StartsWith(origin, StringComparison.OrdinalIgnoreCase));
         }
     }
 

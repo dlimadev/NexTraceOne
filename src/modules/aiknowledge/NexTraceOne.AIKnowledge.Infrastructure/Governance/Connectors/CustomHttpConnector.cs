@@ -1,4 +1,6 @@
+using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -43,10 +45,16 @@ internal sealed class CustomHttpConnector(
         if (string.IsNullOrWhiteSpace(config.FetchEndpoint))
             return [];
 
+        var url = $"{config.BaseUrl?.TrimEnd('/')}{config.FetchEndpoint}";
+        if (!IsSafeExternalUrl(url))
+        {
+            logger.LogWarning("CustomHttpConnector: blocked fetch to disallowed URL '{Url}'.", url);
+            return [];
+        }
+
         try
         {
             var client = BuildClient(config);
-            var url = $"{config.BaseUrl?.TrimEnd('/')}{config.FetchEndpoint}";
             var json = await client.GetStringAsync(url, ct);
             return ParseDocuments(json, config, "custom_http_fetch");
         }
@@ -67,13 +75,20 @@ internal sealed class CustomHttpConnector(
         if (string.IsNullOrWhiteSpace(config.SearchEndpoint))
             return [];
 
+        var endpoint = config.SearchEndpoint
+            .Replace("{query}", Uri.EscapeDataString(query))
+            .Replace("{limit}", maxResults.ToString());
+        var url = $"{config.BaseUrl?.TrimEnd('/')}{endpoint}";
+
+        if (!IsSafeExternalUrl(url))
+        {
+            logger.LogWarning("CustomHttpConnector: blocked search to disallowed URL '{Url}'.", url);
+            return [];
+        }
+
         try
         {
             var client = BuildClient(config);
-            var endpoint = config.SearchEndpoint
-                .Replace("{query}", Uri.EscapeDataString(query))
-                .Replace("{limit}", maxResults.ToString());
-            var url = $"{config.BaseUrl?.TrimEnd('/')}{endpoint}";
             var json = await client.GetStringAsync(url, ct);
             return ParseDocuments(json, config, "custom_http_search");
         }
@@ -124,12 +139,63 @@ internal sealed class CustomHttpConnector(
         }
     }
 
-    private static HttpClient BuildClient(CustomHttpConfig config)
+    private HttpClient BuildClient(CustomHttpConfig config)
     {
-        var client = new HttpClient();
+        var client = httpClientFactory.CreateClient("custom-http-connector");
         if (!string.IsNullOrWhiteSpace(config.AuthHeader) && !string.IsNullOrWhiteSpace(config.AuthValue))
             client.DefaultRequestHeaders.Add(config.AuthHeader, config.AuthValue);
         return client;
+    }
+
+    /// <summary>
+    /// Valida que a URL é segura para chamadas externas.
+    /// Bloqueia loopback, IPs privados, link-local e metadados de cloud (169.254.169.254)
+    /// para prevenir SSRF (Server-Side Request Forgery).
+    /// </summary>
+    private static bool IsSafeExternalUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return false;
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return false;
+
+        // Apenas HTTPS é permitido para conectores externos.
+        if (!uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var host = uri.Host;
+
+        // Rejeita hostnames locais
+        if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (!IPAddress.TryParse(host, out var ip))
+            return true; // hostname não-IP: permitir (DNS resolve em runtime)
+
+        return !IsPrivateOrReservedIp(ip);
+    }
+
+    private static bool IsPrivateOrReservedIp(IPAddress ip)
+    {
+        // Normaliza IPv4-mapped IPv6 para IPv4
+        if (ip.IsIPv4MappedToIPv6)
+            ip = ip.MapToIPv4();
+
+        if (ip.AddressFamily == AddressFamily.InterNetwork)
+        {
+            var bytes = ip.GetAddressBytes();
+            return
+                bytes[0] == 127 ||                           // 127.0.0.0/8 loopback
+                bytes[0] == 10 ||                            // 10.0.0.0/8 private
+                (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) || // 172.16.0.0/12 private
+                (bytes[0] == 192 && bytes[1] == 168) ||      // 192.168.0.0/16 private
+                (bytes[0] == 169 && bytes[1] == 254) ||      // 169.254.0.0/16 link-local (incl. AWS metadata)
+                bytes[0] == 0;                               // 0.0.0.0/8 "this network"
+        }
+
+        // IPv6: loopback e link-local
+        return IPAddress.IsLoopback(ip) || ip.IsIPv6LinkLocal || ip.IsIPv6SiteLocal;
     }
 
     private static CustomHttpConfig ParseConfig(string json)

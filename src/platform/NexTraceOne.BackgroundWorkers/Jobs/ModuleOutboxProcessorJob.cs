@@ -129,7 +129,7 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
         {
             try
             {
-                var eventType = Type.GetType(message.EventType);
+                var eventType = ResolveEventType(message.EventType);
                 if (eventType is null)
                 {
                     message.RetryCount++;
@@ -220,6 +220,22 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
         {
             await ReleaseAdvisoryLockAsync(connection);
         }
+    }
+
+    /// <summary>
+    /// Resolve o tipo de evento do Outbox restringindo a tipos do namespace NexTraceOne.
+    /// Previne deserialização de tipos arbitrários caso a base de dados seja comprometida.
+    /// </summary>
+    private static Type? ResolveEventType(string? eventTypeName)
+    {
+        if (string.IsNullOrWhiteSpace(eventTypeName))
+            return null;
+
+        // Apenas tipos do namespace NexTraceOne são aceites para evitar carregamento arbitrário.
+        if (!eventTypeName.StartsWith("NexTraceOne.", StringComparison.Ordinal))
+            return null;
+
+        return Type.GetType(eventTypeName);
     }
 
     private static async Task<bool> TryAcquireAdvisoryLockAsync(DbConnection connection, CancellationToken cancellationToken)
