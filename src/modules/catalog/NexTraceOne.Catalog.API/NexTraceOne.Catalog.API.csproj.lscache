@@ -60,6 +60,7 @@ Contracts/Endpoints/
  DependencyInjection.cs
  Endpoints/
   BackgroundServiceContractEndpointModule.cs
+  CodeQualityEndpointModule.cs
   ContractChangelogEndpointModule.cs
   ContractsEndpointModule.cs
   ContractStudioEndpointModule.cs

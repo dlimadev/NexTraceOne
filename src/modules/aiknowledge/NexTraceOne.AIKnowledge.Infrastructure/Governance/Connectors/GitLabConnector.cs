@@ -45,7 +45,7 @@ internal sealed class GitLabConnector(
         }
 
         var baseUrl = config.BaseUrl?.TrimEnd('/') ?? "https://gitlab.com";
-        var client = BuildClient(config.AccessToken);
+        var client = BuildClient();
         var documents = new List<DataSourceDocument>();
         var extensions = config.IncludeExtensions.Count > 0
             ? config.IncludeExtensions
@@ -56,7 +56,7 @@ internal sealed class GitLabConnector(
         {
             try
             {
-                var docs = await IndexProjectAsync(client, baseUrl, projectId, config.Branch ?? "main", extensions, maxFiles, ct);
+                var docs = await IndexProjectAsync(client, baseUrl, projectId, config.Branch ?? "main", extensions, maxFiles, config.AccessToken, ct);
                 documents.AddRange(docs);
             }
             catch (Exception ex)
@@ -82,12 +82,13 @@ internal sealed class GitLabConnector(
         string branch,
         IReadOnlyList<string> extensions,
         int maxFiles,
+        string accessToken,
         CancellationToken ct)
     {
         var apiBase = $"{baseUrl}/api/v4/projects/{projectId}";
         var treeUrl = $"{apiBase}/repository/tree?recursive=true&per_page=100&ref={branch}";
 
-        var treeJson = await client.GetStringAsync(treeUrl, ct);
+        var treeJson = await GetStringAsync(client, treeUrl, accessToken, ct);
         var items = JsonSerializer.Deserialize<List<GitLabTreeItem>>(treeJson, JsonOptions) ?? [];
 
         var eligibleFiles = items
@@ -103,7 +104,7 @@ internal sealed class GitLabConnector(
             {
                 var encodedPath = Uri.EscapeDataString(file.Path ?? string.Empty);
                 var fileUrl = $"{apiBase}/repository/files/{encodedPath}/raw?ref={branch}";
-                var content = await client.GetStringAsync(fileUrl, ct);
+                var content = await GetStringAsync(client, fileUrl, accessToken, ct);
 
                 if (content.Length > MaxContentBytes)
                     content = content[..MaxContentBytes];
@@ -123,11 +124,18 @@ internal sealed class GitLabConnector(
         return docs;
     }
 
-    private static HttpClient BuildClient(string token)
+    private HttpClient BuildClient()
     {
-        var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("PRIVATE-TOKEN", token);
-        return client;
+        return httpClientFactory.CreateClient("GitLabConnector");
+    }
+
+    private static async Task<string> GetStringAsync(HttpClient client, string url, string token, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("PRIVATE-TOKEN", token);
+        var response = await client.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(ct);
     }
 
     private static GitLabConfig ParseConfig(string json)

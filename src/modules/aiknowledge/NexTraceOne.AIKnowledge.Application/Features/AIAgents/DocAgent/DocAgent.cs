@@ -52,6 +52,7 @@ public static class DocAgent
             }
 
             var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+            kernel.Data["GroundingQuery"] = request.Content;
 
             var systemPrompt = BuildSystemPrompt(request.DocType, request.TargetAudience, request.Style);
             var messages = new List<ChatMessage>

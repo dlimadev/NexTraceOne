@@ -32,4 +32,7 @@ public static class NexTraceActivitySources
     public static readonly ActivitySource TelemetryPipeline = new("NexTraceOne.TelemetryPipeline");
     /// <summary>Source para operações de integração com sistemas externos (adapters, webhooks, Kafka).</summary>
     public static readonly ActivitySource Integrations = new("NexTraceOne.Integrations");
+
+    /// <summary>Source para operações de IA (agentes, inferência, reflexão, orquestração).</summary>
+    public static readonly ActivitySource AIKnowledge = new("NexTraceOne.AIKnowledge");
 }

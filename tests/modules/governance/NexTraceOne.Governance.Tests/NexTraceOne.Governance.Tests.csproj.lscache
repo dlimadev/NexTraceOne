@@ -65,6 +65,7 @@ Application/
   DelegatedAdminFeatureTests.cs
   DomainFeatureTests.cs
   DoraAndScorecardTests.cs
+  ExecuteComplianceAuditTests.cs
   ExecutiveGovernanceSummaryTests.cs
   FinOpsComplianceGatesTests.cs
   FinOpsConfigAndApprovalTests.cs

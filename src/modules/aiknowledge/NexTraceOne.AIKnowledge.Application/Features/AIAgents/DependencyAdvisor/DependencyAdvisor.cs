@@ -70,6 +70,7 @@ public static class DependencyAdvisor
                 try
                 {
                     var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    kernel.Data["GroundingQuery"] = request.ProjectPath;
                     var systemPrompt = """
                         You are a dependency security analyst. Analyze the project dependencies and identify vulnerabilities and outdated packages.
                         Respond ONLY with valid JSON. No markdown, no explanations.

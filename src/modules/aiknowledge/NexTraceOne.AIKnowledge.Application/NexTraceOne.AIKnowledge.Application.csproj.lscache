@@ -78,11 +78,15 @@ ExternalAI/
 Features/AIAgents/
  AgentModels.cs
  ArchitectureFitness/ArchitectureFitness.cs
+ ChangeAdvisor/ChangeAdvisor.cs
  DependencyAdvisor/DependencyAdvisor.cs
  DocAgent/DocAgent.cs
  DocumentationQuality/DocumentationQuality.cs
+ IncidentResponder/IncidentResponder.cs
  PRAgent/PRAgent.cs
+ ReflectionAgent/ReflectionAgent.cs
  SecurityReview/SecurityReview.cs
+ ServiceAnalyst/ServiceAnalyst.cs
  WebSearchAgent/WebSearchAgent.cs
 Features/NLPRouting/
  NLPRoutingModels.cs
@@ -317,10 +321,13 @@ obj/Debug/net10.0/
  NexTraceOne.AIKnowledge.Application.AssemblyInfo.cs
  NexTraceOne.AIKnowledge.Application.GlobalUsings.g.cs
 Orchestration/Abstractions/
+ IAgentWorkflowExecutionRepository.cs
+ IAgentWorkflowOrchestrator.cs
  IAiContextRepository.cs
  IAiOrchestrationConversationRepository.cs
  IGeneratedTestArtifactRepository.cs
  IKnowledgeCaptureEntryRepository.cs
+ IWorkflowReplanningService.cs
 Orchestration/
  DependencyInjection.cs
  Features/
@@ -332,17 +339,22 @@ Orchestration/
   CompareEnvironments/CompareEnvironments.cs
   EvaluateArchitectureFitness/EvaluateArchitectureFitness.cs
   EvaluateDocumentationQuality/EvaluateDocumentationQuality.cs
+  ExecuteAgentWorkflow/ExecuteAgentWorkflow.cs
   GenerateAiScaffold/GenerateAiScaffold.cs
   GenerateArchitectureDecisionRecord/GenerateArchitectureDecisionRecord.cs
   GenerateRobotFrameworkDraft/GenerateRobotFrameworkDraft.cs
   GenerateTestScenarios/GenerateTestScenarios.cs
   GetAgentMarketplace/GetAgentMarketplace.cs
+  GetAgentWorkflowHistory/GetAgentWorkflowHistory.cs
   GetAiConversationHistory/GetAiConversationHistory.cs
   RecommendTemplateForService/RecommendTemplateForService.cs
   ReviewContractDraft/ReviewContractDraft.cs
   SuggestSemanticVersionWithAI/SuggestSemanticVersionWithAI.cs
   SummarizeReleaseForApproval/SummarizeReleaseForApproval.cs
   ValidateKnowledgeCapture/ValidateKnowledgeCapture.cs
+ Services/
+  AdaptiveWorkflowReplanningService.cs
+  AgentWorkflowOrchestrator.cs
 Runtime/Abstractions/
  ContextWindowManager.cs
  IAiModelCatalogService.cs
@@ -360,6 +372,7 @@ Runtime/Abstractions/
  INativeToolCallProvider.cs
  IPiiRedactionService.cs
  IPromptCacheService.cs
+ IRagGroundingService.cs
  ITelemetryRetrievalService.cs
  ITokenCounterService.cs
  ITokenQuotaCache.cs
@@ -393,11 +406,15 @@ Runtime/
   SearchTelemetry/SearchTelemetry.cs
  Plugins/
   ArchitectureFitnessPlugin.cs
+  ChangeAdvisorPlugin.cs
   DependencyAdvisorPlugin.cs
   DocAgentPlugin.cs
   DocumentationQualityPlugin.cs
+  IncidentResponderPlugin.cs
   PRAgentPlugin.cs
+  ReflectionAgentPlugin.cs
   SecurityReviewPlugin.cs
+  ServiceAnalystPlugin.cs
   WebSearchAgentPlugin.cs
  Services/
   StructuredOutputFallback.cs

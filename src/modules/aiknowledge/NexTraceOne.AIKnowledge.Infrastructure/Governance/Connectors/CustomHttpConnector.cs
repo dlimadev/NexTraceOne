@@ -54,8 +54,8 @@ internal sealed class CustomHttpConnector(
 
         try
         {
-            var client = BuildClient(config);
-            var json = await client.GetStringAsync(url, ct);
+            var client = BuildClient();
+            var json = await GetStringAsync(client, url, config, ct);
             return ParseDocuments(json, config, "custom_http_fetch");
         }
         catch (Exception ex)
@@ -88,8 +88,8 @@ internal sealed class CustomHttpConnector(
 
         try
         {
-            var client = BuildClient(config);
-            var json = await client.GetStringAsync(url, ct);
+            var client = BuildClient();
+            var json = await GetStringAsync(client, url, config, ct);
             return ParseDocuments(json, config, "custom_http_search");
         }
         catch (Exception ex)
@@ -139,12 +139,25 @@ internal sealed class CustomHttpConnector(
         }
     }
 
-    private HttpClient BuildClient(CustomHttpConfig config)
+    private HttpClient BuildClient()
     {
-        var client = httpClientFactory.CreateClient("custom-http-connector");
+        return httpClientFactory.CreateClient("custom-http-connector");
+    }
+
+    private static HttpRequestMessage BuildRequest(HttpMethod method, string url, CustomHttpConfig config)
+    {
+        var request = new HttpRequestMessage(method, url);
         if (!string.IsNullOrWhiteSpace(config.AuthHeader) && !string.IsNullOrWhiteSpace(config.AuthValue))
-            client.DefaultRequestHeaders.Add(config.AuthHeader, config.AuthValue);
-        return client;
+            request.Headers.Add(config.AuthHeader, config.AuthValue);
+        return request;
+    }
+
+    private static async Task<string> GetStringAsync(HttpClient client, string url, CustomHttpConfig config, CancellationToken ct)
+    {
+        using var request = BuildRequest(HttpMethod.Get, url, config);
+        var response = await client.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(ct);
     }
 
     /// <summary>

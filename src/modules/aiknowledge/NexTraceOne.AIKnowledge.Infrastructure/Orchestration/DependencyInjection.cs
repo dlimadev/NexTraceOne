@@ -59,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IAiOrchestrationConversationRepository, AiOrchestrationConversationRepository>();
         services.AddScoped<IKnowledgeCaptureEntryRepository, KnowledgeCaptureEntryRepository>();
         services.AddScoped<IGeneratedTestArtifactRepository, GeneratedTestArtifactRepository>();
+        services.AddScoped<IAgentWorkflowExecutionRepository, AgentWorkflowExecutionRepository>();
         services.AddScoped<IAiOrchestrationModule, AiOrchestrationModule>();
 
         return services;

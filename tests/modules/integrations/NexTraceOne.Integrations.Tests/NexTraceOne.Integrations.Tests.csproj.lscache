@@ -57,9 +57,11 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 Application/Features/
  CloudBillingProviderTests.cs
  ConfluentKafkaTests.cs
+ CreateStorageBucketTests.cs
  IngestionSourceDomainTests.cs
  IntegrationHubFeatureTests.cs
  NullKafkaEventProducerTests.cs
+ RetryConnectorTests.cs
  TenantPipelineRuleTests.cs
  WaveBaIntegrationHealthTests.cs
  WaveZTests.cs

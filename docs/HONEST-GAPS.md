@@ -1,6 +1,6 @@
 # NexTraceOne — Honest Gaps
 
-> **Última atualização:** Maio 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0** | Evolução pós-v1.0.0 em progresso (Wave A.1 ✅, Wave A.2 ✅, Wave A.3 ✅, Wave A.4 ✅)
+> **Última atualização:** Maio 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0** | Evolução pós-v1.0.0 em progresso (Wave A.1 ✅, Wave A.2 ✅, Wave A.3 ✅, Wave A.4 ✅, Wave A.5 ✅)
 > **Propósito:** Registo único e honesto de toda a dívida declarada, degradação graciosa (`simulatedNote`), decisões de "out-of-scope" e providers opcionais cujo enforcement fica dependente de configuração externa.
 >
 > Este ficheiro é **fonte da verdade** para responder "isto está implementado?" quando o `IMPLEMENTATION-STATUS.md` classifica algo como `READY com notas`, `PARTIAL` ou `SIM`.
@@ -201,10 +201,10 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 |---|---|---|---|---|
 | **GAP-M01** | 🟡 Degradação | `GetDashboardAnnotations` retorna 4 anotações hardcoded para serviços fictícios ("payment-service", "user-service") com `IsSimulated:true`. Não há fonte de dados real ligada. | `Governance.Application/Features/GetDashboardAnnotations/GetDashboardAnnotations.cs` | Adicionar a PLAN-02 como CC-09 |
 | **GAP-M02** | 🟡 Config | Startup configuration validation (`ValidateOnStart` para `JwtOptions` e `ConnectionStrings`) não implementado em `Program.cs`. App arranca sem secrets obrigatórios sem falha imediata. | `NexTraceOne.ApiHost/Program.cs` | PRODUCTION-ACTION-PLAN.md Task 2.1 |
-| **GAP-M03** | 🟡 Feature | Contract Pipeline: `GeneratePostmanCollection`, `GenerateMockServer`, `GenerateContractTests` ainda aceitam `ContractJson` do request em vez de carregar spec da DB via `IContractVersionRepository`. (`GenerateServerFromContract` e `GenerateClientSdkFromContract` já corrigidos.) | `Catalog.Application/Portal/ContractPipeline/Features/Generate*/` | PRODUCTION-ACTION-PLAN.md Task 3.1 |
+| **GAP-M03** | ✅ **RESOLVIDO** | Contract Pipeline: `GeneratePostmanCollection`, `GenerateMockServer`, `GenerateContractTests` carregam spec da DB via `IContractVersionRepository.GetByIdAsync` → `SpecContent`. Verificado em Maio 2026 — todos os handlers usam repository pattern. Tests: 13 testes em `ContractPipelineTests.cs`. | `Catalog.Application/Portal/ContractPipeline/Features/Generate*/` | N/A — já implementado |
 | **GAP-M04** | 🟢 Housekeeping | Migrações `SyncModelSnapshot` com `Up()` e `Down()` vazios em Catalog e OperationalIntelligence. Harmless no-ops mas acumulam ruído. | `Catalog.Infrastructure/Migrations/20260410202600_SyncModelSnapshot.cs` + OI equivalente | PRODUCTION-ACTION-PLAN.md Task 4.2 |
 | **GAP-M05** | 🟢 Docs | Runbook `docs/runbooks/database-migrations.md` especificado em PRODUCTION-ACTION-PLAN.md Task 4.3 não existe. Comandos EF Core para migrações multi-context não estão documentados. | `docs/runbooks/database-migrations.md` (ausente) | Criado nesta auditoria |
-| **GAP-M06** | 🟡 Feature | `IIdentityNotifier` usa `NullIdentityNotifier` (log warning) em vez de email real via módulo Notifications. Tokens de activação/reset são gerados mas não chegam ao utilizador em produção. | `IdentityAccess.Infrastructure/Services/NullIdentityNotifier.cs` | Ligar a `INotificationModule` quando SMTP configurado |
+| **GAP-M06** | ✅ **RESOLVIDO** | `IIdentityNotifier` tem implementação real `NotificationsIdentityNotifier` que delega a `INotificationModule.SubmitAsync`. DI regista `NotificationsIdentityNotifier` condicionalmente quando `Smtp:Host` configurado; fallback é `NullIdentityNotifier` (dev/local). Tests: `ForgotPasswordTests.cs` (mock `IIdentityNotifier`), `ActivateAccountTests.cs`. | `IdentityAccess.Infrastructure/Services/NotificationsIdentityNotifier.cs` | N/A — já implementado |
 
 ---
 

@@ -84,7 +84,8 @@ public static class DependencyInjection
                         NexTraceActivitySources.Events.Name,
                         NexTraceActivitySources.ExternalHttp.Name,
                         NexTraceActivitySources.TelemetryPipeline.Name,
-                        NexTraceActivitySources.Integrations.Name)
+                        NexTraceActivitySources.Integrations.Name,
+                        NexTraceActivitySources.AIKnowledge.Name)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation();
 
@@ -178,16 +179,17 @@ public static class DependencyInjection
             {
                 // Elastic desabilitado - usa Null provider
                 services.AddSingleton<IObservabilityProvider, NullObservabilityProvider>();
-                return;
             }
-            
-            // Default: Elastic
-            services.AddHttpClient<ElasticObservabilityProvider>(client =>
+            else
             {
-                client.Timeout = TimeSpan.FromSeconds(30);
-            }).AddStandardResilienceHandler();
-            services.AddSingleton<IObservabilityProvider>(sp =>
-                sp.GetRequiredService<ElasticObservabilityProvider>());
+                // Default: Elastic
+                services.AddHttpClient<ElasticObservabilityProvider>(client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                }).AddStandardResilienceHandler();
+                services.AddSingleton<IObservabilityProvider>(sp =>
+                    sp.GetRequiredService<ElasticObservabilityProvider>());
+            }
         }
 
         services.AddSingleton<ITelemetryQueryService, TelemetryQueryService>();

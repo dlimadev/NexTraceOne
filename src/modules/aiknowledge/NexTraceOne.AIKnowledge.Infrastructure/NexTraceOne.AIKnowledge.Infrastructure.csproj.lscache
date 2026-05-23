@@ -99,6 +99,7 @@ Governance/
   ExternalDataSourceSyncJob.cs
   FeedbackThresholdJob.cs
   ProactiveArchitectureGuardianJob.cs
+  QdrantIndexJob.cs
   TrajectoryExporterJob.cs
  Persistence/
   AiGovernanceDbContext.cs
@@ -219,6 +220,7 @@ Governance/
    SelfHealingActionRepository.cs
    WarRoomRepository.cs
  Services/
+  AiAgentRuntimeServiceObservabilityDecorator.cs
   AiGovernanceModuleService.cs
   DataSourceSyncService.cs
   InMemoryEmbeddingCacheService.cs
@@ -237,6 +239,7 @@ Orchestration/
   AiOrchestrationDbContext.cs
   AiOrchestrationDbContextDesignTimeFactory.cs
   Configurations/
+   AgentWorkflowExecutionConfiguration.cs
    AiContextConfiguration.cs
    AiConversationConfiguration.cs
    GeneratedTestArtifactConfiguration.cs
@@ -245,7 +248,9 @@ Orchestration/
    20260511134752_InitialCreate.cs
    20260511134752_InitialCreate.Designer.cs
    AiOrchestrationDbContextModelSnapshot.cs
-  Repositories/AiOrchestrationRepositories.cs
+  Repositories/
+   AgentWorkflowExecutionRepository.cs
+   AiOrchestrationRepositories.cs
  Services/AiOrchestrationModule.cs
 Runtime/Configuration/
  AiRoutingOptions.cs
@@ -286,12 +291,15 @@ Runtime/
   ExternalAiRoutingPortAdapter.cs
   InMemoryTokenQuotaCache.cs
   PiiRedactionService.cs
+  RagGroundingService.cs
   SemanticKernel/
    AiKernelService.cs
    NexTraceOneChatCompletionService.cs
   TelemetryRetrievalService.cs
   TokenCounterService.cs
-  VectorStore/QdrantVectorStoreRepository.cs
+  VectorStore/
+   NullVectorStoreRepository.cs
+   QdrantVectorStoreRepository.cs
  Tools/
   AgentToolExecutor.cs
   AllowedToolsPermissionValidator.cs

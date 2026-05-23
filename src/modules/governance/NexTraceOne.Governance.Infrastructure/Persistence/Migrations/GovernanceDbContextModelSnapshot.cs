@@ -373,6 +373,12 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("SuccessorDashboardId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValueSql("'[]'::jsonb");
+
                     b.Property<string>("TeamId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");

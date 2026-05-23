@@ -205,6 +205,7 @@ Entities/
  FeatureFlagRecord.cs
 Graph/Entities/
  ApiAsset.cs
+ AssetDeploymentState.cs
  ConsumerAsset.cs
  ConsumerRelationship.cs
  ContractBinding.cs
@@ -234,6 +235,7 @@ Graph/Enums/
  NodeType.cs
  OverlayMode.cs
  RelationshipSemantic.cs
+ RuntimeStatus.cs
  ServiceTierType.cs
  ServiceType.cs
 Graph/Errors/CatalogGraphErrors.cs

@@ -58,6 +58,7 @@ public static class PRAgent
             }
 
             var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+            kernel.Data["GroundingQuery"] = $"{request.Title} {request.Description}".Trim();
 
             var systemPrompt = BuildSystemPrompt(request.Language);
             var userPrompt = BuildUserPrompt(request);

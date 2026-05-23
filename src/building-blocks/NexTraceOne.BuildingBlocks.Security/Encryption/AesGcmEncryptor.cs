@@ -38,6 +38,7 @@ public sealed class AesGcmEncryptor
     }
 
     /// <summary>Descriptografa um texto Base64 previamente protegido com AES-256-GCM.</summary>
+    /// <remarks>Fail-open: se o valor não for um ciphertext válido, retorna o texto original.</remarks>
     public static string Decrypt(string cipherText)
     {
         if (string.IsNullOrEmpty(cipherText))
@@ -45,22 +46,41 @@ public sealed class AesGcmEncryptor
             return cipherText;
         }
 
-        var payload = Convert.FromBase64String(cipherText);
-        if (payload.Length < _nonceSize + _tagSize)
+        byte[] payload;
+        try
         {
-            throw new InvalidOperationException("Encrypted payload is invalid.");
+            payload = Convert.FromBase64String(cipherText);
+        }
+        catch (FormatException)
+        {
+            // Não é Base64 válido — provavelmente dado plaintext legado.
+            return cipherText;
         }
 
-        var key = ResolveEncryptionKey();
-        var nonce = payload[.._nonceSize];
-        var tag = payload[_nonceSize..(_nonceSize + _tagSize)];
-        var cipherBytes = payload[(_nonceSize + _tagSize)..];
-        var plainBytes = new byte[cipherBytes.Length];
+        if (payload.Length < _nonceSize + _tagSize)
+        {
+            // Payload muito curto para ser um ciphertext válido.
+            return cipherText;
+        }
 
-        using var aes = new AesGcm(key, _tagSize);
-        aes.Decrypt(nonce, cipherBytes, tag, plainBytes);
+        try
+        {
+            var key = ResolveEncryptionKey();
+            var nonce = payload[.._nonceSize];
+            var tag = payload[_nonceSize..(_nonceSize + _tagSize)];
+            var cipherBytes = payload[(_nonceSize + _tagSize)..];
+            var plainBytes = new byte[cipherBytes.Length];
 
-        return Encoding.UTF8.GetString(plainBytes);
+            using var aes = new AesGcm(key, _tagSize);
+            aes.Decrypt(nonce, cipherBytes, tag, plainBytes);
+
+            return Encoding.UTF8.GetString(plainBytes);
+        }
+        catch (CryptographicException)
+        {
+            // Chave incorreta ou ciphertext corrompido — retorna original.
+            return cipherText;
+        }
     }
 
     /// <summary>

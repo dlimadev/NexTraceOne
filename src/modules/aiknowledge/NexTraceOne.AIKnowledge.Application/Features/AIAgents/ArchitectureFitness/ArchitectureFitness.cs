@@ -70,6 +70,7 @@ public static class ArchitectureFitness
                 try
                 {
                     var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    kernel.Data["GroundingQuery"] = request.ProjectPath;
                     var systemPrompt = """
                         You are a software architect. Analyze the project structure and identify code smells and refactoring opportunities.
                         Respond ONLY with valid JSON. No markdown, no explanations.

@@ -65,6 +65,8 @@ Contracts/Abstractions/
  IBreakingChangeProposalRepository.cs
  ICanonicalEntityRepository.cs
  ICanonicalEntityVersionRepository.cs
+ ICodeQualityReader.cs
+ ICodeQualityRepository.cs
  IConsumerExpectationRepository.cs
  IContractChangelogRepository.cs
  IContractCompatibilityReader.cs
@@ -169,6 +171,7 @@ Contracts/
   GetCanonicalEntityImpact/GetCanonicalEntityImpact.cs
   GetCanonicalEntityImpactCascade/GetCanonicalEntityImpactCascade.cs
   GetCanonicalEntityUsages/GetCanonicalEntityUsages.cs
+  GetCodeQualityReport/GetCodeQualityReport.cs
   GetCompatibilityAssessment/GetCompatibilityAssessment.cs
   GetComplianceStatus/GetComplianceStatus.cs
   GetContractAdoptionReport/GetContractAdoptionReport.cs
@@ -231,6 +234,7 @@ Contracts/
   ImportContract/ImportContract.cs
   ImportWsdlContract/ImportWsdlContract.cs
   InferDependenciesFromContracts/InferDependenciesFromContracts.cs
+  IngestCodeQualityRecord/IngestCodeQualityRecord.cs
   IngestFeatureFlagState/IngestFeatureFlagState.cs
   IngestSbomRecord/IngestSbomRecord.cs
   InitiateContractDeprecation/InitiateContractDeprecation.cs
@@ -353,6 +357,7 @@ DeveloperExperience/
  Services/NullIdeContextReader.cs
 Graph/Abstractions/
  IApiAssetRepository.cs
+ IAssetDeploymentStateRepository.cs
  ICatalogGraphUnitOfWork.cs
  IContractBindingRepository.cs
  IDiscoveredServiceRepository.cs
@@ -387,6 +392,7 @@ Graph/
   ExportToBackstage/ExportToBackstage.cs
   GetAssetDetail/GetAssetDetail.cs
   GetAssetGraph/GetAssetGraph.cs
+  GetCatalogCompletenessScore/GetCatalogCompletenessScore.cs
   GetDependencyRiskReport/GetDependencyRiskReport.cs
   GetDiscoveryDashboard/GetDiscoveryDashboard.cs
   GetFrameworkDetail/GetFrameworkDetail.cs
@@ -396,6 +402,7 @@ Graph/
   GetNodeHealth/GetNodeHealth.cs
   GetOwnershipAudit/GetOwnershipAudit.cs
   GetOwnershipDriftReport/GetOwnershipDriftReport.cs
+  GetPortfolioCompletenessReport/GetPortfolioCompletenessReport.cs
   GetServiceApiExposureReport/GetServiceApiExposureReport.cs
   GetServiceCouplingIndexReport/GetServiceCouplingIndexReport.cs
   GetServiceDetail/GetServiceDetail.cs
@@ -452,11 +459,13 @@ LegacyAssets/Abstractions/
  IDb2ArtifactRepository.cs
  IImsTransactionRepository.cs
  ILegacyAssetsUnitOfWork.cs
+ ILegacyDependencyRepository.cs
  IMainframeSystemRepository.cs
  IZosConnectBindingRepository.cs
 LegacyAssets/Features/
  DiffCopybookVersions/DiffCopybookVersions.cs
  GetLegacyAssetDetail/GetLegacyAssetDetail.cs
+ GetLegacyImpactPropagation/GetLegacyImpactPropagation.cs
  ImportCopybookLayout/ImportCopybookLayout.cs
  ListLegacyAssets/ListLegacyAssets.cs
  RegisterCicsTransaction/RegisterCicsTransaction.cs

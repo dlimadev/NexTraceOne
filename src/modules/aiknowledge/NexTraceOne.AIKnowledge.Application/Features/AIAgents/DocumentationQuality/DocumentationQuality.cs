@@ -64,6 +64,7 @@ public static class DocumentationQuality
                 try
                 {
                     var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    kernel.Data["GroundingQuery"] = request.ProjectPath;
                     var systemPrompt = """
                         You are a documentation quality analyst. Analyze the project documentation and identify gaps.
                         Respond ONLY with valid JSON. No markdown, no explanations.

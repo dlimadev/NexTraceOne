@@ -30,6 +30,9 @@ public sealed class AiOrchestrationDbContext(
     /// <summary>Entradas sugeridas para base de conhecimento pela orquestração de IA.</summary>
     public DbSet<KnowledgeCaptureEntry> KnowledgeCaptureEntries => Set<KnowledgeCaptureEntry>();
 
+    /// <summary>Execuções de workflows multi-agent para auditoria.</summary>
+    public DbSet<AgentWorkflowExecution> WorkflowExecutions => Set<AgentWorkflowExecution>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiOrchestrationDbContext).Assembly;
 

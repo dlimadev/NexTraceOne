@@ -62,6 +62,7 @@ Abstractions/
  IDashboardCommentRepository.cs
  IDashboardDataBridge.cs
  IDashboardMonitorRepository.cs
+ IDashboardObservabilityReader.cs
  IDashboardTemplateRepository.cs
  IDashboardUsageForwarder.cs
  IDashboardUsageRepository.cs
@@ -118,6 +119,7 @@ Features/
  EvaluateFinOpsBudgetGate/EvaluateFinOpsBudgetGate.cs
  EvaluateFourEyesPrinciple/EvaluateFourEyesPrinciple.cs
  EvaluateReleaseBudgetGate/EvaluateReleaseBudgetGate.cs
+ ExecuteComplianceAudit/ExecuteComplianceAudit.cs
  ExecuteNqlQuery/ExecuteNqlQuery.cs
  ExpireGovernanceWaivers/ExpireGovernanceWaivers.cs
  ExportDashboardAsYaml/ExportDashboardAsYaml.cs
@@ -142,6 +144,7 @@ Features/
  GetCrossTeamDependencies/GetCrossTeamDependencies.cs
  GetCustomDashboard/GetCustomDashboard.cs
  GetDashboardAnnotations/GetDashboardAnnotations.cs
+ GetDashboardBatchQuery/GetDashboardBatchQuery.cs
  GetDashboardComments/GetDashboardComments.cs
  GetDashboardHistory/GetDashboardHistory.cs
  GetDashboardLiveStream/
@@ -300,7 +303,9 @@ SecurityGate/
   NexTraceOne.Configuration.Domain/obj/Debug/net10.0/ref/NexTraceOne.Configuration.Domain.dll
  integrations/NexTraceOne.Integrations.Domain/obj/Debug/net10.0/ref/NexTraceOne.Integrations.Domain.dll
  operationalintelligence/NexTraceOne.OperationalIntelligence.Contracts/obj/Debug/net10.0/ref/NexTraceOne.OperationalIntelligence.Contracts.dll
-../NexTraceOne.Governance.Domain/obj/Debug/net10.0/ref/NexTraceOne.Governance.Domain.dll
+../
+ NexTraceOne.Governance.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Governance.Contracts.dll
+ NexTraceOne.Governance.Domain/obj/Debug/net10.0/ref/NexTraceOne.Governance.Domain.dll
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.8/ref/net10.0/
  Microsoft.AspNetCore.Antiforgery.dll
  Microsoft.AspNetCore.Authentication.Abstractions.dll

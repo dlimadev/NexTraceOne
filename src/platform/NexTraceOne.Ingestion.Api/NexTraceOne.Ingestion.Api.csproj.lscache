@@ -72,6 +72,7 @@ Endpoints/
  ReportEndpoints.cs
  RuntimeSignalEndpoints.cs
  ServiceHealthQueryEndpoints.cs
+ SonarQubeIngestEndpoints.cs
 IngestionApiStartup.cs
 Models/IngestionRequests.cs
 obj/Debug/net10.0/
@@ -112,6 +113,7 @@ Security/IngestionApiSecurity.cs
   NexTraceOne.Configuration.Domain/obj/Debug/net10.0/ref/NexTraceOne.Configuration.Domain.dll
  governance/
   NexTraceOne.Governance.Application/obj/Debug/net10.0/ref/NexTraceOne.Governance.Application.dll
+  NexTraceOne.Governance.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Governance.Contracts.dll
   NexTraceOne.Governance.Domain/obj/Debug/net10.0/ref/NexTraceOne.Governance.Domain.dll
   NexTraceOne.Governance.Infrastructure/obj/Debug/net10.0/ref/NexTraceOne.Governance.Infrastructure.dll
  identityaccess/
@@ -643,6 +645,7 @@ obj/Debug/net10.0/NexTraceOne.Ingestion.Api.GeneratedMSBuildEditorConfig.editorc
   NexTraceOne.Configuration.Domain/bin/Debug/net10.0/NexTraceOne.Configuration.Domain.xml
  governance/
   NexTraceOne.Governance.Application/bin/Debug/net10.0/NexTraceOne.Governance.Application.xml
+  NexTraceOne.Governance.Contracts/bin/Debug/net10.0/NexTraceOne.Governance.Contracts.xml
   NexTraceOne.Governance.Domain/bin/Debug/net10.0/NexTraceOne.Governance.Domain.xml
   NexTraceOne.Governance.Infrastructure/bin/Debug/net10.0/NexTraceOne.Governance.Infrastructure.xml
  identityaccess/

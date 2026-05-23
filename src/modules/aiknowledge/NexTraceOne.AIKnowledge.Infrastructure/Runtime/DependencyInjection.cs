@@ -220,6 +220,9 @@ public static class DependencyInjection
         // Semantic Kernel native chat completion adapter (bridges custom providers to SK IChatCompletionService)
         services.AddScoped<IChatCompletionService, NexTraceOneChatCompletionService>();
 
+        // RAG grounding service — fail-open vector search for prompt enrichment
+        services.AddScoped<IRagGroundingService, RagGroundingService>();
+
         // Semantic Kernel orchestration service
         services.AddScoped<IAiKernelService, AiKernelService>();
 
@@ -235,6 +238,10 @@ public static class DependencyInjection
                 var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QdrantVectorStoreRepository>>();
                 return new QdrantVectorStoreRepository(opts.Host, opts.Port, logger);
             });
+        }
+        else
+        {
+            services.AddSingleton<IVectorStoreRepository, NullVectorStoreRepository>();
         }
 
         // Embedding cache — singleton para partilhar cache entre requests dentro do processo.
@@ -257,6 +264,9 @@ public static class DependencyInjection
         services.AddScoped<IAiAgentPlugin, DocAgentPlugin>();
         services.AddScoped<IAiAgentPlugin, PRAgentPlugin>();
         services.AddScoped<IAiAgentPlugin, WebSearchAgentPlugin>();
+        services.AddScoped<IAiAgentPlugin, ServiceAnalystPlugin>();
+        services.AddScoped<IAiAgentPlugin, ChangeAdvisorPlugin>();
+        services.AddScoped<IAiAgentPlugin, IncidentResponderPlugin>();
 
         // ── Tool infrastructure ──────────────────────────────────────────
         services.AddSingleton<IAgentTool, ListServicesInfoTool>();

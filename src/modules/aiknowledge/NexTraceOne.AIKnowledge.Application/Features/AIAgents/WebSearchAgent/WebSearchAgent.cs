@@ -58,6 +58,7 @@ public static class WebSearchAgent
             }
 
             var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+            kernel.Data["GroundingQuery"] = request.Query;
 
             var systemPrompt = BuildSystemPrompt(request.Focus);
             var userPrompt = BuildUserPrompt(request);

@@ -65,6 +65,7 @@ Contracts/
   BreakingChangeProposalConfiguration.cs
   CanonicalEntityConfiguration.cs
   CanonicalEntityVersionConfiguration.cs
+  CodeQualityRecordConfiguration.cs
   ConsumerExpectationConfiguration.cs
   ContractArtifactConfiguration.cs
   ContractChangelogConfiguration.cs
@@ -110,6 +111,8 @@ Contracts/
    20260511135033_InitialCreate.Designer.cs
    20260515105212_AddContractVersionApiAssetIdIndex.cs
    20260515105212_AddContractVersionApiAssetIdIndex.Designer.cs
+   20260522130000_AddCodeQualityRecords.cs
+   20260522130000_AddCodeQualityRecords.Designer.cs
    ContractsDbContextModelSnapshot.cs
   Repositories/
    BackgroundServiceContractDetailRepository.cs
@@ -131,6 +134,7 @@ Contracts/
    ContractVerificationRepository.cs
    ContractVersionRepository.cs
    DataContractSchemaRepository.cs
+   EfCodeQualityRepository.cs
    EfDataContractRepository.cs
    EfDeprecationScheduleRepository.cs
    EfFeatureFlagRepository.cs
@@ -191,6 +195,7 @@ Graph/
   CatalogGraphDbContextDesignTimeFactory.cs
   Configurations/
    ApiAssetConfiguration.cs
+   AssetDeploymentStateConfiguration.cs
    ConsumerAssetConfiguration.cs
    ConsumerRelationshipConfiguration.cs
    ContractBindingConfiguration.cs
@@ -213,9 +218,12 @@ Graph/
    20260511135018_InitialCreate.Designer.cs
    20260515105151_AddServiceAssetAuditTenantSearchAndEncryption.cs
    20260515105151_AddServiceAssetAuditTenantSearchAndEncryption.Designer.cs
+   20260522120000_AddAssetDeploymentState.cs
+   20260522120000_AddAssetDeploymentState.Designer.cs
    CatalogGraphDbContextModelSnapshot.cs
   Repositories/
    ApiAssetRepository.cs
+   AssetDeploymentStateRepository.cs
    ContractBindingRepository.cs
    DiscoveredServiceRepository.cs
    DiscoveryMatchRuleRepository.cs
@@ -264,6 +272,7 @@ LegacyAssets/
    CopybookVersionRepository.cs
    Db2ArtifactRepository.cs
    ImsTransactionRepository.cs
+   LegacyDependencyRepository.cs
    MainframeSystemRepository.cs
    ZosConnectBindingRepository.cs
 obj/Debug/net10.0/
@@ -298,6 +307,27 @@ Portal/
    SavedSearchRepository.cs
    SubscriptionRepository.cs
  Services/DeveloperPortalModuleService.cs
+Readers/
+ EfApiVersionStrategyReader.cs
+ EfCatalogHealthMaintenanceReader.cs
+ EfCodeQualityReader.cs
+ EfContractDeprecationForecastReader.cs
+ EfContractDeprecationPipelineReader.cs
+ EfContractTestReader.cs
+ EfCriticalPathReader.cs
+ EfDependencyProvenanceReader.cs
+ EfDependencyVersionAlignmentReader.cs
+ EfKnowledgeRelationReader.cs
+ EfSbomCoverageReader.cs
+ EfSchemaEvolutionSafetyReader.cs
+ EfSchemaQualityReader.cs
+ EfSecretsExposureReader.cs
+ EfServiceLifecycleReader.cs
+ EfServiceTopologyReader.cs
+ EfSupplyChainRiskReader.cs
+ EfUncatalogedServicesReader.cs
+ EfVulnerabilityExposureReader.cs
+Services/EfRetirementReadinessReader.cs
 Templates/
  DependencyInjection.cs
  Persistence/

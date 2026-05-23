@@ -113,6 +113,7 @@ obj/Debug/net10.0/
  operationalintelligence/NexTraceOne.OperationalIntelligence.Contracts/obj/Debug/net10.0/ref/NexTraceOne.OperationalIntelligence.Contracts.dll
 ../
  NexTraceOne.Governance.Application/obj/Debug/net10.0/ref/NexTraceOne.Governance.Application.dll
+ NexTraceOne.Governance.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Governance.Contracts.dll
  NexTraceOne.Governance.Domain/obj/Debug/net10.0/ref/NexTraceOne.Governance.Domain.dll
  NexTraceOne.Governance.Infrastructure/obj/Debug/net10.0/ref/NexTraceOne.Governance.Infrastructure.dll
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.8/ref/net10.0/

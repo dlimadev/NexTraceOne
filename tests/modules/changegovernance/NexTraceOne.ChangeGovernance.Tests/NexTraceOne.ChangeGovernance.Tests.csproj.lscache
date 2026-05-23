@@ -137,11 +137,14 @@ obj/Debug/net10.0/
  NexTraceOne.ChangeGovernance.Tests.AssemblyInfo.cs
  NexTraceOne.ChangeGovernance.Tests.GlobalUsings.g.cs
 Platform/Application/Features/WaveAuPlatformIntelligenceTests.cs
-Promotion/Application/Features/
- EvaluateContractComplianceGateTests.cs
- EvaluateSignedArtifactGateTests.cs
- PromotionApplicationTests.cs
- PromotionGateComplianceReportTests.cs
+Promotion/Application/
+ ApprovePromotionTests.cs
+ CreatePromotionRequestTests.cs
+ Features/
+  EvaluateContractComplianceGateTests.cs
+  EvaluateSignedArtifactGateTests.cs
+  PromotionApplicationTests.cs
+  PromotionGateComplianceReportTests.cs
 Promotion/
  Domain/Entities/PromotionDomainTests.cs
  GlobalUsings.cs

@@ -153,6 +153,7 @@ Orchestration/Features/
  AssessPromotionReadinessTests.cs
  ClassifyChangeWithAITests.cs
  CompareEnvironmentsTests.cs
+ ExecuteAgentWorkflowTests.cs
  GenerateAiScaffoldTests.cs
  MissingOrchestrationFeaturesTests.cs
  Phase2OrchestrationHandlerTests.cs
@@ -177,15 +178,23 @@ Runtime/
   OllamaProviderTests.cs
   OpenAiProviderTests.cs
  Services/
+  AgentWorkflowOrchestratorTests.cs
   AiModelCatalogServiceTests.cs
   AiProviderFactoryTests.cs
   AiProviderHealthServiceTests.cs
   AiResourceGovernorTests.cs
   AiTokenQuotaServiceTests.cs
+  ChangeAdvisorTests.cs
+  ConnectorHttpClientFactoryTests.cs
   DistributedPromptCacheServiceTests.cs
   ExternalAiRoutingPortAdapterTests.cs
   GroundingContextAssemblyTests.cs
+  IncidentResponderTests.cs
   PiiRedactionServiceTests.cs
+  QdrantIndexJobTests.cs
+  RagGroundingServiceTests.cs
+  ReflectionAgentTests.cs
+  ServiceAnalystTests.cs
   TokenCounterServiceTests.cs
  Tools/
   AdditionalPhantomToolsTests.cs

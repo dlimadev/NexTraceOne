@@ -47,7 +47,7 @@ internal sealed class GitHubConnector(
             return [];
         }
 
-        var client = BuildClient(config.AccessToken);
+        var client = BuildClient();
         var documents = new List<DataSourceDocument>();
         var extensions = config.IncludeExtensions.Count > 0
             ? config.IncludeExtensions
@@ -59,7 +59,7 @@ internal sealed class GitHubConnector(
             try
             {
                 var branch = config.Branch ?? "main";
-                var files = await GetRepoFilesAsync(client, repo, branch, extensions, maxFiles, ct);
+                var files = await GetRepoFilesAsync(client, repo, branch, extensions, maxFiles, config.AccessToken, ct);
                 documents.AddRange(files);
             }
             catch (Exception ex)
@@ -84,10 +84,11 @@ internal sealed class GitHubConnector(
         string branch,
         IReadOnlyList<string> extensions,
         int maxFiles,
+        string accessToken,
         CancellationToken ct)
     {
         var treeUrl = $"{ApiBase}/repos/{repo}/git/trees/{branch}?recursive=1";
-        var treeJson = await client.GetStringAsync(treeUrl, ct);
+        var treeJson = await GetStringAsync(client, treeUrl, accessToken, ct);
         var tree = JsonSerializer.Deserialize<GitHubTree>(treeJson, JsonOptions);
 
         var eligibleFiles = tree?.Tree?
@@ -101,8 +102,8 @@ internal sealed class GitHubConnector(
         {
             try
             {
-                var raw = await client.GetStringAsync(
-                    $"https://raw.githubusercontent.com/{repo}/{branch}/{file.Path}", ct);
+                var raw = await GetStringAsync(client,
+                    $"https://raw.githubusercontent.com/{repo}/{branch}/{file.Path}", accessToken, ct);
 
                 if (raw.Length > MaxContentBytes)
                     raw = raw[..MaxContentBytes];
@@ -122,14 +123,20 @@ internal sealed class GitHubConnector(
         return docs;
     }
 
-    private static HttpClient BuildClient(string token)
+    private HttpClient BuildClient()
     {
-        var client = new HttpClient();
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("NexTraceOne/1.0");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        return client;
+        return httpClientFactory.CreateClient(ClientName);
+    }
+
+    private static async Task<string> GetStringAsync(HttpClient client, string url, string token, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.UserAgent.ParseAdd("NexTraceOne/1.0");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+        var response = await client.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(ct);
     }
 
     private static GitHubConfig ParseConfig(string json)

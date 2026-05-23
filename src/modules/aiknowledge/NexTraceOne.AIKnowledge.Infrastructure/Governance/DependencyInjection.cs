@@ -9,6 +9,8 @@ using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Services;
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.EventHandlers;
@@ -20,6 +22,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ClickHouse;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ElasticSearch;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -90,7 +93,13 @@ public static class DependencyInjection
         services.AddScoped<IIdeQuerySessionRepository, IdeQuerySessionRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
         services.AddScoped<IAiExecutionPlanRepository, AiExecutionPlanRepository>();
-        services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
+        services.AddScoped<AiAgentRuntimeService>();
+        services.AddScoped<IAiAgentRuntimeService>(sp =>
+            new AiAgentRuntimeServiceObservabilityDecorator(sp.GetRequiredService<AiAgentRuntimeService>()));
+
+        // ── Phase 4: Multi-Agent Workflow Orchestration ───────────────────
+        services.AddScoped<IAgentWorkflowOrchestrator, AgentWorkflowOrchestrator>();
+        services.AddScoped<IWorkflowReplanningService, AdaptiveWorkflowReplanningService>();
 
         // ── Phase 9: Skills System ────────────────────────────────────────
         services.AddScoped<IAiSkillRepository, AiSkillRepository>();
@@ -163,11 +172,18 @@ public static class DependencyInjection
         services.AddHttpClient("GitHubConnector")
             .SetHandlerLifetime(TimeSpan.FromMinutes(5))
             .AddStandardResilienceHandler();
+        services.AddHttpClient("GitLabConnector")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
+        services.AddHttpClient("CustomHttpConnector")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
 
         // Jobs em background
         services.AddHostedService<FeedbackThresholdJob>();
         services.AddHostedService<AiDataRetentionJob>();
         services.AddHostedService<EmbeddingIndexJob>();
+        services.AddHostedService<QdrantIndexJob>();
         services.AddHostedService<ExternalDataSourceSyncJob>();
 
         // ── Analytics & Search: Escolha Exclusiva ─────────────────────────

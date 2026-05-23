@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessScore;
+using CatalogScore = NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessScore.GetCatalogCompletenessScore;
 
 namespace NexTraceOne.Catalog.Application.Graph.Features.GetPortfolioCompletenessReport;
 
@@ -44,7 +45,7 @@ public static class GetPortfolioCompletenessReport
 
             var now = clock.UtcNow;
             var entries = filtered
-                .Select(s => GetCatalogCompletenessScore.Handler.Compute(s, now))
+                .Select(s => CatalogScore.Handler.Compute(s, now))
                 .OrderBy(r => r.TotalScore)
                 .ToList();
 
@@ -72,5 +73,5 @@ public static class GetPortfolioCompletenessReport
         int TotalServices,
         int AverageScore,
         IReadOnlyDictionary<string, int> MaturityDistribution,
-        IReadOnlyList<GetCatalogCompletenessScore.Response> Entries);
+        IReadOnlyList<GetCatalogCompletenessScoreResponse> Entries);
 }

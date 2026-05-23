@@ -8,7 +8,11 @@ using NexTraceOne.AIKnowledge.Application.Features.AIAgents.ArchitectureFitness;
 using NexTraceOne.AIKnowledge.Application.Features.AIAgents.DocAgent;
 using NexTraceOne.AIKnowledge.Application.Features.AIAgents.DocumentationQuality;
 using NexTraceOne.AIKnowledge.Application.Features.AIAgents.PRAgent;
+using NexTraceOne.AIKnowledge.Application.Features.AIAgents.IncidentResponder;
+using NexTraceOne.AIKnowledge.Application.Features.AIAgents.ReflectionAgent;
 using NexTraceOne.AIKnowledge.Application.Features.AIAgents.SecurityReview;
+using NexTraceOne.AIKnowledge.Application.Features.AIAgents.ServiceAnalyst;
+using NexTraceOne.AIKnowledge.Application.Features.AIAgents.ChangeAdvisor;
 using NexTraceOne.AIKnowledge.Application.Features.AIAgents.WebSearchAgent;
 
 namespace NexTraceOne.AIKnowledge.API.Endpoints.AIAgents;
@@ -108,5 +112,53 @@ public sealed class AiAgentsEndpointModule
         })
         .WithName("WebSearch")
         .WithSummary("Search and summarize information using AI");
+
+        // POST /api/v1/ai-agents/incident-responder/analyze — Resposta a incidentes
+        group.MapPost("/incident-responder/analyze", async (
+            IncidentResponder.Command command,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult();
+        })
+        .WithName("AnalyzeIncident")
+        .WithSummary("Analyze incidents, correlate changes and recommend mitigation");
+
+        // POST /api/v1/ai-agents/service-analyst/analyze — Análise de saúde de serviços
+        group.MapPost("/service-analyst/analyze", async (
+            ServiceAnalyst.Command command,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult();
+        })
+        .WithName("AnalyzeServiceHealth")
+        .WithSummary("Analyze service health, identify bottlenecks and critical dependencies");
+
+        // POST /api/v1/ai-agents/change-advisor/analyze — Análise de mudanças
+        group.MapPost("/change-advisor/analyze", async (
+            ChangeAdvisor.Command command,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult();
+        })
+        .WithName("AnalyzeChangeRisk")
+        .WithSummary("Analyze change risk, blast radius, readiness and recommend mitigations");
+
+        // POST /api/v1/ai-agents/reflection-agent/execute — Agente reflexivo
+        group.MapPost("/reflection-agent/execute", async (
+            ReflectionAgent.Command command,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult();
+        })
+        .WithName("ExecuteReflectionAgent")
+        .WithSummary("Execute complex tasks with iterative plan-execute-reflect loops");
     }
 }

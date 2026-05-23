@@ -24,6 +24,8 @@ using RecommendTemplateFeature = NexTraceOne.AIKnowledge.Application.Orchestrati
 using ReviewContractDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ReviewContractDraft.ReviewContractDraft;
 using GetAgentMarketplaceFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAgentMarketplace.GetAgentMarketplace;
 using AnalyzeContractBreakingChangesFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeContractBreakingChanges.AnalyzeContractBreakingChanges;
+using ExecuteAgentWorkflowFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ExecuteAgentWorkflow.ExecuteAgentWorkflow;
+using GetAgentWorkflowHistoryFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAgentWorkflowHistory.GetAgentWorkflowHistory;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -48,6 +50,8 @@ public sealed class AiOrchestrationEndpointModule
         MapKnowledgeEndpoints(app);
         MapGenerationEndpoints(app);
         MapMarketplaceEndpoints(app);
+        MapWorkflowEndpoints(app);
+        MapWorkflowHistoryEndpoints(app);
     }
 
     private static void MapCatalogEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
@@ -343,6 +347,42 @@ public sealed class AiOrchestrationEndpointModule
             int pageSize = 20) =>
         {
             var query = new GetAgentMarketplaceFeature.Query(category, search, isOfficial, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:read");
+    }
+
+    private static void MapWorkflowEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/workflows").RequireRateLimiting("ai");
+
+        group.MapPost("/execute", async (
+            ExecuteAgentWorkflowFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+    }
+
+    private static void MapWorkflowHistoryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/workflows");
+
+        group.MapGet("/history", async (
+            string? workflowName,
+            string? status,
+            string? callerTeamId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var query = new GetAgentWorkflowHistoryFeature.Query(
+                workflowName, status, callerTeamId, page, pageSize);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:read");

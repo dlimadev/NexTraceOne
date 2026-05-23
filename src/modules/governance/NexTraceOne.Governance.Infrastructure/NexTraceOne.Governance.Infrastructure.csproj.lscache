@@ -63,6 +63,7 @@ obj/Debug/net10.0/
  NexTraceOne.Governance.Infrastructure.AssemblyInfo.cs
  NexTraceOne.Governance.Infrastructure.GlobalUsings.g.cs
 Observability/
+ DashboardObservabilityReader.cs
  DashboardUsageForwarder.cs
  ObservabilityBackendHealthAdapter.cs
  ObservabilityHttpAuditReader.cs
@@ -113,6 +114,8 @@ Persistence/
  Migrations/
   20260511134909_InitialCreate.cs
   20260511134909_InitialCreate.Designer.cs
+  20260522214144_AddCustomDashboardTags.cs
+  20260522214144_AddCustomDashboardTags.Designer.cs
   GovernanceDbContextModelSnapshot.cs
  Providers/
   IngestionObservabilityProvider.cs
@@ -192,6 +195,7 @@ Services/
  operationalintelligence/NexTraceOne.OperationalIntelligence.Contracts/obj/Debug/net10.0/ref/NexTraceOne.OperationalIntelligence.Contracts.dll
 ../
  NexTraceOne.Governance.Application/obj/Debug/net10.0/ref/NexTraceOne.Governance.Application.dll
+ NexTraceOne.Governance.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Governance.Contracts.dll
  NexTraceOne.Governance.Domain/obj/Debug/net10.0/ref/NexTraceOne.Governance.Domain.dll
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.8/ref/net10.0/
  Microsoft.AspNetCore.Antiforgery.dll

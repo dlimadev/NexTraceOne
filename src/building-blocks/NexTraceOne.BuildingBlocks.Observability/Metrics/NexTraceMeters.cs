@@ -71,4 +71,22 @@ public static class NexTraceMeters
     /// <summary>Contador de contextos investigativos criados.</summary>
     public static readonly Counter<long> InvestigationContextsCreated =
         Meter.CreateCounter<long>("nextraceone.telemetry.investigation_contexts.created");
+
+    // ── Métricas de Inteligência Artificial ──────────────────────────
+
+    /// <summary>Contador de requisições a agentes de IA.</summary>
+    public static readonly Counter<long> AiRequestsTotal =
+        Meter.CreateCounter<long>("nextraceone.ai.requests.total");
+
+    /// <summary>Contador de tokens consumidos por agentes de IA.</summary>
+    public static readonly Counter<long> AiTokensTotal =
+        Meter.CreateCounter<long>("nextraceone.ai.tokens.total");
+
+    /// <summary>Histograma de duração de requisições a agentes de IA (ms).</summary>
+    public static readonly Histogram<double> AiRequestDuration =
+        Meter.CreateHistogram<double>("nextraceone.ai.request.duration_ms");
+
+    /// <summary>Histograma de custo estimado de requisições a agentes de IA (USD).</summary>
+    public static readonly Histogram<double> AiRequestCostUsd =
+        Meter.CreateHistogram<double>("nextraceone.ai.request.cost_usd");
 }

@@ -65,6 +65,7 @@ Configuration/
  BackupOptions.cs
  ContractConsumerIngestionOptions.cs
  DriftDetectionOptions.cs
+ OtelCatalogBridgeOptions.cs
 Elasticsearch/
  ElasticsearchIndexManagerService.cs
  IElasticsearchIndexManager.cs
@@ -90,6 +91,7 @@ Jobs/
  IncidentProbabilityRefreshJob.cs
  LicenseRecalculationJob.cs
  ModuleOutboxProcessorJob.cs
+ OtelCatalogBridgeJob.cs
  OutboxProcessorJob.cs
  PlatformHealthMonitorJob.cs
  WasteDetectionJob.cs

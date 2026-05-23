@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Models;
@@ -13,12 +14,23 @@ namespace NexTraceOne.Governance.Infrastructure.Observability;
 /// IsBackendAvailable = false com lista vazia, nunca lançam excepções.
 /// </summary>
 internal sealed class DashboardObservabilityReader(
-    IObservabilityProvider observabilityProvider,
-    ITelemetryQueryService telemetryQueryService,
+    IServiceProvider serviceProvider,
     ILogger<DashboardObservabilityReader> logger) : IDashboardObservabilityReader
 {
+    private readonly IObservabilityProvider? _observabilityProvider = serviceProvider.GetService<IObservabilityProvider>();
+    private readonly ITelemetryQueryService? _telemetryQueryService = serviceProvider.GetService<ITelemetryQueryService>();
+
+    private static bool IsAvailable<T>(T? service, ILogger logger, string name) where T : class
+    {
+        if (service is null)
+        {
+            logger.LogWarning("{Service} is not registered — observability features will be degraded.", name);
+            return false;
+        }
+        return true;
+    }
     /// <inheritdoc/>
-    public string BackendName => observabilityProvider.ProviderName;
+    public string BackendName => _observabilityProvider?.ProviderName ?? "None";
 
     /// <inheritdoc/>
     public async Task<DashboardLogsResult> QueryLogsAsync(
@@ -28,7 +40,10 @@ internal sealed class DashboardObservabilityReader(
         try
         {
             // Verificar disponibilidade do backend antes de consultar
-            var healthy = await observabilityProvider.IsHealthyAsync(cancellationToken);
+            if (!IsAvailable(_observabilityProvider, logger, nameof(IObservabilityProvider)))
+                return new DashboardLogsResult([], 0, IsBackendAvailable: false);
+
+            var healthy = await _observabilityProvider!.IsHealthyAsync(cancellationToken);
             if (!healthy)
             {
                 logger.LogWarning(
@@ -48,7 +63,7 @@ internal sealed class DashboardObservabilityReader(
                 Limit            = request.Limit,
             };
 
-            var entries = await observabilityProvider.QueryLogsAsync(filter, cancellationToken);
+            var entries = await _observabilityProvider!.QueryLogsAsync(filter, cancellationToken);
 
             var mapped = entries
                 .Select(e => new DashboardLogEntry(
@@ -78,7 +93,10 @@ internal sealed class DashboardObservabilityReader(
     {
         try
         {
-            var healthy = await observabilityProvider.IsHealthyAsync(cancellationToken);
+            if (!IsAvailable(_observabilityProvider, logger, nameof(IObservabilityProvider)))
+                return new DashboardMetricsResult([], request.MetricName, IsBackendAvailable: false);
+
+            var healthy = await _observabilityProvider!.IsHealthyAsync(cancellationToken);
             if (!healthy)
             {
                 logger.LogWarning(
@@ -96,7 +114,7 @@ internal sealed class DashboardObservabilityReader(
                 ServiceName = request.ServiceName,
             };
 
-            var points = await observabilityProvider.QueryMetricsAsync(filter, cancellationToken);
+            var points = await _observabilityProvider!.QueryMetricsAsync(filter, cancellationToken);
 
             var mapped = points
                 .Select(p => new DashboardMetricPoint(
@@ -124,7 +142,10 @@ internal sealed class DashboardObservabilityReader(
     {
         try
         {
-            var healthy = await observabilityProvider.IsHealthyAsync(cancellationToken);
+            if (!IsAvailable(_observabilityProvider, logger, nameof(IObservabilityProvider)))
+                return new DashboardTracesResult([], IsBackendAvailable: false);
+
+            var healthy = await _observabilityProvider!.IsHealthyAsync(cancellationToken);
             if (!healthy)
             {
                 logger.LogWarning(
@@ -144,7 +165,7 @@ internal sealed class DashboardObservabilityReader(
                 Limit         = request.Limit,
             };
 
-            var traces = await observabilityProvider.QueryTracesAsync(filter, cancellationToken);
+            var traces = await _observabilityProvider!.QueryTracesAsync(filter, cancellationToken);
 
             var mapped = traces
                 .Select(t => new DashboardTraceEntry(
@@ -175,7 +196,10 @@ internal sealed class DashboardObservabilityReader(
     {
         try
         {
-            var errors = await telemetryQueryService.GetTopErrorsByEnvironmentAsync(
+            if (!IsAvailable(_telemetryQueryService, logger, nameof(ITelemetryQueryService)))
+                return new DashboardErrorsResult([], 0, IsBackendAvailable: false);
+
+            var errors = await _telemetryQueryService!.GetTopErrorsByEnvironmentAsync(
                 request.Environment ?? "production",
                 request.From,
                 request.Until,
@@ -211,7 +235,10 @@ internal sealed class DashboardObservabilityReader(
     {
         try
         {
-            var healthy = await observabilityProvider.IsHealthyAsync(cancellationToken);
+            if (!IsAvailable(_observabilityProvider, logger, nameof(IObservabilityProvider)))
+                return new DashboardServiceHealthResult([], IsBackendAvailable: false);
+
+            var healthy = await _observabilityProvider!.IsHealthyAsync(cancellationToken);
             if (!healthy)
             {
                 logger.LogWarning(
@@ -229,7 +256,7 @@ internal sealed class DashboardObservabilityReader(
                 Limit       = 1000,
             };
 
-            var traces = await observabilityProvider.QueryTracesAsync(filter, cancellationToken);
+            var traces = await _observabilityProvider!.QueryTracesAsync(filter, cancellationToken);
 
             // Agrupar por serviço e calcular métricas de saúde
             var grouped = traces

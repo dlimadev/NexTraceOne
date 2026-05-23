@@ -72,6 +72,7 @@ public static class SecurityReview
                 try
                 {
                     var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    kernel.Data["GroundingQuery"] = request.ProjectPath;
                     var systemPrompt = """
                         You are a security expert. Analyze the project and identify vulnerabilities and compliance issues.
                         Respond ONLY with valid JSON. No markdown, no explanations.

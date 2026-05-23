@@ -56,7 +56,7 @@ internal sealed class EfCatalogHealthMaintenanceReader(
             .Where(l => serviceIdList.Contains(l.ServiceAssetId.Value)
                         && l.Category == LinkCategory.Runbook)
             .Select(l => l.ServiceAssetId.Value)
-            .ToHashSet(ct);
+            .ToListAsync(ct);
 
         // Contrato aprovado ou bloqueado por ApiAssetId
         var approvedApiIds = contractVersions

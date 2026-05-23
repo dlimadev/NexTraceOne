@@ -72,6 +72,7 @@ ExternalAI/
  Ports/IExternalAIRoutingPort.cs
 Governance/Entities/
  AgentExecutionPlan.cs
+ AgentReflectionSession.cs
  AIAccessPolicy.cs
  AiAgent.cs
  AiAgentArtifact.cs
@@ -191,6 +192,7 @@ Orchestration/Context/
  RegressionSignal.cs
  RiskFinding.cs
 Orchestration/Entities/
+ AgentWorkflowExecution.cs
  AiContext.cs
  AiConversation.cs
  GeneratedTestArtifact.cs

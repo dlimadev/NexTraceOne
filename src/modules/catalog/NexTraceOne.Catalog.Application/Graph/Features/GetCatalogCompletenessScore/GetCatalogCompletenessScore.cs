@@ -23,7 +23,7 @@ namespace NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessS
 /// </summary>
 public static class GetCatalogCompletenessScore
 {
-    public sealed record Query(Guid ServiceId) : IQuery<Response>;
+    public sealed record Query(Guid ServiceId) : IQuery<GetCatalogCompletenessScoreResponse>;
 
     public sealed class Validator : AbstractValidator<Query>
     {
@@ -35,9 +35,9 @@ public static class GetCatalogCompletenessScore
 
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock) : IQueryHandler<Query, GetCatalogCompletenessScoreResponse>
     {
-        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<GetCatalogCompletenessScoreResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
@@ -51,7 +51,7 @@ public static class GetCatalogCompletenessScore
             return breakdown;
         }
 
-        internal static Response Compute(ServiceAsset service, DateTimeOffset now)
+        internal static GetCatalogCompletenessScoreResponse Compute(ServiceAsset service, DateTimeOffset now)
         {
             var identity = ScoreIdentity(service);
             var ownership = ScoreOwnership(service);
@@ -70,7 +70,7 @@ public static class GetCatalogCompletenessScore
                 _ => "Nascente"
             };
 
-            return new Response(
+            return new GetCatalogCompletenessScoreResponse(
                 ServiceId: service.Id.Value,
                 ServiceName: service.Name,
                 TotalScore: total,
@@ -143,27 +143,27 @@ public static class GetCatalogCompletenessScore
             return new DimensionScore("Governance", items.Sum(i => i.Earned), 20, items);
         }
     }
+}
 
-    public sealed record Response(
-        Guid ServiceId,
-        string ServiceName,
-        int TotalScore,
-        int MaxScore,
-        string MaturityLevel,
-        DimensionScore Identity,
-        DimensionScore Ownership,
-        DimensionScore Operations,
-        DimensionScore Documentation,
-        DimensionScore Governance);
+public sealed record GetCatalogCompletenessScoreResponse(
+    Guid ServiceId,
+    string ServiceName,
+    int TotalScore,
+    int MaxScore,
+    string MaturityLevel,
+    DimensionScore Identity,
+    DimensionScore Ownership,
+    DimensionScore Operations,
+    DimensionScore Documentation,
+    DimensionScore Governance);
 
-    public sealed record DimensionScore(
-        string Name,
-        int Points,
-        int MaxPoints,
-        IReadOnlyList<ScoreItem> Items);
+public sealed record DimensionScore(
+    string Name,
+    int Points,
+    int MaxPoints,
+    IReadOnlyList<ScoreItem> Items);
 
-    public sealed record ScoreItem(string Field, bool Present, int MaxPoints)
-    {
-        public int Earned => Present ? MaxPoints : 0;
-    }
+public sealed record ScoreItem(string Field, bool Present, int MaxPoints)
+{
+    public int Earned => Present ? MaxPoints : 0;
 }
