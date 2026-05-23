@@ -49,6 +49,42 @@ internal static class IngestionApiStartup
             string.Join(", ", configuredKeys
                 .Where(k => IsValidIngestionWriteKey(k) || IsValidIngestionReadKey(k))
                 .Select(k => k.ClientId)));
+
+        ValidateWebhookSecrets(app);
+    }
+
+    private static void ValidateWebhookSecrets(WebApplication app)
+    {
+        var webhookSecrets = app.Configuration
+            .GetSection(WebhookSignatureOptions.SectionName)
+            .Get<Dictionary<string, string>>() ?? [];
+
+        var unconfigured = webhookSecrets
+            .Where(kv => string.IsNullOrWhiteSpace(kv.Value)
+                      || kv.Value.StartsWith("REPLACE", StringComparison.OrdinalIgnoreCase))
+            .Select(kv => kv.Key)
+            .ToList();
+
+        if (unconfigured.Count == 0)
+        {
+            app.Logger.LogInformation(
+                "Webhook HMAC secrets configured for source(s): {Sources}",
+                string.Join(", ", webhookSecrets.Keys));
+            return;
+        }
+
+        const string warnMsg =
+            "Webhook signature validation is DISABLED for source(s): {Sources}. " +
+            "Set Security__WebhookSecrets__{Source}=<secret> to enforce HMAC-SHA256 proof-of-origin.";
+
+        if (app.Environment.IsProduction())
+        {
+            app.Logger.LogWarning(warnMsg, string.Join(", ", unconfigured));
+        }
+        else
+        {
+            app.Logger.LogDebug(warnMsg, string.Join(", ", unconfigured));
+        }
     }
 
     private static bool IsValidIngestionWriteKey(ApiKeyConfiguration apiKey)

@@ -167,6 +167,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Governance.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.CLI.Tests", "tests\platform\NexTraceOne.CLI.Tests\NexTraceOne.CLI.Tests.csproj", "{B0F12618-BB94-406E-B564-A33C21524D56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.IngestionApi.Tests", "tests\platform\NexTraceOne.IngestionApi.Tests\NexTraceOne.IngestionApi.Tests.csproj", "{A1F23456-7890-ABCD-EF12-345678901234}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notifications", "notifications", "{DE9DAF8A-E684-0FD3-FFDC-40D3E3158533}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Notifications.Contracts", "src\modules\notifications\NexTraceOne.Notifications.Contracts\NexTraceOne.Notifications.Contracts.csproj", "{1C5CFFAF-82AC-49BF-BDAA-E94DEEDBFA58}"
@@ -971,6 +973,18 @@ Global
 		{B0F12618-BB94-406E-B564-A33C21524D56}.Release|x64.Build.0 = Release|Any CPU
 		{B0F12618-BB94-406E-B564-A33C21524D56}.Release|x86.ActiveCfg = Release|Any CPU
 		{B0F12618-BB94-406E-B564-A33C21524D56}.Release|x86.Build.0 = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|x64.Build.0 = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Debug|x86.Build.0 = Debug|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|x64.Build.0 = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1F23456-7890-ABCD-EF12-345678901234}.Release|x86.Build.0 = Release|Any CPU
 		{1C5CFFAF-82AC-49BF-BDAA-E94DEEDBFA58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C5CFFAF-82AC-49BF-BDAA-E94DEEDBFA58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C5CFFAF-82AC-49BF-BDAA-E94DEEDBFA58}.Debug|x64.ActiveCfg = Debug|Any CPU

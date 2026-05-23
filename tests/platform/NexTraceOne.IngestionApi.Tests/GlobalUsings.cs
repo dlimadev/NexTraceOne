@@ -1,0 +1,12 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Security.Cryptography;
+global using System.Text;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using FluentAssertions;
+global using NSubstitute;
+global using Xunit;
+global using Microsoft.AspNetCore.Http;
+global using NexTraceOne.Ingestion.Api.Security;

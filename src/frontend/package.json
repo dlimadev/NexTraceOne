@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "dev:e2e:real": "vite --host 127.0.0.1 --port 4173",
@@ -18,7 +21,8 @@
     "test:e2e:typecheck": "tsc --noEmit -p tsconfig.e2e.json",
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint . --fix",
-    "validate:i18n": "node scripts/validate-i18n.mjs"
+    "validate:i18n": "node scripts/validate-i18n.mjs",
+    "audit:security": "npm audit --audit-level=moderate"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.2.8",
@@ -37,8 +41,8 @@
     "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "monaco-editor": "^0.52.2",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-grid-layout": "^2.2.3",
     "react-hook-form": "^7.71.2",
     "react-i18next": "^16.5.8",

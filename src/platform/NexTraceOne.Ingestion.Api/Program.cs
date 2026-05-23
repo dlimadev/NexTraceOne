@@ -101,6 +101,8 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["ready", "health"]);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
+builder.Services.Configure<WebhookSignatureOptions>(options =>
+    builder.Configuration.GetSection(WebhookSignatureOptions.SectionName).Bind(options));
 builder.Services.AddAuthorization(options =>
 {
     // Política de escrita — usada por endpoints de ingestão (POST)

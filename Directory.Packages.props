@@ -88,6 +88,7 @@
     <PackageVersion Include="Dapper" Version="2.1.35" />
   </ItemGroup>
   <ItemGroup Label="ElasticSearch">
+    <!-- SECURITY: NEST 7.x é EOL desde Jan 2026. Migração para Elastic.Clients.Elasticsearch 8.x planeada. -->
     <PackageVersion Include="NEST" Version="7.17.5" />
   </ItemGroup>
   <ItemGroup Label="Testes">
