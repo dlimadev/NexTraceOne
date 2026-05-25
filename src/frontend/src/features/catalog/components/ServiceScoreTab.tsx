@@ -12,7 +12,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Award, Activity, BookMarked, ExternalLink, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
-import { Badge } from '../../../components/Badge';
 import { Link } from 'react-router-dom';
 import client from '../../../api/client';
 
