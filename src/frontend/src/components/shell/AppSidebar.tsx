@@ -51,6 +51,9 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Activity size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  // Fase 4 — decisões estratégicas: Feature Flags e Legacy Assets contextualizados ao serviço
+  { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'services' },
 
   // ── CONTRATOS ─────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
@@ -97,6 +100,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  // Fase 4 — GreenOps: sustentabilidade e eficiência de carbono, contextualizado em Governança
+  { labelKey: 'sidebar.greenOps', to: '/governance/greenops', icon: <Leaf size={18} />, permission: 'governance:finops:read', section: 'governance' },
   // Grupo Risk & Compliance
   { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance', subGroup: 'sidebar.subGroupRiskCompliance' },
   { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:risk:read', section: 'governance', subGroup: 'sidebar.subGroupRiskCompliance' },

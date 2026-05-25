@@ -94,6 +94,22 @@ export function OtelMetricsWidget({
         .then((r) => r.data),
   });
 
+  // Annotations time range — computed here (before early returns) so useAnnotations
+  // is always called unconditionally (Rule of Hooks compliance).
+  const { from: annotFrom, to: annotTo } = (() => {
+    const now = new Date();
+    const match = timeRange.match(/^(\d+)([hd])$/);
+    if (match) {
+      const amount = parseInt(match[1], 10);
+      const unit = match[2];
+      const ms = unit === 'h' ? amount * 60 * 60 * 1000 : amount * 24 * 60 * 60 * 1000;
+      return { from: new Date(now.getTime() - ms).toISOString(), to: now.toISOString() };
+    }
+    return { from: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(), to: now.toISOString() };
+  })();
+
+  const { annotations } = useAnnotations(TENANT_ID, annotFrom, annotTo, config.serviceId ? [config.serviceId] : undefined);
+
   if (isLoading) {
     return (
       <WidgetShell title={displayTitle}>
@@ -155,21 +171,6 @@ export function OtelMetricsWidget({
     time: formatTimestamp(p.timestamp, timeRange),
     value: p.value,
   }));
-
-  // Annotations — Grafana-like vertical event lines
-  const { from, to } = (() => {
-    const now = new Date();
-    const match = timeRange.match(/^(\d+)([hd])$/);
-    if (match) {
-      const amount = parseInt(match[1], 10);
-      const unit = match[2];
-      const ms = unit === 'h' ? amount * 60 * 60 * 1000 : amount * 24 * 60 * 60 * 1000;
-      return { from: new Date(now.getTime() - ms).toISOString(), to: now.toISOString() };
-    }
-    return { from: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(), to: now.toISOString() };
-  })();
-
-  const { annotations } = useAnnotations(TENANT_ID, from, to, config.serviceId ? [config.serviceId] : undefined);
 
   const annotationLines = annotations.map((ann: ChartAnnotation) => ({
     x: formatTimestamp(ann.timestamp, timeRange),

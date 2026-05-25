@@ -67,6 +67,7 @@ export function NqlMonacoEditor({
       tokenPostfix: '.nql',
       keywords: NQL_KEYWORDS.map(k => k.toLowerCase()),
       operators: ['=', '!=', '<>', '<', '>', '<=', '>=', '+', '-', '*', '/'],
+      // eslint-disable-next-line no-useless-escape
       symbols: /[=><!~?:&|+\-*\/\^%]+/,
       escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
       digits: /\d+(_+\d+)*/,
@@ -94,8 +95,11 @@ export function NqlMonacoEditor({
           [/\/\*/, 'comment', '@comment'],
         ],
         comment: [
+          // eslint-disable-next-line no-useless-escape
           [/[^\/*]+/, 'comment'],
+          // eslint-disable-next-line no-useless-escape
           [/\*\//, 'comment', '@pop'],
+          // eslint-disable-next-line no-useless-escape
           [/[\/*]/, 'comment'],
         ],
         numbers: [

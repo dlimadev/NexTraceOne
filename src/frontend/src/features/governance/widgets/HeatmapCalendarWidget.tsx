@@ -190,8 +190,10 @@ export function HeatmapCalendarWidget({
 
   // Referência para medir a altura do container
   const containerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line react-hooks/refs
   const containerHeight = containerRef.current?.clientHeight ?? 300;
   // Modo compacto para widgets muito pequenos
+  // eslint-disable-next-line react-hooks/refs
   const compact = containerHeight < 160;
 
   if (isLoading) {
