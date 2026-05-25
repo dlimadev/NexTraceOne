@@ -77,6 +77,8 @@ const ReleaseCalendarGatePage = lazy(() => import('../features/governance/pages/
 const RollbackCockpitPage = lazy(() => import('../features/governance/pages/centers/RollbackCockpitPage').then(m => ({ default: m.RollbackCockpitPage })));
 const EvidencePackViewerPage = lazy(() => import('../features/governance/pages/centers/EvidencePackViewerPage').then(m => ({ default: m.EvidencePackViewerPage })));
 const SLOServiceCenterPage = lazy(() => import('../features/governance/pages/centers/SLOServiceCenterPage').then(m => ({ default: m.SLOServiceCenterPage })));
+// GreenOps — sustentabilidade e eficiência de carbono (também acessível via /admin/greenops para Platform Admins)
+const GreenOpsPage = lazy(() => import('../features/platform-admin/pages/GreenOpsPage').then(m => ({ default: m.GreenOpsPage })));
 // Wave V3.12 — AI Agents, IDE Console, Admin Consoles
 const AiAgentMarketplacePage = lazy(() => import('../features/governance/pages/AiAgentMarketplacePage').then(m => ({ default: m.AiAgentMarketplacePage })));
 const IdeExtensionsConsolePage = lazy(() => import('../features/governance/pages/IdeExtensionsConsolePage').then(m => ({ default: m.IdeExtensionsConsolePage })));
@@ -644,6 +646,15 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <SLOServiceCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* GreenOps — Governança de sustentabilidade e eficiência de carbono */}
+      <Route
+        path="/governance/greenops"
+        element={
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
+            <GreenOpsPage />
           </ProtectedRoute>
         }
       />
