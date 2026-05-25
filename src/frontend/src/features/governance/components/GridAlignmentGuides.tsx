@@ -214,6 +214,7 @@ export function GridAlignmentGuides({
     const container = containerRef.current;
     if (!container) {
       setGuides([]);
+      // eslint-disable-next-line react-hooks/immutability
       rafRef.current = requestAnimationFrame(tick);
       return;
     }
@@ -226,6 +227,7 @@ export function GridAlignmentGuides({
         setGuides([]);
       }
       lastActiveRef.current = false;
+      // eslint-disable-next-line react-hooks/immutability
       rafRef.current = requestAnimationFrame(tick);
       return;
     }
@@ -257,6 +259,7 @@ export function GridAlignmentGuides({
       return prev;
     });
 
+    // eslint-disable-next-line react-hooks/immutability
     rafRef.current = requestAnimationFrame(tick);
   }, [containerRef]);
 

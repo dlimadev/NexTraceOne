@@ -1017,6 +1017,7 @@ function GridCanvas({
           )}
 
           {/* Ghost preview from palette drag */}
+          {/* eslint-disable-next-line react-hooks/refs */}
           {ghostPreview && containerRef.current && (
             <div
               className="builder-ghost-preview"

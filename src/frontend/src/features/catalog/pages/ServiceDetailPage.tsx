@@ -14,6 +14,8 @@ import {
   Server,
   Plus,
   Info,
+  Activity,
+  Award,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -34,6 +36,10 @@ import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
 import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
+import { ServiceObservabilityTab } from '../components/ServiceObservabilityTab';
+import { ServiceReliabilityTab } from '../components/ServiceReliabilityTab';
+import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
+import { ServiceScoreTab } from '../components/ServiceScoreTab';
 
 /** Mapeia criticidade para variante do Badge. */
 const criticalityBadgeVariant = (level: Criticality): 'danger' | 'warning' | 'default' => {
@@ -80,7 +86,7 @@ const contractLifecycleBadgeVariant = (state: string): 'success' | 'info' | 'war
   }
 };
 
-type ServiceTab = 'overview' | 'apis' | 'contracts' | 'interfaces';
+type ServiceTab = 'overview' | 'apis' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score';
 
 /** Página de detalhe de um serviço do catálogo — redesenhada com EntityHeader + Tabs. */
 export function ServiceDetailPage() {
@@ -143,6 +149,26 @@ export function ServiceDetailPage() {
       id: 'interfaces',
       label: t('serviceDetail.tabInterfaces', 'Interfaces'),
       icon: <Server size={14} />,
+    },
+    {
+      id: 'observability',
+      label: t('serviceDetail.tabObservability', 'Observability'),
+      icon: <Activity size={14} />,
+    },
+    {
+      id: 'reliability',
+      label: t('serviceDetail.tabReliability', 'Reliability & SLOs'),
+      icon: <Shield size={14} />,
+    },
+    {
+      id: 'incidents',
+      label: t('serviceDetail.tabIncidents', 'Incidents'),
+      icon: <AlertTriangle size={14} />,
+    },
+    {
+      id: 'score',
+      label: t('serviceDetail.tabScore', 'Score'),
+      icon: <Award size={14} />,
     },
   ];
 
@@ -497,6 +523,34 @@ export function ServiceDetailPage() {
           {activeTab === 'interfaces' && (
             <PageSection>
               <ServiceInterfacesTab serviceId={serviceId!} />
+            </PageSection>
+          )}
+
+          {/* OBSERVABILITY TAB — APM contextualizado ao serviço */}
+          {activeTab === 'observability' && (
+            <PageSection>
+              <ServiceObservabilityTab serviceId={serviceId!} serviceName={service.name} />
+            </PageSection>
+          )}
+
+          {/* RELIABILITY TAB — SLOs e error budget do serviço */}
+          {activeTab === 'reliability' && (
+            <PageSection>
+              <ServiceReliabilityTab serviceId={serviceId!} />
+            </PageSection>
+          )}
+
+          {/* INCIDENTS TAB — Incidentes que afetaram este serviço */}
+          {activeTab === 'incidents' && (
+            <PageSection>
+              <ServiceIncidentsTab serviceId={serviceId!} />
+            </PageSection>
+          )}
+
+          {/* SCORE TAB — Score consolidado de maturidade, SRE e DX */}
+          {activeTab === 'score' && (
+            <PageSection>
+              <ServiceScoreTab serviceId={serviceId!} />
             </PageSection>
           )}
         </div>
