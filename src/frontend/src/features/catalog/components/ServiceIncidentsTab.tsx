@@ -138,7 +138,7 @@ export function ServiceIncidentsTab({ serviceId }: Props) {
                       <span className="text-xs text-muted capitalize">{incident.status}</span>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted tabular-nums">
-                      {incident.openedAt ? formatRelativeTime(incident.openedAt) : '—'}
+                      {incident.createdAt ? formatRelativeTime(incident.createdAt) : '—'}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
