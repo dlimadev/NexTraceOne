@@ -8,7 +8,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ExternalLink, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Clock, CheckCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Link } from 'react-router-dom';
