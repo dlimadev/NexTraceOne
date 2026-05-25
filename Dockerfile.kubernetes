@@ -7,13 +7,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
 
-# Copiar arquivos de projeto primeiro (cache de layers)
-COPY ["NexTraceOne.sln", "."]
-COPY ["src/**/*.csproj", "./src/"]
-RUN dotnet restore "NexTraceOne.sln"
+# Copiar solução e todos os arquivos de projeto mantendo a estrutura de diretórios.
+# NOTA: COPY com glob "**/*.csproj" não preserva a hierarquia de diretórios no
+# Docker, fazendo com que o 'dotnet restore' não encontre os projetos referenciados
+# pelo .sln. A abordagem correta é copiar o contexto completo de uma vez.
+COPY . .
 
-# Copiar código fonte
-COPY ["src/", "./src/"]
+# Restaurar dependências (usa estrutura real de diretórios)
+RUN dotnet restore "NexTraceOne.sln"
 
 # Build em modo Release
 WORKDIR "/src/src/platform/NexTraceOne.ApiHost"

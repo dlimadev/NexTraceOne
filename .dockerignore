@@ -1,0 +1,32 @@
+# ── Git ──────────────────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Frontend ─────────────────────────────────────────────────────────────────
+src/frontend/node_modules
+src/frontend/dist
+src/frontend/.vite
+
+# ── .NET build artefacts (não necessários para restore/build) ────────────────
+**/bin
+**/obj
+**/TestResults
+**/.vs
+
+# ── Docker / CI ───────────────────────────────────────────────────────────────
+.github
+Dockerfile*
+docker-compose*
+deploy/
+
+# ── Editor / OS ──────────────────────────────────────────────────────────────
+.idea
+.vscode
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# ── Docs ─────────────────────────────────────────────────────────────────────
+docs/
+*.md
