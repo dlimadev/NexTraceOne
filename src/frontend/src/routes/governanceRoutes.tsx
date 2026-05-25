@@ -352,6 +352,14 @@ export function GovernanceRoutes() {
         }
       />
       <Route
+        path="/governance/dashboards/new"
+        element={
+          <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
+            <DashboardBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/governance/technical-debt"
         element={
           <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">

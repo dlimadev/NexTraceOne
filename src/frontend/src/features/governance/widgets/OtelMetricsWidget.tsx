@@ -12,11 +12,13 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import { Activity, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { useAnnotations, type ChartAnnotation } from '../components/ChartAnnotations';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -65,6 +67,7 @@ export function OtelMetricsWidget({
   timeRange,
   title,
 }: WidgetProps): React.ReactElement {
+  const TENANT_ID = 'default';
   const { t } = useTranslation();
 
   const metricName = config.metricName ?? 'http.server.duration';
@@ -153,6 +156,27 @@ export function OtelMetricsWidget({
     value: p.value,
   }));
 
+  // Annotations — Grafana-like vertical event lines
+  const { from, to } = (() => {
+    const now = new Date();
+    const match = timeRange.match(/^(\d+)([hd])$/);
+    if (match) {
+      const amount = parseInt(match[1], 10);
+      const unit = match[2];
+      const ms = unit === 'h' ? amount * 60 * 60 * 1000 : amount * 24 * 60 * 60 * 1000;
+      return { from: new Date(now.getTime() - ms).toISOString(), to: now.toISOString() };
+    }
+    return { from: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(), to: now.toISOString() };
+  })();
+
+  const { annotations } = useAnnotations(TENANT_ID, from, to, config.serviceId ? [config.serviceId] : undefined);
+
+  const annotationLines = annotations.map((ann: ChartAnnotation) => ({
+    x: formatTimestamp(ann.timestamp, timeRange),
+    color: ann.severity === 'critical' ? '#ef4444' : ann.severity === 'warning' ? '#f59e0b' : '#3b82f6',
+    label: ann.label,
+  }));
+
   const subtitle = serviceName ?? undefined;
 
   return (
@@ -194,6 +218,17 @@ export function OtelMetricsWidget({
               }}
               itemStyle={{ color: '#93c5fd' }}
             />
+            {annotationLines.map((line) => (
+              <ReferenceLine
+                key={line.x}
+                x={line.x}
+                stroke={line.color}
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                opacity={0.7}
+                ifOverflow="extendDomain"
+              />
+            ))}
             <Area
               type="monotone"
               dataKey="value"

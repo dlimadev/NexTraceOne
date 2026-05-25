@@ -11,78 +11,98 @@ SET CONSTRAINTS ALL DEFERRED;
 -- Built-in connectors available to all tenants.
 
 INSERT INTO "int_connectors" (
-    "Id", "TenantId", "Name", "DisplayName", "ConnectorType",
-    "Description", "Status", "HealthStatus",
-    "ConfigurationJson", "IsBuiltIn",
+    "Id", "Name", "ConnectorType",
+    "Description", "Provider", "Endpoint",
+    "Status", "Health",
+    "LastSuccessAt", "LastErrorAt", "LastErrorMessage",
+    "FreshnessLagMinutes", "TotalExecutions", "SuccessfulExecutions", "FailedExecutions",
+    "Environment", "AuthenticationMode", "PollingMode", "AllowedTeams",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '40000000-0000-0000-0001-000000000001',
-    '00000000-0000-0000-0000-000000000001',
     'github',
-    'GitHub',
     'SourceControl',
     'GitHub source control integration for release tracking and commit correlation.',
+    'GitHub',
+    'https://api.github.com',
     'Active',
     'Unknown',
-    '{}',
-    TRUE,
+    NULL, NULL, NULL,
+    0, 0, 0, 0,
+    'All', 'OAuth2', 'Webhook',
+    '[]',
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "int_connectors" (
-    "Id", "TenantId", "Name", "DisplayName", "ConnectorType",
-    "Description", "Status", "HealthStatus",
-    "ConfigurationJson", "IsBuiltIn",
+    "Id", "Name", "ConnectorType",
+    "Description", "Provider", "Endpoint",
+    "Status", "Health",
+    "LastSuccessAt", "LastErrorAt", "LastErrorMessage",
+    "FreshnessLagMinutes", "TotalExecutions", "SuccessfulExecutions", "FailedExecutions",
+    "Environment", "AuthenticationMode", "PollingMode", "AllowedTeams",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '40000000-0000-0000-0001-000000000002',
-    '00000000-0000-0000-0000-000000000001',
     'jira',
-    'Jira',
     'IssueTracker',
     'Jira integration for work item linking and change governance.',
+    'Atlassian',
+    'https://api.atlassian.com',
     'Active',
     'Unknown',
-    '{}',
-    TRUE,
+    NULL, NULL, NULL,
+    0, 0, 0, 0,
+    'All', 'OAuth2', 'Polling',
+    '[]',
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "int_connectors" (
-    "Id", "TenantId", "Name", "DisplayName", "ConnectorType",
-    "Description", "Status", "HealthStatus",
-    "ConfigurationJson", "IsBuiltIn",
+    "Id", "Name", "ConnectorType",
+    "Description", "Provider", "Endpoint",
+    "Status", "Health",
+    "LastSuccessAt", "LastErrorAt", "LastErrorMessage",
+    "FreshnessLagMinutes", "TotalExecutions", "SuccessfulExecutions", "FailedExecutions",
+    "Environment", "AuthenticationMode", "PollingMode", "AllowedTeams",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '40000000-0000-0000-0001-000000000003',
-    '00000000-0000-0000-0000-000000000001',
     'pagerduty',
-    'PagerDuty',
     'IncidentManagement',
     'PagerDuty integration for incident ingestion and on-call correlation.',
+    'PagerDuty',
+    'https://api.pagerduty.com',
     'Active',
     'Unknown',
-    '{}',
-    TRUE,
+    NULL, NULL, NULL,
+    0, 0, 0, 0,
+    'All', 'Token', 'Webhook',
+    '[]',
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "int_connectors" (
-    "Id", "TenantId", "Name", "DisplayName", "ConnectorType",
-    "Description", "Status", "HealthStatus",
-    "ConfigurationJson", "IsBuiltIn",
+    "Id", "Name", "ConnectorType",
+    "Description", "Provider", "Endpoint",
+    "Status", "Health",
+    "LastSuccessAt", "LastErrorAt", "LastErrorMessage",
+    "FreshnessLagMinutes", "TotalExecutions", "SuccessfulExecutions", "FailedExecutions",
+    "Environment", "AuthenticationMode", "PollingMode", "AllowedTeams",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '40000000-0000-0000-0001-000000000004',
-    '00000000-0000-0000-0000-000000000001',
     'aws-cost-explorer',
-    'AWS Cost Explorer',
     'CloudBilling',
     'AWS Cost Explorer integration for FinOps cost attribution.',
+    'AWS',
+    'https://ce.us-east-1.amazonaws.com',
     'Active',
     'Unknown',
-    '{}',
-    TRUE,
+    NULL, NULL, NULL,
+    0, 0, 0, 0,
+    'All', 'IAMRole', 'Polling',
+    '[]',
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 

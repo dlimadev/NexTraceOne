@@ -221,5 +221,5 @@ Manter registo de todas as rotações em sistema de ticketing/ITSM:
 - `src/platform/NexTraceOne.ApiHost/StartupValidation.cs` — validação de chaves no startup
 - `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Encryption/EncryptionKeyMaterial.cs` — resolução da chave de encriptação
 - `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Encryption/AesGcmEncryptor.cs` — implementação AES-256-GCM
-- `docs/security/PHASE-1-SECRETS-BASELINE.md` — política de secrets e variáveis de ambiente
+- `docs/security/ENVIRONMENT-BASELINE.md` — política de secrets, configuração e baseline de produção
 - `.env.example` — exemplo de configuração de ambiente

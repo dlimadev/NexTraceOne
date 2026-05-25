@@ -46,7 +46,7 @@ const useCreateTemplate = () => {
       contractType: string;
       templateJson: string;
       description: string;
-    }) => client.post('/api/v1/contract-templates', data).then((r) => r.data),
+    }) => client.post('/contract-templates', data).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contract-templates'] }),
   });
 };
@@ -54,7 +54,7 @@ const useCreateTemplate = () => {
 const useDeleteTemplate = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (templateId: string) => client.delete(`/api/v1/contract-templates/${templateId}`),
+    mutationFn: (templateId: string) => client.delete(`/contract-templates/${templateId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contract-templates'] }),
   });
 };

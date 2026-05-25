@@ -56,14 +56,14 @@ export function WatchButton({ entityType, entityId, size = 'md' }: Props) {
 
   const watch = useMutation({
     mutationFn: (notifyLevel: NotifyLevel) =>
-      client.post('/api/v1/watches', { entityType, entityId, notifyLevel }),
+      client.post('/watches', { entityType, entityId, notifyLevel }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['watches', entityType, entityId] });
     },
   });
 
   const unwatch = useMutation({
-    mutationFn: (watchId: string) => client.delete(`/api/v1/watches/${watchId}`),
+    mutationFn: (watchId: string) => client.delete(`/watches/${watchId}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['watches', entityType, entityId] });
     },

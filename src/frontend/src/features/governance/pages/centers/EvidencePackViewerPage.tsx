@@ -40,8 +40,8 @@ const useEvidencePack = (packId?: string) =>
     queryKey: ['evidence-pack-viewer', packId],
     queryFn: () =>
       packId
-        ? client.get<EvidencePackDetail>(`/api/v1/changes/evidence-packs/${packId}`, { params: { tenantId: 'default' } }).then((r) => r.data)
-        : client.get<EvidencePackDetail>('/api/v1/changes/evidence-packs/latest', { params: { tenantId: 'default' } }).then((r) => r.data),
+        ? client.get<EvidencePackDetail>(`/changes/evidence-packs/${packId}`, { params: { tenantId: 'default' } }).then((r) => r.data)
+        : client.get<EvidencePackDetail>('/changes/evidence-packs/latest', { params: { tenantId: 'default' } }).then((r) => r.data),
   });
 
 const SLSA_COLORS = ['', 'text-warning', 'text-info', 'text-success', 'text-accent'];

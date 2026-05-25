@@ -37,6 +37,7 @@ import {
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
+import { useAuth } from '../../../contexts/AuthContext';
 import client from '../../../api/client';
 import {
   ALL_WIDGET_TYPES,
@@ -49,6 +50,11 @@ import {
   type WidgetSlot,
   type WidgetCategory,
 } from '../widgets/WidgetRegistry';
+import { NqlMonacoEditor } from '../components/NqlMonacoEditor';
+import { DataTransformPanel, type DataTransform } from '../components/DataTransformPanel';
+import { BuilderWidgetCard } from '../components/BuilderWidgetCard';
+import { EmptyCanvasPrompt } from '../components/EmptyCanvasPrompt';
+import { GridAlignmentGuides } from '../components/GridAlignmentGuides';
 
 // ── Emoji icon map ─────────────────────────────────────────────────────────
 
@@ -143,6 +149,7 @@ interface BuilderSlot {
   groupBy: string;
   thresholds: string;
   bucketSize: string;
+  transforms: DataTransform[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -183,6 +190,7 @@ function widgetFromSlot(w: WidgetSlot): BuilderSlot {
     groupBy: '',
     thresholds: '[]',
     bucketSize: '',
+    transforms: [],
   };
 }
 
@@ -202,7 +210,7 @@ function slotsToLayout(slots: BuilderSlot[]): Layout {
 
 const TENANT_ID = 'default';
 
-const useGetDashboard = (dashboardId: string) =>
+const useGetDashboard = (dashboardId: string, enabled: boolean) =>
   useQuery({
     queryKey: ['dashboard-detail', dashboardId, TENANT_ID],
     queryFn: () =>
@@ -211,7 +219,7 @@ const useGetDashboard = (dashboardId: string) =>
           params: { tenantId: TENANT_ID },
         })
         .then((r) => r.data),
-    enabled: Boolean(dashboardId),
+    enabled,
   });
 
 const useUpdateDashboard = (dashboardId: string) => {
@@ -223,6 +231,17 @@ const useUpdateDashboard = (dashboardId: string) => {
       qc.invalidateQueries({ queryKey: ['dashboard-detail', dashboardId] });
       qc.invalidateQueries({ queryKey: ['governance-dashboards'] });
       qc.invalidateQueries({ queryKey: ['dashboard-render-data', dashboardId] });
+    },
+  });
+};
+
+const useCreateDashboard = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: object) =>
+      client.post<{ dashboardId: string }>('/governance/dashboards', payload).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['governance-dashboards'] });
     },
   });
 };
@@ -460,12 +479,10 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 {t('governance.dashboardBuilder.nqlQuery', 'NQL Query')}
               </label>
-              <textarea
+              <NqlMonacoEditor
                 value={slot.nqlQuery}
-                onChange={(e) => onUpdate({ nqlQuery: e.target.value })}
-                rows={4}
-                placeholder="SELECT * FROM services LIMIT 20"
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono focus:outline-none focus:border-accent resize-y"
+                onChange={(v) => onUpdate({ nqlQuery: v })}
+                height="140px"
               />
             </div>
             <div>
@@ -484,6 +501,10 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 ))}
               </select>
             </div>
+            <DataTransformPanel
+              transforms={slot.transforms}
+              onChange={(transforms) => onUpdate({ transforms })}
+            />
           </>
         )}
 
@@ -912,11 +933,13 @@ interface GridCanvasProps {
   isPreview: boolean;
   activeConfigId: string | null;
   draggingType: WidgetType | null;
+  ghostPreview: { x: number; y: number; w: number; h: number } | null;
   onLayoutChange: (layout: Layout) => void;
   onDrop: (layout: Layout, item: LayoutItem | undefined, e: Event) => void;
   onDropDragOver: (e: DragEvent) => { w: number; h: number } | false | void;
   onConfigOpen: (tempId: string) => void;
   onRemove: (tempId: string) => void;
+  onSelect: (tempId: string) => void;
 }
 
 function GridCanvas({
@@ -925,112 +948,94 @@ function GridCanvas({
   isPreview,
   activeConfigId,
   draggingType,
+  ghostPreview,
   onLayoutChange,
   onDrop,
   onDropDragOver,
   onConfigOpen,
   onRemove,
+  onSelect,
 }: GridCanvasProps) {
-  const { t } = useTranslation();
   const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
   const rowHeight = isPreview ? 40 : 60;
 
   const layout = slotsToLayout(slots);
 
-  const slotMap = new Map(slots.map((s) => [s.tempId, s]));
-
   return (
     <div
       ref={containerRef}
-      className="flex-1 min-h-[600px] relative rounded-xl overflow-hidden"
-      style={{
-        background: 'var(--grid-canvas-bg, #f8fafc)',
-        backgroundImage: `
-          radial-gradient(circle, #cbd5e1 1px, transparent 1px)
-        `,
-        backgroundSize: '24px 24px',
-      }}
+      className="flex-1 min-h-[600px] relative rounded-xl overflow-hidden rgl-canvas"
     >
-      {slots.length === 0 && !draggingType && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none select-none z-10">
-          <LayoutGrid size={48} className="mb-3 opacity-30" />
-          <p className="text-sm font-medium opacity-60">
-            {t('governance.dashboardBuilder.canvasEmpty', 'Drag widgets from the palette to build your dashboard')}
-          </p>
-        </div>
-      )}
+      {slots.length === 0 && !draggingType && <EmptyCanvasPrompt />}
 
       {mounted && (
-        <GridLayout
-          width={width}
-          layout={layout}
-          gridConfig={{ cols: 12, rowHeight, margin: [8, 8], containerPadding: [12, 12] }}
-          dragConfig={{ enabled: !isReadOnly, bounded: false }}
-          resizeConfig={{ enabled: !isReadOnly }}
-          dropConfig={{
-            enabled: !isReadOnly,
-            defaultItem: { w: 2, h: 2 },
-            onDragOver: onDropDragOver,
-          }}
-          onLayoutChange={onLayoutChange}
-          onDrop={onDrop}
-          autoSize
-        >
-          {slots.map((slot) => {
-            const meta = WIDGET_META[slot.type];
-            const label = slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type);
-            const isConfigOpen = activeConfigId === slot.tempId;
-
-            return (
-              <div
-                key={slot.tempId}
-                className={`group relative bg-white dark:bg-gray-800 border rounded-lg shadow-sm overflow-hidden flex flex-col items-center justify-center transition-shadow ${
-                  isConfigOpen
-                    ? 'border-accent shadow-accent/20 shadow-md'
-                    : 'border-gray-200 dark:border-gray-700 hover:shadow-md'
-                }`}
-              >
-                {/* Drag handle area (non-button area = full card minus buttons) */}
-                <div className="drag-handle absolute inset-0 cursor-grab active:cursor-grabbing" />
-
-                {/* Widget content */}
-                <div className="relative z-10 flex flex-col items-center gap-1 px-3 pointer-events-none select-none">
-                  <span className="text-2xl">{widgetIcon(slot.type)}</span>
-                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 text-center leading-tight line-clamp-2">
-                    {label}
-                  </span>
-                  <span className="text-[9px] text-gray-400 tabular-nums">
-                    {slot.w}×{slot.h}
-                  </span>
-                </div>
-
-                {/* Action buttons — shown on hover */}
-                {!isReadOnly && (
-                  <div className="absolute top-1.5 right-1.5 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); onConfigOpen(slot.tempId); }}
-                      className="p-1 rounded bg-white/90 dark:bg-gray-700/90 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-accent hover:border-accent transition-colors shadow-sm"
-                      aria-label={t('governance.dashboardBuilder.configWidget', 'Configure widget')}
-                      title="Configure"
-                    >
-                      <Settings size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); onRemove(slot.tempId); }}
-                      className="p-1 rounded bg-white/90 dark:bg-gray-700/90 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-500 hover:border-red-400 transition-colors shadow-sm"
-                      aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
-                      title="Remove"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                )}
+        <>
+          <GridLayout
+            width={width}
+            layout={layout}
+            gridConfig={{ cols: 12, rowHeight, margin: [8, 8], containerPadding: [12, 12] }}
+            dragConfig={{ enabled: !isReadOnly, bounded: false }}
+            resizeConfig={{ enabled: !isReadOnly }}
+            dropConfig={{
+              enabled: !isReadOnly,
+              defaultItem: { w: 2, h: 2 },
+              onDragOver: onDropDragOver,
+            }}
+            onLayoutChange={onLayoutChange}
+            onDrop={onDrop}
+            autoSize
+          >
+            {slots.map((slot) => (
+              <div key={slot.tempId} data-grid-i={slot.tempId}>
+                <BuilderWidgetCard
+                  type={slot.type}
+                  tempId={slot.tempId}
+                  customTitle={slot.customTitle}
+                  w={slot.w}
+                  h={slot.h}
+                  isSelected={activeConfigId === slot.tempId}
+                  isReadOnly={isReadOnly}
+                  onConfigOpen={onConfigOpen}
+                  onRemove={onRemove}
+                  onSelect={onSelect}
+                />
               </div>
-            );
-          })}
-        </GridLayout>
+            ))}
+          </GridLayout>
+
+          {/* Alignment guides overlay */}
+          {!isReadOnly && (
+            <GridAlignmentGuides
+              containerRef={containerRef as React.RefObject<HTMLDivElement>}
+              cols={12}
+              rowHeight={rowHeight}
+              marginX={8}
+              marginY={8}
+              paddingX={12}
+              paddingY={12}
+            />
+          )}
+
+          {/* Ghost preview from palette drag */}
+          {ghostPreview && containerRef.current && (
+            <div
+              className="builder-ghost-preview"
+              style={{
+                left: ghostPreview.x,
+                top: ghostPreview.y,
+                width: ghostPreview.w,
+                height: ghostPreview.h,
+              }}
+            >
+              <span className="builder-ghost-preview__icon">
+                {widgetIcon(draggingType ?? '')}
+              </span>
+              <span className="builder-ghost-preview__label">
+                {WIDGET_META[draggingType!]?.labelKey ?? draggingType}
+              </span>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -1043,10 +1048,15 @@ export function DashboardBuilderPage() {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
   const importInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+
+  const isCreateMode = dashboardId === 'new';
+  const effectiveDashboardId = isCreateMode ? '' : (dashboardId ?? '');
 
   // ── Remote data ──────────────────────────────────────────────────────────
-  const { data, isLoading, isError, refetch } = useGetDashboard(dashboardId ?? '');
-  const updateMutation = useUpdateDashboard(dashboardId ?? '');
+  const { data, isLoading, isError, refetch } = useGetDashboard(effectiveDashboardId, !isCreateMode && Boolean(effectiveDashboardId));
+  const updateMutation = useUpdateDashboard(effectiveDashboardId);
+  const createMutation = useCreateDashboard();
 
   // ── Local editor state ───────────────────────────────────────────────────
   const [name, setName] = useState('');
@@ -1061,6 +1071,7 @@ export function DashboardBuilderPage() {
   const [isPreview, setIsPreview] = useState(false);
   const [activeConfigId, setActiveConfigId] = useState<string | null>(null);
   const [draggingType, setDraggingType] = useState<WidgetType | null>(null);
+  const [ghostPreview, setGhostPreview] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [paletteSearch, setPaletteSearch] = useState('');
   const [paletteCategory, setPaletteCategory] = useState<WidgetCategory>('all');
 
@@ -1080,7 +1091,7 @@ export function DashboardBuilderPage() {
     setInitialized(true);
   }
 
-  const isReadOnly = Boolean(data?.isSystem);
+  const isReadOnly = isCreateMode ? false : Boolean(data?.isSystem);
 
   // ── Palette filtering ────────────────────────────────────────────────────
   const paletteWidgets = ALL_WIDGET_TYPES.filter((wt) => {
@@ -1125,6 +1136,7 @@ export function DashboardBuilderPage() {
       groupBy: '',
       thresholds: '[]',
       bucketSize: '',
+      transforms: [],
     };
     setSlots((prev) => [...prev, newSlot]);
     setActiveConfigId(newSlot.tempId);
@@ -1133,6 +1145,10 @@ export function DashboardBuilderPage() {
   const removeSlot = useCallback((tempId: string) => {
     setSlots((prev) => prev.filter((s) => s.tempId !== tempId));
     setActiveConfigId((id) => (id === tempId ? null : id));
+  }, []);
+
+  const selectSlot = useCallback((tempId: string) => {
+    setActiveConfigId((id) => (id === tempId ? null : tempId));
   }, []);
 
   const updateSlot = useCallback((tempId: string, patch: Partial<BuilderSlot>) => {
@@ -1188,21 +1204,45 @@ export function DashboardBuilderPage() {
         groupBy: '',
         thresholds: '[]',
         bucketSize: '',
+        transforms: [],
       };
       setSlots((prev) => [...prev, newSlot]);
       setDraggingType(null);
+      setGhostPreview(null);
       setActiveConfigId(newSlot.tempId);
     },
     []
   );
 
   const handleDropDragOver = useCallback(
-    (_e: DragEvent): { w: number; h: number } | false | void => {
+    (e: DragEvent): { w: number; h: number } | false | void => {
       if (!draggingType) return false;
       const meta = WIDGET_META[draggingType];
-      return { w: meta?.defaultWidth ?? 2, h: meta?.defaultHeight ?? 2 };
+      const w = meta?.defaultWidth ?? 2;
+      const h = meta?.defaultHeight ?? 2;
+
+      // Update ghost preview position snapped to grid
+      const canvas = (e.target as HTMLElement).closest('.rgl-canvas') as HTMLDivElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const padding = 12;
+        const margin = 8;
+        const colWidth = (rect.width - padding * 2 - margin * 11) / 12;
+        const rowHeightPx = isPreview ? 40 : 60;
+        const rawX = e.clientX - rect.left - padding;
+        const rawY = e.clientY - rect.top - padding;
+        const col = Math.max(0, Math.min(12 - w, Math.round(rawX / (colWidth + margin))));
+        const row = Math.max(0, Math.round(rawY / (rowHeightPx + margin)));
+        const snappedX = padding + col * (colWidth + margin);
+        const snappedY = padding + row * (rowHeightPx + margin);
+        const ghostW = w * colWidth + (w - 1) * margin;
+        const ghostH = h * rowHeightPx + (h - 1) * margin;
+        setGhostPreview({ x: snappedX, y: snappedY, w: ghostW, h: ghostH });
+      }
+
+      return { w, h };
     },
-    [draggingType]
+    [draggingType, isPreview]
   );
 
   // ── Auto-arrange ─────────────────────────────────────────────────────────
@@ -1305,6 +1345,7 @@ export function DashboardBuilderPage() {
             groupBy: '',
             thresholds: '[]',
             bucketSize: '',
+            transforms: [],
           }))
         );
       } catch (err) {
@@ -1320,50 +1361,73 @@ export function DashboardBuilderPage() {
   // ── Save ─────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     setSaveError(null);
+    if (!name.trim()) {
+      setSaveError(t('governance.dashboardBuilder.nameRequired', 'Dashboard name is required.'));
+      return;
+    }
+    if (slots.length === 0) {
+      setSaveError(t('governance.dashboardBuilder.widgetsRequired', 'Add at least one widget before saving.'));
+      return;
+    }
     try {
-      await updateMutation.mutateAsync({
-        dashboardId,
-        tenantId: TENANT_ID,
-        name,
-        description: description || null,
-        layout,
-        tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-        widgets: slots.map((s) => ({
-          existingWidgetId: s.existingWidgetId ?? null,
-          type: s.type,
-          posX: s.x,
-          posY: s.y,
-          width: s.w,
-          height: s.h,
-          serviceId: s.serviceId || null,
-          teamId: s.teamId || null,
-          timeRange: s.timeRange || null,
-          customTitle: s.customTitle || null,
-          metric: s.metric || null,
-          content: s.content || null,
-          nqlQuery: s.nqlQuery || null,
-          renderHint: s.renderHint || null,
-          chartType: s.chartType || null,
-          unit: s.unit || null,
-          colorScheme: s.colorScheme || null,
-          donut: s.donut || null,
-          showDataLabels: s.showDataLabels || null,
-          legendPosition: s.legendPosition || null,
-          yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
-          yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
-          groupBy: s.groupBy || null,
-          thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
-          bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
-        })),
-      });
-      navigate(`/governance/dashboards/${dashboardId}`);
+      const widgetPayload = slots.map((s) => ({
+        existingWidgetId: s.existingWidgetId ?? null,
+        type: s.type,
+        posX: s.x,
+        posY: s.y,
+        width: s.w,
+        height: s.h,
+        serviceId: s.serviceId || null,
+        teamId: s.teamId || null,
+        timeRange: s.timeRange || null,
+        customTitle: s.customTitle || null,
+        metric: s.metric || null,
+        content: s.content || null,
+        nqlQuery: s.nqlQuery || null,
+        renderHint: s.renderHint || null,
+        chartType: s.chartType || null,
+        unit: s.unit || null,
+        colorScheme: s.colorScheme || null,
+        donut: s.donut || null,
+        showDataLabels: s.showDataLabels || null,
+        legendPosition: s.legendPosition || null,
+        yAxisMin: s.yAxisMin ? parseFloat(s.yAxisMin) : null,
+        yAxisMax: s.yAxisMax ? parseFloat(s.yAxisMax) : null,
+        groupBy: s.groupBy || null,
+        thresholds: s.thresholds && s.thresholds !== '[]' ? JSON.parse(s.thresholds) : null,
+        bucketSize: s.bucketSize ? parseInt(s.bucketSize, 10) : null,
+      }));
+      if (isCreateMode) {
+        const result = await createMutation.mutateAsync({
+          tenantId: TENANT_ID,
+          userId: user?.id ?? 'current-user',
+          name: name || t('governance.dashboardBuilder.untitled', 'Untitled Dashboard'),
+          description: description || null,
+          layout,
+          persona,
+          tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+          widgets: widgetPayload,
+        });
+        navigate(`/governance/dashboards/${result.dashboardId}`);
+      } else {
+        await updateMutation.mutateAsync({
+          dashboardId: effectiveDashboardId,
+          tenantId: TENANT_ID,
+          name,
+          description: description || null,
+          layout,
+          tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+          widgets: widgetPayload,
+        });
+        navigate(`/governance/dashboards/${effectiveDashboardId}`);
+      }
     } catch {
       setSaveError(t('governance.dashboardBuilder.saveError', 'Failed to save dashboard.'));
     }
   };
 
   // ── Guards ───────────────────────────────────────────────────────────────
-  if (!dashboardId) {
+  if (!isCreateMode && !dashboardId) {
     return (
       <PageErrorState
         message={t('governance.dashboardView.notFound', 'Dashboard not found')}
@@ -1371,10 +1435,10 @@ export function DashboardBuilderPage() {
       />
     );
   }
-  if (isLoading) {
+  if (!isCreateMode && isLoading) {
     return <PageLoadingState message={t('governance.dashboardBuilder.loading', 'Loading dashboard editor...')} />;
   }
-  if (isError) {
+  if (!isCreateMode && isError) {
     return <PageErrorState message={t('governance.dashboardBuilder.error', 'Failed to load dashboard')} onRetry={() => refetch()} />;
   }
 
@@ -1385,9 +1449,9 @@ export function DashboardBuilderPage() {
       {/* ── Toolbar ────────────────────────────────────────────────────────── */}
       <header className="shrink-0 flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm z-30">
         <Link
-          to={`/governance/dashboards/${dashboardId}`}
+          to={isCreateMode ? '/governance/custom-dashboards' : `/governance/dashboards/${effectiveDashboardId}`}
           className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-accent transition-colors shrink-0"
-          aria-label={t('governance.dashboardBuilder.backToView', 'Back to Dashboard')}
+          aria-label={isCreateMode ? t('governance.dashboardBuilder.backToList', 'Back to Dashboards') : t('governance.dashboardBuilder.backToView', 'Back to Dashboard')}
         >
           <ArrowLeft size={16} />
         </Link>
@@ -1584,7 +1648,8 @@ export function DashboardBuilderPage() {
         <main
           className="flex-1 overflow-auto p-4"
           onDragLeave={() => {
-            // Reset dragging indicator when leaving the canvas entirely
+            setDraggingType(null);
+            setGhostPreview(null);
           }}
         >
           <GridCanvas
@@ -1593,11 +1658,13 @@ export function DashboardBuilderPage() {
             isPreview={isPreview}
             activeConfigId={activeConfigId}
             draggingType={draggingType}
+            ghostPreview={ghostPreview}
             onLayoutChange={handleLayoutChange}
             onDrop={handleDrop}
             onDropDragOver={handleDropDragOver}
             onConfigOpen={(id) => setActiveConfigId((cur) => (cur === id ? null : id))}
             onRemove={removeSlot}
+            onSelect={selectSlot}
           />
         </main>
       </div>

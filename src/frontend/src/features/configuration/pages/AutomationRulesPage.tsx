@@ -50,7 +50,7 @@ const useCreateRule = () => {
       trigger: string;
       conditionsJson: string;
       actionsJson: string;
-    }) => client.post('/api/v1/automation-rules', data).then((r) => r.data),
+    }) => client.post('/automation-rules', data).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['automation-rules'] }),
   });
 };
@@ -59,7 +59,7 @@ const useToggleRule = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ ruleId, enabled }: { ruleId: string; enabled: boolean }) =>
-      client.patch(`/api/v1/automation-rules/${ruleId}/toggle`, { ruleId, enabled }),
+      client.patch(`/automation-rules/${ruleId}/toggle`, { ruleId, enabled }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['automation-rules'] }),
   });
 };
@@ -67,7 +67,7 @@ const useToggleRule = () => {
 const useDeleteRule = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (ruleId: string) => client.delete(`/api/v1/automation-rules/${ruleId}`),
+    mutationFn: (ruleId: string) => client.delete(`/automation-rules/${ruleId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['automation-rules'] }),
   });
 };

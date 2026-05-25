@@ -203,5 +203,4 @@ Endpoints públicos teriam de declarar explicitamente `.AllowAnonymous()`.
 
 - `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Extensions/EndpointAuthorizationExtensions.cs`
 - `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Authorization/PermissionPolicyProvider.cs`
-- [PHASE-1-SECRETS-BASELINE.md](PHASE-1-SECRETS-BASELINE.md)
-- [PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md](PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md)
+- [ENVIRONMENT-BASELINE.md](ENVIRONMENT-BASELINE.md)

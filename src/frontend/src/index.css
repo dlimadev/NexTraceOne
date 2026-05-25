@@ -602,4 +602,334 @@ body {
 /* ─── Notebook cells (Wave V3.4) ─────────────────────────────────────────────── */
 .notebook-cell-markdown { font-family: var(--font-sans); }
 .notebook-cell-query    { font-family: var(--font-mono); background: rgba(0,0,0,.03); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   React Grid Layout — Dashboard Builder Overrides
+   Integra o RGL com o design system NexTraceOne (light/dark themes).
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Canvas background grid pattern */
+.rgl-canvas {
+  background-color: var(--t-canvas);
+  background-image:
+    radial-gradient(circle, var(--t-edge) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  transition: background-color 300ms ease;
+}
+
+/* Widget item base */
+.react-grid-item {
+  transition:
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    opacity 200ms ease;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform, width, height, box-shadow, border-color, opacity;
+}
+
+/* Widget placeholder (ghost during drag) */
+.react-grid-item.react-grid-placeholder {
+  background: var(--t-accent-muted) !important;
+  border: 2px dashed var(--t-accent) !important;
+  border-radius: 12px !important;
+  opacity: 0.45 !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Resize handles */
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  z-index: 20;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--t-muted);
+  border-bottom: 2px solid var(--t-muted);
+  border-radius: 0 0 2px 0;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.react-grid-item:hover > .react-resizable-handle::after {
+  border-color: var(--t-accent);
+}
+
+.react-grid-item > .react-resizable-handle:hover::after {
+  border-color: var(--t-accent);
+  transform: scale(1.2);
+}
+
+/* Disable transitions while dragging/resizing for responsiveness */
+.react-grid-item.react-grid-item-dragging,
+.react-grid-item.react-grid-item-resizing {
+  transition: none !important;
+  z-index: 50;
+}
+
+.react-grid-item.react-grid-item-dragging {
+  opacity: 0.85;
+  box-shadow: var(--t-shadow-xl);
+}
+
+.react-grid-item.react-grid-item-resizing {
+  box-shadow: var(--t-shadow-lg);
+}
+
+/* Builder widget card states */
+.builder-widget-card {
+  background: var(--t-card);
+  border: 1px solid var(--t-edge);
+  border-radius: 10px;
+  box-shadow: var(--t-shadow-xs);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.builder-widget-card:hover {
+  border-color: var(--t-edge-strong);
+  box-shadow: var(--t-shadow-sm);
+}
+
+.builder-widget-card--selected {
+  border-color: var(--t-accent);
+  box-shadow: 0 0 0 3px var(--t-focus-ring), var(--t-shadow-sm);
+}
+
+.builder-widget-card--dragging {
+  opacity: 0.8;
+  box-shadow: var(--t-shadow-xl);
+  transform: scale(1.01);
+}
+
+.builder-widget-card--resizing {
+  border-color: var(--t-accent);
+  box-shadow: var(--t-shadow-lg);
+}
+
+/* Builder widget header */
+.builder-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  min-height: 28px;
+  background: var(--t-subtle);
+  border-bottom: 1px solid var(--t-edge);
+  cursor: grab;
+  user-select: none;
+  transition: background 150ms ease;
+}
+
+.builder-widget-header:active {
+  cursor: grabbing;
+}
+
+.builder-widget-header:hover {
+  background: var(--t-hover);
+}
+
+.builder-widget-header__title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--t-heading);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.builder-widget-header__actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.builder-widget-card:hover .builder-widget-header__actions,
+.builder-widget-card--selected .builder-widget-header__actions {
+  opacity: 1;
+}
+
+.builder-widget-header__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--t-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.builder-widget-header__btn:hover {
+  background: var(--t-hover);
+  border-color: var(--t-edge);
+  color: var(--t-heading);
+}
+
+.builder-widget-header__btn--danger:hover {
+  background: var(--t-critical-muted);
+  border-color: var(--t-critical);
+  color: var(--t-critical);
+}
+
+/* Builder widget body */
+.builder-widget-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+/* Ghost preview (palette drag) */
+.builder-ghost-preview {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  background: var(--t-accent-muted);
+  border: 2px dashed var(--t-accent);
+  border-radius: 10px;
+  opacity: 0.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: opacity 100ms ease;
+}
+
+.builder-ghost-preview__icon {
+  font-size: 1.5rem;
+  opacity: 0.7;
+}
+
+.builder-ghost-preview__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--t-accent);
+  text-align: center;
+}
+
+/* Empty canvas prompt */
+.empty-canvas-prompt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 10;
+  animation: empty-canvas-fade-in 400ms ease-out;
+}
+
+.empty-canvas-prompt__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--t-subtle);
+  border: 2px dashed var(--t-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t-muted);
+  animation: empty-canvas-bob 3s ease-in-out infinite;
+}
+
+.empty-canvas-prompt__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--t-heading);
+}
+
+.empty-canvas-prompt__hint {
+  font-size: 0.75rem;
+  color: var(--t-muted);
+  max-width: 280px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@keyframes empty-canvas-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes empty-canvas-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Alignment guides overlay */
+.alignment-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.alignment-guide-line {
+  stroke: var(--t-accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  opacity: 0.7;
+}
+
+.alignment-guide-label {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--t-accent);
+  font-family: var(--font-mono);
+}
+
+/* Widget add animation */
+@keyframes widget-enter {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes widget-exit {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
+.builder-widget-enter {
+  animation: widget-enter 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.builder-widget-exit {
+  animation: widget-exit 180ms ease-in forwards;
+}
 .notebook-cell-ai       { border-left: 3px solid var(--color-brand-500, #6366f1); }

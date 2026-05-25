@@ -75,7 +75,7 @@ internal static class IngestionApiStartup
 
         const string warnMsg =
             "Webhook signature validation is DISABLED for source(s): {Sources}. " +
-            "Set Security__WebhookSecrets__{Source}=<secret> to enforce HMAC-SHA256 proof-of-origin.";
+            "Set Security__WebhookSecrets__<source>=<secret> to enforce HMAC-SHA256 proof-of-origin.";
 
         if (app.Environment.IsProduction())
         {

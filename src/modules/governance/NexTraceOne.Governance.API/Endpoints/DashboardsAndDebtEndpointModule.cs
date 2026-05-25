@@ -49,6 +49,8 @@ using InstantiateTemplateFeature = NexTraceOne.Governance.Application.Features.I
 using GetPersonaHomeFeature = NexTraceOne.Governance.Application.Features.GetPersonaHome.GetPersonaHome;
 using ListScheduledDashboardReportsFeature = NexTraceOne.Governance.Application.Features.ListScheduledDashboardReports.ListScheduledDashboardReports;
 using NexTraceOne.Governance.Application.Features.GetDashboardBatchQuery;
+using ResolveDashboardVariablesFeature = NexTraceOne.Governance.Application.Features.ResolveDashboardVariables.ResolveDashboardVariables;
+using NexTraceOne.Governance.Domain.Services;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -62,6 +64,7 @@ public sealed class DashboardsAndDebtEndpointModule
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
         MapDashboardEndpoints(app);
+        MapVariableEndpoints(app);
         MapTechnicalDebtEndpoints(app);
         MapNqlEndpoints(app);
         MapLiveEndpoints(app);
@@ -221,6 +224,25 @@ public sealed class DashboardsAndDebtEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+    }
+
+    private static void MapVariableEndpoints(IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/governance/dashboards");
+
+        // GET /api/v1/governance/dashboards/{id}/variables — resolve template variable values
+        group.MapGet("/{dashboardId:guid}/variables", async (
+            Guid dashboardId,
+            string tenantId,
+            string? environmentId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ResolveDashboardVariablesFeature.Query(dashboardId, tenantId, environmentId);
+            var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
     }
@@ -735,15 +757,5 @@ public sealed class DashboardsAndDebtEndpointModule
 
     /// <summary>Resolve um identificador de intervalo de tempo relativo em DateTimeOffset absolutos.</summary>
     private static (DateTimeOffset from, DateTimeOffset until) ResolveTimeRange(string? timeRange)
-    {
-        var now = DateTimeOffset.UtcNow;
-        return timeRange switch
-        {
-            "1h"  => (now.AddHours(-1), now),
-            "6h"  => (now.AddHours(-6), now),
-            "7d"  => (now.AddDays(-7), now),
-            "30d" => (now.AddDays(-30), now),
-            _     => (now.AddHours(-24), now), // padrão: 24 horas
-        };
-    }
+        => TimeRangeResolver.Resolve(timeRange);
 }

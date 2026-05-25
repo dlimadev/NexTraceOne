@@ -44,7 +44,7 @@ ON CONFLICT DO NOTHING;
 
 -- ---------------------------------------------------------------------------
 -- 2. Utilizador Platform Admin
---    Senha: Admin@2026!  (PBKDF2/SHA256 — formato v1.{base64_salt}.{base64_hash}, 100 000 iterações)
+--    Senha: Admin@2026!  (PBKDF2/SHA256 — formato v2.{base64_salt}.{base64_hash}, 600 000 iterações)
 --    AVISO DE SEGURANÇA: alterar a senha imediatamente após o primeiro login
 --    em qualquer ambiente não-desenvolvimento.
 -- ---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ VALUES (
     'admin@nextraceone.io',
     'Platform',
     'Admin',
-    'v1.ppSv9+z4OYt5/ckM0rsEvQ==.VbpxYtiSfi6e4K22pofst54ZLYgPB3GyBPI7Tj1DIUk=',
+    'v2.sGIcV14tRfeiyZpwxQDKyQ==.jJCpK5unlk2wggkgs8hdp3UcskFk93fwyhiPffCwAdg=',
     true,
     0,
     false,
@@ -332,31 +332,30 @@ ON CONFLICT DO NOTHING;
 
 -- ---------------------------------------------------------------------------
 -- 10. Gates de promoção por ambiente de deployment (chg_promotion_gates)
---     DeploymentEnvironmentId FK para chg_deployment_environments.
---     GateType válidos: 'ApprovalGate' | 'EvidencePackGate' | 'BlastRadiusGate' |
---                       'FreezeWindowGate' | 'TestCoverageGate' | 'ManualGate'
+--     Schema do ChangeIntelligence: Name, Description, EnvironmentFrom,
+--     EnvironmentTo, Rules(jsonb), IsActive, BlockOnFailure, CreatedBy,
+--     CreatedAt, TenantId.
 -- ---------------------------------------------------------------------------
 INSERT INTO chg_promotion_gates (
     "Id",
-    "DeploymentEnvironmentId",
-    "GateName",
-    "GateType",
-    "IsRequired",
+    "Name",
+    "Description",
+    "EnvironmentFrom",
+    "EnvironmentTo",
+    "Rules",
     "IsActive",
-    "CreatedAt",
+    "BlockOnFailure",
     "CreatedBy",
-    "UpdatedAt",
-    "UpdatedBy",
-    "IsDeleted"
+    "CreatedAt",
+    "TenantId"
 )
 VALUES
-    -- Staging: 1 gate
-    ('ce000000-0000-0000-0000-000000000001', 'cb000000-0000-0000-0000-000000000002', 'Lead Approval',          'ApprovalGate',    true,  true, NOW(), 'seed', NOW(), 'seed', false),
-    -- Production: 4 gates
-    ('ce000000-0000-0000-0000-000000000002', 'cb000000-0000-0000-0000-000000000003', 'TechLead Approval',      'ApprovalGate',    true,  true, NOW(), 'seed', NOW(), 'seed', false),
-    ('ce000000-0000-0000-0000-000000000003', 'cb000000-0000-0000-0000-000000000003', 'Evidence Pack',          'EvidencePackGate',true,  true, NOW(), 'seed', NOW(), 'seed', false),
-    ('ce000000-0000-0000-0000-000000000004', 'cb000000-0000-0000-0000-000000000003', 'Blast Radius Assessment','BlastRadiusGate', true,  true, NOW(), 'seed', NOW(), 'seed', false),
-    ('ce000000-0000-0000-0000-000000000005', 'cb000000-0000-0000-0000-000000000003', 'Freeze Window Check',    'FreezeWindowGate',true,  true, NOW(), 'seed', NOW(), 'seed', false)
+    -- Staging → Production gates
+    ('ce000000-0000-0000-0000-000000000001', 'Lead Approval',           'Requires TechLead approval before staging deployment.',     'Development', 'Staging',    '{\"gateType\":\"ApprovalGate\"}',    true, true, 'seed', NOW(), 'default'),
+    ('ce000000-0000-0000-0000-000000000002', 'TechLead Approval',       'Requires TechLead approval before production deployment.',  'Staging',     'Production', '{\"gateType\":\"ApprovalGate\"}',    true, true, 'seed', NOW(), 'default'),
+    ('ce000000-0000-0000-0000-000000000003', 'Evidence Pack',           'Requires evidence pack review.',                            'Staging',     'Production', '{\"gateType\":\"EvidencePackGate\"}',true, true, 'seed', NOW(), 'default'),
+    ('ce000000-0000-0000-0000-000000000004', 'Blast Radius Assessment', 'Requires blast radius impact assessment.',                  'Staging',     'Production', '{\"gateType\":\"BlastRadiusGate\"}', true, true, 'seed', NOW(), 'default'),
+    ('ce000000-0000-0000-0000-000000000005', 'Freeze Window Check',     'Verifies deployment is outside freeze windows.',            'Staging',     'Production', '{\"gateType\":\"FreezeWindowGate\"}',true, true, 'seed', NOW(), 'default')
 ON CONFLICT DO NOTHING;
 
 -- ---------------------------------------------------------------------------
@@ -538,6 +537,7 @@ VALUES
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'governance:packs:read',          NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'governance:packs:write',         NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'governance:reports:write',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'analytics:read',                 NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'analytics:write',                NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c001', 'governance:finops:read',         NULL, NOW(), 'seed', true),

@@ -54,7 +54,7 @@ export function RollbackCockpitPage() {
 
   const initiateRollback = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/changes/rollback/${id}/initiate`, { tenantId: 'default', userId: 'current-user' }),
+      client.post(`/changes/rollback/${id}/initiate`, { tenantId: 'default', userId: 'current-user' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['rollback-cockpit'] }),
   });
 

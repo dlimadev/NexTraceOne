@@ -78,6 +78,8 @@ import { DashboardHistoryDrawer } from '../components/DashboardHistoryDrawer';
 import { DashboardSharingModal } from '../components/DashboardSharingModal';
 import { TimeRangePicker, parseTimeRange } from '../components/TimeRangePicker';
 import { AnnotationsOverlay } from '../components/AnnotationsOverlay';
+import { DashboardVariablesPanel } from '../components/DashboardVariablesPanel';
+import { KibanaQueryBar } from '../components/KibanaQueryBar';
 
 // ── Widget registry map ────────────────────────────────────────────────────
 
@@ -413,6 +415,8 @@ function DashboardViewInner() {
   // Dashboard variables — Grafana-style global overrides applied to all widgets
   const [varService, setVarService] = useState(() => searchParams.get('service') ?? '');
   const [varTeam, setVarTeam] = useState(() => searchParams.get('team') ?? '');
+  const [dashboardVariables, setDashboardVariables] = useState<Record<string, string[]>>({});
+  const [kibanaQuery, setKibanaQuery] = useState(() => searchParams.get('q') ?? '');
   const [showVars, setShowVars] = useState(false);
   // Fullscreen expand: stores the widgetId of the widget being expanded (null = closed)
   const [expandedWidgetId, setExpandedWidgetId] = useState<string | null>(null);
@@ -440,10 +444,16 @@ function DashboardViewInner() {
       if (crossFilter.teamId) next.set('filterTeam', crossFilter.teamId); else next.delete('filterTeam');
       if (crossFilter.from) next.set('filterFrom', crossFilter.from); else next.delete('filterFrom');
       if (crossFilter.to) next.set('filterTo', crossFilter.to); else next.delete('filterTo');
+      if (kibanaQuery) next.set('q', kibanaQuery); else next.delete('q');
+      // Persist dashboard variables to URL
+      Object.entries(dashboardVariables).forEach(([key, vals]) => {
+        if (vals.length > 0) next.set(`var_${key}`, vals.join(','));
+        else next.delete(`var_${key}`);
+      });
       return next;
     }, { replace: true });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeRange, varService, varTeam, crossFilter.serviceId, crossFilter.teamId, crossFilter.from, crossFilter.to]);
+  }, [timeRange, varService, varTeam, crossFilter.serviceId, crossFilter.teamId, crossFilter.from, crossFilter.to, dashboardVariables, kibanaQuery]);
 
   // ── V3.3 live hook ────────────────────────────────────────────────────
   const { isLive, isSimulated: liveSimulated, error: liveError, reconnect: liveReconnect } = useDashboardLive({
@@ -724,46 +734,29 @@ function DashboardViewInner() {
         </div>
       </div>
 
-      {/* Dashboard Variables panel — Grafana-style global overrides */}
+      {/* Kibana-style Query Bar */}
+      <div className="mb-4">
+        <KibanaQueryBar
+          value={kibanaQuery}
+          onChange={setKibanaQuery}
+          onSubmit={(q) => {
+            setKibanaQuery(q);
+            // Invalidate all widget queries to re-fetch with new query context
+            qc.invalidateQueries({ queryKey: ['widget-'] });
+          }}
+        />
+      </div>
+
+      {/* Dashboard Variables panel — Grafana-style dynamic dropdowns */}
       {showVars && (
-        <div className="mb-4 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 flex flex-wrap items-center gap-4">
-          <span className="text-xs font-semibold text-accent flex items-center gap-1">
-            <SlidersHorizontal size={12} />
-            {t('governance.dashboardView.variablesLabel', 'Variables')}
-          </span>
-          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-            <span className="font-medium text-accent">$service</span>
-            <input
-              type="text"
-              value={varService}
-              onChange={(e) => setVarService(e.target.value)}
-              placeholder={t('governance.dashboardView.varServicePlaceholder', 'All services')}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white w-36"
-            />
-          </label>
-          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-            <span className="font-medium text-accent">$team</span>
-            <input
-              type="text"
-              value={varTeam}
-              onChange={(e) => setVarTeam(e.target.value)}
-              placeholder={t('governance.dashboardView.varTeamPlaceholder', 'All teams')}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white w-36"
-            />
-          </label>
-          {(varService || varTeam) && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => { setVarService(''); setVarTeam(''); }}
-            >
-              {t('governance.dashboardView.clearVars', 'Clear')}
-            </Button>
-          )}
-          <span className="text-[10px] text-gray-400 ml-auto">
-            {t('governance.dashboardView.varsHint', 'Variable values override per-widget service/team filters')}
-          </span>
-        </div>
+        <DashboardVariablesPanel
+          dashboardId={dashboardId!}
+          tenantId={TENANT_ID}
+          environmentId={activeEnvironmentId}
+          values={dashboardVariables}
+          onChange={(key, vals) => setDashboardVariables(prev => ({ ...prev, [key]: vals }))}
+          onClearAll={() => setDashboardVariables({})}
+        />
       )}
 
       {/* V3.3 — Live error banner */}

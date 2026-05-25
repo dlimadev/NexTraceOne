@@ -51,7 +51,7 @@ const useCreateReport = () => {
       schedule: string;
       recipientsJson: string;
       format: string;
-    }) => client.post('/api/v1/scheduled-reports', data).then((r) => r.data),
+    }) => client.post('/scheduled-reports', data).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scheduled-reports'] }),
   });
 };
@@ -60,7 +60,7 @@ const useToggleReport = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ reportId, enabled }: { reportId: string; enabled: boolean }) =>
-      client.patch(`/api/v1/scheduled-reports/${reportId}/toggle`, { reportId, enabled }),
+      client.patch(`/scheduled-reports/${reportId}/toggle`, { reportId, enabled }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scheduled-reports'] }),
   });
 };
@@ -68,7 +68,7 @@ const useToggleReport = () => {
 const useDeleteReport = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (reportId: string) => client.delete(`/api/v1/scheduled-reports/${reportId}`),
+    mutationFn: (reportId: string) => client.delete(`/scheduled-reports/${reportId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scheduled-reports'] }),
   });
 };
@@ -369,7 +369,7 @@ export function ScheduledReportsPage() {
         ]}
         onExport={(fmt: ExportFormat) => {
           // POST /api/v1/export with the selected format
-          client.post('/api/v1/export', {
+          client.post('/export', {
             entity: 'scheduled-reports',
             format: fmt,
           }).catch(() => null);

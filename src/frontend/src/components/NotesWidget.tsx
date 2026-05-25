@@ -24,7 +24,7 @@ function useSaveNotes(userId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (content: string) =>
-      client.put('/api/v1/configuration/preferences', {
+      client.put('/configuration/preferences', {
         userId,
         key: 'home.widget.notes.content',
         value: content,

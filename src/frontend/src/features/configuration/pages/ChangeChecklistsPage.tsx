@@ -44,7 +44,7 @@ const useCreateChecklist = () => {
       environment?: string;
       isRequired: boolean;
       items: string[];
-    }) => client.post('/api/v1/change-checklists', data).then((r) => r.data),
+    }) => client.post('/change-checklists', data).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['change-checklists'] }),
   });
 };
@@ -52,7 +52,7 @@ const useCreateChecklist = () => {
 const useDeleteChecklist = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => client.delete(`/api/v1/change-checklists/${id}`),
+    mutationFn: (id: string) => client.delete(`/change-checklists/${id}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['change-checklists'] }),
   });
 };

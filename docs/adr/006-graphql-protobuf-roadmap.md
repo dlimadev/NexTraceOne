@@ -1,8 +1,8 @@
-# ADR-006: GraphQL e Protobuf/gRPC — Fora do Escopo do MVP1
+# ADR-006: GraphQL e Protobuf/gRPC — Implementado como Extensão Modular
 
 ## Status
 
-Accepted
+Accepted → Implemented
 
 ## Data
 
@@ -30,16 +30,22 @@ Os fatores considerados foram:
 
 ## Decisão
 
-**GraphQL e Protobuf/gRPC não serão incluídos no MVP1 do NexTraceOne.**
+**GraphQL e Protobuf/gRPC foram implementados como extensões modulares do Contract Governance em Abril 2026 (Waves G.3 e H.1).**
 
-O suporte será considerado para uma fase futura do roadmap (pós-MVP1), com as seguintes condições:
+A implementação seguiu as condições planejadas:
 
-1. O módulo de Contract Governance deve estar estável e em produção para OpenAPI, AsyncAPI e WSDL antes de expandir.
-2. Cada protocolo será implementado como extensão modular do `ContractProtocol` enum e do pipeline de parsing/diff, sem alterar o núcleo do domínio.
-3. A implementação de GraphQL será priorizada antes de Protobuf/gRPC, dado o maior volume de adoção em ambientes web/API-first.
-4. Será criado um ADR específico para cada protocolo quando a implementação for iniciada.
+1. ✅ O módulo de Contract Governance está estável para OpenAPI, AsyncAPI e WSDL.
+2. ✅ Cada protocolo foi implementado como extensão modular do `ContractProtocol` enum e do pipeline de parsing/diff, sem alterar o núcleo do domínio.
+3. ✅ GraphQL foi priorizado e implementado antes de Protobuf/gRPC.
+4. ✅ Este ADR foi atualizado para refletir a implementação concluída.
 
-O modelo de domínio já contempla os valores `GraphQl` e `Protobuf` no enum `ContractProtocol` como reserva para extensibilidade futura, mas os parsers, validators e geradores de código associados não serão desenvolvidos no MVP1.
+As seguintes entidades e serviços foram adicionados:
+- `GraphQlSchemaSnapshot` — snapshot de schema GraphQL com SDL parsing
+- `ProtobufSchemaSnapshot` — snapshot de schema Protobuf com `.proto` parsing
+- `GraphQlDiffEngine` — diff semântico de types, queries, mutations e subscriptions
+- `ProtobufDiffEngine` — diff por field number e backward/forward compatibility
+- `VisualDataContractBuilder.tsx` — UI no Contract Studio para edição visual de contratos
+- Migrations e testes de integração para ambos os protocolos
 
 ## Consequências
 

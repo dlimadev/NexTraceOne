@@ -75,7 +75,7 @@ export function NqlEditor({
 
   const validateMutation = useMutation<NqlValidateResponse, Error, string>({
     mutationFn: async (nqlQuery) => {
-      const res = await client.post('/api/v1/governance/nql/validate', {
+      const res = await client.post('/governance/nql/validate', {
         nqlQuery,
         tenantId,
         persona,
@@ -90,7 +90,7 @@ export function NqlEditor({
 
   const executeMutation = useMutation<NqlExecuteResponse, Error, string>({
     mutationFn: async (nqlQuery) => {
-      const res = await client.post('/api/v1/governance/nql/execute', {
+      const res = await client.post('/governance/nql/execute', {
         nqlQuery,
         tenantId,
         environmentId,

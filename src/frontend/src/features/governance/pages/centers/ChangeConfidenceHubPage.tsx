@@ -16,8 +16,8 @@ const useChangeConfidence = (changeId?: string) =>
     queryKey: ['change-confidence-hub', changeId],
     queryFn: () =>
       changeId
-        ? client.get(`/api/v1/changes/${changeId}/confidence/breakdown`, { params: { tenantId: 'default' } }).then((r) => r.data)
-        : client.get('/api/v1/changes/confidence/latest', { params: { tenantId: 'default' } }).then((r) => r.data),
+        ? client.get(`/changes/${changeId}/confidence/breakdown`, { params: { tenantId: 'default' } }).then((r) => r.data)
+        : client.get('/changes/confidence/latest', { params: { tenantId: 'default' } }).then((r) => r.data),
     enabled: true,
   });
 

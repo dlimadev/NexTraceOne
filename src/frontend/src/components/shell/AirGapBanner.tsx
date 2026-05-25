@@ -14,7 +14,7 @@ function useNetworkPolicy() {
     queryKey: ['platform', 'network-policy'],
     queryFn: () =>
       client
-        .get<NetworkPolicyResponse>('/api/v1/platform/network-policy')
+        .get<NetworkPolicyResponse>('/platform/network-policy')
         .then((r) => r.data),
     staleTime: 5 * 60 * 1_000,
     retry: false,

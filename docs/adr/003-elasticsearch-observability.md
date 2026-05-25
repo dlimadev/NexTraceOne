@@ -27,12 +27,13 @@ Options considered:
 
 ## Decision
 
-We chose **Elasticsearch** as the primary observability and analytics provider, with PostgreSQL as the authoritative source of truth for domain data:
+We chose **Elasticsearch** as the primary observability and analytics provider, with **ClickHouse** as a high-performance alternative for analytics-heavy workloads, and PostgreSQL as the authoritative source of truth for domain data:
 
-- **Elasticsearch** handles: log storage, metrics aggregation, trace search, analytics queries.
+- **Elasticsearch** handles: log storage, full-text search, trace search, basic analytics queries.
+- **ClickHouse** handles: high-volume metrics aggregation, time-series analytics, histogram computations, large-scale drift detection (configurable via `Telemetry:ObservabilityProvider:Provider=ClickHouse`).
 - **PostgreSQL** handles: domain entities, audit trails, compliance data, configuration.
 - **OpenTelemetry Collector** as the ingestion gateway for telemetry data.
-- **Production security**: xpack.security enabled with TLS, authentication, and API keys.
+- **Production security**: xpack.security enabled with TLS, authentication, and API keys (Elasticsearch); native ClickHouse security with RBAC (ClickHouse).
 
 ## Consequences
 

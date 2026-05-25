@@ -62,8 +62,6 @@ public static class CreateCustomDashboard
             RuleFor(x => x.Persona).NotEmpty().MaximumLength(50)
                 .Must(p => ValidPersonas.Contains(p))
                 .WithMessage($"Persona must be one of: {string.Join(", ", ValidPersonas)}");
-            RuleFor(x => x.Widgets).NotEmpty()
-                .WithMessage("At least one widget must be selected.");
             RuleFor(x => x.Widgets.Count).LessThanOrEqualTo(20)
                 .When(x => x.Widgets is not null)
                 .WithMessage("A dashboard may contain at most 20 widgets.");

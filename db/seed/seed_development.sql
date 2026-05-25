@@ -34,7 +34,7 @@ BEGIN;
 
 -- ---------------------------------------------------------------------------
 -- 1. Utilizadores de teste — um por papel do sistema
---    Todos com PBKDF2/SHA256 — formato v1.{base64_salt}.{base64_hash}, 100 000 iterações.
+--    Todos com PBKDF2/SHA256 — formato v2.{base64_salt}.{base64_hash}, 600 000 iterações.
 -- ---------------------------------------------------------------------------
 INSERT INTO iam_users (
     "Id",
@@ -54,7 +54,7 @@ VALUES
         'techlead@nextraceone.io',
         'Ana',
         'Silva',
-        'v1.0b46DSzRMt94/4yLnPUYaw==.KAWR5yo5D3blTBYQjhs7ujRDYV553nzSPdkNzLRpmZw=',
+        'v2.7lYWp+ldQ3GzoRen6VJEMw==.to4IMJPBVf/j5ELGlG4tWav79ciUF4IwIaPlLDIyOhk=',
         true, 0, false, NULL, NULL
     ),
     (
@@ -62,7 +62,7 @@ VALUES
         'dev@nextraceone.io',
         'Bruno',
         'Costa',
-        'v1.cBmEmnRiLd/BIAOmoOH7BA==.XLmgYFh4M5sIOoWlHkk9Larp4e9nUCLo4WvdtuL4XGY=',
+        'v2.8/5kqMTHEqyFQMBNnpnKAg==.wyA43Xw1Yhb3DiKO0D9kBvVPe5BGMivfzxX1acKOoGc=',
         true, 0, false, NULL, NULL
     ),
     (
@@ -70,7 +70,7 @@ VALUES
         'viewer@nextraceone.io',
         'Carla',
         'Mendes',
-        'v1.gGI8arVvEQhYACsvoDZ2yQ==.c+nPZBrQ2GTf+AndKRakJ4hrzSj4iZB93wY3z9BvFX8=',
+        'v2.lJVZRaaGWSe/i+mZnq2FDw==.noR07TI1eKALHohjspwsNosTtdLzWEheyIk15uLdhfM=',
         true, 0, false, NULL, NULL
     ),
     (
@@ -78,7 +78,7 @@ VALUES
         'auditor@nextraceone.io',
         'Daniel',
         'Ferreira',
-        'v1.cidbqZdl+wrJiuUprvaOJA==.dCNhQiRcqWCEzX4EY1yfqPI/RgcGbv4E2SketMZyDME=',
+        'v2.HF8zYhuCvOlpwv5w1a+dsQ==.+z+znK9+U2hToPpzbi7Sr+3pPpbqllY1BC/Af7VcBZk=',
         true, 0, false, NULL, NULL
     ),
     (
@@ -86,7 +86,7 @@ VALUES
         'secreview@nextraceone.io',
         'Elena',
         'Rocha',
-        'v1.GaHQSxY9K0ogtqHzKvp7Tg==.ePf5tCuwHGaRGNS/F4i8vtVZXQlVSvEjfK1TPs4eRlg=',
+        'v2.+djLwrUiNJGX4QmNde6M5w==.YGiSowZSCg1w30MCLvxr8prCvSn+evjxIb/Zm3uncg0=',
         true, 0, false, NULL, NULL
     ),
     (
@@ -94,7 +94,7 @@ VALUES
         'approval@nextraceone.io',
         'Fabio',
         'Lima',
-        'v1.fy4scsVL1c0gE/b6V0QxaQ==.OzvaWSHf9DUC+kroOllidnHAWPgilsa80CqHwvvkedM=',
+        'v2.1mbx4pQHn1bOMfFVHCqw3w==.rexE1WHj36FcbMkrn+AwBzdi3Fiv9fR2eaoYBGXfJkE=',
         true, 0, false, NULL, NULL
     )
 ON CONFLICT DO NOTHING;
@@ -1151,6 +1151,7 @@ VALUES
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:policies:read',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:compliance:read',     NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:reports:write',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'analytics:read',                 NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'promotion:requests:write',       NULL, NOW(), 'seed', true),
@@ -1212,6 +1213,7 @@ VALUES
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'governance:domains:read',        NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'governance:reports:write',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'analytics:read',                 NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'rulesets:read',                  NULL, NOW(), 'seed', true),
@@ -1235,6 +1237,7 @@ VALUES
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:compliance:read',     NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:evidence:read',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:reports:write',       NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'rulesets:read',                  NULL, NOW(), 'seed', true),
     (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'audit:trail:read',               NULL, NOW(), 'seed', true),

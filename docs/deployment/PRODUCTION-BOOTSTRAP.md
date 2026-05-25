@@ -299,4 +299,4 @@ FinOps mostram apenas dados sintéticos.
 - [CI/CD Pipelines](CI-CD-PIPELINES.md)
 - [Migration Strategy](MIGRATION-STRATEGY.md)
 - [Production Secrets Provisioning](../runbooks/PRODUCTION-SECRETS-PROVISIONING.md)
-- [Security Baseline Checklist](../security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md)
+- [Environment Baseline](../security/ENVIRONMENT-BASELINE.md)

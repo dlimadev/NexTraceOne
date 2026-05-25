@@ -4,7 +4,7 @@
 > **Esforço estimado:** M (Medium)
 > **Módulos impactados:** `platform/ApiHost`, `operationalintelligence`, `notifications`
 > **Referência:** [INDEX.md](./INDEX.md)
-> **Estado (Maio 2026):** W2-01 IMPLEMENTADO | W2-02 IMPLEMENTADO | W2-03 NAO IMPLEMENTADO | W2-04 IMPLEMENTADO
+> **Estado (Maio 2026):** W2-01 IMPLEMENTADO | W2-02 IMPLEMENTADO | W2-03 IMPLEMENTADO | W2-04 IMPLEMENTADO
 
 ---
 

@@ -1,11 +1,10 @@
 /**
- * TimeRangePicker — seletor de período estilo Grafana com quick ranges e intervalo absoluto.
- * Suporta valores relativos ('1h', '6h', '24h', '7d', '30d', '90d') e
- * valores absolutos no formato 'abs:ISO|ISO'.
+ * TimeRangePicker — seletor de período estilo Grafana com quick ranges, intervalo absoluto
+ * e expressões relativas avançadas (now-1h, now/d, today, yesterday, etc.).
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, ChevronDown, Calendar, Check } from 'lucide-react';
+import { Clock, ChevronDown, Calendar, Check, Terminal } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -19,45 +18,115 @@ interface QuickRange {
   value: string;
   labelKey: string;
   label: string;
+  category: 'relative' | 'calendar';
 }
 
-// ── Quick range definitions ────────────────────────────────────────────────
+// ── Quick range definitions (Grafana-like) ─────────────────────────────────
 
 const QUICK_RANGES: QuickRange[] = [
-  { value: '1h',  labelKey: 'timeRangePicker.last1Hour',   label: 'Last 1 hour' },
-  { value: '6h',  labelKey: 'timeRangePicker.last6Hours',  label: 'Last 6 hours' },
-  { value: '24h', labelKey: 'timeRangePicker.last24Hours', label: 'Last 24 hours' },
-  { value: '7d',  labelKey: 'timeRangePicker.last7Days',   label: 'Last 7 days' },
-  { value: '30d', labelKey: 'timeRangePicker.last30Days',  label: 'Last 30 days' },
-  { value: '90d', labelKey: 'timeRangePicker.last90Days',  label: 'Last 90 days' },
+  // Relative
+  { value: 'now-1h',  labelKey: 'timeRangePicker.last1Hour',   label: 'Last 1 hour',   category: 'relative' },
+  { value: 'now-6h',  labelKey: 'timeRangePicker.last6Hours',  label: 'Last 6 hours',  category: 'relative' },
+  { value: 'now-24h', labelKey: 'timeRangePicker.last24Hours', label: 'Last 24 hours', category: 'relative' },
+  { value: 'now-7d',  labelKey: 'timeRangePicker.last7Days',   label: 'Last 7 days',   category: 'relative' },
+  { value: 'now-30d', labelKey: 'timeRangePicker.last30Days',  label: 'Last 30 days',  category: 'relative' },
+  { value: 'now-90d', labelKey: 'timeRangePicker.last90Days',  label: 'Last 90 days',  category: 'relative' },
+  // Calendar
+  { value: 'today',     labelKey: 'timeRangePicker.today',     label: 'Today',         category: 'calendar' },
+  { value: 'yesterday', labelKey: 'timeRangePicker.yesterday', label: 'Yesterday',     category: 'calendar' },
+  { value: 'week',      labelKey: 'timeRangePicker.thisWeek',  label: 'This week',     category: 'calendar' },
+  { value: 'month',     labelKey: 'timeRangePicker.thisMonth', label: 'This month',    category: 'calendar' },
 ];
 
 // ── Helper functions (exported) ────────────────────────────────────────────
 
 /**
  * Analisa um valor de período e retorna as datas absolutas correspondentes.
- * Suporta valores relativos ('24h', '7d') e absolutos ('abs:ISO|ISO').
+ * Suporta valores relativos ('24h', '7d', 'now-1h', 'now/d'), absolutos ('abs:ISO|ISO'),
+ * e palavras-chave ('today', 'yesterday', 'week', 'month').
  */
 export function parseTimeRange(value: string): { from: Date; to: Date } {
+  const now = new Date();
+
   if (value.startsWith('abs:')) {
     const [fromIso, toIso] = value.slice(4).split('|');
     return { from: new Date(fromIso), to: new Date(toIso) };
   }
 
-  const now = new Date();
-  const match = value.match(/^(\d+)(h|d)$/);
-  if (!match) {
-    // Fallback: last 24 hours
-    return { from: new Date(now.getTime() - 24 * 60 * 60 * 1000), to: now };
+  // Keyword aliases
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  switch (value.toLowerCase()) {
+    case 'today':
+      return { from: startOfDay, to: now };
+    case 'yesterday': {
+      const yest = new Date(startOfDay);
+      yest.setDate(yest.getDate() - 1);
+      return { from: yest, to: new Date(startOfDay.getTime() - 1) };
+    }
+    case 'week': {
+      const weekStart = new Date(startOfDay);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      return { from: weekStart, to: now };
+    }
+    case 'month': {
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { from: monthStart, to: now };
+    }
   }
 
-  const amount = parseInt(match[1], 10);
-  const unit = match[2];
-  const ms = unit === 'h'
-    ? amount * 60 * 60 * 1000
-    : amount * 24 * 60 * 60 * 1000;
+  // Grafana-like: now-1h, now-7d, now/d
+  const grafanaMatch = value.match(/^now(?:([+-]\d+[hdwMy]))?(?:\/([hdwMy]))?$/i);
+  if (grafanaMatch) {
+    let from = new Date(now);
 
-  return { from: new Date(now.getTime() - ms), to: now };
+    // Apply offset
+    if (grafanaMatch[1]) {
+      const offset = grafanaMatch[1];
+      const sign = offset[0] === '+' ? 1 : -1;
+      const amount = parseInt(offset.slice(1, -1), 10);
+      const unit = offset.slice(-1).toLowerCase();
+      switch (unit) {
+        case 'h': from.setHours(from.getHours() + sign * amount); break;
+        case 'd': from.setDate(from.getDate() + sign * amount); break;
+        case 'w': from.setDate(from.getDate() + sign * amount * 7); break;
+        case 'm': from.setMonth(from.getMonth() + sign * amount); break;
+        case 'y': from.setFullYear(from.getFullYear() + sign * amount); break;
+      }
+    }
+
+    // Apply snap
+    if (grafanaMatch[2]) {
+      const snap = grafanaMatch[2].toLowerCase();
+      switch (snap) {
+        case 'h': from = new Date(from.getFullYear(), from.getMonth(), from.getDate(), from.getHours(), 0, 0); break;
+        case 'd': from = new Date(from.getFullYear(), from.getMonth(), from.getDate(), 0, 0, 0); break;
+        case 'w': {
+          const d = new Date(from.getFullYear(), from.getMonth(), from.getDate(), 0, 0, 0);
+          d.setDate(d.getDate() - d.getDay());
+          from = d;
+          break;
+        }
+        case 'm': from = new Date(from.getFullYear(), from.getMonth(), 1, 0, 0, 0); break;
+        case 'y': from = new Date(from.getFullYear(), 1, 1, 0, 0, 0); break;
+      }
+    }
+
+    return { from, to: now };
+  }
+
+  // Simple relative: "1h", "6h", "24h", "7d", "30d", "90d"
+  const match = value.match(/^(\d+)([hd])$/);
+  if (match) {
+    const amount = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+    const ms = unit === 'h'
+      ? amount * 60 * 60 * 1000
+      : amount * 24 * 60 * 60 * 1000;
+    return { from: new Date(now.getTime() - ms), to: now };
+  }
+
+  // Fallback: last 24 hours
+  return { from: new Date(now.getTime() - 24 * 60 * 60 * 1000), to: now };
 }
 
 /**
@@ -102,7 +171,8 @@ function toDatetimeLocal(date: Date): string {
 export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePickerProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'quick' | 'absolute'>('quick');
+  const [activeTab, setActiveTab] = useState<'quick' | 'absolute' | 'custom'>('quick');
+  const [customExpr, setCustomExpr] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Absolute range state — initialised from current value if it's absolute
@@ -140,21 +210,31 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
     return () => document.removeEventListener('keydown', handleKey);
   }, [isOpen]);
 
-  function handleQuickSelect(rangeValue: string) {
+  const handleQuickSelect = useCallback((rangeValue: string) => {
     onChange(rangeValue);
     setIsOpen(false);
-  }
+  }, [onChange]);
 
-  function handleAbsoluteApply() {
+  const handleAbsoluteApply = useCallback(() => {
     if (!absFrom || !absTo) return;
     const fromIso = new Date(absFrom).toISOString();
     const toIso = new Date(absTo).toISOString();
     onChange(`abs:${fromIso}|${toIso}`);
     setIsOpen(false);
-  }
+  }, [absFrom, absTo, onChange]);
+
+  const handleCustomApply = useCallback(() => {
+    if (!customExpr.trim()) return;
+    onChange(customExpr.trim());
+    setIsOpen(false);
+    setCustomExpr('');
+  }, [customExpr, onChange]);
 
   const label = formatTimeRangeLabel(value);
   const resolvedRange = formatResolvedRange(value);
+
+  const relativeRanges = QUICK_RANGES.filter(r => r.category === 'relative');
+  const calendarRanges = QUICK_RANGES.filter(r => r.category === 'calendar');
 
   return (
     <div ref={containerRef} className={`relative inline-block ${className}`}>
@@ -180,7 +260,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
         <div
           role="dialog"
           aria-label={t('timeRangePicker.panelLabel', 'Select time range')}
-          className="absolute left-0 top-full z-50 mt-1 w-[360px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl"
+          className="absolute left-0 top-full z-50 mt-1 w-[420px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl"
         >
           {/* Tab bar */}
           <div className="flex border-b border-gray-200 dark:border-gray-700">
@@ -208,32 +288,79 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
               <Calendar size={12} />
               {t('timeRangePicker.absoluteRange', 'Absolute range')}
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('custom')}
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors ${
+                activeTab === 'custom'
+                  ? 'border-b-2 border-accent text-accent -mb-px'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <Terminal size={12} />
+              {t('timeRangePicker.customExpression', 'Custom')}
+            </button>
           </div>
 
           {/* Tab content */}
           <div className="p-3">
             {activeTab === 'quick' ? (
-              <div className="grid grid-cols-3 gap-2">
-                {QUICK_RANGES.map((range) => {
-                  const isSelected = value === range.value;
-                  return (
-                    <button
-                      key={range.value}
-                      type="button"
-                      onClick={() => handleQuickSelect(range.value)}
-                      className={`flex items-center justify-between gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
-                        isSelected
-                          ? 'bg-accent text-white'
-                          : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
-                      }`}
-                    >
-                      <span>{t(range.labelKey, range.label)}</span>
-                      {isSelected && <Check size={10} className="shrink-0" />}
-                    </button>
-                  );
-                })}
+              <div className="space-y-3">
+                {/* Relative ranges */}
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    {t('timeRangePicker.relative', 'Relative')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {relativeRanges.map((range) => {
+                      const isSelected = value === range.value;
+                      return (
+                        <button
+                          key={range.value}
+                          type="button"
+                          onClick={() => handleQuickSelect(range.value)}
+                          className={`flex items-center justify-between gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
+                            isSelected
+                              ? 'bg-accent text-white'
+                              : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
+                          }`}
+                        >
+                          <span>{t(range.labelKey, range.label)}</span>
+                          {isSelected && <Check size={10} className="shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Calendar ranges */}
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    {t('timeRangePicker.calendar', 'Calendar')}
+                  </p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {calendarRanges.map((range) => {
+                      const isSelected = value === range.value;
+                      return (
+                        <button
+                          key={range.value}
+                          type="button"
+                          onClick={() => handleQuickSelect(range.value)}
+                          className={`flex items-center justify-center gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
+                            isSelected
+                              ? 'bg-accent text-white'
+                              : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
+                          }`}
+                        >
+                          <span>{t(range.labelKey, range.label)}</span>
+                          {isSelected && <Check size={10} className="shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            ) : (
+            ) : activeTab === 'absolute' ? (
               <div className="flex flex-col gap-3">
                 <label className="flex flex-col gap-1">
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -261,6 +388,44 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                   type="button"
                   onClick={handleAbsoluteApply}
                   disabled={!absFrom || !absTo}
+                  className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {t('timeRangePicker.apply', 'Apply')}
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {t('timeRangePicker.customExpressionLabel', 'Expression')}
+                  </span>
+                  <input
+                    type="text"
+                    value={customExpr}
+                    onChange={(e) => setCustomExpr(e.target.value)}
+                    placeholder="now-1h, now-7d, now/d, today..."
+                    className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-1 focus:ring-accent"
+                  />
+                </label>
+                <div className="rounded bg-gray-50 dark:bg-gray-800 p-2 space-y-1">
+                  <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {t('timeRangePicker.examples', 'Examples')}
+                  </p>
+                  {['now-1h', 'now-7d', 'now/d', 'now-1d/d', 'today', 'yesterday'].map(ex => (
+                    <button
+                      key={ex}
+                      type="button"
+                      onClick={() => { setCustomExpr(ex); }}
+                      className="block text-[10px] text-blue-500 hover:text-blue-400 font-mono"
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCustomApply}
+                  disabled={!customExpr.trim()}
                   className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('timeRangePicker.apply', 'Apply')}

@@ -49,7 +49,7 @@ const useCreateRule = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { name: string; condition: string; channel: Channel }) =>
-      client.post('/api/v1/alert-rules', data).then((r) => r.data),
+      client.post('/alert-rules', data).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['alert-rules'] }),
   });
 };
@@ -58,7 +58,7 @@ const useToggleRule = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ ruleId, enabled }: { ruleId: string; enabled: boolean }) =>
-      client.patch(`/api/v1/alert-rules/${ruleId}/toggle`, { ruleId, enabled }),
+      client.patch(`/alert-rules/${ruleId}/toggle`, { ruleId, enabled }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['alert-rules'] }),
   });
 };
@@ -66,7 +66,7 @@ const useToggleRule = () => {
 const useDeleteRule = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (ruleId: string) => client.delete(`/api/v1/alert-rules/${ruleId}`),
+    mutationFn: (ruleId: string) => client.delete(`/alert-rules/${ruleId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['alert-rules'] }),
   });
 };

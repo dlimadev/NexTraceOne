@@ -47,7 +47,7 @@ export function DriftCenterPage() {
 
   const acknowledge = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/operations/drift/${id}/acknowledge`, { tenantId: 'default', userId: 'current-user' }),
+      client.post(`/operations/drift/${id}/acknowledge`, { tenantId: 'default', userId: 'current-user' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['drift-center'] }),
   });
 

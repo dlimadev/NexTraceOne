@@ -88,7 +88,7 @@ export function AnnotationsOverlay({
         maxPerSource: '50',
       });
       if (serviceNames?.length) params.set('services', serviceNames.join(','));
-      const res = await client.get(`/api/v1/governance/dashboards/annotations?${params}`);
+      const res = await client.get(`/governance/dashboards/annotations?${params}`);
       return res.data;
     },
     enabled,

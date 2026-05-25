@@ -1,7 +1,7 @@
 -- ============================================================================
 -- NexTraceOne Configuration Module Seed Data
 -- Idempotent: uses ON CONFLICT DO NOTHING
--- Includes: ConfigurationDefinitions, ConfigurationEntries (system defaults)
+-- Includes: ConfigurationDefinitions (system defaults)
 -- ============================================================================
 
 BEGIN;
@@ -12,7 +12,9 @@ SET CONSTRAINTS ALL DEFERRED;
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000001',
@@ -23,14 +25,18 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System', 'Tenant'],
     'Boolean',
     'true',
-    FALSE, FALSE, NULL,
+    FALSE, TRUE, TRUE,
+    NULL, 'toggle', 10,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000002',
@@ -41,14 +47,18 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System'],
     'Integer',
     '90',
-    FALSE, FALSE, '^\d+$',
+    FALSE, TRUE, FALSE,
+    '^\\d+$', 'number', 20,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000003',
@@ -59,14 +69,18 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System'],
     'Decimal',
     '0.1',
-    FALSE, FALSE, NULL,
+    FALSE, TRUE, FALSE,
+    NULL, 'number', 30,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000004',
@@ -77,14 +91,18 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System'],
     'Boolean',
     'true',
-    FALSE, FALSE, NULL,
+    FALSE, TRUE, FALSE,
+    NULL, 'toggle', 40,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000005',
@@ -95,14 +113,18 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System', 'Tenant'],
     'Boolean',
     'true',
-    FALSE, FALSE, NULL,
+    FALSE, TRUE, TRUE,
+    NULL, 'toggle', 50,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
 INSERT INTO "cfg_definitions" (
     "Id", "Key", "DisplayName", "Description",
     "Category", "AllowedScopes", "ValueType", "DefaultValue",
-    "IsRequired", "IsSecret", "ValidationRegex",
+    "IsSensitive", "IsEditable", "IsInheritable",
+    "ValidationRules", "UiEditorType", "SortOrder",
+    "ModuleId", "IsDeprecated", "DeprecatedMessage",
     "CreatedAt", "UpdatedAt"
 ) VALUES (
     '30000000-0000-0000-0001-000000000006',
@@ -113,7 +135,9 @@ INSERT INTO "cfg_definitions" (
     ARRAY['System', 'Tenant'],
     'Boolean',
     'false',
-    FALSE, FALSE, NULL,
+    FALSE, TRUE, FALSE,
+    NULL, 'toggle', 60,
+    NULL, FALSE, NULL,
     NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 

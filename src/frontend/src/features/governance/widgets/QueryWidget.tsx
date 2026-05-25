@@ -173,7 +173,7 @@ export function QueryWidget({ widgetId, config, environmentId, timeRange, title 
 
   const autoRunMutation = useMutation<NqlExecuteResponse, Error, string>({
     mutationFn: async (query) => {
-      const res = await client.post('/api/v1/governance/nql/execute', {
+      const res = await client.post('/governance/nql/execute', {
         nqlQuery: query,
         tenantId,
         environmentId,

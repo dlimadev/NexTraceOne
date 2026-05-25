@@ -39,7 +39,7 @@ const useCreateTemplate = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { name: string; eventType: EventType; payloadTemplate: string; headersJson?: string }) =>
-      client.post('/api/v1/webhook-templates', data).then(r => r.data),
+      client.post('/webhook-templates', data).then(r => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['webhook-templates'] }),
   });
 };
@@ -48,7 +48,7 @@ const useToggleTemplate = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ templateId, enabled }: { templateId: string; enabled: boolean }) =>
-      client.patch(`/api/v1/webhook-templates/${templateId}/toggle`, { enabled }),
+      client.patch(`/webhook-templates/${templateId}/toggle`, { enabled }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['webhook-templates'] }),
   });
 };
@@ -56,7 +56,7 @@ const useToggleTemplate = () => {
 const useDeleteTemplate = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (templateId: string) => client.delete(`/api/v1/webhook-templates/${templateId}`),
+    mutationFn: (templateId: string) => client.delete(`/webhook-templates/${templateId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['webhook-templates'] }),
   });
 };

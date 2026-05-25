@@ -177,6 +177,9 @@ public static class DependencyInjection
         // Dashboard Data Bridge — B-04 (SSE live stream real events via snapshots)
         services.AddScoped<IDashboardDataBridge, SnapshotDashboardDataBridge>();
 
+        // Dashboard Variable Value Resolver — dynamic template variables (Grafana-like)
+        services.AddScoped<IVariableValueResolver, VariableValueResolver>();
+
         // AI Dashboard Composer — Wave V3.4; uses IChatCompletionProvider when configured
         services.AddScoped<IAiDashboardComposerService>(sp =>
             new AiDashboardComposerService(

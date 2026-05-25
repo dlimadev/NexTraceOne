@@ -1,6 +1,9 @@
+using Microsoft.Extensions.Options;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Tests.TestDoubles;
@@ -17,6 +20,15 @@ public sealed class StartOidcLoginTests
     private static readonly DateTimeOffset FixedNow = new(2026, 5, 10, 10, 0, 0, TimeSpan.Zero);
     private static readonly Guid TenantId = Guid.NewGuid();
     private const string ConfiguredProvider = "azure";
+
+    private static StartOidcLogin.Validator CreateValidator()
+    {
+        var options = Options.Create(new AllowedOriginsOptions
+        {
+            Allowed = ["http://localhost:3000", "https://localhost"],
+        });
+        return new StartOidcLogin.Validator(options);
+    }
 
     private static (
         IOidcProvider oidcProvider,
@@ -134,7 +146,7 @@ public sealed class StartOidcLoginTests
     [InlineData("http://external.com")]
     public async Task Validator_Should_RejectExternalReturnTo_ToPreventOpenRedirect(string maliciousReturnTo)
     {
-        var validator = new StartOidcLogin.Validator();
+        var validator = CreateValidator();
 
         var result = validator.Validate(new StartOidcLogin.Command(ConfiguredProvider, maliciousReturnTo));
 
@@ -148,7 +160,7 @@ public sealed class StartOidcLoginTests
     [InlineData("https://localhost/settings")]
     public async Task Validator_Should_AcceptSafeReturnTo(string safeReturnTo)
     {
-        var validator = new StartOidcLogin.Validator();
+        var validator = CreateValidator();
 
         var result = validator.Validate(new StartOidcLogin.Command(ConfiguredProvider, safeReturnTo));
 

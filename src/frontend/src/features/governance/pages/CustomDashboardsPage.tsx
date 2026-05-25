@@ -329,15 +329,7 @@ export function CustomDashboardsPage() {
   const cloneMutation = useCloneDashboard();
   const deleteMutation = useDeleteDashboard();
 
-  // Form state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [layout, setLayout] = useState<string>(LAYOUTS[0]);
-  const [persona, setPersona] = useState<string>(PERSONAS[0]);
-  const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
-  const [tagsInput, setTagsInput] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
-  const [formSuccess, setFormSuccess] = useState(false);
+
 
   // Filter/sort state
   const [searchQuery, setSearchQuery] = useState('');
@@ -362,19 +354,30 @@ export function CustomDashboardsPage() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const toggleWidget = (widgetId: string) => {
-    setSelectedWidgets((prev) =>
-      prev.includes(widgetId) ? prev.filter((w) => w !== widgetId) : [...prev, widgetId],
-    );
+  const handleCreateNew = () => {
+    navigate('/governance/dashboards/new');
   };
 
-  const applyTemplate = (tpl: TemplatePreview) => {
-    setName(t(tpl.titleKey, tpl.persona));
-    setLayout(tpl.layout);
-    setPersona(tpl.persona);
-    setSelectedWidgets(tpl.widgets as string[]);
-    setFormSuccess(false);
-    setFormError(null);
+  const applyTemplate = async (tpl: TemplatePreview) => {
+    try {
+      const result = await createMutation.mutateAsync({
+        tenantId: TENANT_ID,
+        userId: USER_ID,
+        name: t(tpl.titleKey, tpl.persona),
+        description: '',
+        layout: tpl.layout,
+        persona: tpl.persona,
+        widgets: (tpl.widgets as string[]).map((type, index) => {
+          const size = WIDGET_DEFAULT_SIZE[type] ?? { w: 2, h: 2 };
+          return { type, posX: 0, posY: index * size.h, width: size.w, height: size.h };
+        }),
+      });
+      if (result?.dashboardId) {
+        navigate(`/governance/dashboards/${result.dashboardId}/edit`);
+      }
+    } catch {
+      // Silently fail; template picker can be retried
+    }
   };
 
   const handleFavoriteToggle = (id: string) => {
@@ -410,30 +413,7 @@ export function CustomDashboardsPage() {
     }
   };
 
-  const buildWidgetInputs = (widgetIds: string[]): WidgetInput[] =>
-    widgetIds.map((id, index) => {
-      const size = WIDGET_DEFAULT_SIZE[id] ?? { w: 2, h: 2 };
-      return { type: id, posX: 0, posY: index * size.h, width: size.w, height: size.h };
-    });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-    setFormSuccess(false);
-    const tags = tagsInput.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
-    try {
-      await createMutation.mutateAsync({
-        tenantId: TENANT_ID, userId: USER_ID, name, description, layout,
-        widgets: buildWidgetInputs(selectedWidgets), persona,
-        tags: tags.length > 0 ? tags : undefined,
-      });
-      setFormSuccess(true);
-      setName(''); setDescription(''); setLayout(LAYOUTS[0]);
-      setPersona(PERSONAS[0]); setSelectedWidgets([]); setTagsInput('');
-    } catch {
-      setFormError(t('governance.customDashboards.createError', 'Failed to create dashboard.'));
-    }
-  };
 
   if (isLoading) return <PageLoadingState message={t('governance.customDashboards.loading', 'Loading dashboards...')} />;
   if (isError) return <PageErrorState message={t('governance.customDashboards.error', 'Failed to load dashboards')} onRetry={() => refetch()} />;
@@ -537,125 +517,28 @@ export function CustomDashboardsPage() {
         </div>
       )}
 
-      {/* Create Dashboard Form */}
+      {/* Create Dashboard CTA */}
       <PageSection title={t('governance.customDashboards.createDashboard', 'Create Dashboard')}>
-        <Card>
-          <CardBody>
-            <div className="flex justify-end mb-3">
-              <Button size="sm" variant="secondary" onClick={() => setTemplatePickerOpen(true)}>
-                <LayoutIcon size={14} className="mr-1" />
+        <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-0">
+          <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4 py-8">
+            <div className="text-center sm:text-left">
+              <h3 className="text-lg font-semibold text-white mb-1">
+                {t('governance.customDashboards.builderCtaTitle', 'Visual Dashboard Builder')}
+              </h3>
+              <p className="text-sm text-gray-400 max-w-md">
+                {t('governance.customDashboards.builderCtaDesc', 'Drag and drop widgets, resize panels, and configure your layout interactively — just like Grafana.')}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <Button variant="secondary" onClick={() => setTemplatePickerOpen(true)}>
+                <LayoutIcon size={16} className="mr-1.5" />
                 {t('governance.customDashboards.fromTemplate', 'Use Template')}
               </Button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('governance.customDashboards.dashboardName', 'Name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    maxLength={100}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('governance.customDashboards.tags', 'Tags')} <span className="text-gray-400 font-normal">(comma-separated)</span>
-                  </label>
-                  <div className="relative">
-                    <Tag size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      value={tagsInput}
-                      onChange={(e) => setTagsInput(e.target.value)}
-                      placeholder="ops, sre, team-alpha"
-                      className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pl-8 pr-3 py-2 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('governance.customDashboards.description', 'Description')}
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('governance.customDashboards.layout', 'Layout')}
-                  </label>
-                  <select
-                    value={layout}
-                    onChange={(e) => setLayout(e.target.value)}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                  >
-                    {LAYOUTS.map((l) => (
-                      <option key={l} value={l}>{l}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('governance.customDashboards.persona', 'Persona')}
-                  </label>
-                  <select
-                    value={persona}
-                    onChange={(e) => setPersona(e.target.value)}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
-                  >
-                    {PERSONAS.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('governance.customDashboards.selectWidgets', 'Starter Widgets')}
-                </label>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {WIDGET_IDS.map((widgetId) => (
-                    <label
-                      key={widgetId}
-                      className="flex items-center gap-2 rounded border border-gray-200 dark:border-gray-700 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/20"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedWidgets.includes(widgetId)}
-                        onChange={() => toggleWidget(widgetId)}
-                        className="rounded"
-                      />
-                      <span className="text-xs text-gray-700 dark:text-gray-300">
-                        {t(`governance.customDashboards.widgets.${WIDGET_KEY_MAP[widgetId] ?? widgetId}`, widgetId)}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
-              {formSuccess && (
-                <p className="text-sm text-green-600 dark:text-green-400">
-                  {t('governance.customDashboards.createSuccess', 'Dashboard created successfully!')}
-                </p>
-              )}
-
-              <Button type="submit" disabled={createMutation.isPending}>
-                <Plus size={14} className="mr-1" />
+              <Button onClick={handleCreateNew}>
+                <Plus size={16} className="mr-1.5" />
                 {t('governance.customDashboards.submit', 'Create Dashboard')}
               </Button>
-            </form>
+            </div>
           </CardBody>
         </Card>
       </PageSection>

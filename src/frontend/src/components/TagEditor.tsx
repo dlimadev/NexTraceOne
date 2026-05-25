@@ -57,7 +57,7 @@ export function TagEditor({ entityType, entityId, readOnly = false }: Props) {
 
   const addTag = useMutation({
     mutationFn: ({ key, value }: { key: string; value: string }) =>
-      client.post('/api/v1/tags', { tenantId, entityType, entityId, key, value, createdBy }),
+      client.post('/tags', { tenantId, entityType, entityId, key, value, createdBy }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tags', tenantId, entityType, entityId] });
       setInputValue('');
@@ -67,7 +67,7 @@ export function TagEditor({ entityType, entityId, readOnly = false }: Props) {
 
   const removeTag = useMutation({
     mutationFn: (tagId: string) =>
-      client.delete(`/api/v1/tags/${tagId}`, { params: { tenantId } }),
+      client.delete(`/tags/${tagId}`, { params: { tenantId } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tags', tenantId, entityType, entityId] }),
   });
 

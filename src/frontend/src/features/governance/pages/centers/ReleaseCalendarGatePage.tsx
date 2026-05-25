@@ -64,7 +64,7 @@ export function ReleaseCalendarGatePage() {
 
   const approveRelease = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/changes/releases/${id}/approve`, { tenantId: 'default', userId: 'current-user' }),
+      client.post(`/changes/releases/${id}/approve`, { tenantId: 'default', userId: 'current-user' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['release-calendar-gate'] }),
   });
 

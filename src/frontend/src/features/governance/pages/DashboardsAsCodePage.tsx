@@ -36,7 +36,7 @@ const useDashboardsAsCode = () =>
     queryFn: () =>
       client
         .get<{ repositories: DacRepository[]; recentChanges: DacChange[]; isSimulated: boolean }>(
-          '/api/v1/governance/dashboards-as-code',
+          '/governance/dashboards-as-code',
           { params: { tenantId: 'default' } }
         )
         .then((r) => r.data),
@@ -63,7 +63,7 @@ export function DashboardsAsCodePage() {
 
   const syncRepo = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/governance/dashboards-as-code/repositories/${id}/sync`, { tenantId: 'default' }),
+      client.post(`/governance/dashboards-as-code/repositories/${id}/sync`, { tenantId: 'default' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboards-as-code'] }),
   });
 

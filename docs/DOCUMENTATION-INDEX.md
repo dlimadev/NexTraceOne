@@ -103,9 +103,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`SECURITY.md`](SECURITY.md) | Modelo de segurança |
 | [`security/BACKEND-ENDPOINT-AUTH-AUDIT.md`](security/BACKEND-ENDPOINT-AUTH-AUDIT.md) | Auditoria de autenticação de endpoints |
 | [`security/KEY-ROTATION.md`](security/KEY-ROTATION.md) | Rotação de chaves |
-| [`security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md`](security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md) | Checklist baseline produção |
-| [`security/PHASE-1-SECRETS-BASELINE.md`](security/PHASE-1-SECRETS-BASELINE.md) | Baseline de segredos |
-| [`security/REQUIRED-ENVIRONMENT-CONFIGURATION.md`](security/REQUIRED-ENVIRONMENT-CONFIGURATION.md) | Configuração de ambiente obrigatória |
+| [`security/ENVIRONMENT-BASELINE.md`](security/ENVIRONMENT-BASELINE.md) | Baseline de segurança e configuração de ambiente |
 | [`security/application-hardening-checklist.md`](security/application-hardening-checklist.md) | Checklist de hardening |
 | [`security/application-onprem-hardening-notes.md`](security/application-onprem-hardening-notes.md) | Notas de hardening on-prem |
 | [`security/application-privacy-lgpd-gdpr-notes.md`](security/application-privacy-lgpd-gdpr-notes.md) | Notas de privacidade LGPD/GDPR |

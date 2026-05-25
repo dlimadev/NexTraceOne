@@ -44,7 +44,7 @@ const useCreateApiKey = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { name: string; scopes: string[]; expiresAt?: string }) =>
-      client.post<CreateApiKeyResponse>('/api/v1/developerportal/api-keys', data).then(r => r.data),
+      client.post<CreateApiKeyResponse>('/developerportal/api-keys', data).then(r => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['api-keys'] }),
   });
 };
@@ -52,7 +52,7 @@ const useCreateApiKey = () => {
 const useRevokeApiKey = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (apiKeyId: string) => client.delete(`/api/v1/developerportal/api-keys/${apiKeyId}`),
+    mutationFn: (apiKeyId: string) => client.delete(`/developerportal/api-keys/${apiKeyId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['api-keys'] }),
   });
 };

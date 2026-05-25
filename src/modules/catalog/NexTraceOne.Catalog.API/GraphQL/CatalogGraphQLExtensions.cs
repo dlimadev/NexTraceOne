@@ -47,12 +47,11 @@ public static class CatalogGraphQLExtensions
             .ModifyRequestOptions(opt =>
             {
                 opt.IncludeExceptionDetails = includeExceptionDetails;
-                // Limita complexidade de queries a 1000 pontos para prevenir consultas abusivas.
-                opt.Complexity.Enable = true;
-                opt.Complexity.MaximumAllowed = 1_000;
             })
             // Desabilita introspection em produção para não expor a estrutura do schema.
-            .ModifyOptions(o => o.EnableSchemaIntrospection = enableIntrospection);
+            // Nota: HotChocolate 14 desabilita introspection automaticamente em ambiente Production.
+            // Chamamos DisableIntrospection explicitamente quando o parâmetro for false.
+            .DisableIntrospection(!enableIntrospection);
     }
 
     /// <summary>

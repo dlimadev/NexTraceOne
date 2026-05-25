@@ -63,7 +63,7 @@ const useAddComment = (dashboardId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { content: string; widgetId?: string; tenantId: string; authorUserId: string }) =>
-      client.post('/api/v1/governance/collaboration/comments', { dashboardId, ...data }).then((r) => r.data),
+      client.post('/governance/collaboration/comments', { dashboardId, ...data }).then((r) => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard-comments', dashboardId] }),
   });
 };
@@ -72,7 +72,7 @@ const useResolveComment = (dashboardId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ commentId, tenantId, userId }: { commentId: string; tenantId: string; userId: string }) =>
-      client.post(`/api/v1/governance/collaboration/comments/${commentId}/resolve`, null, {
+      client.post(`/governance/collaboration/comments/${commentId}/resolve`, null, {
         params: { tenantId, userId },
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard-comments', dashboardId] }),

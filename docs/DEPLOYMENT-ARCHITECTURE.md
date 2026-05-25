@@ -45,7 +45,7 @@ obrigatórios. Toda a observabilidade, persistência e inteligência pode funcio
 
 - **Papel:** Host principal da plataforma — expõe todas as APIs de domínio.
 - **Porta:** 8080 (HTTP), 8443 (HTTPS opcionalmente via proxy reverso)
-- **Framework:** ASP.NET Core 8 Minimal API
+- **Framework:** ASP.NET Core 10 Minimal API
 - **Módulos registados:** IdentityAccess, Catalog, Contracts, ChangeGovernance,
   ChangeWorkflow, RulesetGovernance, Promotion, AuditCompliance, DeveloperPortal,
   Governance, OperationalIntelligence, AIKnowledge

@@ -323,7 +323,7 @@ export const platformAdminApi = {
    * Valida todas as configurações da plataforma com sugestões de resolução.
    */
   getConfigHealth: () =>
-    client.get<ConfigHealthResponse>('/api/v1/platform/config-health').then((r) => r.data),
+    client.get<ConfigHealthResponse>('/platform/config-health').then((r) => r.data),
 
   /**
    * GET /api/v1/platform/migrations/pending — requer platform:admin:read.
@@ -413,7 +413,7 @@ export const platformAdminApi = {
    * Inicia um backup manual imediato.
    */
   runBackupNow: () =>
-    client.post<BackupRecord>('/api/v1/admin/backup/run').then((r) => r.data),
+    client.post<BackupRecord>('/admin/backup/run').then((r) => r.data),
 
   // ── W2-02: Startup Report ─────────────────────────────────────────────────
 
@@ -873,14 +873,14 @@ export const platformAdminApi = {
    * Retorna configuração actual de SAML SSO.
    */
   getSamlSsoConfig: (): Promise<SamlSsoConfig> =>
-    client.get<SamlSsoConfig>('/api/v1/admin/saml-sso').then((r) => r.data),
+    client.get<SamlSsoConfig>('/admin/saml-sso').then((r) => r.data),
 
   /**
    * PUT /api/v1/admin/saml-sso — requer platform:admin:write.
    * Actualiza a configuração de SAML SSO.
    */
   updateSamlSsoConfig: (update: SamlSsoConfigUpdate): Promise<SamlSsoConfig> =>
-    client.put<SamlSsoConfig>('/api/v1/admin/saml-sso', update).then((r) => r.data),
+    client.put<SamlSsoConfig>('/admin/saml-sso', update).then((r) => r.data),
 
   /**
    * POST /api/v1/admin/saml-sso/test — requer platform:admin:write.
@@ -898,21 +898,21 @@ export const platformAdminApi = {
    * Retorna estado do mTLS, política e inventário de certificados.
    */
   getMtlsManager: (): Promise<MtlsManagerResponse> =>
-    client.get<MtlsManagerResponse>('/api/v1/admin/mtls').then((r) => r.data),
+    client.get<MtlsManagerResponse>('/admin/mtls').then((r) => r.data),
 
   /**
    * POST /api/v1/admin/mtls/certificates/:id/revoke — requer platform:admin:write.
    * Revoga um certificado mTLS pelo ID.
    */
   revokeMtlsCert: (certId: string): Promise<void> =>
-    client.post(`/api/v1/admin/mtls/certificates/${encodeURIComponent(certId)}/revoke`, {}).then(() => undefined),
+    client.post(`/admin/mtls/certificates/${encodeURIComponent(certId)}/revoke`, {}).then(() => undefined),
 
   /**
    * PUT /api/v1/admin/mtls/policy — requer platform:admin:write.
    * Actualiza a política mTLS da plataforma.
    */
   updateMtlsPolicy: (policy: Partial<MtlsPolicy>): Promise<MtlsPolicy> =>
-    client.put<MtlsPolicy>('/api/v1/admin/mtls/policy', policy).then((r) => r.data),
+    client.put<MtlsPolicy>('/admin/mtls/policy', policy).then((r) => r.data),
 
   // ── W8-02: Feature Flags Runtime ──────────────────────────────────────────
 
@@ -953,7 +953,7 @@ export const platformAdminApi = {
   setFeatureFlagRuntimeOverride: async (
     req: FeatureFlagRuntimeOverrideRequest,
   ): Promise<FeatureFlagRuntimeEntry> => {
-    await client.put(`/api/v1/configuration/flags/${encodeURIComponent(req.key)}/override`, {
+    await client.put(`/configuration/flags/${encodeURIComponent(req.key)}/override`, {
       scope: req.scope,
       scopeReferenceId: req.scopeReferenceId,
       isEnabled: req.enabled,
@@ -975,7 +975,7 @@ export const platformAdminApi = {
    * Retorna todos os canary deployments activos e histórico recente.
    */
   getCanaryDashboard: (): Promise<CanaryDashboardResponse> =>
-    client.get<CanaryDashboardResponse>('/api/v1/platform/canary/rollouts').then((r) => r.data),
+    client.get<CanaryDashboardResponse>('/platform/canary/rollouts').then((r) => r.data),
 
   // ── CFG-01: SystemHealthPage (optional providers) ─────────────────────────
 
@@ -996,7 +996,7 @@ export const platformAdminApi = {
    * Lista schemas PostgreSQL criados por tenant.
    */
   getTenantSchemas: (): Promise<TenantSchemasResponse> =>
-    client.get<TenantSchemasResponse>('/api/v1/platform/tenant-schemas').then((r) => r.data),
+    client.get<TenantSchemasResponse>('/platform/tenant-schemas').then((r) => r.data),
 
   /**
    * POST /api/v1/platform/tenant-schemas/provision — requer platform:admin:write.

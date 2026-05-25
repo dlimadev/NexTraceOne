@@ -35,7 +35,7 @@ VALUES (
 ON CONFLICT DO NOTHING;
 
 -- ═══ USERS ═══════════════════════════════════════════════════════════════════
--- PBKDF2/SHA256, 100 000 iterações — formato v1.{base64_salt}.{base64_hash}
+-- PBKDF2/SHA256, 600 000 iterações — formato v2.{base64_salt}.{base64_hash}
 
 INSERT INTO iam_users (
     "Id", "Email", first_name, last_name, "PasswordHash",
@@ -46,49 +46,49 @@ VALUES
         'b0000000-0000-0000-0000-000000000001',
         'admin@nextraceone.io',
         'Platform', 'Admin',
-        'v1.ppSv9+z4OYt5/ckM0rsEvQ==.VbpxYtiSfi6e4K22pofst54ZLYgPB3GyBPI7Tj1DIUk=',
+        'v2.sGIcV14tRfeiyZpwxQDKyQ==.jJCpK5unlk2wggkgs8hdp3UcskFk93fwyhiPffCwAdg=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000002',
         'techlead@nextraceone.io',
         'Ana', 'Silva',
-        'v1.0b46DSzRMt94/4yLnPUYaw==.KAWR5yo5D3blTBYQjhs7ujRDYV553nzSPdkNzLRpmZw=',
+        'v2.7lYWp+ldQ3GzoRen6VJEMw==.to4IMJPBVf/j5ELGlG4tWav79ciUF4IwIaPlLDIyOhk=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000003',
         'dev@nextraceone.io',
         'Bruno', 'Costa',
-        'v1.cBmEmnRiLd/BIAOmoOH7BA==.XLmgYFh4M5sIOoWlHkk9Larp4e9nUCLo4WvdtuL4XGY=',
+        'v2.8/5kqMTHEqyFQMBNnpnKAg==.wyA43Xw1Yhb3DiKO0D9kBvVPe5BGMivfzxX1acKOoGc=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000004',
         'viewer@nextraceone.io',
         'Carla', 'Mendes',
-        'v1.gGI8arVvEQhYACsvoDZ2yQ==.c+nPZBrQ2GTf+AndKRakJ4hrzSj4iZB93wY3z9BvFX8=',
+        'v2.lJVZRaaGWSe/i+mZnq2FDw==.noR07TI1eKALHohjspwsNosTtdLzWEheyIk15uLdhfM=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000005',
         'auditor@nextraceone.io',
         'Daniel', 'Ferreira',
-        'v1.cidbqZdl+wrJiuUprvaOJA==.dCNhQiRcqWCEzX4EY1yfqPI/RgcGbv4E2SketMZyDME=',
+        'v2.HF8zYhuCvOlpwv5w1a+dsQ==.+z+znK9+U2hToPpzbi7Sr+3pPpbqllY1BC/Af7VcBZk=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000006',
         'secreview@nextraceone.io',
         'Elena', 'Rocha',
-        'v1.GaHQSxY9K0ogtqHzKvp7Tg==.ePf5tCuwHGaRGNS/F4i8vtVZXQlVSvEjfK1TPs4eRlg=',
+        'v2.+djLwrUiNJGX4QmNde6M5w==.YGiSowZSCg1w30MCLvxr8prCvSn+evjxIb/Zm3uncg0=',
         true, 0, false, NULL, NULL
     ),
     (
         'b0000000-0000-0000-0000-000000000007',
         'approval@nextraceone.io',
         'Fabio', 'Lima',
-        'v1.fy4scsVL1c0gE/b6V0QxaQ==.OzvaWSHf9DUC+kroOllidnHAWPgilsa80CqHwvvkedM=',
+        'v2.1mbx4pQHn1bOMfFVHCqw3w==.rexE1WHj36FcbMkrn+AwBzdi3Fiv9fR2eaoYBGXfJkE=',
         true, 0, false, NULL, NULL
     )
 ON CONFLICT DO NOTHING;

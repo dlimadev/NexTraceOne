@@ -54,7 +54,7 @@ export function BreakGlassAccessPage() {
 
   const requestAccess = useMutation({
     mutationFn: () =>
-      client.post('/api/v1/platform/jit-access/request', {
+      client.post('/platform/jit-access/request', {
         tenantId: 'default',
         userId: 'current-user',
         resource,
@@ -72,13 +72,13 @@ export function BreakGlassAccessPage() {
 
   const approve = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/platform/jit-access/requests/${id}/approve`, { tenantId: 'default', userId: 'current-user' }),
+      client.post(`/platform/jit-access/requests/${id}/approve`, { tenantId: 'default', userId: 'current-user' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['break-glass-access'] }),
   });
 
   const deny = useMutation({
     mutationFn: (id: string) =>
-      client.post(`/api/v1/platform/jit-access/requests/${id}/deny`, { tenantId: 'default', userId: 'current-user' }),
+      client.post(`/platform/jit-access/requests/${id}/deny`, { tenantId: 'default', userId: 'current-user' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['break-glass-access'] }),
   });
 

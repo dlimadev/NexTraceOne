@@ -39,8 +39,8 @@ const useMobileOnCall = () =>
     queryKey: ['mobile-on-call'],
     queryFn: async () => {
       const [incidents, approvals] = await Promise.allSettled([
-        client.get<{ items: OnCallIncident[] }>('/api/v1/operations/incidents', { params: { tenantId: 'default', status: 'open', page: 1, pageSize: 10 } }).then((r) => r.data.items),
-        client.get<{ items: PendingApproval[] }>('/api/v1/changes/approvals/pending', { params: { tenantId: 'default' } }).then((r) => r.data.items),
+        client.get<{ items: OnCallIncident[] }>('/operations/incidents', { params: { tenantId: 'default', status: 'open', page: 1, pageSize: 10 } }).then((r) => r.data.items),
+        client.get<{ items: PendingApproval[] }>('/changes/approvals/pending', { params: { tenantId: 'default' } }).then((r) => r.data.items),
       ]);
       return {
         incidents: incidents.status === 'fulfilled' ? incidents.value : [],
