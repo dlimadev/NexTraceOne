@@ -9303,6 +9303,8 @@
     "subGroupReleaseLifecycle": "Ciclo de Vida del Release",
     "subGroupRiskRollback": "Riesgo y Rollback",
     "subGroupWorkflowManagement": "Gestión de Workflow",
+    "subGroupRiskCompliance": "Riesgo y Cumplimiento",
+    "subGroupTrackingAudit": "Seguimiento y Auditoría",
     "workflowConfiguration": "Configuración de Workflow",
     "releaseGatesDashboard": "Gates de Release",
     "evidencePackViewer": "Evidence Pack",

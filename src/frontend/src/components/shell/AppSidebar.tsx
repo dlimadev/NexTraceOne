@@ -14,7 +14,7 @@ import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
   Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
   ClipboardCheck, Monitor, Bot, Database, ShieldCheck,
-  FileCode, Share2, Server, Layers,
+  FileCode, Share2, Server,
   Globe, Activity, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
@@ -50,6 +50,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'services' },
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Activity size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'services' },
 
   // ── CONTRATOS ─────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
@@ -83,6 +84,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.syntheticMonitoring', to: '/operations/synthetic-monitoring', icon: <Radio size={18} />, permission: 'operations:reliability:read', section: 'operations' },
   { labelKey: 'sidebar.runtimeIntelligence', to: '/operations/runtime-comparison', icon: <BarChart3 size={18} />, permission: 'operations:runtime:read', section: 'operations' },
   { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
+  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'operations' },
 
   // ── HUB DE IA ─────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
@@ -91,23 +93,17 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiAudit', to: '/ai/audit', icon: <ClipboardList size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
 
   // ── GOVERNANÇA ────────────────────────────────────────────────────────────
+  // Grupo estratégico (sem sub-grupo visual)
   { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance' },
-  { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:policies:read', section: 'governance' },
-  { labelKey: 'sidebar.packs', to: '/governance/packs', icon: <Layers size={18} />, permission: 'governance:packs:read', section: 'governance' },
-  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:risk:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },
-  { labelKey: 'sidebar.controls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
-  { labelKey: 'sidebar.evidence', to: '/governance/evidence', icon: <FileText size={18} />, permission: 'governance:evidence:read', section: 'governance' },
-  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <ClipboardList size={18} />, permission: 'governance:waivers:read', section: 'governance' },
-  { labelKey: 'sidebar.governanceGates', to: '/governance/gates', icon: <ShieldCheck size={18} />, permission: 'governance:gates:read', section: 'governance' },
-  { labelKey: 'sidebar.technicalDebt', to: '/governance/technical-debt', icon: <TrendingDown size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.auditTrail', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:trail:read', section: 'governance' },
-
-  // ── CONHECIMENTO ──────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
-  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
+  // Grupo Risk & Compliance
+  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance', subGroup: 'sidebar.subGroupRiskCompliance' },
+  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:risk:read', section: 'governance', subGroup: 'sidebar.subGroupRiskCompliance' },
+  { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:policies:read', section: 'governance', subGroup: 'sidebar.subGroupRiskCompliance' },
+  // Grupo Tracking & Audit
+  { labelKey: 'sidebar.technicalDebt', to: '/governance/technical-debt', icon: <TrendingDown size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupTrackingAudit' },
+  { labelKey: 'sidebar.auditTrail', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:trail:read', section: 'governance', subGroup: 'sidebar.subGroupTrackingAudit' },
 
   // ── ORGANIZAÇÃO ───────────────────────────────────────────────────────────
   { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read', section: 'organization' },
@@ -132,7 +128,6 @@ const sectionLabels: Record<NavSection, string> = {
   home: '',
   services: 'sidebar.sectionServices',
   contracts: 'sidebar.sectionContracts',
-  knowledge: 'sidebar.sectionKnowledge',
   changes: 'sidebar.sectionChanges',
   operations: 'sidebar.sectionOperations',
   aiHub: 'sidebar.sectionAiHub',
@@ -147,7 +142,6 @@ const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
   home: <LayoutDashboard size={22} />,
   services: <Server size={22} />,
   contracts: <FileText size={22} />,
-  knowledge: <BookOpen size={22} />,
   changes: <Zap size={22} />,
   operations: <AlertTriangle size={22} />,
   aiHub: <Bot size={22} />,
@@ -159,7 +153,7 @@ const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
 
 /** Agrupamento visual para separadores no icon rail. */
 const sectionGroups: NavSection[][] = [
-  ['home', 'services', 'contracts', 'knowledge', 'changes', 'operations'],
+  ['home', 'services', 'contracts', 'changes', 'operations'],
   ['aiHub'],
   ['governance', 'organization', 'integrations'],
   ['admin'],

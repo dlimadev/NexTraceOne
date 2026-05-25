@@ -8006,6 +8006,8 @@
     "subGroupReleaseLifecycle": "Release Lifecycle",
     "subGroupRiskRollback": "Risk & Rollback",
     "subGroupWorkflowManagement": "Workflow Management",
+    "subGroupRiskCompliance": "Risk & Compliance",
+    "subGroupTrackingAudit": "Tracking & Audit",
     "workflowConfiguration": "Workflow Configuration",
     "tenants": "Tenants",
     "sreDashboard": "SRE Dashboard",
