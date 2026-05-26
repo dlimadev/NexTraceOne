@@ -291,7 +291,7 @@
    ──────────────────────────────────────────────────────────────────────────── */
 :root {
   /* Layout dimensions — alinhados com Template NexLink */
-  --nto-header-height: 80px;
+  --nto-header-height: 56px;
   --nto-sidebar-width-expanded: 320px;
   --nto-sidebar-width-collapsed: 80px;
 
@@ -345,6 +345,11 @@
   50% { opacity: 0.5; }
 }
 
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.92); }
+}
+
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -354,6 +359,38 @@
   0% { width: 0; opacity: 1; }
   80% { width: 90%; opacity: 1; }
   100% { width: 100%; opacity: 0; }
+}
+
+/* ─── Sidebar — always dark regardless of user theme ───────────────────────────────────
+   Adding data-sidebar="dark" to the sidebar root div triggers these overrides.
+   All Tailwind utilities inside (text-heading, bg-hover, etc.) resolve to
+   dark values, enabling an always-dark sidebar without duplicating classes.
+   ────────────────────────────────────────────────────────────────────────────── */
+[data-sidebar] {
+  --t-canvas: #081120;
+  --t-deep: #0A1730;
+  --t-panel: #0F1E38;
+  --t-card: #0F1E38;
+  --t-elevated: #132543;
+  --t-subtle: #0D1B32;
+  --t-hover: rgba(255, 255, 255, 0.04);
+  --t-active: #1A2E50;
+  --t-edge: rgba(129, 170, 214, 0.08);
+  --t-edge-strong: rgba(129, 170, 214, 0.20);
+  --t-divider: rgba(255, 255, 255, 0.06);
+  --t-heading: #F2F7FF;
+  --t-body: rgba(181, 196, 216, 0.9);
+  --t-muted: rgba(129, 170, 214, 0.6);
+  --t-faded: rgba(129, 170, 214, 0.4);
+  --t-accent: #1B7FE8;
+  --t-accent-hover: #1468CC;
+  --t-accent-muted: rgba(27, 127, 232, 0.15);
+  --t-blue: #1B7FE8;
+  --t-blue-muted: rgba(27, 127, 232, 0.15);
+  --t-success: #10B981;
+  --t-warning: #F59E0B;
+  --t-critical: #EF4444;
+  --t-sidebar-gradient: linear-gradient(180deg, #0D1C35, #081120);
 }
 
 /* ─── Global Base ────────────────────────────────────────────────────────────── */
