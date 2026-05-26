@@ -377,6 +377,7 @@
   --t-active: #1A2E50;
   --t-edge: rgba(129, 170, 214, 0.08);
   --t-edge-strong: rgba(129, 170, 214, 0.20);
+  --t-edge-focus: rgba(55, 190, 233, 0.42);
   --t-divider: rgba(255, 255, 255, 0.06);
   --t-heading: #F2F7FF;
   --t-body: rgba(181, 196, 216, 0.9);
