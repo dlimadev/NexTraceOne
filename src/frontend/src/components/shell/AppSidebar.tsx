@@ -5,7 +5,7 @@ import { cn } from '../../lib/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { usePersona } from '../../contexts/PersonaContext';
-// import { AppSidebarFooter } from './AppSidebarFooter';
+import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_RAIL_WIDTH, SIDEBAR_CONTENT_WIDTH, SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
@@ -253,11 +253,12 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
       }}
       role="navigation"
       aria-label={t('shell.sidebarNav')}
+      data-sidebar="dark"
     >
       {/* ─── Icon Rail ─────────────────────────────────────────────────────── */}
       <div
         className="flex flex-col h-full shrink-0 border-r border-edge"
-        style={{ width: SIDEBAR_RAIL_WIDTH, background: 'var(--t-sidebar-gradient)' }}
+        style={{ width: SIDEBAR_RAIL_WIDTH, background: 'linear-gradient(180deg, #0F1E38, #081120)' }}
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-[70px] shrink-0 border-b border-edge">
@@ -271,7 +272,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         {/* Section tab icons */}
         <div className="flex-1 flex flex-col py-3 px-3 overflow-y-auto">
           {sectionGroups.map((group, gi) => (
-            <div key={gi}>
+            <div key={gi} className={gi === sectionGroups.length - 1 ? 'mt-auto' : undefined}>
               {gi > 0 && (
                 <div className="w-6 h-px bg-edge mx-auto my-3" />
               )}
@@ -295,10 +296,10 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                       'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-xl mb-1',
                       'transition-all duration-200',
                       isActive
-                        ? 'bg-blue/15 text-blue shadow-glow-blue'
+                        ? 'bg-[rgba(27,127,232,.25)] text-[#3D96F2] shadow-[0_0_12px_rgba(27,127,232,.18),inset_0_0_0_1px_rgba(27,127,232,.4)]'
                         : isHighlighted
                           ? 'text-cyan hover:bg-hover hover:text-cyan'
-                          : 'text-muted hover:bg-hover hover:text-body',
+                          : 'text-[rgba(129,170,214,.5)] hover:bg-[rgba(255,255,255,.04)] hover:text-[rgba(129,170,214,.8)]',
                     )}
                     aria-current={isActive ? 'true' : undefined}
                   >
@@ -330,13 +331,13 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         )}
 
         {/* User avatar — rail mode */}
-        {/* <AppSidebarFooter
+        <AppSidebarFooter
           collapsed
           email={user?.email}
           persona={persona}
           roleName={roleName}
           onLogout={handleLogout}
-        /> */}
+        />
       </div>
 
       {/* ─── Content Panel ─────────────────────────────────────────────────── */}
@@ -348,7 +349,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         )}
         style={{
           ...(!collapsed || mobile ? { width: SIDEBAR_CONTENT_WIDTH } : {}),
-          background: 'var(--t-sidebar-gradient)',
+          background: 'linear-gradient(180deg, #0D1C35, #081120)',
         }}
       >
         {/* Brand header + collapse toggle */}
@@ -397,10 +398,10 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                       'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm',
                       'transition-all duration-150',
                       isActive
-                        ? 'bg-blue text-white font-medium shadow-sm'
+                        ? 'bg-[linear-gradient(90deg,rgba(27,127,232,.22),rgba(18,196,232,.08))] text-[#EAF2FF] font-medium shadow-[inset_2px_0_0_#1B7FE8]'
                         : item.preview
-                          ? 'text-muted/50 hover:bg-hover hover:text-muted'
-                          : 'text-body hover:bg-hover hover:text-heading font-normal',
+                          ? 'text-[rgba(129,170,214,.4)] hover:bg-[rgba(255,255,255,.04)] hover:text-[rgba(181,196,216,.8)]'
+                          : 'text-[rgba(181,196,216,.6)] hover:bg-[rgba(255,255,255,.04)] hover:text-[#EAF2FF] font-normal',
                     )
                   }
                 >
@@ -424,13 +425,13 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         </nav>
 
         {/* User card — expanded mode */}
-        {/* <AppSidebarFooter
+        <AppSidebarFooter
           collapsed={false}
           email={user?.email}
           persona={persona}
           roleName={roleName}
           onLogout={handleLogout}
-        /> */}
+        />
       </div>
     </div>
   );
