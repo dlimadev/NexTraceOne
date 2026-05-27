@@ -12,6 +12,10 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  /** Cor CSS do dot indicator (ex: 'var(--t-cyan)' ou '#1B7FE8'). Omitir para sem dot. */
+  dot?: string;
+  /** Anima o dot com pulse (requer dot). Para cards de incidentes/críticos. */
+  pulsing?: boolean;
 }
 
 export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
@@ -69,9 +73,23 @@ export function Card({ children, variant = 'default', loading, className, ...res
   );
 }
 
-export function CardHeader({ children, className, ...rest }: CardHeaderProps) {
+export function CardHeader({ children, dot, pulsing, className, ...rest }: CardHeaderProps) {
   return (
-    <div className={cn('px-5 py-4 border-b border-edge/60', className)} {...rest}>
+    <div className={cn('px-5 py-4 border-b border-edge/60 flex items-center gap-2.5', className)} {...rest}>
+      {dot && (
+        <span
+          data-testid="card-header-dot"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            background: dot,
+            flexShrink: 0,
+            animation: pulsing ? 'pulse-badge 1.5s ease-in-out infinite' : undefined,
+          }}
+          aria-hidden="true"
+        />
+      )}
       {children}
     </div>
   );

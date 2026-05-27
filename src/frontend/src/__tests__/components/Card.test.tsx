@@ -36,6 +36,26 @@ describe('CardHeader', () => {
   });
 });
 
+describe('CardHeader dot indicator', () => {
+  it('renderiza dot quando dot prop é fornecida', () => {
+    const { container } = render(<CardHeader dot="#1B7FE8">Serviços</CardHeader>);
+    const dot = container.querySelector('[data-testid="card-header-dot"]');
+    expect(dot).toBeInTheDocument();
+    expect(dot).toHaveStyle({ background: '#1B7FE8' });
+  });
+
+  it('não renderiza dot quando prop omitida', () => {
+    const { container } = render(<CardHeader>Sem dot</CardHeader>);
+    expect(container.querySelector('[data-testid="card-header-dot"]')).not.toBeInTheDocument();
+  });
+
+  it('anima o dot quando pulsing=true', () => {
+    const { container } = render(<CardHeader dot="#EF4444" pulsing>Incidentes</CardHeader>);
+    const dot = container.querySelector('[data-testid="card-header-dot"]');
+    expect(dot).toHaveStyle({ animation: 'pulse-badge 1.5s ease-in-out infinite' });
+  });
+});
+
 describe('CardBody', () => {
   it('renderiza o conteúdo filho', () => {
     render(<CardBody>Corpo do card</CardBody>);
