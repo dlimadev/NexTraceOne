@@ -13,17 +13,22 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { saasApi, type AgentRegistrationDto, type AgentStatus } from '../api/saasApi';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
+import { Card, CardBody } from '../../../components/Card';
+import { EmptyState } from '../../../components/EmptyState';
 
 const STATUS_ICON: Record<AgentStatus, React.ReactNode> = {
-  Active: <CheckCircle size={14} className="text-green-500" />,
-  Inactive: <XCircle size={14} className="text-slate-400" />,
-  Decommissioned: <AlertCircle size={14} className="text-red-400" />,
+  Active: <CheckCircle size={14} className="text-success" />,
+  Inactive: <XCircle size={14} className="text-faded" />,
+  Decommissioned: <AlertCircle size={14} className="text-critical/60" />,
 };
 
 const STATUS_COLOR: Record<AgentStatus, string> = {
-  Active: 'bg-green-100 text-green-700',
-  Inactive: 'bg-slate-100 text-slate-600',
-  Decommissioned: 'bg-red-100 text-red-600',
+  Active: 'bg-success/10 text-success',
+  Inactive: 'bg-elevated text-muted',
+  Decommissioned: 'bg-critical/10 text-critical',
 };
 
 function formatHeartbeat(lastHeartbeatAt: string | null): string {
@@ -44,13 +49,13 @@ function AgentRow({ agent, now }: { agent: AgentRegistrationDto; now: number }) 
   const isStale = heartbeatAge > 5 * 60_000;
 
   return (
-    <tr className="hover:bg-slate-50 transition-colors">
+    <tr className="hover:bg-elevated transition-colors">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          <Server size={15} className="text-slate-400 shrink-0" />
+          <Server size={15} className="text-faded shrink-0" />
           <div>
-            <div className="text-sm font-medium text-slate-800">{agent.hostname}</div>
-            <div className="text-xs text-slate-400 font-mono">{agent.hostUnitId.slice(0, 8)}…</div>
+            <div className="text-sm font-medium text-heading">{agent.hostname}</div>
+            <div className="text-xs text-faded font-mono">{agent.hostUnitId.slice(0, 8)}…</div>
           </div>
         </div>
       </td>
@@ -60,31 +65,31 @@ function AgentRow({ agent, now }: { agent: AgentRegistrationDto; now: number }) 
           {agent.status}
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-slate-700">
+      <td className="px-4 py-3 text-sm text-body">
         <div className="flex items-center gap-1.5">
-          <Cpu size={13} className="text-slate-400" />
+          <Cpu size={13} className="text-faded" />
           {agent.cpuCores}c
         </div>
       </td>
-      <td className="px-4 py-3 text-sm text-slate-700">
+      <td className="px-4 py-3 text-sm text-body">
         <div className="flex items-center gap-1.5">
-          <MemoryStick size={13} className="text-slate-400" />
+          <MemoryStick size={13} className="text-faded" />
           {agent.ramGb}GB
         </div>
       </td>
       <td className="px-4 py-3">
-        <span className="inline-flex items-center gap-1 text-sm font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full">
           <Activity size={12} />
           {agent.hostUnits.toFixed(1)} HU
         </span>
       </td>
       <td className="px-4 py-3">
-        <div className={`flex items-center gap-1.5 text-sm ${isStale ? 'text-amber-600' : 'text-slate-600'}`}>
+        <div className={`flex items-center gap-1.5 text-sm ${isStale ? 'text-warning' : 'text-muted'}`}>
           <Clock size={13} />
           {formatHeartbeat(agent.lastHeartbeatAt)}
         </div>
       </td>
-      <td className="px-4 py-3 text-xs text-slate-400">{agent.agentVersion}</td>
+      <td className="px-4 py-3 text-xs text-faded">{agent.agentVersion}</td>
     </tr>
   );
 }
@@ -108,77 +113,88 @@ export function AgentRegistrationsPage() {
   const agents = data?.items ?? [];
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
-        </div>
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg px-3 py-2 transition-colors"
-        >
-          <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
-          {t('refresh')}
-        </button>
-      </div>
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          icon={<Server size={20} />}
+          actions={
+            <Button
+              variant="ghost"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="flex items-center gap-2"
+              size="sm"
+            >
+              <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
+              {t('refresh')}
+            </Button>
+          }
+        />
 
-      {isError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
-          {t('loadError')}
-        </div>
-      )}
-
-      {/* Summary */}
-      {data && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="text-sm text-slate-500 mb-1">{t('totalAgents')}</div>
-            <div className="text-2xl font-bold text-slate-900">{agents.length}</div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="text-sm text-slate-500 mb-1">{t('activeAgents')}</div>
-            <div className="text-2xl font-bold text-green-700">{data.activeCount}</div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="text-sm text-slate-500 mb-1">{t('totalHostUnits')}</div>
-            <div className="text-2xl font-bold text-violet-700">{data.totalHostUnits.toFixed(1)} HU</div>
-          </div>
-        </div>
-      )}
-
-      {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-        {isLoading ? (
-          <div className="p-8 text-center text-slate-400 text-sm">{t('loading')}</div>
-        ) : agents.length === 0 ? (
-          <div className="p-12 text-center">
-            <Server size={40} className="mx-auto text-slate-300 mb-3" />
-            <p className="text-slate-500 text-sm">{t('noAgents')}</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  {['hostname', 'status', 'cpu', 'ram', 'hostUnits', 'lastHeartbeat', 'version'].map((col) => (
-                    <th key={col} className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      {t(`col.${col}`)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {agents.map((agent) => (
-                  <AgentRow key={agent.id} agent={agent} now={now} />
-                ))}
-              </tbody>
-            </table>
+        {isError && (
+          <div className="bg-critical/10 border border-critical/20 text-critical rounded-lg p-4 text-sm">
+            {t('loadError')}
           </div>
         )}
+
+        {/* Summary */}
+        {data && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardBody>
+                <div className="text-sm text-muted mb-1">{t('totalAgents')}</div>
+                <div className="text-2xl font-bold text-heading">{agents.length}</div>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <div className="text-sm text-muted mb-1">{t('activeAgents')}</div>
+                <div className="text-2xl font-bold text-success">{data.activeCount}</div>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <div className="text-sm text-muted mb-1">{t('totalHostUnits')}</div>
+                <div className="text-2xl font-bold text-accent">{data.totalHostUnits.toFixed(1)} HU</div>
+              </CardBody>
+            </Card>
+          </div>
+        )}
+
+        {/* Table */}
+        <div className="bg-card border border-edge rounded-xl overflow-hidden">
+          {isLoading ? (
+            <div className="p-8 text-center text-faded text-sm">{t('loading')}</div>
+          ) : agents.length === 0 && !isLoading ? (
+            <EmptyState
+              icon={<Server size={24} />}
+              title={t('noAgents', 'No agents registered')}
+              description={t('noAgentsDescription', 'No agent registrations found. Agents will appear here once they connect.')}
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-elevated border-b border-edge">
+                  <tr>
+                    {['hostname', 'status', 'cpu', 'ram', 'hostUnits', 'lastHeartbeat', 'version'].map((col) => (
+                      <th key={col} className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        {t(`col.${col}`)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-edge/50">
+                  {agents.map((agent) => (
+                    <AgentRow key={agent.id} agent={agent} now={now} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
