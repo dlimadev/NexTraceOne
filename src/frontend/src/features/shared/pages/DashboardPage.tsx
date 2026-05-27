@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-  Zap, GitBranch, FileText, ShieldCheck, Activity, AlertTriangle,
-  ArrowRight, AlertCircle, Clock, Server, Download,
+  Zap, FileText, ShieldCheck, Activity, AlertTriangle,
+  ArrowRight, AlertCircle, Clock, ChevronRight,
 } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody, CardFooter } from '../../../components/Card';
@@ -19,24 +19,27 @@ import { changeConfidenceApi } from '../../change-governance/api/changeConfidenc
 import { incidentsApi } from '../../operations/api/incidents';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { queryKeys } from '../../../shared/api/queryKeys';
+import type { Persona } from '../../../auth/persona';
+import { Download } from 'lucide-react';
+
+/** Chips decorativos de persona — apresentam o perfil activo e os disponíveis. */
+const PERSONA_CHIPS: { id: Persona; labelKey: string }[] = [
+  { id: 'Engineer',     labelKey: 'persona.Engineer.label' },
+  { id: 'TechLead',     labelKey: 'persona.TechLead.label' },
+  { id: 'Architect',    labelKey: 'persona.Architect.label' },
+  { id: 'Executive',    labelKey: 'persona.Executive.label' },
+  { id: 'PlatformAdmin',labelKey: 'persona.PlatformAdmin.label' },
+];
 
 /**
  * Página principal do dashboard — experiência persona-aware com narrativa operacional.
  *
- * Adapta conteúdo, ordem e linguagem com base na persona do utilizador:
- * - Engineer: foco operacional nos próprios serviços
- * - Tech Lead: visão da equipa e risco
- * - Architect: dependências e consistência
- * - Product: impacto funcional e confiança de release
- * - Executive: visão agregada e estratégica
- * - Platform Admin: governança e administração
- * - Auditor: rastreabilidade e evidências
- *
  * Layout:
- * 1. Context bar (title + persona + subtitle)
- * 2. KPI storytelling row
- * 3. Attention alerts (priority items)
- * 4. Operational widgets (real data)
+ * 1. Context bar (title + persona badge + subtítulo)
+ * 2. Persona switcher decorativo (chips horizontais)
+ * 3. KPI storytelling row — 4 colunas
+ * 4. Attention alerts estruturados
+ * 5. Operational grid 2×2
  *
  * @see docs/PERSONA-UX-MAPPING.md
  */
@@ -71,67 +74,68 @@ export function DashboardPage() {
   });
 
   const totalServices = graph?.services?.length ?? 0;
-  const totalApis = graph?.apis?.length ?? 0;
   const totalContracts = contractsSummary?.totalVersions ?? 0;
   const totalChanges = changesSummary?.totalChanges ?? 0;
   const openIncidents = incidentsSummary?.totalOpen ?? 0;
 
+  /** 4 KPIs — "APIs registadas" movida para /services como stat local. */
   const stats = [
     {
       title: t('dashboard.activeServices'),
       value: graphLoading ? '…' : totalServices,
-      icon: <Activity size={22} />,
+      icon: <Activity size={20} />,
       color: 'text-cyan',
       trend: totalServices > 0 ? { direction: 'up' as const, label: t('dashboard.trendHealthy') } : undefined,
-      sparkline: totalServices > 0 ? { data: [3, 5, 8, 12, 15, totalServices], color: 'var(--t-cyan)' } : undefined,
+      sparkline: totalServices > 0 ? { data: [3, 5, 8, 12, 15, totalServices, totalServices], color: 'var(--t-cyan)' } : undefined,
       footer: totalServices > 0 ? t('dashboard.vsLastPeriod', { value: Math.max(0, totalServices - 2) }) : undefined,
       footerHref: '/services',
     },
     {
       title: t('dashboard.totalContracts'),
       value: contractsLoading ? '…' : totalContracts,
-      icon: <FileText size={22} />,
+      icon: <FileText size={20} />,
       color: 'text-success',
       trend: (contractsSummary?.inReviewCount ?? 0) > 0
         ? { direction: 'up' as const, label: `${contractsSummary?.inReviewCount} ${t('dashboard.inReviewShort')}` }
         : undefined,
-      sparkline: totalContracts > 0 ? { data: [2, 4, 6, 8, 10, totalContracts], color: 'var(--t-success)' } : undefined,
+      sparkline: totalContracts > 0 ? { data: [2, 4, 6, 8, 10, totalContracts, totalContracts], color: 'var(--t-success)' } : undefined,
     },
     {
       title: t('dashboard.recentChanges'),
       value: changesLoading ? '…' : totalChanges,
-      icon: <ShieldCheck size={22} />,
+      icon: <ShieldCheck size={20} />,
       color: 'text-warning',
       trend: (changesSummary?.changesNeedingAttention ?? 0) > 0
         ? { direction: 'down' as const, label: `${changesSummary?.changesNeedingAttention} ${t('dashboard.needAttention')}` }
         : undefined,
-      sparkline: totalChanges > 0 ? { data: [1, 3, 2, 5, 4, totalChanges], color: 'var(--t-warning)' } : undefined,
+      sparkline: totalChanges > 0 ? { data: [1, 3, 2, 5, 4, totalChanges, totalChanges], color: 'var(--t-warning)' } : undefined,
     },
     {
       title: t('dashboard.openIncidents'),
       value: incidentsLoading ? '…' : openIncidents,
-      icon: <AlertTriangle size={22} />,
+      icon: <AlertTriangle size={20} />,
       color: 'text-critical',
       trend: openIncidents > 0
         ? { direction: 'down' as const, label: `${openIncidents} ${t('dashboard.activeNow')}` }
         : undefined,
-      sparkline: openIncidents > 0 ? { data: [5, 3, 4, 2, 1, openIncidents], color: 'var(--t-critical)' } : undefined,
-    },
-    {
-      title: t('dashboard.registeredApis'),
-      value: graphLoading ? '…' : totalApis,
-      icon: <GitBranch size={22} />,
-      color: 'text-accent',
-      sparkline: totalApis > 0 ? { data: [1, 2, 3, 4, 5, totalApis], color: 'var(--t-accent)' } : undefined,
+      sparkline: openIncidents > 0 ? { data: [5, 3, 4, 2, 1, openIncidents, openIncidents], color: 'var(--t-critical)' } : undefined,
     },
   ];
 
-  // Build attention alerts from operational data
-  const attentionAlerts: Array<{ icon: React.ReactNode; text: string; severity: 'critical' | 'warning' | 'info'; to: string }> = [];
+  // Alertas de atenção com severidade
+  const attentionAlerts: Array<{
+    icon: React.ReactNode;
+    title: string;
+    description?: string;
+    severity: 'critical' | 'warning' | 'info';
+    to: string;
+  }> = [];
+
   if (openIncidents > 0 && isRouteAvailableInFinalProductionScope('/operations/incidents')) {
     attentionAlerts.push({
       icon: <AlertTriangle size={14} />,
-      text: t('dashboard.alertOpenIncidents', { count: openIncidents }),
+      title: t('dashboard.alertOpenIncidents', { count: openIncidents }),
+      description: t('dashboard.alertOpenIncidentsDesc', 'Requires immediate attention'),
       severity: 'critical',
       to: '/operations/incidents',
     });
@@ -139,7 +143,8 @@ export function DashboardPage() {
   if ((changesSummary?.changesNeedingAttention ?? 0) > 0) {
     attentionAlerts.push({
       icon: <Clock size={14} />,
-      text: t('dashboard.alertPendingChanges', { count: changesSummary?.changesNeedingAttention }),
+      title: t('dashboard.alertPendingChanges', { count: changesSummary?.changesNeedingAttention }),
+      description: t('dashboard.alertPendingChangesDesc', 'Pending review or approval'),
       severity: 'warning',
       to: '/changes',
     });
@@ -147,7 +152,7 @@ export function DashboardPage() {
   if ((changesSummary?.suspectedRegressions ?? 0) > 0) {
     attentionAlerts.push({
       icon: <AlertCircle size={14} />,
-      text: t('dashboard.alertSuspectedRegressions', { count: changesSummary?.suspectedRegressions }),
+      title: t('dashboard.alertSuspectedRegressions', { count: changesSummary?.suspectedRegressions }),
       severity: 'critical',
       to: '/changes',
     });
@@ -155,22 +160,35 @@ export function DashboardPage() {
   if ((contractsSummary?.deprecatedCount ?? 0) > 0 && isRouteAvailableInFinalProductionScope('/contracts')) {
     attentionAlerts.push({
       icon: <FileText size={14} />,
-      text: t('dashboard.alertDeprecatedContracts', { count: contractsSummary?.deprecatedCount }),
+      title: t('dashboard.alertDeprecatedContracts', { count: contractsSummary?.deprecatedCount }),
       severity: 'warning',
       to: '/contracts',
     });
   }
 
-  const severityColors = {
-    critical: 'bg-critical/10 border-critical/25 text-critical',
-    warning: 'bg-warning/10 border-warning/25 text-warning',
-    info: 'bg-info/10 border-info/25 text-info',
+  /** Paleta de estilos dos alertas estruturados. */
+  const alertStyles = {
+    critical: {
+      wrap: 'bg-critical/6 border-critical/18 hover:bg-critical/10',
+      iconBox: 'bg-critical/12 text-critical',
+      chevron: 'text-critical/50',
+    },
+    warning: {
+      wrap: 'bg-warning/6 border-warning/18 hover:bg-warning/10',
+      iconBox: 'bg-warning/12 text-warning',
+      chevron: 'text-warning/50',
+    },
+    info: {
+      wrap: 'bg-info/6 border-info/18 hover:bg-info/10',
+      iconBox: 'bg-info/12 text-info',
+      chevron: 'text-info/50',
+    },
   };
 
   return (
     <PageContainer>
       {/* ── Context bar ──────────────────────────────────────────────────────── */}
-      <div className="mb-7">
+      <div className="mb-5">
         <div className="flex items-center gap-3 mb-1.5">
           <h1 className="text-2xl font-bold text-heading tracking-tight">{t('dashboard.title')}</h1>
           <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue/10 text-cyan border border-cyan/15">
@@ -180,7 +198,23 @@ export function DashboardPage() {
         <p className="text-sm text-muted">{t(config.homeSubtitleKey)}</p>
       </div>
 
-      {/* Error state */}
+      {/* ── Persona switcher decorativo ───────────────────────────────────────── */}
+      <div className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-0.5 scrollbar-none">
+        {PERSONA_CHIPS.map((chip) => (
+          <span
+            key={chip.id}
+            className={
+              chip.id === persona
+                ? 'shrink-0 px-3 py-1 rounded-full text-[11px] font-semibold bg-accent/12 text-accent border border-accent/25 cursor-default'
+                : 'shrink-0 px-3 py-1 rounded-full text-[11px] font-medium text-muted border border-edge bg-elevated cursor-default'
+            }
+          >
+            {t(chip.labelKey)}
+          </span>
+        ))}
+      </div>
+
+      {/* Erro de carregamento */}
       {graphError && (
         <div role="alert" className="mb-6 rounded-lg bg-critical/10 border border-critical/25 px-4 py-3 flex items-start gap-3 animate-fade-in">
           <AlertTriangle size={18} className="text-critical shrink-0 mt-0.5" />
@@ -191,29 +225,44 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* ── KPI Stats ────────────────────────────────────────────────────────── */}
+      {/* ── KPI Stats — 4 colunas ────────────────────────────────────────────── */}
       <div className="mb-6">
-        <ContentGrid columns={5}>
+        <ContentGrid columns={4}>
           {stats.map((s) => (
             <StatCard key={s.title} {...s} />
           ))}
         </ContentGrid>
       </div>
 
-      {/* ── Attention Alerts ─────────────────────────────────────────────────── */}
+      {/* ── Alertas estruturados ─────────────────────────────────────────────── */}
       {attentionAlerts.length > 0 && (
         <div className="mb-6 space-y-2">
-          {attentionAlerts.map((alert) => (
-            <Link
-              key={alert.to}
-              to={alert.to}
-              className={`flex items-center gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors hover:opacity-80 ${severityColors[alert.severity]}`}
-            >
-              {alert.icon}
-              <span className="flex-1">{alert.text}</span>
-              <ArrowRight size={14} className="opacity-60" />
-            </Link>
-          ))}
+          {attentionAlerts.map((alert) => {
+            const styles = alertStyles[alert.severity];
+            return (
+              <Link
+                key={alert.to}
+                to={alert.to}
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${styles.wrap}`}
+              >
+                {/* Icon box 28×28 tonal */}
+                <div
+                  className={`shrink-0 flex items-center justify-center rounded-lg ${styles.iconBox}`}
+                  style={{ width: 28, height: 28 }}
+                  aria-hidden="true"
+                >
+                  {alert.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold leading-tight">{alert.title}</p>
+                  {alert.description && (
+                    <p className="text-xs mt-0.5 opacity-70">{alert.description}</p>
+                  )}
+                </div>
+                <ChevronRight size={14} className={`shrink-0 ${styles.chevron}`} />
+              </Link>
+            );
+          })}
         </div>
       )}
 
@@ -221,12 +270,9 @@ export function DashboardPage() {
       <PageSection>
         <ContentGrid columns={showContractsSurface ? 2 : 1}>
         <Card>
-          <CardHeader>
+          <CardHeader dot="var(--t-cyan)">
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <Server size={16} className="text-cyan" />
-                <h2 className="text-sm font-semibold text-heading">{t('dashboard.recentServices')}</h2>
-              </div>
+              <h2 className="text-sm font-semibold text-heading">{t('dashboard.recentServices')}</h2>
               <Link to="/services" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
                 {t('common.viewAll')} <ArrowRight size={12} />
               </Link>
@@ -284,12 +330,9 @@ export function DashboardPage() {
 
         {showContractsSurface && (
         <Card>
-          <CardHeader>
+          <CardHeader dot="var(--t-success)">
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <FileText size={16} className="text-success" />
-                <h2 className="text-sm font-semibold text-heading">{t('dashboard.contractHealth')}</h2>
-              </div>
+              <h2 className="text-sm font-semibold text-heading">{t('dashboard.contractHealth')}</h2>
               <Link to="/contracts" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
                 {t('common.viewAll')} <ArrowRight size={12} />
               </Link>
@@ -369,12 +412,9 @@ export function DashboardPage() {
       <PageSection>
         <ContentGrid columns={2}>
         <Card>
-          <CardHeader>
+          <CardHeader dot="var(--t-warning)">
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-warning" />
-                <h2 className="text-sm font-semibold text-heading">{t('dashboard.changeOverview')}</h2>
-              </div>
+              <h2 className="text-sm font-semibold text-heading">{t('dashboard.changeOverview')}</h2>
               <Link to="/changes" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
                 {t('common.viewAll')} <ArrowRight size={12} />
               </Link>
@@ -421,12 +461,9 @@ export function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader dot="var(--t-critical)" pulsing={openIncidents > 0}>
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <AlertTriangle size={16} className="text-critical" />
-                <h2 className="text-sm font-semibold text-heading">{t('dashboard.incidentOverview')}</h2>
-              </div>
+              <h2 className="text-sm font-semibold text-heading">{t('dashboard.incidentOverview')}</h2>
               <Link to="/operations/incidents" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
                 {t('common.viewAll')} <ArrowRight size={12} />
               </Link>

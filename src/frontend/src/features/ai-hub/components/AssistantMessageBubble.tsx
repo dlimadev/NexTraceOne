@@ -62,15 +62,29 @@ export function AssistantMessageBubble({
   return (
     <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[85%] rounded-lg px-3 py-2.5 ${
-          msg.role === 'assistant' ? 'bg-elevated' : 'bg-accent/20'
-        }`}
+        className="max-w-[85%] px-3 py-2.5"
+        style={
+          msg.role === 'user'
+            ? {
+                background: '#1B7FE8',
+                color: 'white',
+                borderRadius: '12px 12px 4px 12px',
+              }
+            : {
+                background: 'var(--t-card)',
+                border: '1px solid var(--t-edge)',
+                borderRadius: '12px 12px 12px 4px',
+              }
+        }
       >
         {/* Header */}
         {msg.role === 'assistant' && (
           <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-            <Bot size={12} className="text-accent" />
-            <span className="text-[10px] font-medium text-accent">{t('aiHub.assistant')}</span>
+            <Bot size={11} style={{ color: '#0891B2' }} aria-hidden="true" />
+            {/* Nome do modelo ou label "Assistant" em estilo diferenciado */}
+            <span style={{ fontSize: 9, fontWeight: 600, color: '#0891B2' }}>
+              {msg.modelName ? msg.modelName : t('aiHub.assistant')}
+            </span>
             {msg.confidenceLevel && (
               <Badge
                 variant={
@@ -123,13 +137,15 @@ export function AssistantMessageBubble({
         )}
         {msg.role === 'user' && (
           <div className="flex items-center gap-1.5 mb-1 justify-end">
-            <span className="text-[10px] text-faded">{formatTime(msg.timestamp)}</span>
-            <span className="text-[10px] font-medium text-body">{t('aiHub.you')}</span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,.7)' }}>{formatTime(msg.timestamp)}</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'white' }}>{t('aiHub.you')}</span>
           </div>
         )}
 
-        {/* Content */}
-        <p className="text-xs text-body whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+        {/* Content — user bubbles sempre branco, AI bubbles herdam text-body */}
+        <p className={`text-xs whitespace-pre-wrap leading-relaxed ${msg.role === 'user' ? '' : 'text-body'}`}
+           style={msg.role === 'user' ? { color: 'white' } : undefined}
+        >{msg.content}</p>
 
         {/* ── Grounding Sources (compact badges) ──────────────────────── */}
         {hasGroundingSources && !hasExplainabilityHints && (

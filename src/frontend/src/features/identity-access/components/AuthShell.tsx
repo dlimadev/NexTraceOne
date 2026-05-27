@@ -60,13 +60,15 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
 
   return (
     <div className="min-h-screen bg-canvas flex relative overflow-x-hidden overflow-y-auto">
-      {/* Background radial halos */}
+      {/* Background radial halos — animação pulse suave nos orbs */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
           className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px] bg-[radial-gradient(circle,rgba(27,127,232,0.10)_0%,transparent_70%)]"
+          style={{ animation: 'pulse-soft 4s ease-in-out infinite' }}
         />
         <div
           className="absolute bottom-[-20%] right-[-10%] w-[45%] h-[50%] rounded-full blur-[120px] bg-[radial-gradient(circle,rgba(18,196,232,0.07)_0%,transparent_70%)]"
+          style={{ animation: 'pulse-soft 5s ease-in-out infinite 1s' }}
         />
       </div>
 
@@ -93,6 +95,7 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
               src="/brand/logo.svg"
               alt="NexTraceOne"
               className="h-16 xl:h-20 w-auto"
+              style={{ boxShadow: '0 0 24px rgba(18,196,232,.25)' }}
             />
           </div>
 

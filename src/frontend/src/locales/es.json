@@ -10,7 +10,7 @@
     "passwordLabel": "Contraseña",
     "passwordPlaceholder": "Elija una contraseña",
     "submit": "Activar cuenta",
-    "subtitle": "Bienvenido a NexTraceOne. Establezca su contraseña para completar la activación de la cuenta.",
+    "subtitle": "Bienvenido de vuelta. Establezca su contraseña para completar la activación de la cuenta.",
     "successMessage": "Su cuenta está lista. Ahora puede iniciar sesión.",
     "successTitle": "Cuenta activada",
     "title": "Activar su cuenta"
@@ -980,7 +980,7 @@
     "tagline": "Plataforma Soberana de Gobernanza de Ingeniería",
     "trustCompliant": "Conforme para empresas",
     "trustEncrypted": "Cifrado en tránsito",
-    "welcomeTitle": "Bienvenido a NexTraceOne",
+    "welcomeTitle": "Bienvenido de vuelta",
     "logout": "Cerrar sesión"
   },
   "authorization": {
@@ -7634,7 +7634,7 @@
       "hint3Title": "Verificar Salud del Servicio"
     },
     "wizard": {
-      "title": "Bienvenido a NexTraceOne",
+      "title": "Bienvenido de vuelta",
       "subtitle": "Complete estos pasos para configurar su plataforma"
     },
     "progress": {
@@ -8301,7 +8301,7 @@
     "quotaExceededTitle": "Cuota excedida",
     "successTitle": "Éxito",
     "welcomeSubtitle": "La fuente de verdad para servicios, contratos, cambios y conocimiento operacional",
-    "welcomeTitle": "Bienvenido a NexTraceOne",
+    "welcomeTitle": "Bienvenido de vuelta",
     "userPreferences.timezone.title": "Zona Horaria y Formato de Fecha",
     "userPreferences.timezone.timezone": "Zona Horaria",
     "userPreferences.timezone.dateFormat": "Formato de Fecha",
@@ -10417,7 +10417,7 @@
     "progress": "Paso {{current}} de {{total}}",
     "welcome": {
       "stepLabel": "Bienvenida",
-      "title": "Bienvenido a NexTraceOne",
+      "title": "Bienvenido de vuelta",
       "description": "Este asistente le guiará por la configuración inicial.",
       "introText": "NexTraceOne es la fuente de verdad para servicios, contratos, cambios y conocimiento operacional.",
       "feature_database": "PostgreSQL 16+ conectado y migraciones aplicadas",

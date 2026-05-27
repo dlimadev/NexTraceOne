@@ -796,11 +796,15 @@ export function AiAssistantPage() {
                 const model = allModels.find(m => m.modelId === selectedModelId);
                 if (!model) return null;
                 return (
-                  <span className="inline-flex items-center gap-1 text-[10px] text-muted">
-                    {model.isInternal ? <Shield size={9} className="text-success" /> : <Globe size={9} className="text-warning" />}
-                    {t('aiHub.usingModel')}: {model.displayName}
-                    {model.isInternal ? ` (${t('aiHub.internalLabel')})` : ` (${t('aiHub.externalLabel')})`}
-                  </span>
+                  <Badge
+                    variant={model.isInternal ? 'success' : 'warning'}
+                    dot
+                    size="sm"
+                    className={model.isInternal ? 'bg-success/10 text-success border-success/20' : undefined}
+                  >
+                    {model.isInternal ? <Shield size={9} aria-hidden="true" /> : <Globe size={9} aria-hidden="true" />}
+                    {model.displayName}
+                  </Badge>
                 );
               })()}
               <span className="flex-1" />

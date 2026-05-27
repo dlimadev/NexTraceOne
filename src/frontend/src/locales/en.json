@@ -10,7 +10,7 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Choose a password",
     "submit": "Activate account",
-    "subtitle": "Welcome to NexTraceOne. Set your password to complete account activation.",
+    "subtitle": "Welcome back. Set your password to complete account activation.",
     "successMessage": "Your account is ready. You can now sign in.",
     "successTitle": "Account activated",
     "title": "Activate your account"
@@ -980,7 +980,7 @@
     "tagline": "Sovereign Engineering Governance Platform",
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
-    "welcomeTitle": "Welcome to NexTraceOne",
+    "welcomeTitle": "Welcome back",
     "logout": "Logout"
   },
   "authorization": {
@@ -6333,7 +6333,7 @@
       "hint3Title": "Check Service Health"
     },
     "wizard": {
-      "title": "Welcome to NexTraceOne",
+      "title": "Welcome back",
       "subtitle": "Complete these steps to set up your platform"
     },
     "progress": {
@@ -7000,7 +7000,7 @@
     "quotaExceededTitle": "Quota exceeded",
     "successTitle": "Success",
     "welcomeSubtitle": "The source of truth for services, contracts, changes and operational knowledge",
-    "welcomeTitle": "Welcome to NexTraceOne",
+    "welcomeTitle": "Welcome back",
     "userPreferences.timezone.title": "Timezone & Date Format",
     "userPreferences.timezone.timezone": "Timezone",
     "userPreferences.timezone.dateFormat": "Date Format",
@@ -9116,7 +9116,7 @@
     "progress": "Step {{current}} of {{total}}",
     "welcome": {
       "stepLabel": "Welcome",
-      "title": "Welcome to NexTraceOne",
+      "title": "Welcome back",
       "description": "This wizard will guide you through the initial configuration.",
       "introText": "NexTraceOne is the source of truth for services, contracts, changes and operational knowledge. Complete this wizard to finish your on-premises installation.",
       "feature_database": "PostgreSQL 16+ connected and migrations applied",

@@ -10,7 +10,7 @@
     "passwordLabel": "Palavra-passe",
     "passwordPlaceholder": "Escolha uma palavra-passe",
     "submit": "Ativar conta",
-    "subtitle": "Bem-vindo ao NexTraceOne. Defina a sua palavra-passe para concluir a ativação da conta.",
+    "subtitle": "Bem-vindo de volta. Defina a sua palavra-passe para concluir a ativação da conta.",
     "successMessage": "A sua conta está pronta. Já pode iniciar sessão.",
     "successTitle": "Conta ativada",
     "title": "Ativar a sua conta"
@@ -980,7 +980,7 @@
     "tagline": "Plataforma Soberana de Governança de Engenharia",
     "trustCompliant": "Conforme para empresas",
     "trustEncrypted": "Encriptado em trânsito",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "welcomeTitle": "Bem-vindo de volta",
     "logout": "Terminar sessão"
   },
   "authorization": {
@@ -7631,7 +7631,7 @@
       "hint3Title": "Verificar Saúde do Serviço"
     },
     "wizard": {
-      "title": "Bem-vindo ao NexTraceOne",
+      "title": "Bem-vindo de volta",
       "subtitle": "Complete estes passos para configurar a sua plataforma"
     },
     "progress": {
@@ -8298,7 +8298,7 @@
     "quotaExceededTitle": "Quota excedida",
     "successTitle": "Sucesso",
     "welcomeSubtitle": "A fonte de verdade para serviços, contratos, alterações e conhecimento operacional",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "welcomeTitle": "Bem-vindo de volta",
     "userPreferences.timezone.title": "Fuso Horário e Formato de Data",
     "userPreferences.timezone.timezone": "Fuso Horário",
     "userPreferences.timezone.dateFormat": "Formato de Data",
@@ -10414,7 +10414,7 @@
     "progress": "Passo {{current}} de {{total}}",
     "welcome": {
       "stepLabel": "Boas-vindas",
-      "title": "Bem-vindo ao NexTraceOne",
+      "title": "Bem-vindo de volta",
       "description": "Este assistente irá guiá-lo pela configuração inicial.",
       "introText": "NexTraceOne é a fonte de verdade para serviços, contratos, mudanças e conhecimento operacional. Complete este assistente para finalizar a sua instalação on-premises.",
       "feature_database": "PostgreSQL 16+ conectado e migrations aplicadas",
