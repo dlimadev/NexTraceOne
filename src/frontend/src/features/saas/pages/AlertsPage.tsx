@@ -35,10 +35,10 @@ const STATUS_STYLE: Record<AlertFiringStatus, { bg: string; text: string; icon: 
 };
 
 const SEVERITY_COLOR: Record<string, string> = {
-  Critical: 'bg-critical text-white',
-  High: 'bg-orange-500 text-white',
-  Medium: 'bg-warning text-heading',
-  Low: 'bg-accent/60 text-white',
+  Critical: 'bg-critical text-on-accent', /* text-on-accent: intentional on filled bg */
+  High: 'bg-warning text-on-accent', /* text-on-accent: intentional on filled bg */
+  Medium: 'bg-warning/20 text-warning',
+  Low: 'bg-accent/60 text-on-accent', /* text-on-accent: intentional on filled bg */
   Info: 'bg-elevated text-muted',
 };
 
@@ -200,7 +200,7 @@ export function AlertsPage() {
               onClick={() => setDays(d)}
               className={`rounded-full border ${
                 days === d
-                  ? 'bg-accent text-white border-accent'
+                  ? 'bg-accent text-on-accent border-accent' /* text-on-accent: intentional on filled bg */
                   : 'border-edge text-muted hover:bg-elevated'
               }`}
             >

@@ -56,11 +56,12 @@ function StepIndicator({ current, total }: { current: Step; total: number }) {
       {Array.from({ length: total }, (_, i) => i + 1).map((step) => (
         <div key={step} className="flex items-center gap-2">
           <div
-            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
+            // text-on-accent: intentional on filled bg (success/accent circles)
+          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
               step < current
-                ? 'bg-success text-white'
+                ? 'bg-success text-on-accent'
                 : step === current
-                ? 'bg-accent text-white'
+                ? 'bg-accent text-on-accent'
                 : 'bg-elevated text-faded'
             }`}
           >
@@ -210,6 +211,7 @@ export function TenantProvisioningPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {(Object.keys(PLAN_DESCRIPTIONS) as TenantPlan[]).map((plan) => {
                     const desc = PLAN_DESCRIPTIONS[plan];
+                    // plan-selector-card: kept as raw button — complex nested layout
                     return (
                       <button
                         key={plan}
