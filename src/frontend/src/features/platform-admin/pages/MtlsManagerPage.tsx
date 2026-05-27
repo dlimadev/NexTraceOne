@@ -184,10 +184,10 @@ export function MtlsManagerPage() {
                     {t('rootCaExpiry')}: {new Date(data.policy.rootCaCertExpiry).toLocaleDateString()}
                   </span>
                 )}
-                <button className="flex items-center gap-2 px-3 py-1.5 text-xs border border-edge rounded-lg hover:bg-elevated text-muted">
+                <Button variant="outline" className="flex items-center gap-2">
                   <Upload size={12} />
                   {t('btnUploadRootCa')}
-                </button>
+                </Button>
               </div>
             </section>
 

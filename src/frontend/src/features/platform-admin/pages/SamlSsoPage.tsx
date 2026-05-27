@@ -159,10 +159,10 @@ export function SamlSsoPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-3 py-2 text-sm border border-edge rounded-lg hover:bg-elevated text-muted">
+                <Button variant="outline" className="flex items-center gap-2">
                   <Download size={14} />
                   {t('btnDownloadSpCert')}
-                </button>
+                </Button>
               </div>
             </section>
 
