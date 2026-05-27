@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Shield, Settings, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
 import { platformAdminApi, type SessionSecurityConfigUpdate } from '../api/platformAdmin';
 
 export function SessionSecurityPage() {
@@ -41,167 +44,163 @@ export function SessionSecurityPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield size={24} className="text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-            <p className="mt-1 text-sm text-slate-500">{t('subtitle')}</p>
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          icon={<Shield size={24} className="text-accent" />}
+          actions={
+            <Button variant="ghost" onClick={() => refetch()}>
+              <RefreshCw size={14} />
+              {t('refresh')}
+            </Button>
+          }
+        />
+
+        {isLoading && (
+          <div className="flex items-center justify-center h-48 text-faded text-sm">
+            {t('loading')}
           </div>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <RefreshCw size={14} />
-          {t('refresh')}
-        </button>
-      </div>
+        )}
 
-      {isLoading && (
-        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
-          {t('loading')}
-        </div>
-      )}
-
-      {isError && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <XCircle size={18} />
-          {t('error')}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SummaryCard
-              label={t('inactivityLabel')}
-              value={`${data.inactivityTimeoutMinutes}m`}
-              color="blue"
-            />
-            <SummaryCard
-              label={t('maxSessionsLabel')}
-              value={String(data.maxConcurrentSessions)}
-              color="indigo"
-            />
-            <SummaryCard
-              label={t('reauthLabel')}
-              value={data.requireReauthForSensitiveActions ? t('on') : t('off')}
-              color={data.requireReauthForSensitiveActions ? 'emerald' : 'slate'}
-            />
-            <SummaryCard
-              label={t('ipChangeLabel')}
-              value={data.detectAnomalousIpChange ? t('on') : t('off')}
-              color={data.detectAnomalousIpChange ? 'emerald' : 'slate'}
-            />
+        {isError && (
+          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
+            <XCircle size={18} />
+            {t('error')}
           </div>
+        )}
 
-          {/* Config */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium text-slate-800">{t('configTitle')}</h2>
-              {!editing && (
-                <button
-                  onClick={startEdit}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-indigo-600 border border-indigo-200 rounded hover:bg-indigo-50"
-                >
-                  <Settings size={14} />
-                  {t('editBtn')}
-                </button>
-              )}
+        {data && (
+          <>
+            {/* Summary cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <SummaryCard
+                label={t('inactivityLabel')}
+                value={`${data.inactivityTimeoutMinutes}m`}
+                color="accent"
+              />
+              <SummaryCard
+                label={t('maxSessionsLabel')}
+                value={String(data.maxConcurrentSessions)}
+                color="accent"
+              />
+              <SummaryCard
+                label={t('reauthLabel')}
+                value={data.requireReauthForSensitiveActions ? t('on') : t('off')}
+                color={data.requireReauthForSensitiveActions ? 'success' : 'faded'}
+              />
+              <SummaryCard
+                label={t('ipChangeLabel')}
+                value={data.detectAnomalousIpChange ? t('on') : t('off')}
+                color={data.detectAnomalousIpChange ? 'success' : 'faded'}
+              />
             </div>
 
-            {editing ? (
-              <div className="border border-slate-200 rounded-lg p-5 space-y-4">
-                <NumericField
-                  label={t('inactivityLabel')}
-                  hint={t('inactivityHint')}
-                  value={form.inactivityTimeoutMinutes}
-                  onChange={(v) => setForm((f) => ({ ...f, inactivityTimeoutMinutes: v }))}
-                  min={5}
-                  max={2880}
-                />
-                <NumericField
-                  label={t('maxSessionsLabel')}
-                  hint={t('maxSessionsHint')}
-                  value={form.maxConcurrentSessions}
-                  onChange={(v) => setForm((f) => ({ ...f, maxConcurrentSessions: v }))}
-                  min={1}
-                  max={20}
-                />
-                <ToggleField
-                  label={t('reauthLabel')}
-                  hint={t('reauthHint')}
-                  value={form.requireReauthForSensitiveActions}
-                  onChange={(v) => setForm((f) => ({ ...f, requireReauthForSensitiveActions: v }))}
-                />
-                <ToggleField
-                  label={t('ipChangeLabel')}
-                  hint={t('ipChangeHint')}
-                  value={form.detectAnomalousIpChange}
-                  onChange={(v) => setForm((f) => ({ ...f, detectAnomalousIpChange: v }))}
-                />
-                <div className="flex gap-3 pt-2">
+            {/* Config */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-medium text-heading">{t('configTitle')}</h2>
+                {!editing && (
                   <button
-                    onClick={() => mutation.mutate(form)}
-                    disabled={mutation.isPending}
-                    className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                    onClick={startEdit}
+                    className="flex items-center gap-2 px-3 py-1.5 text-sm text-accent border border-accent/20 rounded hover:bg-accent/10"
                   >
-                    {mutation.isPending ? t('saving') : t('save')}
+                    <Settings size={14} />
+                    {t('editBtn')}
                   </button>
-                  <button
-                    onClick={() => setEditing(false)}
-                    className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
-                  >
-                    {t('cancel')}
-                  </button>
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="border border-slate-200 rounded-lg divide-y divide-slate-100">
-                <ConfigRow label={t('inactivityLabel')} value={`${data.inactivityTimeoutMinutes} ${t('minutes')}`} />
-                <ConfigRow label={t('maxSessionsLabel')} value={String(data.maxConcurrentSessions)} />
-                <ConfigRow
-                  label={t('reauthLabel')}
-                  value={data.requireReauthForSensitiveActions ? t('enabled') : t('disabled')}
-                />
-                <ConfigRow
-                  label={t('ipChangeLabel')}
-                  value={data.detectAnomalousIpChange ? t('enabled') : t('disabled')}
-                />
+
+              {editing ? (
+                <div className="border border-edge rounded-lg p-5 space-y-4">
+                  <NumericField
+                    label={t('inactivityLabel')}
+                    hint={t('inactivityHint')}
+                    value={form.inactivityTimeoutMinutes}
+                    onChange={(v) => setForm((f) => ({ ...f, inactivityTimeoutMinutes: v }))}
+                    min={5}
+                    max={2880}
+                  />
+                  <NumericField
+                    label={t('maxSessionsLabel')}
+                    hint={t('maxSessionsHint')}
+                    value={form.maxConcurrentSessions}
+                    onChange={(v) => setForm((f) => ({ ...f, maxConcurrentSessions: v }))}
+                    min={1}
+                    max={20}
+                  />
+                  <ToggleField
+                    label={t('reauthLabel')}
+                    hint={t('reauthHint')}
+                    value={form.requireReauthForSensitiveActions}
+                    onChange={(v) => setForm((f) => ({ ...f, requireReauthForSensitiveActions: v }))}
+                  />
+                  <ToggleField
+                    label={t('ipChangeLabel')}
+                    hint={t('ipChangeHint')}
+                    value={form.detectAnomalousIpChange}
+                    onChange={(v) => setForm((f) => ({ ...f, detectAnomalousIpChange: v }))}
+                  />
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => mutation.mutate(form)}
+                      disabled={mutation.isPending}
+                      className="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90 disabled:opacity-50"
+                    >
+                      {mutation.isPending ? t('saving') : t('save')}
+                    </button>
+                    <button
+                      onClick={() => setEditing(false)}
+                      className="px-4 py-2 text-sm border border-edge rounded-lg hover:bg-elevated text-muted"
+                    >
+                      {t('cancel')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border border-edge rounded-lg divide-y divide-edge/50">
+                  <ConfigRow label={t('inactivityLabel')} value={`${data.inactivityTimeoutMinutes} ${t('minutes')}`} />
+                  <ConfigRow label={t('maxSessionsLabel')} value={String(data.maxConcurrentSessions)} />
+                  <ConfigRow
+                    label={t('reauthLabel')}
+                    value={data.requireReauthForSensitiveActions ? t('enabled') : t('disabled')}
+                  />
+                  <ConfigRow
+                    label={t('ipChangeLabel')}
+                    value={data.detectAnomalousIpChange ? t('enabled') : t('disabled')}
+                  />
+                </div>
+              )}
+            </section>
+
+            {/* Sensitive actions */}
+            {data.sensitiveActions.length > 0 && (
+              <section>
+                <h2 className="text-lg font-medium text-heading mb-3">{t('sensitiveActionsTitle')}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {data.sensitiveActions.map((action) => (
+                    <span
+                      key={action}
+                      className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full border border-accent/20"
+                    >
+                      {action}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {mutation.isSuccess && (
+              <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg p-3">
+                <CheckCircle size={16} />
+                {t('saveSuccess')}
               </div>
             )}
-          </section>
-
-          {/* Sensitive actions */}
-          {data.sensitiveActions.length > 0 && (
-            <section>
-              <h2 className="text-lg font-medium text-slate-800 mb-3">{t('sensitiveActionsTitle')}</h2>
-              <div className="flex flex-wrap gap-2">
-                {data.sensitiveActions.map((action) => (
-                  <span
-                    key={action}
-                    className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-200"
-                  >
-                    {action}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {mutation.isSuccess && (
-            <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-              <CheckCircle size={16} />
-              {t('saveSuccess')}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
 
@@ -212,17 +211,16 @@ function SummaryCard({
 }: {
   label: string;
   value: string;
-  color: 'blue' | 'indigo' | 'emerald' | 'slate';
+  color: 'accent' | 'success' | 'faded';
 }) {
   const colorMap = {
-    blue: 'text-blue-600',
-    indigo: 'text-indigo-600',
-    emerald: 'text-emerald-600',
-    slate: 'text-slate-500',
+    accent: 'text-accent',
+    success: 'text-success',
+    faded: 'text-faded',
   };
   return (
-    <div className="border border-slate-200 rounded-lg p-4 bg-white">
-      <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+    <div className="border border-edge rounded-lg p-4 bg-card">
+      <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
       <p className={`text-xl font-semibold mt-1 ${colorMap[color]}`}>{value}</p>
     </div>
   );
@@ -231,8 +229,8 @@ function SummaryCard({
 function ConfigRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex px-4 py-3 gap-4">
-      <span className="text-sm text-slate-500 w-56 shrink-0">{label}</span>
-      <span className="text-sm font-medium text-slate-800">{value}</span>
+      <span className="text-sm text-muted w-56 shrink-0">{label}</span>
+      <span className="text-sm font-medium text-heading">{value}</span>
     </div>
   );
 }
@@ -254,17 +252,17 @@ function NumericField({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label className="block text-sm font-medium text-body">{label}</label>
       <input
         type="number"
         value={value}
         min={min}
         max={max}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-40 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+        className="w-40 px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
         aria-label={label}
       />
-      <p className="text-xs text-slate-500">{hint}</p>
+      <p className="text-xs text-muted">{hint}</p>
     </div>
   );
 }
@@ -287,7 +285,7 @@ function ToggleField({
         role="switch"
         aria-checked={value}
         onClick={() => onChange(!value)}
-        className={`mt-0.5 relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${value ? 'bg-indigo-600' : 'bg-slate-200'}`}
+        className={`mt-0.5 relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${value ? 'bg-accent' : 'bg-elevated'}`}
         aria-label={label}
       >
         <span
@@ -295,8 +293,8 @@ function ToggleField({
         />
       </button>
       <div>
-        <p className="text-sm font-medium text-slate-700">{label}</p>
-        <p className="text-xs text-slate-500">{hint}</p>
+        <p className="text-sm font-medium text-body">{label}</p>
+        <p className="text-xs text-muted">{hint}</p>
       </div>
     </div>
   );

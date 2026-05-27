@@ -12,6 +12,7 @@ import {
   Clock,
   User,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
 import { platformAdminApi } from '../api/platformAdmin';
 import type { SupportBundleEntry } from '../api/platformAdmin';
 
@@ -99,7 +100,8 @@ export function SupportBundlePage() {
   const bundles = listQuery.data?.bundles ?? [];
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <PageContainer>
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-heading">{t('supportBundle.title')}</h1>
@@ -210,6 +212,6 @@ export function SupportBundlePage() {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
