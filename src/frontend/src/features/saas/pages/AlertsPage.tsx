@@ -92,18 +92,22 @@ function AlertRow({
       <td className="px-4 py-3">
         {alert.status === 'Firing' && (
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={() => onResolve(alert.id, 'resolve')}
-              className="text-xs px-2 py-1 rounded bg-success/10 text-success border border-success/20 hover:bg-success/20 transition-colors"
+              className="bg-success/10 text-success border border-success/20 hover:bg-success/20"
             >
               {t('resolve')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={() => onResolve(alert.id, 'silence')}
-              className="text-xs px-2 py-1 rounded bg-elevated text-muted border border-edge hover:bg-hover transition-colors"
+              className="bg-elevated text-muted border border-edge hover:bg-hover"
             >
               {t('silence')}
-            </button>
+            </Button>
           </div>
         )}
       </td>
@@ -189,25 +193,29 @@ export function AlertsPage() {
           <Filter size={14} className="text-faded" />
           <span className="text-sm text-muted">{t('periodDays')}:</span>
           {[1, 7, 30, 90].map((d) => (
-            <button
+            <Button
               key={d}
+              variant="ghost"
+              size="xs"
               onClick={() => setDays(d)}
-              className={`text-sm px-3 py-1 rounded-full border transition-colors ${
+              className={`rounded-full border ${
                 days === d
                   ? 'bg-accent text-white border-accent'
                   : 'border-edge text-muted hover:bg-elevated'
               }`}
             >
               {d}d
-            </button>
+            </Button>
           ))}
           {statusFilter && (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={() => setStatusFilter(undefined)}
-              className="text-xs text-muted underline ml-2"
+              className="text-muted underline ml-2"
             >
               {t('clearFilter')}
-            </button>
+            </Button>
           )}
         </div>
 
