@@ -38,4 +38,11 @@ describe('EmptyState', () => {
     render(<EmptyState title="Vazio" icon={<span data-testid="custom-icon">★</span>} />);
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
+
+  it('aplica borda dashed accent no ícone default', () => {
+    const { container } = render(<EmptyState title="Vazio" />);
+    const iconWrapper = container.querySelector('[data-testid="empty-state-icon"]');
+    expect(iconWrapper).toBeInTheDocument();
+    expect(iconWrapper).toHaveAttribute('data-variant', 'default');
+  });
 });

@@ -14,28 +14,56 @@ interface EmptyStateProps {
   variant?: EmptyStateVariant;
 }
 
-const variantConfig: Record<EmptyStateVariant, { icon: ReactNode; iconBg: string }> = {
+const variantConfig: Record<EmptyStateVariant, {
+  icon: ReactNode;
+  /** Inline style para ícone — borda dashed accent. */
+  iconStyle: React.CSSProperties;
+  iconColor: string;
+}> = {
   default: {
     icon: <Inbox size={24} aria-hidden="true" />,
-    iconBg: 'bg-elevated border border-edge text-muted',
+    iconStyle: {
+      border: '1.5px dashed rgba(27,127,232,.25)',
+      background: 'rgba(27,127,232,.06)',
+      borderRadius: 14,
+    },
+    iconColor: 'text-accent',
   },
   error: {
     icon: <AlertCircle size={24} aria-hidden="true" />,
-    iconBg: 'bg-danger/10 border border-danger/20 text-danger',
+    iconStyle: {
+      border: '1.5px dashed rgba(220,38,38,.25)',
+      background: 'rgba(220,38,38,.06)',
+      borderRadius: 14,
+    },
+    iconColor: 'text-critical',
   },
   onboarding: {
     icon: <Rocket size={24} aria-hidden="true" />,
-    iconBg: 'bg-info/10 border border-info/20 text-info',
+    iconStyle: {
+      border: '1.5px dashed rgba(8,145,178,.25)',
+      background: 'rgba(8,145,178,.06)',
+      borderRadius: 14,
+    },
+    iconColor: 'text-info',
   },
   'permission-denied': {
     icon: <ShieldX size={24} aria-hidden="true" />,
-    iconBg: 'bg-warning/10 border border-warning/20 text-warning',
+    iconStyle: {
+      border: '1.5px dashed rgba(217,119,6,.25)',
+      background: 'rgba(217,119,6,.06)',
+      borderRadius: 14,
+    },
+    iconColor: 'text-warning',
   },
 };
 
 /**
  * Estado vazio — DESIGN-SYSTEM.md §4.13
  * Título + explicação + ação recomendada. Nunca genérico, sempre contextual.
+ *
+ * Ícone com borda dashed accent (1.5px) + fundo tonal (6% opacity).
+ * CTA inline fornecido pelo consumidor via `action` prop.
  *
  * Variantes:
  * - default: ícone neutro para listas/tabelas vazias
@@ -51,11 +79,16 @@ export function EmptyState({ icon, title, description, action, size = 'default',
       'flex flex-col items-center justify-center text-center animate-fade-in',
       size === 'compact' ? 'py-8 px-4' : 'py-16 px-6',
     )}>
-      <div className={cn(
-        'flex items-center justify-center rounded-lg mb-4',
-        size === 'compact' ? 'w-10 h-10' : 'w-14 h-14',
-        config.iconBg,
-      )}>
+      <div
+        data-testid="empty-state-icon"
+        data-variant={variant}
+        className={cn(
+          'flex items-center justify-center mb-4',
+          config.iconColor,
+          size === 'compact' ? 'w-10 h-10' : 'w-14 h-14',
+        )}
+        style={config.iconStyle}
+      >
         {icon ?? (
           size === 'compact'
             ? <span className="[&>svg]:w-[18px] [&>svg]:h-[18px]">{config.icon}</span>
