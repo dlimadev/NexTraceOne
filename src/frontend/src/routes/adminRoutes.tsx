@@ -126,7 +126,7 @@ export function AdminRoutes() {
       <Route
         path="/environments"
         element={
-          <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="env:environments:read" redirectTo="/unauthorized">
             <EnvironmentsPage />
           </ProtectedRoute>
         }

@@ -30,6 +30,7 @@ const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfS
 const DeveloperExperienceScorePage = lazy(() => import('../features/catalog/pages/DeveloperExperienceScorePage').then(m => ({ default: m.DeveloperExperienceScorePage })));
 const DependencyDashboardPage = lazy(() => import('../features/catalog/pages/DependencyDashboardPage').then(m => ({ default: m.DependencyDashboardPage })));
 const LicenseCompliancePage = lazy(() => import('../features/catalog/pages/LicenseCompliancePage').then(m => ({ default: m.LicenseCompliancePage })));
+const ServiceFeatureFlagsPage = lazy(() => import('../features/catalog/pages/ServiceFeatureFlagsPage').then(m => ({ default: m.ServiceFeatureFlagsPage })));
 
 export function CatalogRoutes() {
   return (
@@ -234,6 +235,15 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <LicenseCompliancePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Feature Flags por Serviço ── */}
+      <Route
+        path="/services/feature-flags"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceFeatureFlagsPage />
           </ProtectedRoute>
         }
       />

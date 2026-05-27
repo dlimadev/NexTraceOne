@@ -60,7 +60,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <Zap size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'contracts' },
   { labelKey: 'sidebar.contractsHealth', to: '/contracts/health', icon: <BarChart3 size={18} />, permission: 'contracts:read', section: 'contracts' },
   { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <Activity size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ShieldCheck size={18} />, permission: 'contracts:write', section: 'contracts' },
+  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ShieldCheck size={18} />, permission: 'rulesets:read', section: 'contracts' },
   { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Database size={18} />, permission: 'contracts:read', section: 'contracts' },
   { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <ArrowUpCircle size={18} />, permission: 'contracts:write', section: 'contracts' },
 
