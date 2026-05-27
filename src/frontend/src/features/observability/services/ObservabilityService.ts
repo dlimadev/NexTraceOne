@@ -75,7 +75,7 @@ export class ObservabilityService {
     }
   }
 
-  private buildQueryParams(filters: DashboardFilters): any {
+  private buildQueryParams(filters: DashboardFilters): Record<string, string | undefined> {
     const now = new Date();
     let from: Date;
 

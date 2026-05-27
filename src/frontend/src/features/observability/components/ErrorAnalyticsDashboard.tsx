@@ -1,36 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { observabilityService } from '../services/ObservabilityService';
 import type { ErrorAnalytics, DashboardFilters } from '../types/ObservabilityTypes';
+import { CHART_SEMANTIC, CHART_RAINBOW } from '../../../lib/chartColors';
 import { Loader2, AlertTriangle } from 'lucide-react';
-
-const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'];
 
 export const ErrorAnalyticsDashboard: React.FC = () => {
   const [errors, setErrors] = useState<ErrorAnalytics[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<DashboardFilters>({
+  const [filters] = useState<DashboardFilters>({
     timeRange: '24h'
   });
 
   useEffect(() => {
-    loadErrors();
+    let cancelled = false;
+    setLoading(true);
+    observabilityService.getErrorAnalytics(filters)
+      .then(data => { if (!cancelled) setErrors(data); })
+      .catch(() => { /* Erro tratado silenciosamente — estado vazio */ })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [filters]);
-
-  const loadErrors = async () => {
-    try {
-      setLoading(true);
-      const data = await observabilityService.getErrorAnalytics(filters);
-      setErrors(data);
-    } catch {
-      // Erro tratado silenciosamente - component mostra estado vazio
-      // Logging estruturado deve ser feito pelo backend
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const errorTypeData = errors.reduce((acc, err) => {
     const existing = acc.find(e => e.name === err.errorType);
@@ -62,44 +53,44 @@ export const ErrorAnalyticsDashboard: React.FC = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-critical" />
               Total Errors
-            </CardTitle>
+            </h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+          <CardBody>
+            <div className="text-2xl font-bold text-critical">
               {errors.reduce((sum, e) => sum + e.occurrenceCount, 0).toLocaleString()}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Critical</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">Critical</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{severityCounts.critical}</div>
-          </CardContent>
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">{severityCounts.critical}</div>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">High</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">High</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{severityCounts.high}</div>
-          </CardContent>
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">{severityCounts.high}</div>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Unique Types</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">Unique Types</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{errorTypeData.length}</div>
-          </CardContent>
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">{errorTypeData.length}</div>
+          </CardBody>
         </Card>
       </div>
 
@@ -107,9 +98,9 @@ export const ErrorAnalyticsDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Error Distribution by Type</CardTitle>
+            <h3 className="text-sm font-medium text-heading">Error Distribution by Type</h3>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -119,49 +110,51 @@ export const ErrorAnalyticsDashboard: React.FC = () => {
                   labelLine={false}
                   label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : '0'}%`}
                   outerRadius={100}
-                  fill="#8884d8"
+                  fill={CHART_RAINBOW[0]}
                   dataKey="value"
                 >
-                  {errorTypeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {errorTypeData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={CHART_RAINBOW[index % CHART_RAINBOW.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-          </CardContent>
+          </CardBody>
         </Card>
 
         {/* Top Errors List */}
         <Card>
           <CardHeader>
-            <CardTitle>Top Errors</CardTitle>
+            <h3 className="text-sm font-medium text-heading">Top Errors</h3>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="space-y-3 max-h-[300px] overflow-y-auto">
               {errors.slice(0, 10).map((err, idx) => (
-                <div key={idx} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                <div key={idx} className="border border-edge rounded-lg p-3 hover:bg-elevated transition-colors">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="font-medium text-sm truncate flex-1">{err.errorType}</div>
-                    <Badge variant="destructive">{err.occurrenceCount}</Badge>
+                    <div className="font-medium text-sm text-body truncate flex-1">{err.errorType}</div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-critical/10 text-critical ml-2 shrink-0">
+                      {err.occurrenceCount}
+                    </span>
                   </div>
-                  <div className="text-xs text-gray-600 mb-1 line-clamp-2">{err.errorMessage}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted mb-1 line-clamp-2">{err.errorMessage}</div>
+                  <div className="text-xs text-faded">
                     Service: {err.serviceName} | Affected: {err.affectedEndpoints.length} endpoints
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
 
       {/* Error Trend Bar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Error Trend Over Time</CardTitle>
+          <h3 className="text-sm font-medium text-heading">Error Trend Over Time</h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
               data={errors.slice(0, 20).map(e => ({
@@ -170,15 +163,15 @@ export const ErrorAnalyticsDashboard: React.FC = () => {
                 type: e.errorType.substring(0, 30)
               }))}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_SEMANTIC.grid} />
+              <XAxis dataKey="time" stroke={CHART_SEMANTIC.axis} />
+              <YAxis stroke={CHART_SEMANTIC.axis} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#ef4444" name="Error Count" />
+              <Bar dataKey="count" fill={CHART_SEMANTIC.critical} name="Error Count" />
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

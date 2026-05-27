@@ -1,34 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { observabilityService } from '../services/ObservabilityService';
 import type { SystemHealthMetrics, DashboardFilters } from '../types/ObservabilityTypes';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 import { Loader2, Server, Cpu, HardDrive, Activity } from 'lucide-react';
 
 export const SystemHealthDashboard: React.FC = () => {
   const [health, setHealth] = useState<SystemHealthMetrics[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<DashboardFilters>({
+  const [filters] = useState<DashboardFilters>({
     timeRange: '1h'
   });
 
   useEffect(() => {
-    loadHealth();
+    let cancelled = false;
+    setLoading(true);
+    observabilityService.getSystemHealth(filters)
+      .then(data => { if (!cancelled) setHealth(data); })
+      .catch(() => { /* Erro tratado silenciosamente — estado vazio */ })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [filters]);
-
-  const loadHealth = async () => {
-    try {
-      setLoading(true);
-      const data = await observabilityService.getSystemHealth(filters);
-      setHealth(data);
-    } catch {
-      // Erro tratado silenciosamente - component mostra estado vazio
-      // Logging estruturado deve ser feito pelo backend
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const latest = health[0];
   const avgCpu = health.length > 0 ? health.reduce((sum, h) => sum + h.cpuUsagePercent, 0) / health.length : 0;
@@ -38,7 +31,7 @@ export const SystemHealthDashboard: React.FC = () => {
   const chartData = health.map(h => ({
     time: new Date(h.timestamp).toLocaleTimeString(),
     cpu: h.cpuUsagePercent.toFixed(1),
-    memory: (h.memoryUsageMB / 1024).toFixed(2), // Convert to GB
+    memory: (h.memoryUsageMB / 1024).toFixed(2),
     rps: h.requestsPerSecond.toFixed(0),
     errorRate: h.errorRatePercent.toFixed(2)
   }));
@@ -56,63 +49,78 @@ export const SystemHealthDashboard: React.FC = () => {
       {/* Current Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading flex items-center gap-2">
               <Cpu className="h-4 w-4" />
               CPU Usage
-            </CardTitle>
+            </h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold mb-2">
-              {latest?.cpuUsagePercent.toFixed(1) || 0}%
+          <CardBody>
+            <div className="text-2xl font-bold text-heading mb-2">
+              {latest?.cpuUsagePercent.toFixed(1) ?? 0}%
             </div>
-            <Progress value={latest?.cpuUsagePercent || 0} className="h-2" />
-          </CardContent>
+            <div className="w-full h-2 bg-elevated rounded-full overflow-hidden">
+              <div
+                className="h-full bg-accent rounded-full transition-all"
+                style={{ width: `${Math.min(latest?.cpuUsagePercent ?? 0, 100)}%` }}
+              />
+            </div>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading flex items-center gap-2">
               <Server className="h-4 w-4" />
               Memory
-            </CardTitle>
+            </h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold mb-2">
+          <CardBody>
+            <div className="text-2xl font-bold text-heading mb-2">
               {latest ? (latest.memoryUsageMB / 1024).toFixed(2) : 0} GB
             </div>
-            <Progress value={(latest?.memoryUsageMB || 0) / 80} className="h-2" />
-          </CardContent>
+            <div className="w-full h-2 bg-elevated rounded-full overflow-hidden">
+              <div
+                className="h-full bg-success rounded-full transition-all"
+                style={{ width: `${Math.min((latest?.memoryUsageMB ?? 0) / 80, 100)}%` }}
+              />
+            </div>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading flex items-center gap-2">
               <Activity className="h-4 w-4" />
               RPS
-            </CardTitle>
+            </h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {latest?.requestsPerSecond.toFixed(0) || 0}
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">
+              {latest?.requestsPerSecond.toFixed(0) ?? 0}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Requests per second</div>
-          </CardContent>
+            <div className="text-xs text-muted mt-1">Requests per second</div>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading flex items-center gap-2">
               <HardDrive className="h-4 w-4" />
               Disk Usage
-            </CardTitle>
+            </h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold mb-2">
-              {latest?.diskUsagePercent.toFixed(1) || 0}%
+          <CardBody>
+            <div className="text-2xl font-bold text-heading mb-2">
+              {latest?.diskUsagePercent.toFixed(1) ?? 0}%
             </div>
-            <Progress value={latest?.diskUsagePercent || 0} className="h-2" />
-          </CardContent>
+            <div className="w-full h-2 bg-elevated rounded-full overflow-hidden">
+              <div
+                className="h-full bg-warning rounded-full transition-all"
+                style={{ width: `${Math.min(latest?.diskUsagePercent ?? 0, 100)}%` }}
+              />
+            </div>
+          </CardBody>
         </Card>
       </div>
 
@@ -120,22 +128,22 @@ export const SystemHealthDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>CPU & Memory Trends</CardTitle>
+            <h3 className="text-sm font-medium text-heading">CPU &amp; Memory Trends</h3>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_SEMANTIC.grid} />
+                <XAxis dataKey="time" stroke={CHART_SEMANTIC.axis} />
+                <YAxis yAxisId="left" stroke={CHART_SEMANTIC.axis} />
+                <YAxis yAxisId="right" orientation="right" stroke={CHART_SEMANTIC.axis} />
                 <Tooltip />
                 <Legend />
                 <Line
                   yAxisId="left"
                   type="monotone"
                   dataKey="cpu"
-                  stroke="#3b82f6"
+                  stroke={CHART_SEMANTIC.accent}
                   strokeWidth={2}
                   name="CPU %"
                 />
@@ -143,33 +151,33 @@ export const SystemHealthDashboard: React.FC = () => {
                   yAxisId="right"
                   type="monotone"
                   dataKey="memory"
-                  stroke="#10b981"
+                  stroke={CHART_SEMANTIC.success}
                   strokeWidth={2}
                   name="Memory (GB)"
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Request Rate & Error Rate</CardTitle>
+            <h3 className="text-sm font-medium text-heading">Request Rate &amp; Error Rate</h3>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_SEMANTIC.grid} />
+                <XAxis dataKey="time" stroke={CHART_SEMANTIC.axis} />
+                <YAxis yAxisId="left" stroke={CHART_SEMANTIC.axis} />
+                <YAxis yAxisId="right" orientation="right" stroke={CHART_SEMANTIC.axis} />
                 <Tooltip />
                 <Legend />
                 <Line
                   yAxisId="left"
                   type="monotone"
                   dataKey="rps"
-                  stroke="#8b5cf6"
+                  stroke={CHART_SEMANTIC.info}
                   strokeWidth={2}
                   name="RPS"
                 />
@@ -177,37 +185,37 @@ export const SystemHealthDashboard: React.FC = () => {
                   yAxisId="right"
                   type="monotone"
                   dataKey="errorRate"
-                  stroke="#ef4444"
+                  stroke={CHART_SEMANTIC.critical}
                   strokeWidth={2}
                   name="Error Rate %"
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
 
       {/* Averages Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Average Metrics (Selected Period)</CardTitle>
+          <h3 className="text-sm font-medium text-heading">Average Metrics (Selected Period)</h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Avg CPU</div>
-              <div className="text-2xl font-bold text-blue-600">{avgCpu.toFixed(1)}%</div>
+            <div className="text-center p-4 bg-accent/10 rounded-lg">
+              <div className="text-sm text-muted mb-1">Avg CPU</div>
+              <div className="text-2xl font-bold text-accent">{avgCpu.toFixed(1)}%</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Avg Memory</div>
-              <div className="text-2xl font-bold text-green-600">{(avgMemory / 1024).toFixed(2)} GB</div>
+            <div className="text-center p-4 bg-success/10 rounded-lg">
+              <div className="text-sm text-muted mb-1">Avg Memory</div>
+              <div className="text-2xl font-bold text-success">{(avgMemory / 1024).toFixed(2)} GB</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1">Avg RPS</div>
-              <div className="text-2xl font-bold text-purple-600">{avgRps.toFixed(0)}</div>
+            <div className="text-center p-4 bg-elevated rounded-lg">
+              <div className="text-sm text-muted mb-1">Avg RPS</div>
+              <div className="text-2xl font-bold text-heading">{avgRps.toFixed(0)}</div>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { observabilityService } from '../services/ObservabilityService';
 import type { RequestMetrics, DashboardFilters } from '../types/ObservabilityTypes';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 import { Loader2 } from 'lucide-react';
 
 export const RequestMetricsDashboard: React.FC = () => {
@@ -14,21 +14,14 @@ export const RequestMetricsDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    loadMetrics();
+    let cancelled = false;
+    setLoading(true);
+    observabilityService.getRequestMetrics(filters)
+      .then(data => { if (!cancelled) setMetrics(data); })
+      .catch(() => { /* Erro tratado silenciosamente — estado vazio */ })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [filters]);
-
-  const loadMetrics = async () => {
-    try {
-      setLoading(true);
-      const data = await observabilityService.getRequestMetrics(filters);
-      setMetrics(data);
-    } catch {
-      // Erro tratado silenciosamente - component mostra estado vazio
-      // Logging estruturado deve ser feito pelo backend
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const chartData = metrics.map(m => ({
     time: new Date(m.timeBucket).toLocaleTimeString(),
@@ -46,146 +39,148 @@ export const RequestMetricsDashboard: React.FC = () => {
     );
   }
 
+  const timeRangeOptions: { value: DashboardFilters['timeRange']; label: string }[] = [
+    { value: '1h',  label: 'Last 1 Hour' },
+    { value: '6h',  label: 'Last 6 Hours' },
+    { value: '24h', label: 'Last 24 Hours' },
+    { value: '7d',  label: 'Last 7 Days' },
+    { value: '30d', label: 'Last 30 Days' },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
+          <h3 className="text-sm font-medium text-heading">Filters</h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Time Range</label>
-              <Select
+              <label className="text-sm font-medium text-body mb-2 block">Time Range</label>
+              <select
                 value={filters.timeRange}
-                onValueChange={(value) => setFilters({ ...filters, timeRange: value as any })}
+                onChange={(e) => setFilters({ ...filters, timeRange: e.target.value as DashboardFilters['timeRange'] })}
+                className="w-full h-9 rounded-md border border-edge bg-card text-body text-sm px-3 focus:outline-none focus:ring-2 focus:ring-accent/40"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1h">Last 1 Hour</SelectItem>
-                  <SelectItem value="6h">Last 6 Hours</SelectItem>
-                  <SelectItem value="24h">Last 24 Hours</SelectItem>
-                  <SelectItem value="7d">Last 7 Days</SelectItem>
-                  <SelectItem value="30d">Last 30 Days</SelectItem>
-                </SelectContent>
-              </Select>
+                {timeRangeOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">Total Requests</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">
               {metrics.reduce((sum, m) => sum + m.requestCount, 0).toLocaleString()}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">Avg Response Time</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics.length > 0 
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">
+              {metrics.length > 0
                 ? Math.round(metrics.reduce((sum, m) => sum + m.avgDurationMs, 0) / metrics.length)
                 : 0} ms
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">P95 Latency</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">P95 Latency</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardBody>
+            <div className="text-2xl font-bold text-heading">
               {metrics.length > 0
                 ? Math.round(metrics.reduce((sum, m) => sum + m.p95DurationMs, 0) / metrics.length)
                 : 0} ms
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
+          <CardHeader>
+            <h3 className="text-sm font-medium text-heading">Error Rate</h3>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+          <CardBody>
+            <div className="text-2xl font-bold text-critical">
               {metrics.length > 0
                 ? (metrics.reduce((sum, m) => sum + m.errorRate, 0) / metrics.length).toFixed(2)
                 : 0}%
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
 
       {/* Request Volume Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Request Volume Over Time</CardTitle>
+          <h3 className="text-sm font-medium text-heading">Request Volume Over Time</h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_SEMANTIC.grid} />
+              <XAxis dataKey="time" stroke={CHART_SEMANTIC.axis} />
+              <YAxis stroke={CHART_SEMANTIC.axis} />
               <Tooltip />
               <Legend />
               <Area
                 type="monotone"
                 dataKey="requests"
-                stroke="#3b82f6"
-                fill="#3b82f6"
+                stroke={CHART_SEMANTIC.accent}
+                fill={CHART_SEMANTIC.accent}
                 fillOpacity={0.3}
                 name="Requests"
               />
             </AreaChart>
           </ResponsiveContainer>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Response Time Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Response Time Trends</CardTitle>
+          <h3 className="text-sm font-medium text-heading">Response Time Trends</h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_SEMANTIC.grid} />
+              <XAxis dataKey="time" stroke={CHART_SEMANTIC.axis} />
+              <YAxis stroke={CHART_SEMANTIC.axis} />
               <Tooltip />
               <Legend />
               <Line
                 type="monotone"
                 dataKey="avgDuration"
-                stroke="#10b981"
+                stroke={CHART_SEMANTIC.success}
                 strokeWidth={2}
                 name="Avg (ms)"
               />
               <Line
                 type="monotone"
                 dataKey="p95Duration"
-                stroke="#f59e0b"
+                stroke={CHART_SEMANTIC.warning}
                 strokeWidth={2}
                 name="P95 (ms)"
               />
             </LineChart>
           </ResponsiveContainer>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );
