@@ -43,4 +43,22 @@ describe('Badge', () => {
     const badge = screen.getByText('Label');
     expect(badge.tagName).toBe('SPAN');
   });
+
+  it('renderiza dot indicator quando dot=true', () => {
+    const { container } = render(<Badge dot>Active</Badge>);
+    const dot = container.querySelector('[data-testid="badge-dot"]');
+    expect(dot).toBeInTheDocument();
+    expect(dot).toHaveStyle({ width: '5px', height: '5px', borderRadius: '50%' });
+  });
+
+  it('não renderiza dot quando dot=false (default)', () => {
+    const { container } = render(<Badge>No dot</Badge>);
+    expect(container.querySelector('[data-testid="badge-dot"]')).not.toBeInTheDocument();
+  });
+
+  it('aplica animação pulsing quando pulsing=true', () => {
+    const { container } = render(<Badge dot pulsing>Critical</Badge>);
+    const dot = container.querySelector('[data-testid="badge-dot"]');
+    expect(dot).toHaveStyle({ animation: 'pulse-badge 1.5s ease-in-out infinite' });
+  });
 });
