@@ -4,14 +4,18 @@ import type { BadgeProps } from '../../../components/Badge';
 
 type BadgeVariant = NonNullable<BadgeProps['variant']>;
 
-/** Estados do ciclo de vida de contrato → variante de Badge. */
+/**
+ * Estados do ciclo de vida de contrato → variante de Badge.
+ * Estados: Draft, InReview, Approved, Locked, Deprecated, Sunset, Retired
+ */
 export type ContractLifecycleState =
   | 'Draft'
   | 'InReview'
   | 'Approved'
   | 'Locked'
   | 'Deprecated'
-  | 'Archived';
+  | 'Sunset'
+  | 'Retired';
 
 const STATE_VARIANT_MAP: Record<ContractLifecycleState, BadgeVariant> = {
   Draft:      'default',
@@ -19,7 +23,8 @@ const STATE_VARIANT_MAP: Record<ContractLifecycleState, BadgeVariant> = {
   Approved:   'success',
   Locked:     'info',
   Deprecated: 'danger',
-  Archived:   'neutral',
+  Sunset:     'warning',
+  Retired:    'neutral',
 };
 
 /**
@@ -29,13 +34,3 @@ const STATE_VARIANT_MAP: Record<ContractLifecycleState, BadgeVariant> = {
 export function stateToVariant(state: string): BadgeVariant {
   return STATE_VARIANT_MAP[state as ContractLifecycleState] ?? 'default';
 }
-
-/** Mapeamento estado → classe CSS de cor legacy (para gradual migration). */
-export const STATE_COLOR_CLASSES: Record<string, string> = {
-  Draft:      'bg-elevated text-body border-edge',
-  InReview:   'bg-warning/12 text-warning border-warning/25',
-  Approved:   'bg-success/12 text-success border-success/25',
-  Locked:     'bg-info/12 text-info border-info/25',
-  Deprecated: 'bg-critical/12 text-critical border-critical/25',
-  Archived:   'bg-elevated text-muted border-edge',
-};
