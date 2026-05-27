@@ -10,6 +10,9 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
 import {
   platformAdminApi,
   type PlatformAlertRule,
@@ -64,122 +67,120 @@ export function PlatformAlertRulesPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('subtitle')}</p>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <RefreshCw size={14} />
-          {t('refresh')}
-        </button>
-      </div>
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          actions={
+            <Button variant="primary" onClick={() => refetch()}>
+              <RefreshCw size={14} />
+              {t('refresh')}
+            </Button>
+          }
+        />
 
-      {isLoading && (
-        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
-          {t('loading')}
-        </div>
-      )}
-
-      {isError && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <XCircle size={18} />
-          {t('error')}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Summary */}
-          <div className="grid grid-cols-3 gap-4">
-            <SummaryCard
-              label={t('activeAlerts')}
-              value={data.activeAlertCount}
-              color={data.activeAlertCount > 0 ? 'red' : 'emerald'}
-            />
-            <SummaryCard
-              label={t('totalRules')}
-              value={data.rules.length}
-              color="slate"
-            />
-            <SummaryCard
-              label={t('enabledRules')}
-              value={data.rules.filter((r) => r.enabled).length}
-              color="indigo"
-            />
+        {isLoading && (
+          <div className="flex items-center justify-center h-48 text-faded text-sm">
+            {t('loading')}
           </div>
+        )}
 
-          {/* Rules Table */}
-          <section>
-            <h2 className="text-lg font-medium text-slate-800 mb-3">{t('rulesTitle')}</h2>
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colRule')}</th>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colWarning')}</th>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colCritical')}</th>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colCooldown')}</th>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colStatus')}</th>
-                    <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colActions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {data.rules.map((rule) => (
-                    <RuleRow
-                      key={rule.id}
-                      rule={rule}
-                      isEditing={editingRuleId === rule.id}
-                      editValues={editValues}
-                      setEditValues={setEditValues}
-                      onEdit={() => startEdit(rule)}
-                      onSave={() => saveEdit(rule.id)}
-                      onCancel={cancelEdit}
-                      isSaving={updateMutation.isPending && editingRuleId === rule.id}
-                      t={t}
-                    />
-                  ))}
-                </tbody>
-              </table>
+        {isError && (
+          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
+            <XCircle size={18} />
+            {t('error')}
+          </div>
+        )}
+
+        {data && (
+          <>
+            {/* Summary */}
+            <div className="grid grid-cols-3 gap-4">
+              <SummaryCard
+                label={t('activeAlerts')}
+                value={data.activeAlertCount}
+                color={data.activeAlertCount > 0 ? 'critical' : 'success'}
+              />
+              <SummaryCard
+                label={t('totalRules')}
+                value={data.rules.length}
+                color="body"
+              />
+              <SummaryCard
+                label={t('enabledRules')}
+                value={data.rules.filter((r) => r.enabled).length}
+                color="accent"
+              />
             </div>
-          </section>
 
-          {/* Alert History */}
-          <section>
-            <h2 className="text-lg font-medium text-slate-800 mb-3">{t('historyTitle')}</h2>
-            {data.recentAlerts.length === 0 ? (
-              <div className="flex items-center justify-center h-24 border border-slate-200 rounded-lg text-slate-400 text-sm">
-                {t('noHistory')}
-              </div>
-            ) : (
-              <div className="border border-slate-200 rounded-lg overflow-hidden">
+            {/* Rules Table */}
+            <section>
+              <h2 className="text-lg font-medium text-heading mb-3">{t('rulesTitle')}</h2>
+              <div className="border border-edge rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-elevated border-b border-edge">
                     <tr>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colTriggered')}</th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colRule')}</th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colSeverity')}</th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colValue')}</th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">{t('colAlertStatus')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colRule')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colWarning')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colCritical')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colCooldown')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colStatus')}</th>
+                      <th className="text-left px-4 py-3 text-muted font-medium">{t('colActions')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {data.recentAlerts.map((alert) => (
-                      <AlertHistoryRow key={alert.id} alert={alert} t={t} />
+                  <tbody className="divide-y divide-edge/50">
+                    {data.rules.map((rule) => (
+                      <RuleRow
+                        key={rule.id}
+                        rule={rule}
+                        isEditing={editingRuleId === rule.id}
+                        editValues={editValues}
+                        setEditValues={setEditValues}
+                        onEdit={() => startEdit(rule)}
+                        onSave={() => saveEdit(rule.id)}
+                        onCancel={cancelEdit}
+                        isSaving={updateMutation.isPending && editingRuleId === rule.id}
+                        t={t}
+                      />
                     ))}
                   </tbody>
                 </table>
               </div>
-            )}
-          </section>
-        </>
-      )}
-    </div>
+            </section>
+
+            {/* Alert History */}
+            <section>
+              <h2 className="text-lg font-medium text-heading mb-3">{t('historyTitle')}</h2>
+              {data.recentAlerts.length === 0 ? (
+                <div className="flex items-center justify-center h-24 border border-edge rounded-lg text-faded text-sm">
+                  {t('noHistory')}
+                </div>
+              ) : (
+                <div className="border border-edge rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-elevated border-b border-edge">
+                      <tr>
+                        <th className="text-left px-4 py-3 text-muted font-medium">{t('colTriggered')}</th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">{t('colRule')}</th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">{t('colSeverity')}</th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">{t('colValue')}</th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">{t('colAlertStatus')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-edge/50">
+                      {data.recentAlerts.map((alert) => (
+                        <AlertHistoryRow key={alert.id} alert={alert} t={t} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
 
@@ -192,17 +193,17 @@ function SummaryCard({
 }: {
   label: string;
   value: number;
-  color: 'red' | 'emerald' | 'slate' | 'indigo';
+  color: 'critical' | 'success' | 'body' | 'accent';
 }) {
   const colorMap = {
-    red: 'text-red-600',
-    emerald: 'text-emerald-600',
-    slate: 'text-slate-700',
-    indigo: 'text-indigo-600',
+    critical: 'text-critical',
+    success: 'text-success',
+    body: 'text-body',
+    accent: 'text-accent',
   };
   return (
-    <div className="border border-slate-200 rounded-lg p-4 bg-white">
-      <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+    <div className="border border-edge rounded-lg p-4 bg-card">
+      <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
       <p className={`text-2xl font-semibold mt-1 ${colorMap[color]}`}>{value}</p>
     </div>
   );
@@ -231,46 +232,46 @@ function RuleRow({
 }) {
   if (isEditing) {
     return (
-      <tr className="bg-indigo-50">
+      <tr className="bg-accent/5">
         <td className="px-4 py-3">
-          <div className="font-medium text-slate-800">{rule.name}</div>
-          <div className="text-xs text-slate-500">{rule.description}</div>
+          <div className="font-medium text-heading">{rule.name}</div>
+          <div className="text-xs text-muted">{rule.description}</div>
         </td>
         <td className="px-4 py-3">
           <input
             type="number"
             value={editValues.warning ?? ''}
             onChange={(e) => setEditValues({ ...editValues, warning: e.target.value })}
-            className="w-20 px-2 py-1 border border-slate-300 rounded text-sm"
+            className="w-20 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
             aria-label={t('colWarning')}
           />
-          <span className="ml-1 text-xs text-slate-500">{rule.unit}</span>
+          <span className="ml-1 text-xs text-muted">{rule.unit}</span>
         </td>
         <td className="px-4 py-3">
           <input
             type="number"
             value={editValues.critical ?? ''}
             onChange={(e) => setEditValues({ ...editValues, critical: e.target.value })}
-            className="w-20 px-2 py-1 border border-slate-300 rounded text-sm"
+            className="w-20 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
             aria-label={t('colCritical')}
           />
-          <span className="ml-1 text-xs text-slate-500">{rule.unit}</span>
+          <span className="ml-1 text-xs text-muted">{rule.unit}</span>
         </td>
         <td className="px-4 py-3">
           <input
             type="number"
             value={editValues.cooldown ?? ''}
             onChange={(e) => setEditValues({ ...editValues, cooldown: e.target.value })}
-            className="w-16 px-2 py-1 border border-slate-300 rounded text-sm"
+            className="w-16 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
             aria-label={t('colCooldown')}
           />
-          <span className="ml-1 text-xs text-slate-500">{t('minutes')}</span>
+          <span className="ml-1 text-xs text-muted">{t('minutes')}</span>
         </td>
         <td className="px-4 py-3">
           <select
             value={editValues.enabled ?? 'true'}
             onChange={(e) => setEditValues({ ...editValues, enabled: e.target.value })}
-            className="px-2 py-1 border border-slate-300 rounded text-sm"
+            className="px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
             aria-label={t('colStatus')}
           >
             <option value="true">{t('enabled')}</option>
@@ -281,13 +282,13 @@ function RuleRow({
           <button
             onClick={onSave}
             disabled={isSaving}
-            className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 disabled:opacity-50"
+            className="px-3 py-1 bg-accent text-white text-xs rounded hover:bg-accent/90 disabled:opacity-50"
           >
             {isSaving ? t('saving') : t('save')}
           </button>
           <button
             onClick={onCancel}
-            className="px-3 py-1 bg-white border border-slate-300 text-xs rounded hover:bg-slate-50"
+            className="px-3 py-1 bg-card border border-edge text-xs rounded hover:bg-elevated text-muted"
           >
             {t('cancel')}
           </button>
@@ -297,25 +298,25 @@ function RuleRow({
   }
 
   return (
-    <tr className="hover:bg-slate-50">
+    <tr className="hover:bg-elevated">
       <td className="px-4 py-3">
-        <div className="font-medium text-slate-800">{rule.name}</div>
-        <div className="text-xs text-slate-500">{rule.description}</div>
+        <div className="font-medium text-heading">{rule.name}</div>
+        <div className="text-xs text-muted">{rule.description}</div>
       </td>
-      <td className="px-4 py-3 text-amber-600 font-medium">
+      <td className="px-4 py-3 text-warning font-medium">
         {rule.warningThreshold} {rule.unit}
       </td>
-      <td className="px-4 py-3 text-red-600 font-medium">
+      <td className="px-4 py-3 text-critical font-medium">
         {rule.criticalThreshold} {rule.unit}
       </td>
-      <td className="px-4 py-3 text-slate-600">{rule.cooldownMinutes} {t('minutes')}</td>
+      <td className="px-4 py-3 text-muted">{rule.cooldownMinutes} {t('minutes')}</td>
       <td className="px-4 py-3">
         {rule.enabled ? (
-          <span className="flex items-center gap-1 text-emerald-600 text-xs">
+          <span className="flex items-center gap-1 text-success text-xs">
             <Bell size={12} /> {t('enabled')}
           </span>
         ) : (
-          <span className="flex items-center gap-1 text-slate-400 text-xs">
+          <span className="flex items-center gap-1 text-faded text-xs">
             <BellOff size={12} /> {t('disabled')}
           </span>
         )}
@@ -323,7 +324,7 @@ function RuleRow({
       <td className="px-4 py-3">
         <button
           onClick={onEdit}
-          className="px-3 py-1 text-xs text-indigo-600 border border-indigo-200 rounded hover:bg-indigo-50"
+          className="px-3 py-1 text-xs text-accent border border-accent/20 rounded hover:bg-accent/10"
         >
           {t('edit')}
         </button>
@@ -334,17 +335,17 @@ function RuleRow({
 
 function severityIcon(severity: PlatformAlertSeverity) {
   return severity === 'Critical' ? (
-    <AlertCircle size={14} className="text-red-500" />
+    <AlertCircle size={14} className="text-critical" />
   ) : (
-    <AlertTriangle size={14} className="text-amber-500" />
+    <AlertTriangle size={14} className="text-warning" />
   );
 }
 
 function statusBadge(status: PlatformAlertStatus) {
   const map: Record<PlatformAlertStatus, string> = {
-    Active: 'bg-red-100 text-red-700',
-    Resolved: 'bg-emerald-100 text-emerald-700',
-    Suppressed: 'bg-slate-100 text-slate-600',
+    Active: 'bg-critical/10 text-critical',
+    Resolved: 'bg-success/10 text-success',
+    Suppressed: 'bg-elevated text-muted',
   };
   return (
     <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${map[status]}`}>
@@ -362,16 +363,16 @@ function AlertHistoryRow({
 }) {
   const triggeredDate = new Date(alert.triggeredAt).toLocaleString();
   return (
-    <tr className="hover:bg-slate-50">
-      <td className="px-4 py-3 text-slate-600 text-xs">{triggeredDate}</td>
-      <td className="px-4 py-3 font-medium text-slate-800">{alert.ruleName}</td>
+    <tr className="hover:bg-elevated">
+      <td className="px-4 py-3 text-muted text-xs">{triggeredDate}</td>
+      <td className="px-4 py-3 font-medium text-heading">{alert.ruleName}</td>
       <td className="px-4 py-3">
         <span className="flex items-center gap-1">
           {severityIcon(alert.severity)}
           {alert.severity}
         </span>
       </td>
-      <td className="px-4 py-3 text-slate-700">
+      <td className="px-4 py-3 text-body">
         {alert.value} {alert.unit}
       </td>
       <td className="px-4 py-3">{statusBadge(alert.status)}</td>
