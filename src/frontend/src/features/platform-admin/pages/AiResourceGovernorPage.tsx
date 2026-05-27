@@ -12,6 +12,9 @@ import {
   Clock,
   Layers,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
 import { platformAdminApi, type AiResourceGovernorConfigUpdate } from '../api/platformAdmin';
 
 export function AiResourceGovernorPage() {
@@ -73,211 +76,201 @@ export function AiResourceGovernorPage() {
   const cbState = data?.metrics.circuitBreakerState;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Cpu size={24} className="text-violet-600" />
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-            <p className="mt-1 text-sm text-slate-500">{t('subtitle')}</p>
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          icon={<Cpu size={24} className="text-accent" />}
+          actions={
+            <Button variant="primary" onClick={() => refetch()}>
+              <RefreshCw size={14} />
+              {t('refresh')}
+            </Button>
+          }
+        />
+
+        {isLoading && (
+          <div className="flex items-center justify-center h-48 text-faded text-sm">
+            {t('loading')}
           </div>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
-        >
-          <RefreshCw size={14} />
-          {t('refresh')}
-        </button>
-      </div>
+        )}
 
-      {isLoading && (
-        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
-          {t('loading')}
-        </div>
-      )}
-
-      {isError && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <XCircle size={18} />
-          {t('error')}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Circuit Breaker Banner */}
-          {cbState === 'Open' && (
-            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <AlertTriangle size={18} className="text-red-600 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-red-800">{t('cbOpenTitle')}</p>
-                <p className="text-xs text-red-600 mt-0.5">
-                  {t('cbOpenDetail', { since: data.metrics.circuitBreakerOpenSince ?? '—' })}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {cbState === 'HalfOpen' && (
-            <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle size={18} className="text-amber-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-amber-800">{t('cbHalfOpenMsg')}</p>
-            </div>
-          )}
-
-          {cbState === 'Closed' && (
-            <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <CheckCircle size={18} className="text-emerald-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-emerald-800">{t('cbClosedMsg')}</p>
-            </div>
-          )}
-
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <MetricCard
-              icon={<Layers size={18} className="text-violet-500" />}
-              label={t('metricActiveReq')}
-              value={String(data.metrics.activeRequests)}
-              sub={`/ ${data.config.maxConcurrency} ${t('max')}`}
-            />
-            <MetricCard
-              icon={<Activity size={18} className="text-indigo-500" />}
-              label={t('metricQueueDepth')}
-              value={String(data.metrics.queueDepth)}
-            />
-            <MetricCard
-              icon={<Zap size={18} className="text-amber-500" />}
-              label={t('metricP95Latency')}
-              value={`${data.metrics.latencyP95Ms} ms`}
-            />
-            <MetricCard
-              icon={<Clock size={18} className="text-rose-500" />}
-              label={t('metricErrorRate')}
-              value={`${data.metrics.errorRatePercent.toFixed(1)}%`}
-            />
+        {isError && (
+          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
+            <XCircle size={18} />
+            {t('error')}
           </div>
+        )}
 
-          {/* Config Section */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium text-slate-800">{t('configTitle')}</h2>
-              {!editing && (
-                <button
-                  onClick={startEdit}
-                  className="px-3 py-1.5 text-sm text-violet-600 border border-violet-200 rounded hover:bg-violet-50"
-                >
-                  {t('editConfig')}
-                </button>
-              )}
-            </div>
-
-            {editing ? (
-              <div className="border border-slate-200 rounded-lg p-5 space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <NumberField
-                    label={t('maxConcurrencyLabel')}
-                    hint={t('maxConcurrencyHint')}
-                    value={form.maxConcurrency}
-                    onChange={(v) => setForm((f) => ({ ...f, maxConcurrency: v }))}
-                  />
-                  <NumberField
-                    label={t('inferenceTimeoutLabel')}
-                    hint={t('inferenceTimeoutHint')}
-                    value={form.inferenceTimeoutSeconds}
-                    onChange={(v) => setForm((f) => ({ ...f, inferenceTimeoutSeconds: v }))}
-                  />
-                  <NumberField
-                    label={t('queueTimeoutLabel')}
-                    hint={t('queueTimeoutHint')}
-                    value={form.queueTimeoutSeconds}
-                    onChange={(v) => setForm((f) => ({ ...f, queueTimeoutSeconds: v }))}
-                  />
-                  <NumberField
-                    label={t('cbErrorThresholdLabel')}
-                    hint={t('cbErrorThresholdHint')}
-                    value={form.circuitBreakerErrorThresholdPercent}
-                    onChange={(v) =>
-                      setForm((f) => ({ ...f, circuitBreakerErrorThresholdPercent: v }))
-                    }
-                  />
-                  <NumberField
-                    label={t('cbResetLabel')}
-                    hint={t('cbResetHint')}
-                    value={form.circuitBreakerResetAfterMinutes}
-                    onChange={(v) =>
-                      setForm((f) => ({ ...f, circuitBreakerResetAfterMinutes: v }))
-                    }
-                  />
+        {data && (
+          <>
+            {/* Circuit Breaker Banner */}
+            {cbState === 'Open' && (
+              <div className="flex items-start gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg">
+                <AlertTriangle size={18} className="text-critical mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-critical">{t('cbOpenTitle')}</p>
+                  <p className="text-xs text-critical mt-0.5">
+                    {t('cbOpenDetail', { since: data.metrics.circuitBreakerOpenSince ?? '—' })}
+                  </p>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <ToggleField
-                    label={t('cbEnabledLabel')}
-                    hint={t('cbEnabledHint')}
-                    checked={form.circuitBreakerEnabled}
-                    onChange={(v) => setForm((f) => ({ ...f, circuitBreakerEnabled: v }))}
-                  />
-                  <ToggleField
-                    label={t('priorityQueueLabel')}
-                    hint={t('priorityQueueHint')}
-                    checked={form.priorityQueueEnabled}
-                    onChange={(v) => setForm((f) => ({ ...f, priorityQueueEnabled: v }))}
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={saveConfig}
-                    disabled={updateMutation.isPending}
-                    className="px-4 py-2 bg-violet-600 text-white text-sm rounded-lg hover:bg-violet-700 disabled:opacity-50"
-                  >
-                    {updateMutation.isPending ? t('saving') : t('save')}
-                  </button>
-                  <button
-                    onClick={() => setEditing(false)}
-                    className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
-                  >
-                    {t('cancel')}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="border border-slate-200 rounded-lg divide-y divide-slate-100">
-                <ConfigRow label={t('maxConcurrencyLabel')} value={String(data.config.maxConcurrency)} />
-                <ConfigRow
-                  label={t('inferenceTimeoutLabel')}
-                  value={`${data.config.inferenceTimeoutSeconds}s`}
-                />
-                <ConfigRow
-                  label={t('queueTimeoutLabel')}
-                  value={`${data.config.queueTimeoutSeconds}s`}
-                />
-                <ConfigRow
-                  label={t('cbEnabledLabel')}
-                  value={data.config.circuitBreakerEnabled ? t('enabled') : t('disabled')}
-                />
-                <ConfigRow
-                  label={t('cbErrorThresholdLabel')}
-                  value={`${data.config.circuitBreakerErrorThresholdPercent}%`}
-                />
-                <ConfigRow
-                  label={t('cbResetLabel')}
-                  value={`${data.config.circuitBreakerResetAfterMinutes} min`}
-                />
-                <ConfigRow
-                  label={t('priorityQueueLabel')}
-                  value={data.config.priorityQueueEnabled ? t('enabled') : t('disabled')}
-                />
               </div>
             )}
-          </section>
 
-          <p className="text-xs text-slate-400">
-            {t('updatedAt', { date: data.config.updatedAt })}
-          </p>
-        </>
-      )}
-    </div>
+            {cbState === 'HalfOpen' && (
+              <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />
+                <p className="text-sm text-warning">{t('cbHalfOpenMsg')}</p>
+              </div>
+            )}
+
+            {cbState === 'Closed' && (
+              <div className="flex items-start gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
+                <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />
+                <p className="text-sm text-success">{t('cbClosedMsg')}</p>
+              </div>
+            )}
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <MetricCard
+                icon={<Layers size={18} className="text-accent" />}
+                label={t('metricActiveReq')}
+                value={String(data.metrics.activeRequests)}
+                sub={`/ ${data.config.maxConcurrency} ${t('max')}`}
+              />
+              <MetricCard
+                icon={<Activity size={18} className="text-accent" />}
+                label={t('metricQueueDepth')}
+                value={String(data.metrics.queueDepth)}
+              />
+              <MetricCard
+                icon={<Zap size={18} className="text-warning" />}
+                label={t('metricP95Latency')}
+                value={`${data.metrics.latencyP95Ms} ms`}
+              />
+              <MetricCard
+                icon={<Clock size={18} className="text-critical" />}
+                label={t('metricErrorRate')}
+                value={`${data.metrics.errorRatePercent.toFixed(1)}%`}
+              />
+            </div>
+
+            {/* Config Section */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-medium text-heading">{t('configTitle')}</h2>
+                {!editing && (
+                  <Button variant="outline" onClick={startEdit}>
+                    {t('editConfig')}
+                  </Button>
+                )}
+              </div>
+
+              {editing ? (
+                <div className="border border-edge rounded-lg p-5 space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <NumberField
+                      label={t('maxConcurrencyLabel')}
+                      hint={t('maxConcurrencyHint')}
+                      value={form.maxConcurrency}
+                      onChange={(v) => setForm((f) => ({ ...f, maxConcurrency: v }))}
+                    />
+                    <NumberField
+                      label={t('inferenceTimeoutLabel')}
+                      hint={t('inferenceTimeoutHint')}
+                      value={form.inferenceTimeoutSeconds}
+                      onChange={(v) => setForm((f) => ({ ...f, inferenceTimeoutSeconds: v }))}
+                    />
+                    <NumberField
+                      label={t('queueTimeoutLabel')}
+                      hint={t('queueTimeoutHint')}
+                      value={form.queueTimeoutSeconds}
+                      onChange={(v) => setForm((f) => ({ ...f, queueTimeoutSeconds: v }))}
+                    />
+                    <NumberField
+                      label={t('cbErrorThresholdLabel')}
+                      hint={t('cbErrorThresholdHint')}
+                      value={form.circuitBreakerErrorThresholdPercent}
+                      onChange={(v) =>
+                        setForm((f) => ({ ...f, circuitBreakerErrorThresholdPercent: v }))
+                      }
+                    />
+                    <NumberField
+                      label={t('cbResetLabel')}
+                      hint={t('cbResetHint')}
+                      value={form.circuitBreakerResetAfterMinutes}
+                      onChange={(v) =>
+                        setForm((f) => ({ ...f, circuitBreakerResetAfterMinutes: v }))
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <ToggleField
+                      label={t('cbEnabledLabel')}
+                      hint={t('cbEnabledHint')}
+                      checked={form.circuitBreakerEnabled}
+                      onChange={(v) => setForm((f) => ({ ...f, circuitBreakerEnabled: v }))}
+                    />
+                    <ToggleField
+                      label={t('priorityQueueLabel')}
+                      hint={t('priorityQueueHint')}
+                      checked={form.priorityQueueEnabled}
+                      onChange={(v) => setForm((f) => ({ ...f, priorityQueueEnabled: v }))}
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      variant="primary"
+                      onClick={saveConfig}
+                      disabled={updateMutation.isPending}
+                    >
+                      {updateMutation.isPending ? t('saving') : t('save')}
+                    </Button>
+                    <Button variant="ghost" onClick={() => setEditing(false)}>
+                      {t('cancel')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border border-edge rounded-lg divide-y divide-edge/50">
+                  <ConfigRow label={t('maxConcurrencyLabel')} value={String(data.config.maxConcurrency)} />
+                  <ConfigRow
+                    label={t('inferenceTimeoutLabel')}
+                    value={`${data.config.inferenceTimeoutSeconds}s`}
+                  />
+                  <ConfigRow
+                    label={t('queueTimeoutLabel')}
+                    value={`${data.config.queueTimeoutSeconds}s`}
+                  />
+                  <ConfigRow
+                    label={t('cbEnabledLabel')}
+                    value={data.config.circuitBreakerEnabled ? t('enabled') : t('disabled')}
+                  />
+                  <ConfigRow
+                    label={t('cbErrorThresholdLabel')}
+                    value={`${data.config.circuitBreakerErrorThresholdPercent}%`}
+                  />
+                  <ConfigRow
+                    label={t('cbResetLabel')}
+                    value={`${data.config.circuitBreakerResetAfterMinutes} min`}
+                  />
+                  <ConfigRow
+                    label={t('priorityQueueLabel')}
+                    value={data.config.priorityQueueEnabled ? t('enabled') : t('disabled')}
+                  />
+                </div>
+              )}
+            </section>
+
+            <p className="text-xs text-faded">
+              {t('updatedAt', { date: data.config.updatedAt })}
+            </p>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
 
@@ -295,12 +288,12 @@ function MetricCard({
   sub?: string;
 }) {
   return (
-    <div className="border border-slate-200 rounded-lg p-4 bg-white flex items-start gap-3">
+    <div className="border border-edge rounded-lg p-4 bg-card flex items-start gap-3">
       <div className="mt-0.5">{icon}</div>
       <div>
-        <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
-        <p className="text-xl font-semibold text-slate-900 mt-0.5">{value}</p>
-        {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+        <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
+        <p className="text-xl font-semibold text-heading mt-0.5">{value}</p>
+        {sub && <p className="text-xs text-faded mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -309,8 +302,8 @@ function MetricCard({
 function ConfigRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex px-4 py-3 gap-4">
-      <span className="text-sm text-slate-500 w-56 shrink-0">{label}</span>
-      <span className="text-sm font-medium text-slate-800">{value}</span>
+      <span className="text-sm text-muted w-56 shrink-0">{label}</span>
+      <span className="text-sm font-medium text-heading">{value}</span>
     </div>
   );
 }
@@ -328,15 +321,15 @@ function NumberField({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label className="block text-sm font-medium text-body">{label}</label>
       <input
         type="number"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-violet-500 focus:border-violet-500"
+        className="w-full px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
       />
-      <p className="text-xs text-slate-500">{hint}</p>
+      <p className="text-xs text-muted">{hint}</p>
     </div>
   );
 }
@@ -359,11 +352,11 @@ function ToggleField({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         aria-label={label}
-        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-violet-600"
+        className="mt-0.5 h-4 w-4 rounded border-edge text-accent"
       />
       <div>
-        <span className="block text-sm font-medium text-slate-700">{label}</span>
-        <span className="block text-xs text-slate-500">{hint}</span>
+        <span className="block text-sm font-medium text-body">{label}</span>
+        <span className="block text-xs text-muted">{hint}</span>
       </div>
     </label>
   );

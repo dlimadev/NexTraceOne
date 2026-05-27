@@ -10,6 +10,9 @@ import {
   ThumbsDown,
   BarChart2,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
 import { platformAdminApi, type AiGovernanceConfigUpdate } from '../api/platformAdmin';
 
 export function AiGovernancePage() {
@@ -65,264 +68,254 @@ export function AiGovernancePage() {
     data && data.modelStats.some((m) => m.hallucinationPercent > (data.config.highHallucinationThresholdPercent ?? 20));
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ShieldCheck size={24} className="text-indigo-600" />
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-            <p className="mt-1 text-sm text-slate-500">{t('subtitle')}</p>
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          icon={<ShieldCheck size={24} className="text-accent" />}
+          actions={
+            <Button variant="primary" onClick={() => refetch()}>
+              <RefreshCw size={14} />
+              {t('refresh')}
+            </Button>
+          }
+        />
+
+        {isLoading && (
+          <div className="flex items-center justify-center h-48 text-faded text-sm">
+            {t('loading')}
           </div>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <RefreshCw size={14} />
-          {t('refresh')}
-        </button>
-      </div>
+        )}
 
-      {isLoading && (
-        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
-          {t('loading')}
-        </div>
-      )}
-
-      {isError && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <XCircle size={18} />
-          {t('error')}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Hallucination Alert Banner */}
-          {hasHighHallucination ? (
-            <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle size={18} className="text-amber-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-amber-800">{t('highHallucinationWarning')}</p>
-            </div>
-          ) : (
-            <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <CheckCircle size={18} className="text-emerald-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-emerald-800">{t('qualityOkMsg')}</p>
-            </div>
-          )}
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <SummaryCard
-              label={t('totalFeedback')}
-              value={String(data.totalFeedbackCount)}
-              color="indigo"
-            />
-            <SummaryCard
-              label={t('negativeFeedbackRate')}
-              value={`${data.negativeFeedbackPercent.toFixed(1)}%`}
-              color={data.negativeFeedbackPercent > 20 ? 'red' : 'emerald'}
-            />
-            <SummaryCard
-              label={t('modelsMonitored')}
-              value={String(data.modelStats.length)}
-              color="slate"
-            />
+        {isError && (
+          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
+            <XCircle size={18} />
+            {t('error')}
           </div>
+        )}
 
-          {/* Model Quality Table */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart2 size={18} className="text-indigo-500" />
-              <h2 className="text-lg font-medium text-slate-800">{t('modelQualityTitle')}</h2>
-            </div>
-            {data.modelStats.length === 0 ? (
-              <p className="text-sm text-slate-500 italic">{t('noModelData')}</p>
+        {data && (
+          <>
+            {/* Hallucination Alert Banner */}
+            {hasHighHallucination ? (
+              <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />
+                <p className="text-sm text-warning">{t('highHallucinationWarning')}</p>
+              </div>
             ) : (
-              <div className="border border-slate-200 rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colModel')}
-                      </th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colTotal')}
-                      </th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colGood')}
-                      </th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colLowConf')}
-                      </th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colHallucination')}
-                      </th>
-                      <th className="text-left px-4 py-3 text-slate-600 font-medium">
-                        {t('colFeedback')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {data.modelStats.map((m) => (
-                      <tr key={m.modelName} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 font-medium text-slate-800">{m.modelName}</td>
-                        <td className="px-4 py-3 text-slate-600">{m.totalResponses}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-emerald-700 font-medium">
-                            {m.goodPercent.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="text-amber-700 font-medium">
-                            {m.lowConfidencePercent.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={
-                              m.hallucinationPercent > 10
-                                ? 'text-red-700 font-medium'
-                                : 'text-slate-600'
-                            }
-                          >
-                            {m.hallucinationPercent.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 text-rose-600">
-                            <ThumbsDown size={12} />
-                            <span>{m.negativeFeedbackCount}</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="flex items-start gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
+                <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />
+                <p className="text-sm text-success">{t('qualityOkMsg')}</p>
               </div>
             )}
-          </section>
 
-          {/* Top Hallucination Patterns */}
-          {data.topHallucinationPatterns.length > 0 && (
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <SummaryCard
+                label={t('totalFeedback')}
+                value={String(data.totalFeedbackCount)}
+                color="indigo"
+              />
+              <SummaryCard
+                label={t('negativeFeedbackRate')}
+                value={`${data.negativeFeedbackPercent.toFixed(1)}%`}
+                color={data.negativeFeedbackPercent > 20 ? 'red' : 'emerald'}
+              />
+              <SummaryCard
+                label={t('modelsMonitored')}
+                value={String(data.modelStats.length)}
+                color="slate"
+              />
+            </div>
+
+            {/* Model Quality Table */}
             <section>
-              <h2 className="text-lg font-medium text-slate-800 mb-3">
-                {t('topPatternsTitle')}
-              </h2>
-              <ul className="border border-slate-200 rounded-lg divide-y divide-slate-100">
-                {data.topHallucinationPatterns.map((pattern, idx) => (
-                  <li key={idx} className="flex items-center gap-3 px-4 py-3">
-                    <span className="text-xs text-slate-400 font-mono w-5">#{idx + 1}</span>
-                    <span className="text-sm text-slate-700">{pattern}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Config Section */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium text-slate-800">{t('configTitle')}</h2>
-              {!editing && (
-                <button
-                  onClick={startEdit}
-                  className="px-3 py-1.5 text-sm text-indigo-600 border border-indigo-200 rounded hover:bg-indigo-50"
-                >
-                  {t('editConfig')}
-                </button>
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart2 size={18} className="text-accent" />
+                <h2 className="text-lg font-medium text-heading">{t('modelQualityTitle')}</h2>
+              </div>
+              {data.modelStats.length === 0 ? (
+                <p className="text-sm text-muted italic">{t('noModelData')}</p>
+              ) : (
+                <div className="border border-edge rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-elevated border-b border-edge">
+                      <tr>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colModel')}
+                        </th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colTotal')}
+                        </th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colGood')}
+                        </th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colLowConf')}
+                        </th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colHallucination')}
+                        </th>
+                        <th className="text-left px-4 py-3 text-muted font-medium">
+                          {t('colFeedback')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-edge/50">
+                      {data.modelStats.map((m) => (
+                        <tr key={m.modelName} className="hover:bg-elevated">
+                          <td className="px-4 py-3 font-medium text-heading">{m.modelName}</td>
+                          <td className="px-4 py-3 text-muted">{m.totalResponses}</td>
+                          <td className="px-4 py-3">
+                            <span className="text-success font-medium">
+                              {m.goodPercent.toFixed(1)}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-warning font-medium">
+                              {m.lowConfidencePercent.toFixed(1)}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={
+                                m.hallucinationPercent > 10
+                                  ? 'text-critical font-medium'
+                                  : 'text-muted'
+                              }
+                            >
+                              {m.hallucinationPercent.toFixed(1)}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1 text-critical">
+                              <ThumbsDown size={12} />
+                              <span>{m.negativeFeedbackCount}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-            </div>
+            </section>
 
-            {editing ? (
-              <div className="border border-slate-200 rounded-lg p-5 space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <NumberField
-                    label={t('hallucinationThresholdLabel')}
-                    hint={t('hallucinationThresholdHint')}
-                    value={form.hallucinationFlagThreshold}
-                    onChange={(v) => setForm((f) => ({ ...f, hallucinationFlagThreshold: v }))}
-                  />
-                  <NumberField
-                    label={t('autoSuspendThresholdLabel')}
-                    hint={t('autoSuspendThresholdHint')}
-                    value={form.highHallucinationThresholdPercent}
-                    onChange={(v) =>
-                      setForm((f) => ({ ...f, highHallucinationThresholdPercent: v }))
-                    }
-                  />
-                </div>
-                <div className="flex flex-col gap-3">
-                  <ToggleField
-                    label={t('groundingCheckLabel')}
-                    hint={t('groundingCheckHint')}
-                    checked={form.groundingCheckEnabled}
-                    onChange={(v) => setForm((f) => ({ ...f, groundingCheckEnabled: v }))}
-                  />
-                  <ToggleField
-                    label={t('feedbackEnabledLabel')}
-                    hint={t('feedbackEnabledHint')}
-                    checked={form.feedbackEnabled}
-                    onChange={(v) => setForm((f) => ({ ...f, feedbackEnabled: v }))}
-                  />
-                  <ToggleField
-                    label={t('autoSuspendLabel')}
-                    hint={t('autoSuspendHint')}
-                    checked={form.autoSuspendOnHighHallucinationRate}
-                    onChange={(v) =>
-                      setForm((f) => ({ ...f, autoSuspendOnHighHallucinationRate: v }))
-                    }
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={saveConfig}
-                    disabled={configMutation.isPending}
-                    className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                  >
-                    {configMutation.isPending ? t('saving') : t('save')}
-                  </button>
-                  <button
-                    onClick={() => setEditing(false)}
-                    className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
-                  >
-                    {t('cancel')}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="border border-slate-200 rounded-lg divide-y divide-slate-100">
-                <ConfigRow
-                  label={t('groundingCheckLabel')}
-                  value={data.config.groundingCheckEnabled ? t('enabled') : t('disabled')}
-                />
-                <ConfigRow
-                  label={t('hallucinationThresholdLabel')}
-                  value={String(data.config.hallucinationFlagThreshold)}
-                />
-                <ConfigRow
-                  label={t('feedbackEnabledLabel')}
-                  value={data.config.feedbackEnabled ? t('enabled') : t('disabled')}
-                />
-                <ConfigRow
-                  label={t('autoSuspendLabel')}
-                  value={
-                    data.config.autoSuspendOnHighHallucinationRate ? t('enabled') : t('disabled')
-                  }
-                />
-                <ConfigRow
-                  label={t('autoSuspendThresholdLabel')}
-                  value={`${data.config.highHallucinationThresholdPercent}%`}
-                />
-              </div>
+            {/* Top Hallucination Patterns */}
+            {data.topHallucinationPatterns.length > 0 && (
+              <section>
+                <h2 className="text-lg font-medium text-heading mb-3">
+                  {t('topPatternsTitle')}
+                </h2>
+                <ul className="border border-edge rounded-lg divide-y divide-edge/50">
+                  {data.topHallucinationPatterns.map((pattern, idx) => (
+                    <li key={idx} className="flex items-center gap-3 px-4 py-3">
+                      <span className="text-xs text-faded font-mono w-5">#{idx + 1}</span>
+                      <span className="text-sm text-body">{pattern}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
-          </section>
 
-          <p className="text-xs text-slate-400 italic">{data.simulatedNote}</p>
-        </>
-      )}
-    </div>
+            {/* Config Section */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-medium text-heading">{t('configTitle')}</h2>
+                {!editing && (
+                  <Button variant="outline" onClick={startEdit}>
+                    {t('editConfig')}
+                  </Button>
+                )}
+              </div>
+
+              {editing ? (
+                <div className="border border-edge rounded-lg p-5 space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <NumberField
+                      label={t('hallucinationThresholdLabel')}
+                      hint={t('hallucinationThresholdHint')}
+                      value={form.hallucinationFlagThreshold}
+                      onChange={(v) => setForm((f) => ({ ...f, hallucinationFlagThreshold: v }))}
+                    />
+                    <NumberField
+                      label={t('autoSuspendThresholdLabel')}
+                      hint={t('autoSuspendThresholdHint')}
+                      value={form.highHallucinationThresholdPercent}
+                      onChange={(v) =>
+                        setForm((f) => ({ ...f, highHallucinationThresholdPercent: v }))
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <ToggleField
+                      label={t('groundingCheckLabel')}
+                      hint={t('groundingCheckHint')}
+                      checked={form.groundingCheckEnabled}
+                      onChange={(v) => setForm((f) => ({ ...f, groundingCheckEnabled: v }))}
+                    />
+                    <ToggleField
+                      label={t('feedbackEnabledLabel')}
+                      hint={t('feedbackEnabledHint')}
+                      checked={form.feedbackEnabled}
+                      onChange={(v) => setForm((f) => ({ ...f, feedbackEnabled: v }))}
+                    />
+                    <ToggleField
+                      label={t('autoSuspendLabel')}
+                      hint={t('autoSuspendHint')}
+                      checked={form.autoSuspendOnHighHallucinationRate}
+                      onChange={(v) =>
+                        setForm((f) => ({ ...f, autoSuspendOnHighHallucinationRate: v }))
+                      }
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      variant="primary"
+                      onClick={saveConfig}
+                      disabled={configMutation.isPending}
+                    >
+                      {configMutation.isPending ? t('saving') : t('save')}
+                    </Button>
+                    <Button variant="ghost" onClick={() => setEditing(false)}>
+                      {t('cancel')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border border-edge rounded-lg divide-y divide-edge/50">
+                  <ConfigRow
+                    label={t('groundingCheckLabel')}
+                    value={data.config.groundingCheckEnabled ? t('enabled') : t('disabled')}
+                  />
+                  <ConfigRow
+                    label={t('hallucinationThresholdLabel')}
+                    value={String(data.config.hallucinationFlagThreshold)}
+                  />
+                  <ConfigRow
+                    label={t('feedbackEnabledLabel')}
+                    value={data.config.feedbackEnabled ? t('enabled') : t('disabled')}
+                  />
+                  <ConfigRow
+                    label={t('autoSuspendLabel')}
+                    value={
+                      data.config.autoSuspendOnHighHallucinationRate ? t('enabled') : t('disabled')
+                    }
+                  />
+                  <ConfigRow
+                    label={t('autoSuspendThresholdLabel')}
+                    value={`${data.config.highHallucinationThresholdPercent}%`}
+                  />
+                </div>
+              )}
+            </section>
+
+            <p className="text-xs text-faded italic">{data.simulatedNote}</p>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
 
@@ -338,14 +331,14 @@ function SummaryCard({
   color: 'indigo' | 'emerald' | 'red' | 'slate';
 }) {
   const colorMap = {
-    indigo: 'text-indigo-600',
-    emerald: 'text-emerald-600',
-    red: 'text-red-600',
-    slate: 'text-slate-700',
+    indigo: 'text-accent',
+    emerald: 'text-success',
+    red: 'text-critical',
+    slate: 'text-body',
   };
   return (
-    <div className="border border-slate-200 rounded-lg p-4 bg-white">
-      <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+    <div className="border border-edge rounded-lg p-4 bg-card">
+      <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
       <p className={`text-2xl font-semibold mt-1 ${colorMap[color]}`}>{value}</p>
     </div>
   );
@@ -354,8 +347,8 @@ function SummaryCard({
 function ConfigRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex px-4 py-3 gap-4">
-      <span className="text-sm text-slate-500 w-56 shrink-0">{label}</span>
-      <span className="text-sm font-medium text-slate-800">{value}</span>
+      <span className="text-sm text-muted w-56 shrink-0">{label}</span>
+      <span className="text-sm font-medium text-heading">{value}</span>
     </div>
   );
 }
@@ -373,15 +366,15 @@ function NumberField({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label className="block text-sm font-medium text-body">{label}</label>
       <input
         type="number"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+        className="w-full px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
       />
-      <p className="text-xs text-slate-500">{hint}</p>
+      <p className="text-xs text-muted">{hint}</p>
     </div>
   );
 }
@@ -404,11 +397,11 @@ function ToggleField({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         aria-label={label}
-        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600"
+        className="mt-0.5 h-4 w-4 rounded border-edge text-accent"
       />
       <div>
-        <span className="block text-sm font-medium text-slate-700">{label}</span>
-        <span className="block text-xs text-slate-500">{hint}</span>
+        <span className="block text-sm font-medium text-body">{label}</span>
+        <span className="block text-xs text-muted">{hint}</span>
       </div>
     </label>
   );
