@@ -29,7 +29,7 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
     <div className="shrink-0">
       <header
         className={cn(
-          'h-20 border-b border-edge',
+          'h-14 border-b border-edge',
           'flex items-center justify-between px-5 lg:px-6 gap-3',
           'backdrop-blur-md sticky top-0 z-[var(--z-header)]',
         )}
@@ -54,7 +54,7 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
         <div className="flex items-center gap-1.5">
           <WorkspaceSwitcher />
           <AppTopbarActions />
-          <div className="w-px h-6 bg-edge mx-1.5" aria-hidden="true" />
+          <div className="w-px h-5 bg-edge mx-1.5" aria-hidden="true" />
           <AppUserMenu />
         </div>
       </header>
