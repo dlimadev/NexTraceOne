@@ -14,6 +14,9 @@ import {
   DatabaseBackup,
   Timer,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
 import { platformAdminApi } from '../api/platformAdmin';
 import type { BackupRecord, BackupScheduleConfig, BackupStatus } from '../api/platformAdmin';
 
@@ -228,109 +231,107 @@ export function BackupCoordinatorPage() {
   const data = statusQuery.data;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-heading">{t('backup.title')}</h1>
-          <p className="mt-1 text-sm text-muted">{t('backup.subtitle')}</p>
-        </div>
-        <button
-          onClick={() => statusQuery.refetch()}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-heading transition-colors"
-        >
-          <RefreshCw size={14} className={statusQuery.isFetching ? 'animate-spin' : ''} />
-          {t('backup.refresh')}
-        </button>
-      </div>
+    <PageContainer>
+      <div className="max-w-3xl mx-auto space-y-6">
+        <PageHeader
+          title={t('backup.title')}
+          subtitle={t('backup.subtitle')}
+          actions={
+            <Button variant="ghost" onClick={() => statusQuery.refetch()}>
+              <RefreshCw size={14} className={statusQuery.isFetching ? 'animate-spin' : ''} />
+              {t('backup.refresh')}
+            </Button>
+          }
+        />
 
-      {statusQuery.isLoading && (
-        <div className="flex items-center justify-center py-16 gap-2 text-muted">
-          <Loader2 size={18} className="animate-spin" />
-          <span className="text-sm">{t('backup.loading')}</span>
-        </div>
-      )}
-
-      {statusQuery.isError && (
-        <div className="flex items-center gap-2 py-8 text-critical text-sm">
-          <AlertTriangle size={16} />
-          {t('backup.loadError')}
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Last successful backup summary */}
-          {data.lastSuccessfulBackup ? (
-            <div className="flex items-center gap-4 bg-success/10 border border-success/20 rounded-xl p-4">
-              <CheckCircle2 size={20} className="text-success shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-heading">
-                  {t('backup.lastSuccessfulLabel')}
-                </p>
-                <p className="text-xs text-muted">
-                  {formatDate(data.lastSuccessfulBackup.startedAt)} —{' '}
-                  {formatSizeGb(data.lastSuccessfulBackup.fileSizeGb)}
-                </p>
-              </div>
-              <button
-                onClick={() => runNowMutation.mutate()}
-                disabled={runNowMutation.isPending}
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-success text-white rounded-lg text-xs font-medium hover:bg-success/90 transition-colors disabled:opacity-60"
-              >
-                {runNowMutation.isPending ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Play size={12} />
-                )}
-                {t('backup.runNow')}
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4 bg-warning/10 border border-warning/20 rounded-xl p-4">
-              <AlertTriangle size={20} className="text-warning shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-heading">{t('backup.noBackupYet')}</p>
-                <p className="text-xs text-muted">{t('backup.noBackupNote')}</p>
-              </div>
-              <button
-                onClick={() => runNowMutation.mutate()}
-                disabled={runNowMutation.isPending}
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-warning text-white rounded-lg text-xs font-medium hover:bg-warning/90 transition-colors disabled:opacity-60"
-              >
-                {runNowMutation.isPending ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <DatabaseBackup size={12} />
-                )}
-                {t('backup.runNow')}
-              </button>
-            </div>
-          )}
-
-          {/* Schedule form */}
-          <ScheduleForm initial={data.schedule} />
-
-          {/* Backup history */}
-          <div>
-            <h2 className="text-base font-semibold text-heading mb-3">{t('backup.historyTitle')}</h2>
-            <div className="bg-card border border-border rounded-xl">
-              {data.recentBackups.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-muted text-sm gap-2">
-                  <DatabaseBackup size={24} className="text-muted/40" />
-                  {t('backup.emptyHistory')}
-                </div>
-              ) : (
-                <div className="px-4">
-                  {data.recentBackups.map((b) => (
-                    <BackupRow key={b.id} backup={b} />
-                  ))}
-                </div>
-              )}
-            </div>
+        {statusQuery.isLoading && (
+          <div className="flex items-center justify-center py-16 gap-2 text-muted">
+            <Loader2 size={18} className="animate-spin" />
+            <span className="text-sm">{t('backup.loading')}</span>
           </div>
-        </>
-      )}
-    </div>
+        )}
+
+        {statusQuery.isError && (
+          <div className="flex items-center gap-2 py-8 text-critical text-sm">
+            <AlertTriangle size={16} />
+            {t('backup.loadError')}
+          </div>
+        )}
+
+        {data && (
+          <>
+            {/* Last successful backup summary */}
+            {data.lastSuccessfulBackup ? (
+              <div className="flex items-center gap-4 bg-success/10 border border-success/20 rounded-xl p-4">
+                <CheckCircle2 size={20} className="text-success shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-heading">
+                    {t('backup.lastSuccessfulLabel')}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {formatDate(data.lastSuccessfulBackup.startedAt)} —{' '}
+                    {formatSizeGb(data.lastSuccessfulBackup.fileSizeGb)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => runNowMutation.mutate()}
+                  disabled={runNowMutation.isPending}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-success text-white rounded-lg text-xs font-medium hover:bg-success/90 transition-colors disabled:opacity-60"
+                >
+                  {runNowMutation.isPending ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Play size={12} />
+                  )}
+                  {t('backup.runNow')}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 bg-warning/10 border border-warning/20 rounded-xl p-4">
+                <AlertTriangle size={20} className="text-warning shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-heading">{t('backup.noBackupYet')}</p>
+                  <p className="text-xs text-muted">{t('backup.noBackupNote')}</p>
+                </div>
+                <button
+                  onClick={() => runNowMutation.mutate()}
+                  disabled={runNowMutation.isPending}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-warning text-white rounded-lg text-xs font-medium hover:bg-warning/90 transition-colors disabled:opacity-60"
+                >
+                  {runNowMutation.isPending ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <DatabaseBackup size={12} />
+                  )}
+                  {t('backup.runNow')}
+                </button>
+              </div>
+            )}
+
+            {/* Schedule form */}
+            <ScheduleForm initial={data.schedule} />
+
+            {/* Backup history */}
+            <div>
+              <h2 className="text-base font-semibold text-heading mb-3">{t('backup.historyTitle')}</h2>
+              <div className="bg-card border border-border rounded-xl">
+                {data.recentBackups.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-muted text-sm gap-2">
+                    <DatabaseBackup size={24} className="text-muted/40" />
+                    {t('backup.emptyHistory')}
+                  </div>
+                ) : (
+                  <div className="px-4">
+                    {data.recentBackups.map((b) => (
+                      <BackupRow key={b.id} backup={b} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
