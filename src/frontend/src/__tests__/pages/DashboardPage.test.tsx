@@ -118,11 +118,12 @@ describe('DashboardPage', () => {
       apis: [],
     });
     renderDashboard();
+    // 4 KPIs: "Registered APIs" movida para /services (redesign § 4)
     expect(screen.getByText('Active Services')).toBeInTheDocument();
     expect(screen.getByText('Total Contracts')).toBeInTheDocument();
     expect(screen.getByText('Recent Changes')).toBeInTheDocument();
     expect(screen.getByText('Open Incidents')).toBeInTheDocument();
-    expect(screen.getByText('Registered APIs')).toBeInTheDocument();
+    expect(screen.queryByText('Registered APIs')).not.toBeInTheDocument();
   });
 
   it('exibe serviços carregados do grafo com links de navegação', async () => {

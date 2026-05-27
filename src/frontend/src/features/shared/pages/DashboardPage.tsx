@@ -237,11 +237,11 @@ export function DashboardPage() {
       {/* ── Alertas estruturados ─────────────────────────────────────────────── */}
       {attentionAlerts.length > 0 && (
         <div className="mb-6 space-y-2">
-          {attentionAlerts.map((alert) => {
+          {attentionAlerts.map((alert, idx) => {
             const styles = alertStyles[alert.severity];
             return (
               <Link
-                key={alert.to}
+                key={`${alert.to}-${idx}`}
                 to={alert.to}
                 className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${styles.wrap}`}
               >
