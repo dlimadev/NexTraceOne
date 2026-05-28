@@ -9,6 +9,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { integrationsApi } from '../api/integrations';
@@ -141,19 +142,20 @@ function ConnectorDetailContent({
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Back link */}
       <Link to="/integrations" className="text-accent hover:underline text-sm flex items-center gap-1 mb-4">
         <ArrowLeft size={14} /> {t('integrations.backToHub')}
       </Link>
 
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Cable size={24} className="text-accent" />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-heading">{connector.name}</h1>
-          <p className="text-muted text-sm">{connector.provider} &middot; {connector.connectorType}</p>
-        </div>
+      <PageHeader
+        title={connector.name}
+        subtitle={`${connector.provider} · ${connector.connectorType}`}
+        icon={<Cable />}
+      />
+
+      {/* Status badges + retry */}
+      <div className="flex items-center gap-2 mb-6">
         <Badge variant={statusBadge(connector.status)}>{t(`integrations.${connector.status.toLowerCase()}`)}</Badge>
         <Badge variant={healthBadgeVariant(connector.healthScore)}>{t(`integrations.${healthLabel.toLowerCase()}`)}</Badge>
         <button
@@ -308,6 +310,6 @@ function ConnectorDetailContent({
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

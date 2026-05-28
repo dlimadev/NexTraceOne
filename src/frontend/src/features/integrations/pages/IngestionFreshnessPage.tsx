@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { integrationsApi } from '../api/integrations';
@@ -149,11 +150,11 @@ export function IngestionFreshnessPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('integrations.freshnessTitle')}</h1>
-        <p className="text-muted mt-1">{t('integrations.freshnessSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('integrations.ingestion.freshness.title')}
+        subtitle={t('integrations.ingestion.freshness.subtitle')}
+        icon={<RefreshCw />}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

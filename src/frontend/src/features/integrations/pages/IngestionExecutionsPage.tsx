@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Activity, Search, CheckCircle, AlertTriangle, XCircle, RefreshCw,
+  Activity, Search, CheckCircle, AlertTriangle, XCircle, RefreshCw, Play,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { integrationsApi } from '../api/integrations';
@@ -91,11 +92,11 @@ export function IngestionExecutionsPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('integrations.executionsTitle')}</h1>
-        <p className="text-muted mt-1">{t('integrations.executionsSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('integrations.ingestion.executions.title')}
+        subtitle={t('integrations.ingestion.executions.subtitle')}
+        icon={<Play />}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
