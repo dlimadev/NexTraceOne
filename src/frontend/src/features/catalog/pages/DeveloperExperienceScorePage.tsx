@@ -58,10 +58,10 @@ const SCORE_LEVEL_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'se
 };
 
 const SCORE_LEVEL_COLOR: Record<string, string> = {
-  Excellent: 'text-green-600 dark:text-green-400',
-  Good: 'text-blue-600 dark:text-blue-400',
-  Fair: 'text-yellow-600 dark:text-yellow-400',
-  Poor: 'text-red-600 dark:text-red-400',
+  Excellent: 'text-success',
+  Good: 'text-accent',
+  Fair: 'text-warning',
+  Poor: 'text-critical',
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ function ScoreResultCard({ score }: { score: ScoreResponse }) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span className="text-sm font-medium text-gray-900 dark:text-white">{score.teamName}</span>
+          <span className="text-sm font-medium text-heading">{score.teamName}</span>
           <Badge variant={SCORE_LEVEL_VARIANT[score.scoreLevel] ?? 'secondary'}>
             {t(`developerExperienceScore.${score.scoreLevel.toLowerCase()}` as never, {
               defaultValue: score.scoreLevel,
@@ -86,31 +86,31 @@ function ScoreResultCard({ score }: { score: ScoreResponse }) {
           <span className={`text-5xl font-bold ${SCORE_LEVEL_COLOR[score.scoreLevel] ?? 'text-gray-900 dark:text-white'}`}>
             {score.overallScore}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+          <span className="text-sm text-muted mb-1">
             / 100 — {t('developerExperienceScore.overallScore')}
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded bg-gray-50 dark:bg-gray-800 p-3 text-center">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{score.cycleTimeHours}h</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('developerExperienceScore.cycleTime')}</p>
+          <div className="rounded bg-elevated border border-edge p-3 text-center">
+            <p className="text-lg font-semibold text-heading">{score.cycleTimeHours}h</p>
+            <p className="text-xs text-muted">{t('developerExperienceScore.cycleTime')}</p>
           </div>
-          <div className="rounded bg-gray-50 dark:bg-gray-800 p-3 text-center">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{score.deploymentFrequencyPerWeek}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('developerExperienceScore.deploysPerWeek')}</p>
+          <div className="rounded bg-elevated border border-edge p-3 text-center">
+            <p className="text-lg font-semibold text-heading">{score.deploymentFrequencyPerWeek}</p>
+            <p className="text-xs text-muted">{t('developerExperienceScore.deploysPerWeek')}</p>
           </div>
-          <div className="rounded bg-gray-50 dark:bg-gray-800 p-3 text-center">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{score.cognitiveLoadScore}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('developerExperienceScore.cognitiveLoad')}</p>
+          <div className="rounded bg-elevated border border-edge p-3 text-center">
+            <p className="text-lg font-semibold text-heading">{score.cognitiveLoadScore}</p>
+            <p className="text-xs text-muted">{t('developerExperienceScore.cognitiveLoad')}</p>
           </div>
-          <div className="rounded bg-gray-50 dark:bg-gray-800 p-3 text-center">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{score.toilPercentage}%</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('developerExperienceScore.toil')}</p>
+          <div className="rounded bg-elevated border border-edge p-3 text-center">
+            <p className="text-lg font-semibold text-heading">{score.toilPercentage}%</p>
+            <p className="text-xs text-muted">{t('developerExperienceScore.toil')}</p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted">
           {t('developerExperienceScore.computedAt')}: {new Date(score.computedAt).toLocaleString()}
         </p>
       </CardBody>
@@ -165,8 +165,8 @@ export function DeveloperExperienceScorePage() {
   };
 
   const inputClass =
-    'w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400';
-  const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
+    'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
+  const labelClass = 'mb-1 block text-xs font-medium text-muted';
 
   return (
     <PageContainer>
@@ -270,7 +270,7 @@ export function DeveloperExperienceScorePage() {
               </div>
 
               {createMutation.isError && (
-                <p className="text-sm text-red-600 dark:text-red-400">{t('developerExperienceScore.createError')}</p>
+                <p className="text-sm text-critical">{t('developerExperienceScore.createError')}</p>
               )}
 
               <div className="flex justify-end">
@@ -293,7 +293,7 @@ export function DeveloperExperienceScorePage() {
         <div className="mb-3 flex gap-2">
           <input
             type="text"
-            className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="rounded border border-edge bg-elevated px-3 py-1.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
             placeholder={t('developerExperienceScore.teamId')}
             value={filterTeamId}
             onChange={(e) => setFilterTeamId(e.target.value)}
@@ -315,20 +315,20 @@ export function DeveloperExperienceScorePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700 text-left">
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-600 dark:text-gray-400">
+                <tr className="border-b border-edge text-left">
+                  <th className="pb-2 pr-4 text-xs font-medium text-muted">
                     {t('developerExperienceScore.teamName')}
                   </th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <th className="pb-2 pr-4 text-xs font-medium text-muted">
                     {t('developerExperienceScore.period')}
                   </th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <th className="pb-2 pr-4 text-xs font-medium text-muted">
                     {t('developerExperienceScore.overallScore')}
                   </th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <th className="pb-2 pr-4 text-xs font-medium text-muted">
                     {t('developerExperienceScore.scoreLevel')}
                   </th>
-                  <th className="pb-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <th className="pb-2 text-xs font-medium text-muted">
                     {t('developerExperienceScore.computedAt')}
                   </th>
                 </tr>
@@ -337,11 +337,11 @@ export function DeveloperExperienceScorePage() {
                 {scoresData.items.map((score) => (
                   <tr
                     key={score.scoreId}
-                    className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    className="border-b border-edge hover:bg-elevated/50 transition-colors"
                   >
-                    <td className="py-2 pr-4 font-medium text-gray-900 dark:text-white">{score.teamName}</td>
-                    <td className="py-2 pr-4 text-gray-600 dark:text-gray-400">{score.period}</td>
-                    <td className="py-2 pr-4 font-semibold text-gray-900 dark:text-white">{score.overallScore}</td>
+                    <td className="py-2 pr-4 font-medium text-heading">{score.teamName}</td>
+                    <td className="py-2 pr-4 text-muted">{score.period}</td>
+                    <td className="py-2 pr-4 font-semibold text-heading">{score.overallScore}</td>
                     <td className="py-2 pr-4">
                       <Badge variant={SCORE_LEVEL_VARIANT[score.scoreLevel] ?? 'secondary'}>
                         {t(`developerExperienceScore.${score.scoreLevel.toLowerCase()}` as never, {
@@ -349,7 +349,7 @@ export function DeveloperExperienceScorePage() {
                         })}
                       </Badge>
                     </td>
-                    <td className="py-2 text-xs text-gray-500 dark:text-gray-400">
+                    <td className="py-2 text-xs text-muted">
                       {new Date(score.computedAt).toLocaleString()}
                     </td>
                   </tr>

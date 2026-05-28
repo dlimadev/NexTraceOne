@@ -16,6 +16,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Delay de debounce para a pesquisa (ms). */
@@ -41,11 +42,11 @@ const criticalityColors: Record<string, string> = {
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
   OpenApi: 'bg-success/15 text-success border border-success/25',
-  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
-  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  Swagger: 'bg-info/10 text-info border border-info/25',
+  Wsdl: 'bg-elevated text-muted border border-edge',
   AsyncApi: 'bg-info/15 text-info border border-info/25',
   Protobuf: 'bg-warning/15 text-warning border border-warning/25',
-  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+  GraphQl: 'bg-accent/10 text-accent border border-accent/25',
 };
 
 /** Página de exploração e descoberta do Source of Truth — pesquisa unificada. */
@@ -86,19 +87,11 @@ export function SourceOfTruthExplorerPage() {
 
   return (
     <PageContainer>
-
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center">
-            <Globe size={22} className="text-accent" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-heading">{t('sourceOfTruth.title')}</h1>
-            <p className="text-sm text-muted">{t('sourceOfTruth.subtitle')}</p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={t('sourceOfTruth.title')}
+        subtitle={t('sourceOfTruth.subtitle')}
+        icon={<Globe size={24} />}
+      />
 
       {/* Search bar */}
       <Card className="mb-8">

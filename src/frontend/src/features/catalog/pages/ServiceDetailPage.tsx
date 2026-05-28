@@ -32,6 +32,7 @@ import { ServiceLifecyclePanel } from '../components/ServiceLifecyclePanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 import type { ServiceType } from '../../../types';
 import { PageContainer, PageSection, TableWrapper } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
@@ -174,6 +175,11 @@ export function ServiceDetailPage() {
 
   return (
     <PageContainer className="animate-fade-in">
+      <PageHeader
+        title={service.displayName || service.name}
+        subtitle={t(`catalog.badges.type.${service.serviceType}`)}
+        icon={<Server size={24} />}
+      />
       {/* ── EntityHeader ── */}
       <EntityHeader
         name={service.displayName || service.name}

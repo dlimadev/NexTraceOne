@@ -213,16 +213,16 @@ export function SelfServicePortalPage() {
               <Link
                 key={action.titleKey}
                 to={action.href}
-                className="group flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm transition-all hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="group flex items-start gap-3 rounded-lg border border-edge bg-card p-4 shadow-sm transition-all hover:border-accent/40 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent/20 transition-colors">
                   {action.icon}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <p className="text-sm font-semibold text-heading group-hover:text-accent transition-colors">
                     {t(action.titleKey)}
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 leading-snug">
+                  <p className="mt-0.5 text-xs text-muted leading-snug">
                     {t(action.descKey)}
                   </p>
                 </div>

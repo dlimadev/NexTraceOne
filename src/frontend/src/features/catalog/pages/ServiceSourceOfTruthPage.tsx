@@ -20,6 +20,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import type { CoverageIndicators, ContractVersionDetail, SourceOfTruthReferenceItem, ServiceApiSummary } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de criticidade. */
@@ -41,11 +42,11 @@ const lifecycleColors: Record<string, string> = {
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
   OpenApi: 'bg-success/15 text-success border border-success/25',
-  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
-  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  Swagger: 'bg-info/10 text-info border border-info/25',
+  Wsdl: 'bg-elevated text-muted border border-edge',
   AsyncApi: 'bg-info/15 text-info border border-info/25',
   Protobuf: 'bg-warning/15 text-warning border border-warning/25',
-  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+  GraphQl: 'bg-accent/10 text-accent border border-accent/25',
 };
 
 /** Chaves dos indicadores de cobertura para iteração. */
@@ -110,7 +111,13 @@ export function ServiceSourceOfTruthPage() {
   const dashOffset = RING_CIRCUMFERENCE - (coveragePercent / 100) * RING_CIRCUMFERENCE;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      <PageHeader
+        title={sot.displayName || sot.name}
+        subtitle={sot.domain}
+        icon={<Server size={24} />}
+      />
+
       {/* Navigation */}
       <div className="flex items-center gap-4 mb-6">
         <Link to="/source-of-truth" className="flex items-center gap-1.5 text-sm text-muted hover:text-accent transition-colors">
@@ -123,25 +130,16 @@ export function ServiceSourceOfTruthPage() {
         </Link>
       </div>
 
-      {/* Header */}
-      <div className="flex items-start gap-4 mb-8">
-        <div className="w-12 h-12 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
-          <Server size={24} className="text-accent" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-heading truncate">{sot.displayName || sot.name}</h1>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-sm text-muted">{sot.domain}</span>
-            {sot.criticality && (
-              <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[sot.criticality] ?? 'bg-elevated text-muted border border-edge'}`}>
-                {t(`catalog.badges.criticality.${sot.criticality}`, sot.criticality)}
-              </span>
-            )}
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[lifecycleStatus] ?? 'bg-elevated text-muted border border-edge'}`}>
-              {String(t(`catalog.badges.lifecycle.${lifecycleStatus}`, lifecycleStatus))}
-            </span>
-          </div>
-        </div>
+      {/* Criticality and lifecycle badges */}
+      <div className="flex items-center gap-2 mb-8 flex-wrap">
+        {sot.criticality && (
+          <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[sot.criticality] ?? 'bg-elevated text-muted border border-edge'}`}>
+            {t(`catalog.badges.criticality.${sot.criticality}`, sot.criticality)}
+          </span>
+        )}
+        <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[lifecycleStatus] ?? 'bg-elevated text-muted border border-edge'}`}>
+          {String(t(`catalog.badges.lifecycle.${lifecycleStatus}`, lifecycleStatus))}
+        </span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -436,6 +434,6 @@ export function ServiceSourceOfTruthPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

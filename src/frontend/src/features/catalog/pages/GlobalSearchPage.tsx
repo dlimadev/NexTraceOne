@@ -16,6 +16,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { globalSearchApi } from '../api/globalSearch';
 import type { SearchResultItem } from '../api/globalSearch';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -101,15 +102,11 @@ export function GlobalSearchPage() {
 
   return (
     <PageContainer>
-      {/* ── Cabeçalho ── */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">
-          {t('commandPalette.globalSearch.title')}
-        </h1>
-        <p className="text-muted mt-1">
-          {t('commandPalette.globalSearch.subtitle')}
-        </p>
-      </div>
+      <PageHeader
+        title={t('commandPalette.globalSearch.title')}
+        subtitle={t('commandPalette.globalSearch.subtitle')}
+        icon={<Search size={24} />}
+      />
 
       {/* ── Pesquisa ── */}
       <Card className="mb-6">

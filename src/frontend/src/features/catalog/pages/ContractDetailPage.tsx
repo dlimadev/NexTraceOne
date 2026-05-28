@@ -22,15 +22,16 @@ import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
   OpenApi: 'bg-success/15 text-success border border-success/25',
-  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
-  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  Swagger: 'bg-info/10 text-info border border-info/25',
+  Wsdl: 'bg-elevated text-muted border border-edge',
   AsyncApi: 'bg-info/15 text-info border border-info/25',
   Protobuf: 'bg-warning/15 text-warning border border-warning/25',
-  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+  GraphQl: 'bg-accent/10 text-accent border border-accent/25',
 };
 
 /** Variantes visuais para badges de estado do ciclo de vida. */
@@ -97,7 +98,13 @@ export function ContractDetailPage() {
   const otherVersions = versionHistory?.filter((v) => v.id !== contractVersionId) ?? [];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      <PageHeader
+        title={detail.apiAssetId}
+        subtitle={t('contractGov.detail.title')}
+        icon={<FileText size={24} />}
+      />
+
       {/* ── Navegação ── */}
       <Link
         to="/contracts"
@@ -107,23 +114,19 @@ export function ContractDetailPage() {
         {t('contractGov.detail.backToList')}
       </Link>
 
-      {/* ── Cabeçalho ── */}
-      <div className="mb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-heading">{detail.apiAssetId}</h1>
-          <span className="text-sm font-mono text-muted">v{detail.semVer}</span>
-          <span
-            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[detail.protocol] ?? 'bg-elevated text-muted border border-edge'}`}
-          >
-            {t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)}
-          </span>
-          <span
-            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[detail.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}
-          >
-            {t(`contractGov.badges.lifecycle.${detail.lifecycleState}`, detail.lifecycleState)}
-          </span>
-        </div>
-        <p className="text-muted mt-1">{t('contractGov.detail.title')}</p>
+      {/* ── Badges de protocolo e ciclo de vida ── */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <span className="text-sm font-mono text-muted">v{detail.semVer}</span>
+        <span
+          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[detail.protocol] ?? 'bg-elevated text-muted border border-edge'}`}
+        >
+          {t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)}
+        </span>
+        <span
+          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[detail.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}
+        >
+          {t(`contractGov.badges.lifecycle.${detail.lifecycleState}`, detail.lifecycleState)}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -374,7 +377,7 @@ export function ContractDetailPage() {
       </div>
 
       {/* ── AI Assistant Panel ── */}
-      <div className="mt-6">
+      <div className="mt-6" >
         <AssistantPanel
           contextType="contract"
           contextId={contractVersionId!}
@@ -430,7 +433,7 @@ export function ContractDetailPage() {
           }}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

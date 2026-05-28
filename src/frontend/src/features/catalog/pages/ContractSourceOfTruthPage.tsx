@@ -19,6 +19,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import type { SourceOfTruthReferenceItem } from '../../../types';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -26,11 +27,11 @@ import { useEnvironment } from '../../../contexts/EnvironmentContext';
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
   OpenApi: 'bg-success/15 text-success border border-success/25',
-  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
-  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  Swagger: 'bg-info/10 text-info border border-info/25',
+  Wsdl: 'bg-elevated text-muted border border-edge',
   AsyncApi: 'bg-info/15 text-info border border-info/25',
   Protobuf: 'bg-warning/15 text-warning border border-warning/25',
-  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+  GraphQl: 'bg-accent/10 text-accent border border-accent/25',
 };
 
 /** Variantes visuais para badges de ciclo de vida. */
@@ -80,7 +81,13 @@ export function ContractSourceOfTruthPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      <PageHeader
+        title={t('sourceOfTruth.contract.title')}
+        subtitle={`${sot.apiAssetId} · v${sot.semVer}`}
+        icon={<FileText size={24} />}
+      />
+
       {/* Navigation */}
       <div className="flex items-center gap-4 mb-6">
         <Link to="/source-of-truth" className="flex items-center gap-1.5 text-sm text-muted hover:text-accent transition-colors">
@@ -95,24 +102,14 @@ export function ContractSourceOfTruthPage() {
         )}
       </div>
 
-      {/* Header */}
-      <div className="flex items-start gap-4 mb-8">
-        <div className="w-12 h-12 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
-          <FileText size={24} className="text-accent" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-heading">{t('sourceOfTruth.contract.title')}</h1>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-sm text-muted">{sot.apiAssetId}</span>
-            <span className="text-sm text-muted">v{sot.semVer}</span>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[sot.protocol] ?? 'bg-elevated text-muted border border-edge'}`}>
-              {t(`contractGov.badges.protocols.${sot.protocol}`, sot.protocol)}
-            </span>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}>
-              {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
-            </span>
-          </div>
-        </div>
+      {/* Protocol and lifecycle badges */}
+      <div className="flex items-center gap-2 mb-8 flex-wrap">
+        <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[sot.protocol] ?? 'bg-elevated text-muted border border-edge'}`}>
+          {t(`contractGov.badges.protocols.${sot.protocol}`, sot.protocol)}
+        </span>
+        <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}>
+          {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
+        </span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -267,6 +264,6 @@ export function ContractSourceOfTruthPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

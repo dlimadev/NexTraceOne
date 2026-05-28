@@ -18,16 +18,17 @@ import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
 import type { ContractListItem } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
   OpenApi: 'bg-success/15 text-success border border-success/25',
-  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
-  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  Swagger: 'bg-info/10 text-info border border-info/25',
+  Wsdl: 'bg-elevated text-muted border border-edge',
   AsyncApi: 'bg-info/15 text-info border border-info/25',
   Protobuf: 'bg-warning/15 text-warning border border-warning/25',
-  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+  GraphQl: 'bg-accent/10 text-accent border border-accent/25',
 };
 
 /** Variantes visuais para badges de estado do ciclo de vida. */
@@ -110,11 +111,11 @@ export function ContractListPage() {
 
   return (
     <PageContainer>
-      {/* ── Cabeçalho ── */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('contractGov.title')}</h1>
-        <p className="text-muted mt-1">{t('contractGov.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('contractGov.title')}
+        subtitle={t('contractGov.subtitle')}
+        icon={<FileText size={24} />}
+      />
 
       {/* ── Métricas de resumo ── */}
       {summary && (

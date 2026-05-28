@@ -10,6 +10,7 @@ import { ArrowLeft, Layers, Check } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { serviceCatalogApi } from '../api';
@@ -154,22 +155,11 @@ export function CreateServiceInterfacePage() {
         </Link>
       </div>
 
-      {/* ── Page header ── */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent/10">
-          <Layers size={20} className="text-accent" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-xl font-semibold text-heading">
-            {t('serviceInterfaces.createTitle', 'New Interface')}
-          </h1>
-          <p className="text-sm text-muted">
-            {t('serviceInterfaces.createSubtitle', 'Register a new interface for this service')}
-            {' — '}
-            <span className="text-body font-medium">{service.displayName || service.name}</span>
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={t('serviceInterfaces.createTitle', 'New Interface')}
+        subtitle={`${t('serviceInterfaces.createSubtitle', 'Register a new interface for this service')} — ${service.displayName || service.name}`}
+        icon={<Layers size={24} />}
+      />
 
       <PageSection>
         <Card>

@@ -21,6 +21,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -172,12 +173,12 @@ export function ServiceCatalogListPage() {
 
   return (
     <PageContainer>
-      {/* ── Cabeçalho ── */}
-      <div className="mb-6 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('catalog.title')}</h1>
-          <p className="text-muted mt-1">{t('catalog.subtitle')}</p>
-        </div>
+      <div className="flex items-start justify-between mb-2">
+        <PageHeader
+          title={t('catalog.title')}
+          subtitle={t('catalog.subtitle')}
+          icon={<Server size={24} />}
+        />
         <Button onClick={() => setShowServiceForm((v) => !v)}>
           <Plus size={16} /> {t('serviceCatalog.registerService')}
         </Button>
