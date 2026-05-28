@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
