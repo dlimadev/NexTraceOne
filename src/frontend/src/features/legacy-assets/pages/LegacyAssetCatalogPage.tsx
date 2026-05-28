@@ -15,6 +15,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { legacyAssetsApi } from '../api/legacyAssets';
 import type { LegacyAssetFilters } from '../api/legacyAssets';
 
@@ -122,11 +123,11 @@ export function LegacyAssetCatalogPage() {
 
   return (
     <PageContainer>
-      {/* ── Cabeçalho ── */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('legacyCatalog.title')}</h1>
-        <p className="text-muted mt-1">{t('legacyCatalog.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('legacyCatalog.title')}
+        subtitle={t('legacyCatalog.subtitle')}
+        icon={<Database />}
+      />
 
       {/* ── Pesquisa e filtros + Tabela ── */}
       <PageSection>

@@ -13,6 +13,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { legacyAssetsApi } from '../api/legacyAssets';
 
 /** Variantes visuais para badges de criticidade. */
@@ -68,22 +69,18 @@ export function MainframeSystemDetailPage() {
   return (
     <PageContainer>
       {/* ── Navegação e cabeçalho ── */}
-      <div className="mb-6">
-        <Link
-          to="/services/legacy"
-          className="inline-flex items-center gap-1 text-sm text-accent hover:underline mb-4"
-        >
-          <ArrowLeft size={14} />
-          {t('legacyCatalog.detail.back')}
-        </Link>
-        <div className="flex items-center gap-3">
-          <Database size={24} className="text-accent" />
-          <div>
-            <h1 className="text-2xl font-bold text-heading">{asset.displayName || asset.name}</h1>
-            <p className="text-muted text-sm mt-0.5">{asset.assetType}</p>
-          </div>
-        </div>
-      </div>
+      <Link
+        to="/services/legacy"
+        className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
+      >
+        <ArrowLeft size={14} />
+        {t('legacyCatalog.detail.back')}
+      </Link>
+      <PageHeader
+        title={asset.displayName || asset.name}
+        subtitle={asset.assetType}
+        icon={<Database />}
+      />
 
       {/* ── Informação geral ── */}
       <PageSection>
