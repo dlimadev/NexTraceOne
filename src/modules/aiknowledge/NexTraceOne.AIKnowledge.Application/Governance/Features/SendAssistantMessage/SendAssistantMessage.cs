@@ -53,7 +53,8 @@ public static class SendAssistantMessage
         Guid? ChangeId,
         Guid? TeamId,
         Guid? DomainId,
-        string? ContextBundle = null) : ICommand<Response>;
+        string? ContextBundle = null,
+        string? FeatureKey = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de envio de mensagem.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -80,6 +81,7 @@ public static class SendAssistantMessage
         IAiGuardrailEnforcementService guardrailEnforcementService,
         IContextWindowManager contextWindow,
         IPromptCacheService promptCache,
+        IAiModelCatalogService modelCatalogService,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         ICurrentEnvironment currentEnvironment,
@@ -158,31 +160,42 @@ public static class SendAssistantMessage
                 sources,
                 cancellationToken);
 
-            // 3. Resolve routing (model + provider)
+            // 3. Resolve feature binding override (takes precedence over preferred model)
+            var resolvedPreferredModelId = request.PreferredModelId;
+            if (!string.IsNullOrWhiteSpace(request.FeatureKey))
+            {
+                var featureBoundModel = await modelCatalogService.ResolveModelForFeatureAsync(
+                    request.FeatureKey, "chat", currentTenant.Id, cancellationToken);
+
+                if (featureBoundModel is not null)
+                    resolvedPreferredModelId = featureBoundModel.ModelId;
+            }
+
+            // 4. Resolve routing (model + provider)
             var activeStrategies = await routingStrategyRepository.ListAsync(isActive: true, cancellationToken);
             var routingResult = await routingResolver.ResolveRoutingAsync(
                 persona,
                 groundingResult.UseCaseType,
                 request.ClientType,
-                request.PreferredModelId,
+                resolvedPreferredModelId,
                 groundingResult.ConfidenceLevel,
                 activeStrategies,
                 cancellationToken);
 
-            // 4. Validate model authorization
-            if (request.PreferredModelId.HasValue)
+            // 5. Validate model authorization
+            if (resolvedPreferredModelId.HasValue)
             {
                 var accessDecision = await modelAuthorizationService.ValidateModelAccessAsync(
-                    request.PreferredModelId.Value, cancellationToken);
+                    resolvedPreferredModelId.Value, cancellationToken);
 
                 if (!accessDecision.IsAllowed)
                 {
                     logger.LogWarning(
                         "User {UserId} denied access to model {ModelId}: {Reason}",
-                        currentUser.Id, request.PreferredModelId.Value, accessDecision.DenialReason);
+                        currentUser.Id, resolvedPreferredModelId.Value, accessDecision.DenialReason);
 
                     return AiGovernanceErrors.ModelAccessDenied(
-                        request.PreferredModelId.Value.ToString(),
+                        resolvedPreferredModelId.Value.ToString(),
                         accessDecision.DenialReason ?? "Access denied by policy");
                 }
             }

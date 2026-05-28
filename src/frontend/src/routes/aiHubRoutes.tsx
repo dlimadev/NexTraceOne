@@ -20,6 +20,9 @@ const AgentMarketplacePage = lazy(() => import('../features/ai-hub/pages/AgentMa
 const AiIntegrationsConfigurationPage = lazy(() => import('../features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
 const McpServerPage = lazy(() => import('../features/ai-hub/pages/McpServerPage').then(m => ({ default: m.McpServerPage })));
 const AiMemoryIntelligencePage = lazy(() => import('../features/ai-hub/pages/AiMemoryIntelligencePage').then(m => ({ default: m.AiMemoryIntelligencePage })));
+const FeatureModelBindingsPage = lazy(() => import('../features/ai-hub/pages/FeatureModelBindingsPage').then(m => ({ default: m.FeatureModelBindingsPage })));
+const UserModelPoliciesPage = lazy(() => import('../features/ai-hub/pages/UserModelPoliciesPage').then(m => ({ default: m.UserModelPoliciesPage })));
+const UserTokenQuotasPage = lazy(() => import('../features/ai-hub/pages/UserTokenQuotasPage').then(m => ({ default: m.UserTokenQuotasPage })));
 
 export function AiHubRoutes() {
   return (
@@ -133,6 +136,30 @@ export function AiHubRoutes() {
         element={
           <ProtectedRoute permission="ai:governance:read" redirectTo="/unauthorized">
             <AiMemoryIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/feature-bindings"
+        element={
+          <ProtectedRoute permission="ai:governance:write" redirectTo="/unauthorized">
+            <FeatureModelBindingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/user-model-policies"
+        element={
+          <ProtectedRoute permission="ai:governance:write" redirectTo="/unauthorized">
+            <UserModelPoliciesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/user-token-quotas"
+        element={
+          <ProtectedRoute permission="ai:governance:write" redirectTo="/unauthorized">
+            <UserTokenQuotasPage />
           </ProtectedRoute>
         }
       />

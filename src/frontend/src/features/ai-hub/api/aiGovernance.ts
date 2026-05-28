@@ -375,4 +375,36 @@ export const aiGovernanceApi = {
     minTeamExecutions?: number;
   }) =>
     client.get('/ai/intelligence/capability-maturity', { params }).then(r => r.data),
+
+  // ── Feature Model Bindings ────────────────────────────────────────
+  listFeatureModelBindings: (params?: { isActive?: boolean }) =>
+    client.get('/ai/feature-model-bindings', { params }).then(r => r.data),
+  getFeatureModelBinding: (id: string) =>
+    client.get(`/ai/feature-model-bindings/${id}`).then(r => r.data),
+  createFeatureModelBinding: (data: unknown) =>
+    client.post('/ai/feature-model-bindings', data).then(r => r.data),
+  updateFeatureModelBinding: (id: string, data: unknown) =>
+    client.put(`/ai/feature-model-bindings/${id}`, data).then(r => r.data),
+  deleteFeatureModelBinding: (id: string) =>
+    client.delete(`/ai/feature-model-bindings/${id}`).then(r => r.data),
+
+  // ── User Model Policies ───────────────────────────────────────────
+  listUserModelPolicies: (params?: { isActive?: boolean }) =>
+    client.get('/ai/user-model-policies', { params }).then(r => r.data),
+  createUserModelPolicy: (data: unknown) =>
+    client.post('/ai/user-model-policies', data).then(r => r.data),
+  updateUserModelPolicy: (id: string, data: unknown) =>
+    client.put(`/ai/user-model-policies/${id}`, data).then(r => r.data),
+  deleteUserModelPolicy: (id: string) =>
+    client.delete(`/ai/user-model-policies/${id}`).then(r => r.data),
+
+  // ── User Token Quotas ─────────────────────────────────────────────
+  listUserTokenQuotas: (params?: { userId?: string }) =>
+    client.get('/ai/user-token-quotas', { params }).then(r => r.data),
+  createUserTokenQuota: (data: unknown) =>
+    client.post('/ai/user-token-quotas', data).then(r => r.data),
+  updateUserTokenQuota: (id: string, data: unknown) =>
+    client.put(`/ai/user-token-quotas/${id}`, data).then(r => r.data),
+  deleteUserTokenQuota: (id: string) =>
+    client.delete(`/ai/user-token-quotas/${id}`).then(r => r.data),
 };

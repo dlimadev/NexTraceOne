@@ -56,7 +56,8 @@ public sealed class AiDraftGeneratorService : IAiDraftGenerator
 
         try
         {
-            var model = await _modelCatalog.ResolveDefaultModelAsync("chat", cancellationToken);
+            var model = await _modelCatalog.ResolveModelForFeatureAsync(
+                "catalog.contract-draft", "chat", _currentTenant.Id, cancellationToken);
             if (model is null)
             {
                 _logger.LogWarning("No AI model available for contract draft generation — falling back to template");

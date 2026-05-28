@@ -25,7 +25,8 @@ public static class ExecuteAiChat
         Guid? PreferredModelId,
         string? SystemPrompt,
         double? Temperature,
-        int? MaxTokens) : ICommand<Response>;
+        int? MaxTokens,
+        string? FeatureKey = null) : ICommand<Response>;
 
     public sealed class Validator : AbstractValidator<Command>
     {
@@ -60,9 +61,14 @@ public static class ExecuteAiChat
             var correlationId = Guid.NewGuid().ToString();
             var startTime = dateTimeProvider.UtcNow;
 
-            // 1. Resolve model
+            // 1. Resolve model — feature binding takes precedence over preferred model
             ResolvedModel? resolvedModel;
-            if (request.PreferredModelId.HasValue)
+            if (!string.IsNullOrWhiteSpace(request.FeatureKey))
+            {
+                resolvedModel = await modelCatalogService.ResolveModelForFeatureAsync(
+                    request.FeatureKey, "chat", currentTenant.Id, cancellationToken);
+            }
+            else if (request.PreferredModelId.HasValue)
             {
                 resolvedModel = await modelCatalogService.ResolveModelByIdAsync(
                     request.PreferredModelId.Value, cancellationToken);

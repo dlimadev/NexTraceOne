@@ -150,6 +150,9 @@ public static class DependencyInjection
         // ── AI Model Quality — overrides Application-layer singleton stub ──
         services.AddScoped<IModelPredictionRepository, EfModelPredictionRepository>();
 
+        // ── Feature Model Bindings (Phase 3 AI Governance) ───────────────────
+        services.AddScoped<IAiFeatureModelBindingRepository, AiFeatureModelBindingRepository>();
+
         // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
 
