@@ -10,6 +10,8 @@ import { TrendingUp, AlertTriangle, Zap, Loader2 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { stateToVariant } from '../lib/contractVariants';
 import { contractsApi } from '../api/contracts';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 type HealthTimelinePoint = {
   semVer: string;
@@ -71,17 +73,12 @@ export function ContractHealthTimelinePage() {
   const points = data?.points ?? [];
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-heading flex items-center gap-2">
-          <TrendingUp size={24} className="text-accent" />
-          {t('phase4.healthTimeline.title', 'Health Score Timeline')}
-        </h1>
-        <p className="text-muted text-sm mt-1">
-          {t('phase4.healthTimeline.subtitle', 'Evolution of contract health over time')}
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('phase4.healthTimeline.title', 'Health Score Timeline')}
+        subtitle={t('phase4.healthTimeline.subtitle', 'Evolution of contract health over time')}
+        icon={<TrendingUp />}
+      />
 
       {/* Controls */}
       <div className="bg-elevated rounded-lg border border-edge p-4">
@@ -187,6 +184,6 @@ export function ContractHealthTimelinePage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

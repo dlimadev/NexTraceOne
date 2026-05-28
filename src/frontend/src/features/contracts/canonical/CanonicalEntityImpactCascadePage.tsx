@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import { contractsApi } from '../api/contracts';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 type CascadeNode = {
   entityName: string;
@@ -27,19 +29,19 @@ type CascadeResponse = {
 };
 
 const RISK_COLORS: Record<string, string> = {
-  None: 'text-green-400',
-  Low: 'text-green-400',
-  Medium: 'text-yellow-400',
-  High: 'text-orange-400',
-  Critical: 'text-red-400',
+  None: 'text-success',
+  Low: 'text-success',
+  Medium: 'text-warning',
+  High: 'text-warning',
+  Critical: 'text-critical',
 };
 
 const RISK_BG: Record<string, string> = {
-  None: 'bg-green-400/10 border-green-400/25',
-  Low: 'bg-green-400/10 border-green-400/25',
-  Medium: 'bg-yellow-400/10 border-yellow-400/25',
-  High: 'bg-orange-400/10 border-orange-400/25',
-  Critical: 'bg-red-400/10 border-red-400/25',
+  None: 'bg-success/10 border-success/25',
+  Low: 'bg-success/10 border-success/25',
+  Medium: 'bg-warning/10 border-warning/25',
+  High: 'bg-warning/10 border-warning/25',
+  Critical: 'bg-critical/10 border-critical/25',
 };
 
 function CascadeNodeTree({ node, depth = 0 }: { node: CascadeNode; depth?: number }) {
@@ -48,23 +50,23 @@ function CascadeNodeTree({ node, depth = 0 }: { node: CascadeNode; depth?: numbe
   const hasChildren = node.children.length > 0;
 
   return (
-    <div className="ml-4 border-l border-slate-700 pl-3">
+    <div className="ml-4 border-l border-edge pl-3">
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="flex items-center gap-2 py-1.5 w-full text-left hover:text-white transition-colors text-slate-300"
+        className="flex items-center gap-2 py-1.5 w-full text-left hover:text-heading transition-colors text-body"
         aria-label={t('phase4.impactCascade.entityName')}
       >
         {hasChildren ? (
-          expanded ? <ChevronDown size={14} className="text-slate-500" /> : <ChevronRight size={14} className="text-slate-500" />
+          expanded ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />
         ) : (
           <span className="w-3.5" />
         )}
-        <GitBranch size={14} className="text-blue-400 shrink-0" />
+        <GitBranch size={14} className="text-accent shrink-0" />
         <span className="font-medium text-sm">{node.entityName}</span>
-        <span className="text-xs text-slate-500 ml-1">
+        <span className="text-xs text-muted ml-1">
           {t('phase4.impactCascade.depthLabel', { depth: node.depth })}
         </span>
-        <span className="ml-auto text-xs bg-slate-700 rounded px-1.5 py-0.5">
+        <span className="ml-auto text-xs bg-elevated rounded px-1.5 py-0.5">
           {node.affectedContractIds.length} {t('phase4.impactCascade.affectedContracts')}
         </span>
       </button>
@@ -102,27 +104,22 @@ export function CanonicalEntityImpactCascadePage() {
     setSubmittedDepth(maxDepth);
   };
 
-  const riskColor = data ? (RISK_COLORS[data.riskLevel] ?? 'text-slate-400') : 'text-slate-400';
-  const riskBg = data ? (RISK_BG[data.riskLevel] ?? 'bg-slate-700/10 border-slate-700/25') : '';
+  const riskColor = data ? (RISK_COLORS[data.riskLevel] ?? 'text-muted') : 'text-muted';
+  const riskBg = data ? (RISK_BG[data.riskLevel] ?? 'bg-elevated/10 border-edge/25') : '';
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
-          <GitBranch size={24} className="text-blue-400" />
-          {t('phase4.impactCascade.title', 'Canonical Entity Impact Cascade')}
-        </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          {t('phase4.impactCascade.subtitle', 'Multi-level cascade analysis of canonical entity changes')}
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('phase4.impactCascade.title', 'Canonical Entity Impact Cascade')}
+        subtitle={t('phase4.impactCascade.subtitle', 'Multi-level cascade analysis of canonical entity changes')}
+        icon={<GitBranch />}
+      />
 
       {/* Controls */}
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 space-y-4">
+      <div className="bg-elevated rounded-lg border border-edge p-4 space-y-4">
         <div className="flex gap-3 flex-wrap">
           <div className="flex-1 min-w-[260px]">
-            <label className="block text-xs text-slate-400 mb-1 uppercase tracking-wide">
+            <label className="block text-xs text-muted mb-1 uppercase tracking-wide">
               {t('phase4.impactCascade.entityName', 'Canonical Entity ID')}
             </label>
             <input
@@ -130,18 +127,18 @@ export function CanonicalEntityImpactCascadePage() {
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
               placeholder={t('phase4.impactCascade.entityIdPlaceholder', 'Search or enter canonical entity name')}
-              className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg bg-elevated border border-edge text-heading text-sm placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label={t('phase4.impactCascade.entityName')}
             />
           </div>
           <div className="w-36">
-            <label className="block text-xs text-slate-400 mb-1 uppercase tracking-wide">
+            <label className="block text-xs text-muted mb-1 uppercase tracking-wide">
               {t('phase4.impactCascade.maxDepth', 'Max Depth')}
             </label>
             <select
               value={maxDepth}
               onChange={(e) => setMaxDepth(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg bg-elevated border border-edge text-heading text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label={t('phase4.impactCascade.maxDepth')}
             >
               <option value={1}>1</option>
@@ -153,7 +150,7 @@ export function CanonicalEntityImpactCascadePage() {
             <button
               onClick={handleAnalyze}
               disabled={!entityId.trim() || isLoading}
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-heading hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? '...' : t('phase4.impactCascade.analyze', 'Analyze Cascade')}
             </button>
@@ -164,14 +161,14 @@ export function CanonicalEntityImpactCascadePage() {
       {/* Loading */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={24} className="animate-spin text-blue-400 mr-2" />
-          <span className="text-slate-400 text-sm">{t('common.loading', 'Loading...')}</span>
+          <Loader2 size={24} className="animate-spin text-accent mr-2" />
+          <span className="text-muted text-sm">{t('common.loading', 'Loading...')}</span>
         </div>
       )}
 
       {/* Error */}
       {isError && (
-        <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 flex items-center gap-2 text-red-400">
+        <div className="bg-critical/10 border border-critical/25 rounded-lg p-4 flex items-center gap-2 text-critical">
           <AlertTriangle size={16} />
           <span className="text-sm">{t('phase4.impactCascade.loadError', 'Failed to load cascade analysis. Please verify the entity ID.')}</span>
           <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
@@ -183,52 +180,52 @@ export function CanonicalEntityImpactCascadePage() {
         <div className="space-y-4">
           {/* Summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <div className="text-xs text-slate-400 uppercase tracking-wide mb-1">
+            <div className="bg-elevated rounded-lg border border-edge p-4">
+              <div className="text-xs text-muted uppercase tracking-wide mb-1">
                 {t('phase4.impactCascade.totalContracts', 'Total Contracts Affected')}
               </div>
-              <div className="text-2xl font-semibold text-white tabular-nums">
+              <div className="text-2xl font-semibold text-heading tabular-nums">
                 {data.totalContractsAffected}
               </div>
             </div>
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <div className="text-xs text-slate-400 uppercase tracking-wide mb-1">
+            <div className="bg-elevated rounded-lg border border-edge p-4">
+              <div className="text-xs text-muted uppercase tracking-wide mb-1">
                 {t('phase4.impactCascade.uniqueEntities', 'Unique Entities in Cascade')}
               </div>
-              <div className="text-2xl font-semibold text-white tabular-nums">
+              <div className="text-2xl font-semibold text-heading tabular-nums">
                 {data.totalUniqueEntitiesInCascade}
               </div>
             </div>
             <div className={`rounded-lg border p-4 ${riskBg}`}>
-              <div className="text-xs text-slate-400 uppercase tracking-wide mb-1">
+              <div className="text-xs text-muted uppercase tracking-wide mb-1">
                 {t('phase4.impactCascade.riskLevel', 'Risk Level')}
               </div>
               <div className={`text-2xl font-semibold tabular-nums ${riskColor}`}>
                 {data.riskLevel}
               </div>
             </div>
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <div className="text-xs text-slate-400 uppercase tracking-wide mb-1">
+            <div className="bg-elevated rounded-lg border border-edge p-4">
+              <div className="text-xs text-muted uppercase tracking-wide mb-1">
                 {t('phase4.impactCascade.maxDepth', 'Max Depth Reached')}
               </div>
-              <div className="text-2xl font-semibold text-white tabular-nums">
+              <div className="text-2xl font-semibold text-heading tabular-nums">
                 {data.maxDepthReached}
               </div>
             </div>
           </div>
 
           {/* Root entity info */}
-          <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
+          <div className="bg-elevated rounded-lg border border-edge p-4">
             <div className="flex items-center gap-2 mb-3">
-              <CheckCircle2 size={16} className="text-blue-400" />
-              <h2 className="text-sm font-medium text-white">
+              <CheckCircle2 size={16} className="text-accent" />
+              <h2 className="text-sm font-medium text-heading">
                 {data.rootEntityName}
               </h2>
             </div>
 
             {/* Tree */}
             {data.cascadeNodes.length === 0 ? (
-              <p className="text-slate-400 text-sm">
+              <p className="text-muted text-sm">
                 {t('phase4.impactCascade.noChildren', 'No cascading impact')}
               </p>
             ) : (
@@ -241,6 +238,6 @@ export function CanonicalEntityImpactCascadePage() {
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

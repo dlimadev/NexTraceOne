@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
 import { ShieldCheck, AlertTriangle, CheckCircle2, XCircle, BarChart2, TrendingUp } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 type HealthDashboardData = {
   totalContractVersions: number;
@@ -68,19 +70,12 @@ export function ContractHealthDashboardPage() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-heading flex items-center gap-2">
-            <ShieldCheck size={24} className="text-accent" />
-            {t('contracts.healthDashboard.title', 'Contract Health Dashboard')}
-          </h1>
-          <p className="text-muted text-sm mt-1">
-            {t('contracts.healthDashboard.subtitle', 'Aggregated quality and governance metrics across all contracts')}
-          </p>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('contracts.healthDashboard.title', 'Contract Health Dashboard')}
+        subtitle={t('contracts.healthDashboard.subtitle', 'Aggregated quality and governance metrics across all contracts')}
+        icon={<ShieldCheck />}
+      />
 
       {isLoading && (
         <div className="flex items-center justify-center h-48 text-muted">
@@ -168,6 +163,6 @@ export function ContractHealthDashboardPage() {
           )}
         </>
       )}
-    </div>
+    </PageContainer>
   );
 }

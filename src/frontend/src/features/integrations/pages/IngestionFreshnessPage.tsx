@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Gauge, CheckCircle, AlertTriangle, XCircle, Clock, Activity, Shield,
+  Gauge, CheckCircle, AlertTriangle, XCircle, Clock, Activity, Shield, RefreshCw,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
