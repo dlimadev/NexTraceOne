@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import client from '../../../api/client';
 import { NqlEditor, NqlResultViewer } from '../components/NqlEditor';
-import { CHART_RAINBOW, CHART_SEMANTIC } from '../../../lib/chartColors';
+import { CHART_RAINBOW, CHART_SEMANTIC, CHART_CHROME } from '../../../lib/chartColors';
 import type { WidgetProps } from './WidgetRegistry';
 import type { NqlRenderHint } from './WidgetRegistry';
 
@@ -98,9 +98,9 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
     return (
       <ResponsiveContainer width="100%" height={220}>
         <ScatterChart>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-          <XAxis dataKey="x" name={xCol} tick={{ fill: '#9ca3af', fontSize: 10 }} />
-          <YAxis dataKey="y" name={yCol} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_CHROME.tooltipBorder} />
+          <XAxis dataKey="x" name={xCol} tick={{ fill: CHART_CHROME.tooltipMuted, fontSize: 10 }} />
+          <YAxis dataKey="y" name={yCol} tick={{ fill: CHART_CHROME.tooltipMuted, fontSize: 10 }} />
           <RechartsTooltip
             cursor={{ strokeDasharray: '3 3' }}
             content={({ payload }) => {

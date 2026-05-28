@@ -45,6 +45,33 @@ export const CHART_SEMANTIC = {
   grid:     'rgba(148,163,184,0.15)', // gridline muito subtil
 } as const;
 
+/**
+ * Cores de chrome para tooltips e UI interna de gráficos.
+ * Usar em vez de hex hardcoded em contentStyle / style de Recharts/ECharts.
+ */
+export const CHART_CHROME = {
+  tooltipBg:      '#1f2937', // fundo de tooltip escuro
+  tooltipBorder:  '#374151', // borda de tooltip / grid lines
+  tooltipBorderDark: '#111827', // borda mais escura (cell borders no heatmap)
+  tooltipText:    '#f9fafb', // texto primário no tooltip
+  tooltipMuted:   '#9ca3af', // texto secundário / eixos
+  tooltipFaded:   '#6b7280', // texto muito discreto (y-axis label)
+  labelText:      '#d1d5db', // labels de nó em grafos
+  itemBlue:       '#93c5fd', // item color azul claro (CHART_BLUE[4])
+} as const;
+
+/**
+ * Gradiente de calor para heatmaps — do "vazio" ao "crítico".
+ * Índice 0 = zero eventos, índice 4 = máximo (crítico).
+ * Usar como: [CHART_HEAT[0], CHART_HEAT[1], CHART_HEAT[2], CHART_HEAT[3], CHART_SEMANTIC.critical]
+ */
+export const CHART_HEAT = [
+  '#1f2937', // 0 — sem eventos (fundo escuro)
+  '#fef9c3', // 1 — poucos eventos (amarelo muito claro)
+  '#fde68a', // 2 — moderado (amarelo)
+  '#f97316', // 3 — alto (laranja)
+] as const;
+
 /** Retorna a paleta certa dado um colorScheme string. */
 export function getChartPalette(colorScheme?: string | null): readonly string[] {
   switch (colorScheme) {

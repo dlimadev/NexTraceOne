@@ -16,7 +16,7 @@ import { PieChart as PieChartIcon } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
-import { getChartPalette } from '../../../lib/chartColors';
+import { getChartPalette, CHART_CHROME } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -74,17 +74,17 @@ function CustomTooltip({
   return (
     <div
       style={{
-        backgroundColor: '#1f2937',
-        border: '1px solid #374151',
+        backgroundColor: CHART_CHROME.tooltipBg,
+        border: `1px solid ${CHART_CHROME.tooltipBorder}`,
         borderRadius: 6,
         fontSize: 11,
-        color: '#f9fafb',
+        color: CHART_CHROME.tooltipText,
         padding: '6px 10px',
       }}
     >
       <div className="font-semibold">{item.name}</div>
       <div>{item.value.toLocaleString()} {unit}</div>
-      <div style={{ color: '#9ca3af' }}>{pct}% do total</div>
+      <div style={{ color: CHART_CHROME.tooltipMuted }}>{pct}% do total</div>
     </div>
   );
 }
@@ -251,7 +251,7 @@ export function PieChartWidget({
             <Legend
               iconSize={8}
               iconType="circle"
-              wrapperStyle={{ fontSize: 9, color: '#9ca3af' }}
+              wrapperStyle={{ fontSize: 9, color: CHART_CHROME.tooltipMuted }}
             />
           </PieChart>
         </ResponsiveContainer>

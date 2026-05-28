@@ -13,6 +13,7 @@ import {
   User,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { platformAdminApi } from '../api/platformAdmin';
 import type { SupportBundleEntry } from '../api/platformAdmin';
 
@@ -102,11 +103,11 @@ export function SupportBundlePage() {
   return (
     <PageContainer>
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-heading">{t('supportBundle.title')}</h1>
-        <p className="mt-1 text-sm text-muted">{t('supportBundle.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('supportBundle.title')}
+        subtitle={t('supportBundle.subtitle')}
+        icon={<PackageOpen size={24} className="text-accent" />}
+      />
 
       {/* Info box — what's included */}
       <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-3">
@@ -212,6 +213,7 @@ export function SupportBundlePage() {
           )}
         </div>
       </div>
+    </div>
     </PageContainer>
   );
 }

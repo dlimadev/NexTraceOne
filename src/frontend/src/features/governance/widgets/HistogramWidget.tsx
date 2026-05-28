@@ -18,7 +18,7 @@ import { BarChart2 } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps, WidgetConfig } from './WidgetRegistry';
 import client from '../../../api/client';
-import { CHART_SEMANTIC } from '../../../lib/chartColors';
+import { CHART_SEMANTIC, CHART_CHROME } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -101,17 +101,17 @@ function CustomTooltip({
   return (
     <div
       style={{
-        backgroundColor: '#1f2937',
-        border: '1px solid #374151',
+        backgroundColor: CHART_CHROME.tooltipBg,
+        border: `1px solid ${CHART_CHROME.tooltipBorder}`,
         borderRadius: 6,
         fontSize: 11,
-        color: '#f9fafb',
+        color: CHART_CHROME.tooltipText,
         padding: '6px 10px',
       }}
     >
       <div className="font-semibold">{rangeLabel}</div>
       <div>{count.toLocaleString()} requests</div>
-      <div style={{ color: '#9ca3af' }}>{pct.toFixed(1)}% do total · {unit}</div>
+      <div style={{ color: CHART_CHROME.tooltipMuted }}>{pct.toFixed(1)}% do total · {unit}</div>
     </div>
   );
 }
@@ -232,7 +232,7 @@ export function HistogramWidget({
           >
             <XAxis
               dataKey="rangeLabel"
-              tick={{ fontSize: 8, fill: '#9ca3af' }}
+              tick={{ fontSize: 8, fill: CHART_CHROME.tooltipMuted }}
               tickLine={false}
               axisLine={false}
               interval={0}
@@ -241,7 +241,7 @@ export function HistogramWidget({
               height={32}
             />
             <YAxis
-              tick={{ fontSize: 9, fill: '#9ca3af' }}
+              tick={{ fontSize: 9, fill: CHART_CHROME.tooltipMuted }}
               tickLine={false}
               axisLine={false}
               width={36}
@@ -250,7 +250,7 @@ export function HistogramWidget({
                 angle: -90,
                 position: 'insideLeft',
                 offset: 12,
-                style: { fontSize: 9, fill: '#6b7280' },
+                style: { fontSize: 9, fill: CHART_CHROME.tooltipFaded },
               }}
             />
             <Tooltip

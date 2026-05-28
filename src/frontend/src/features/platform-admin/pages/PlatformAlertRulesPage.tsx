@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
   BellOff,
-  CheckCircle,
   XCircle,
   AlertTriangle,
   AlertCircle,
@@ -170,7 +169,7 @@ export function PlatformAlertRulesPage() {
                     </thead>
                     <tbody className="divide-y divide-edge/50">
                       {data.recentAlerts.map((alert) => (
-                        <AlertHistoryRow key={alert.id} alert={alert} t={t} />
+                        <AlertHistoryRow key={alert.id} alert={alert} />
                       ))}
                     </tbody>
                   </table>
@@ -356,10 +355,8 @@ function statusBadge(status: PlatformAlertStatus) {
 
 function AlertHistoryRow({
   alert,
-  t,
 }: {
   alert: PlatformAlertHistoryEntry;
-  t: (k: string) => string;
 }) {
   const triggeredDate = new Date(alert.triggeredAt).toLocaleString();
   return (

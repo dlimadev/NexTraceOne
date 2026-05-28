@@ -19,7 +19,7 @@ import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
 import { useAnnotations, type ChartAnnotation } from '../components/ChartAnnotations';
-import { CHART_SEMANTIC } from '../../../lib/chartColors';
+import { CHART_SEMANTIC, CHART_CHROME } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -212,13 +212,13 @@ export function OtelMetricsWidget({
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1f2937',
-                border: '1px solid #374151',
+                backgroundColor: CHART_CHROME.tooltipBg,
+                border: `1px solid ${CHART_CHROME.tooltipBorder}`,
                 borderRadius: '6px',
                 fontSize: '11px',
-                color: '#f9fafb',
+                color: CHART_CHROME.tooltipText,
               }}
-              itemStyle={{ color: '#93c5fd' }}
+              itemStyle={{ color: CHART_CHROME.itemBlue }}
             />
             {annotationLines.map((line) => (
               <ReferenceLine

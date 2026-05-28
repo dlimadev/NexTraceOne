@@ -11,7 +11,7 @@ import { Network, AlertCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
-import { CHART_SEMANTIC } from '../../../lib/chartColors';
+import { CHART_SEMANTIC, CHART_CHROME } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -125,7 +125,7 @@ function ServiceMapChart({
                 label: {
                   show: true,
                   fontSize: 9,
-                  color: '#d1d5db',
+                  color: CHART_CHROME.labelText,
                 },
                 force: {
                   repulsion: 80,
@@ -141,7 +141,7 @@ function ServiceMapChart({
                 edges: edges.map((e) => ({
                   source: e.source,
                   target: e.target,
-                  lineStyle: { color: '#374151', width: 1 },
+                  lineStyle: { color: CHART_CHROME.tooltipBorder, width: 1 },
                 })),
               },
             ],

@@ -14,7 +14,7 @@ import {
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
-import { platformAdminApi, type FeatureFlagRuntimeEntry } from '../api/platformAdmin';
+import { platformAdminApi } from '../api/platformAdmin';
 
 export function FeatureFlagsRuntimePage() {
   const { t } = useTranslation('featureFlagsRuntime');

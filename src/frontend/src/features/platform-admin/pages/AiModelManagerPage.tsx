@@ -100,7 +100,7 @@ export function AiModelManagerPage() {
                   </thead>
                   <tbody className="divide-y divide-edge/50">
                     {data.models.map((m) => (
-                      <ModelRow key={m.name} model={m} t={t} />
+                      <ModelRow key={m.name} model={m} />
                     ))}
                   </tbody>
                 </table>
@@ -141,7 +141,7 @@ function HardwareCard({
   );
 }
 
-function ModelRow({ model, t }: { model: ModelAdvice; t: (key: string) => string }) {
+function ModelRow({ model }: { model: ModelAdvice }) {
   const compatible = model.status === 'Compatible';
   return (
     <tr className={compatible ? '' : 'opacity-60 bg-elevated'}>

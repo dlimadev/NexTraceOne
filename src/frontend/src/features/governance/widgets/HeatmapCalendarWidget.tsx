@@ -10,7 +10,7 @@ import { CalendarDays } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
-import { CHART_SEMANTIC } from '../../../lib/chartColors';
+import { CHART_SEMANTIC, CHART_CHROME, CHART_HEAT } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -104,7 +104,7 @@ function EChartsCalendar({ cells, maxValue, startDate, endDate, compact }: EChar
         },
       },
       visualMap: compact
-        ? { show: false, min: 0, max: maxValue, inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', CHART_SEMANTIC.critical] } }
+        ? { show: false, min: 0, max: maxValue, inRange: { color: [...CHART_HEAT, CHART_SEMANTIC.critical] } }
         : {
             min: 0,
             max: maxValue,
@@ -114,24 +114,24 @@ function EChartsCalendar({ cells, maxValue, startDate, endDate, compact }: EChar
             bottom: 5,
             itemWidth: 12,
             itemHeight: 80,
-            textStyle: { color: '#9ca3af', fontSize: 9 },
-            inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', CHART_SEMANTIC.critical] },
+            textStyle: { color: CHART_CHROME.tooltipMuted, fontSize: 9 },
+            inRange: { color: [...CHART_HEAT, CHART_SEMANTIC.critical] },
           },
       calendar: {
         range: [startDate, endDate],
         cellSize: ['auto', compact ? 10 : 14],
         itemStyle: {
           borderWidth: 2,
-          borderColor: '#111827',
+          borderColor: CHART_CHROME.tooltipBorderDark,
         },
         yearLabel: { show: false },
         dayLabel: {
           nameMap: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as string[],
-          color: '#9ca3af',
+          color: CHART_CHROME.tooltipMuted,
           fontSize: 10,
           firstDay: 0,
         },
-        monthLabel: { color: '#9ca3af', fontSize: 10 },
+        monthLabel: { color: CHART_CHROME.tooltipMuted, fontSize: 10 },
         top: 10,
         left: 30,
         right: 10,

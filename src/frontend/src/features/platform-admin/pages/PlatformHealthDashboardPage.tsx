@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   XCircle,
   RefreshCw,
-  HardDrive,
   Shield,
   ArrowRight,
   Layers,

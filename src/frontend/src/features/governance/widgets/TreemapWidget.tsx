@@ -10,7 +10,7 @@ import { LayoutGrid } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
-import { getChartPalette } from '../../../lib/chartColors';
+import { getChartPalette, CHART_CHROME } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -120,22 +120,22 @@ function EChartsTreemap({ nodes, unit, colorPalette, activeServiceId, onNodeClic
             show: true,
             formatter: '{b}\n{c}',
             fontSize: 10,
-            color: '#f9fafb',
+            color: CHART_CHROME.tooltipText,
           },
           upperLabel: {
             show: true,
             height: 30,
             fontSize: 10,
-            color: '#f9fafb',
+            color: CHART_CHROME.tooltipText,
           },
           itemStyle: {
             borderWidth: 1,
-            borderColor: '#1f2937',
+            borderColor: CHART_CHROME.tooltipBg,
             gapWidth: 2,
           },
           levels: [
             {
-              itemStyle: { borderWidth: 2, borderColor: '#374151' },
+              itemStyle: { borderWidth: 2, borderColor: CHART_CHROME.tooltipBorder },
               upperLabel: { show: true },
             },
             {
