@@ -15,6 +15,16 @@ public static class TenantCapabilities
     public const string KnowledgeBase = "knowledge_base";
     public const string BasicAnalytics = "basic_analytics";
 
+    // ── IA — controlo granular de uso de inteligência artificial ─────────
+    /// <summary>Toggle principal: IA ligada para o tenant. Quando ausente, toda UI de IA é ocultada.</summary>
+    public const string AiEnabled = "ai_enabled";
+    /// <summary>Permite uso de IA interna (Ollama / LM Studio). Requer ai_enabled.</summary>
+    public const string AiInternal = "ai_internal";
+    /// <summary>Permite uso de IA externa (OpenAI / Anthropic). Requer ai_enabled.</summary>
+    public const string AiExternal = "ai_external";
+    /// <summary>Activa gestão de budget e quotas de tokens por utilizador/tenant.</summary>
+    public const string AiTokenBudget = "ai_token_budget";
+
     // ── Professional ──────────────────────────────────────────────────────
     public const string AiGovernance = "ai_governance";
     public const string ContractStudio = "contract_studio";
@@ -51,6 +61,7 @@ public static class TenantCapabilities
     private static readonly IReadOnlyList<string> ProfessionalCapabilities =
     [
         Apm, Infra, ServiceCatalog, ChangeGovernanceBasic, KnowledgeBase, BasicAnalytics,
+        AiEnabled, AiInternal, AiTokenBudget,
         AiGovernance, ContractStudio, ComplianceBasic, FinOps,
         ChangeGovernanceAdvanced, DeveloperPortal, AdvancedAnalytics,
     ];
@@ -58,6 +69,7 @@ public static class TenantCapabilities
     private static readonly IReadOnlyList<string> EnterpriseCapabilities =
     [
         Apm, Infra, ServiceCatalog, ChangeGovernanceBasic, KnowledgeBase, BasicAnalytics,
+        AiEnabled, AiInternal, AiExternal, AiTokenBudget,
         AiGovernance, ContractStudio, ComplianceBasic, FinOps,
         ChangeGovernanceAdvanced, DeveloperPortal, AdvancedAnalytics,
         ComplianceAdvanced, MultiRegion, AirGapped, CustomAgents,
@@ -69,6 +81,7 @@ public static class TenantCapabilities
     private static readonly IReadOnlyList<string> TrialCapabilities =
     [
         Apm, Infra, ServiceCatalog, ChangeGovernanceBasic, KnowledgeBase, BasicAnalytics,
+        AiEnabled, AiInternal, AiExternal, AiTokenBudget,
         AiGovernance, ContractStudio, ComplianceBasic, FinOps,
         ChangeGovernanceAdvanced, DeveloperPortal, AdvancedAnalytics,
         ComplianceAdvanced, CustomAgents, SsoEnterprise, AuditExport,

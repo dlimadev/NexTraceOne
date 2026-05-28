@@ -47,10 +47,36 @@ public sealed class TokenCounterService : ITokenCounterService
 
     public int CountTokens(string text, string modelName)
     {
-        // Futuro: suportar esquemas específicos por modelo (llama, qwen, etc.)
-        // Por agora, usamos cl100k_base para todos como estimativa conservadora.
-        _logger.LogDebug("Token counting for model {Model} — using cl100k_base as conservative estimate", modelName);
-        return CountTokens(text);
+        // Modelos Llama, Phi, Mistral e Gemma usam SentencePiece/BPE com vocabulários diferentes
+        // do cl100k_base (GPT-4). Para evitar subestimar tokens reais e violar quotas,
+        // aplica fator de segurança de 1.3 em modelos não-GPT/não-Anthropic.
+        var baseCount = CountTokens(text);
+        if (IsNonGptModel(modelName))
+        {
+            var conservative = (int)Math.Ceiling(baseCount * 1.3);
+            _logger.LogDebug(
+                "Token count for non-GPT model {Model}: {Base} → {Conservative} (×1.3 safety factor)",
+                modelName, baseCount, conservative);
+            return conservative;
+        }
+
+        _logger.LogDebug("Token counting for model {Model} — using cl100k_base", modelName);
+        return baseCount;
+    }
+
+    private static bool IsNonGptModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName))
+            return false;
+
+        var lower = modelName.ToLowerInvariant();
+        return lower.StartsWith("llama", StringComparison.Ordinal)
+            || lower.StartsWith("phi", StringComparison.Ordinal)
+            || lower.StartsWith("mistral", StringComparison.Ordinal)
+            || lower.StartsWith("codellama", StringComparison.Ordinal)
+            || lower.StartsWith("gemma", StringComparison.Ordinal)
+            || lower.StartsWith("nomic", StringComparison.Ordinal)
+            || lower.StartsWith("mxbai", StringComparison.Ordinal);
     }
 
     public string TruncateToTokens(string text, int maxTokens)

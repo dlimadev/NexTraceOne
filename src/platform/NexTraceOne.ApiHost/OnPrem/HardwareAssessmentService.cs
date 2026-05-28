@@ -11,13 +11,13 @@ public sealed class HardwareAssessmentService
 {
     private static readonly IReadOnlyList<ModelSpec> KnownModels = new List<ModelSpec>
     {
-        new("deepseek-r1:1.5b",  "DeepSeek R1 1.5B",  1.1, 2.0,  "Padrão recomendado — baixíssimo consumo, ideal para on-prem com recursos limitados"),
-        new("deepseek-r1:7b",    "DeepSeek R1 7B",    4.7, 7.0,  "Excelente relação qualidade/consumo para uso interactivo"),
-        new("llama3.2:3b",       "Llama 3.2 3B",      2.0, 3.5,  "Bom para contextos maiores e análise de código"),
-        new("qwen2.5:7b",        "Qwen 2.5 7B",       4.7, 7.0,  "Alta qualidade em análise de código e contratos"),
-        new("llama3.1:8b",       "Llama 3.1 8B",      4.9, 8.0,  "Equilibrado para uso geral com contextos longos"),
+        new("phi3.5:3.8b",       "Phi 3.5 3.8B",      2.3, 4.0,  "Padrão recomendado — raciocínio de alta qualidade, baixíssimo consumo, ideal para on-prem"),
+        new("llama3.2:3b",       "Llama 3.2 3B",      2.0, 3.5,  "Chat geral com tool calling — bom para contextos maiores e análise de código"),
+        new("llama3.1:8b",       "Llama 3.1 8B",      4.9, 8.0,  "Equilibrado para uso geral com contextos longos (128K)"),
+        new("mistral:7b",        "Mistral 7B",         4.1, 7.0,  "Excelente instrução e raciocínio, muito eficiente"),
         new("llama3.1:13b",      "Llama 3.1 13B",     8.0, 12.0, "Melhor qualidade; requer servidor dedicado"),
-        new("mistral-nemo:12b",  "Mistral Nemo 12B",  7.1, 11.0, "Excelente para análise multilíngue"),
+        new("mistral-nemo:12b",  "Mistral Nemo 12B",  7.1, 11.0, "Excelente para análise multilíngue (128K contexto)"),
+        new("codellama:7b",      "Code Llama 7B",      4.1, 7.0,  "Especializado em geração e análise de código"),
         new("llama3.1:70b",      "Llama 3.1 70B",    40.0, 56.0, "Qualidade máxima; requer hardware de alto nível com GPU"),
         new("nomic-embed-text",  "Nomic Embed Text",  0.3,  0.5,  "Embeddings para RAG/search semântico — baixíssimo consumo"),
         new("mxbai-embed-large", "MxBai Embed Large", 0.7,  1.0,  "Embeddings de alta qualidade para RAG"),

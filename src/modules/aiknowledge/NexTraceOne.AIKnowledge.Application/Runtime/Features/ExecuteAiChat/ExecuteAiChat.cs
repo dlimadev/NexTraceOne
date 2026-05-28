@@ -25,7 +25,8 @@ public static class ExecuteAiChat
         Guid? PreferredModelId,
         string? SystemPrompt,
         double? Temperature,
-        int? MaxTokens) : ICommand<Response>;
+        int? MaxTokens,
+        string? FeatureKey = null) : ICommand<Response>;
 
     public sealed class Validator : AbstractValidator<Command>
     {
@@ -54,12 +55,20 @@ public static class ExecuteAiChat
         {
             Guard.Against.Null(request);
 
+            if (!currentTenant.HasCapability("ai_enabled"))
+                return Error.Forbidden("AI.Disabled", "AI features are disabled for this tenant.");
+
             var correlationId = Guid.NewGuid().ToString();
             var startTime = dateTimeProvider.UtcNow;
 
-            // 1. Resolve model
+            // 1. Resolve model — feature binding takes precedence over preferred model
             ResolvedModel? resolvedModel;
-            if (request.PreferredModelId.HasValue)
+            if (!string.IsNullOrWhiteSpace(request.FeatureKey))
+            {
+                resolvedModel = await modelCatalogService.ResolveModelForFeatureAsync(
+                    request.FeatureKey, "chat", currentTenant.Id, cancellationToken);
+            }
+            else if (request.PreferredModelId.HasValue)
             {
                 resolvedModel = await modelCatalogService.ResolveModelByIdAsync(
                     request.PreferredModelId.Value, cancellationToken);
@@ -77,7 +86,14 @@ public static class ExecuteAiChat
                     "No AI model available for chat. Please configure a model in the AI Model Registry.");
             }
 
-            // 2. Get chat provider
+            // 2. Guard: validar capability de provider interno vs externo
+            if (resolvedModel.IsInternal && !currentTenant.HasCapability("ai_internal"))
+                return Error.Forbidden("AI.InternalDisabled", "Internal AI (Ollama) is disabled for this tenant.");
+
+            if (!resolvedModel.IsInternal && !currentTenant.HasCapability("ai_external"))
+                return Error.Forbidden("AI.ExternalDisabled", "External AI providers are disabled for this tenant.");
+
+            // 3. Get chat provider
             var chatProvider = providerFactory.GetChatProvider(resolvedModel.ProviderId);
             if (chatProvider is null)
             {
