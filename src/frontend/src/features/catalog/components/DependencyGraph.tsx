@@ -17,7 +17,7 @@ type GraphLink = NonNullable<GraphSeriesOption['links']>[number];
 /** Paleta de cores dos nós — alinha com o design system. */
 const COLORS = {
   service: { fill: CHART_SEMANTIC.accent, stroke: CHART_SERIES[7], label: '#eff6ff' },
-  api: { fill: CHART_SEMANTIC.success, stroke: '#059669', label: '#ecfdf5' },
+  api: { fill: CHART_SEMANTIC.success, stroke: CHART_SEMANTIC.success, label: '#ecfdf5' },
   edge: CHART_SEMANTIC.muted,
   selectedRing: CHART_SEMANTIC.warning,
 };
