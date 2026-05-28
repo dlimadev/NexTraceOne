@@ -16,6 +16,7 @@ import { PieChart as PieChartIcon } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { getChartPalette } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -30,22 +31,6 @@ interface DistributionResult {
   total: number;
   unit?: string;
   isBackendAvailable: boolean;
-}
-
-// ── Paletas de cores ───────────────────────────────────────────────────────
-
-const RAINBOW_PALETTE = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4'];
-const BLUE_PALETTE = ['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'];
-const RED_PALETTE = ['#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#f87171', '#fca5a5'];
-const DEFAULT_PALETTE = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#14b8a6'];
-
-function getPalette(colorScheme?: string | null): string[] {
-  switch (colorScheme) {
-    case 'rainbow': return RAINBOW_PALETTE;
-    case 'blue':    return BLUE_PALETTE;
-    case 'red':     return RED_PALETTE;
-    default:        return DEFAULT_PALETTE;
-  }
 }
 
 // ── Dados simulados ────────────────────────────────────────────────────────
@@ -200,7 +185,7 @@ export function PieChartWidget({
   const isSimulated = !effectiveData.isBackendAvailable;
 
   const { segments, total, unit = '' } = effectiveData;
-  const palette = getPalette(config.colorScheme);
+  const palette = getChartPalette(config.colorScheme);
 
   const innerRadius = config.donut === true ? 60 : 0;
   const showLabels  = config.showDataLabels === true;

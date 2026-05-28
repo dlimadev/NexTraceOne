@@ -18,6 +18,7 @@ import { BarChart2 } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps, WidgetConfig } from './WidgetRegistry';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -67,13 +68,13 @@ function resolveBucketColor(bucket: HistogramBucket, thresholds?: WidgetConfig['
     for (const t of sorted) {
       if (midpoint <= t.value) return t.color;
     }
-    return '#10b981';
+    return CHART_SEMANTIC.success;
   }
 
   // Defaults para latência: verde <150ms, amarelo <300ms, vermelho >=300ms
-  if (bucket.max <= 150)  return '#10b981'; // verde
-  if (bucket.max <= 300)  return '#f59e0b'; // amarelo
-  return '#ef4444';                          // vermelho
+  if (bucket.max <= 150)  return CHART_SEMANTIC.success; // verde
+  if (bucket.max <= 300)  return CHART_SEMANTIC.warning; // amarelo
+  return CHART_SEMANTIC.critical;                         // vermelho
 }
 
 // ── Tooltip customizado ────────────────────────────────────────────────────
@@ -261,10 +262,10 @@ export function HistogramWidget({
             {p95 != null && (
               <ReferenceLine
                 x={buckets.find((b) => b.min <= p95 && b.max >= p95)?.rangeLabel}
-                stroke="#f59e0b"
+                stroke={CHART_SEMANTIC.warning}
                 strokeDasharray="3 3"
                 strokeWidth={1.5}
-                label={{ value: 'p95', position: 'top', fontSize: 8, fill: '#f59e0b' }}
+                label={{ value: 'p95', position: 'top', fontSize: 8, fill: CHART_SEMANTIC.warning }}
               />
             )}
 
@@ -272,10 +273,10 @@ export function HistogramWidget({
             {p99 != null && (
               <ReferenceLine
                 x={buckets.find((b) => b.min <= p99 && b.max >= p99)?.rangeLabel}
-                stroke="#ef4444"
+                stroke={CHART_SEMANTIC.critical}
                 strokeDasharray="3 3"
                 strokeWidth={1.5}
-                label={{ value: 'p99', position: 'top', fontSize: 8, fill: '#ef4444' }}
+                label={{ value: 'p99', position: 'top', fontSize: 8, fill: CHART_SEMANTIC.critical }}
               />
             )}
 

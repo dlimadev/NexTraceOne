@@ -10,6 +10,7 @@ import { LayoutGrid } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { getChartPalette } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -41,22 +42,6 @@ const SIMULATED_DATA: TreemapResult = {
   unit: 'USD/month',
   isBackendAvailable: false,
 };
-
-// ── Paletas para ECharts ───────────────────────────────────────────────────
-
-const COLOR_PALETTES: Record<string, string[]> = {
-  rainbow: ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#14b8a6'],
-  blue:    ['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
-  green:   ['#065f46', '#047857', '#059669', '#10b981', '#34d399', '#6ee7b7'],
-  red:     ['#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#f87171', '#fca5a5'],
-  purple:  ['#4c1d95', '#6d28d9', '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd'],
-};
-
-function getColorPalette(colorScheme?: string | null): string[] {
-  return colorScheme && colorScheme in COLOR_PALETTES
-    ? (COLOR_PALETTES[colorScheme] as string[])
-    : (COLOR_PALETTES['rainbow'] as string[]);
-}
 
 // ── Formatador de valor ────────────────────────────────────────────────────
 
@@ -231,7 +216,7 @@ export function TreemapWidget({
   const isSimulated   = !effectiveData.isBackendAvailable;
   const unit          = config.unit ?? effectiveData.unit ?? '';
 
-  const colorPalette = getColorPalette(config.colorScheme);
+  const colorPalette = getChartPalette(config.colorScheme);
 
   function handleNodeClick(name: string): void {
     onCrossFilter?.({ serviceId: name });

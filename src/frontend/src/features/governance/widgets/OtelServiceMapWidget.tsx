@@ -11,6 +11,7 @@ import { Network, AlertCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -43,15 +44,15 @@ interface ServiceNode {
 
 function serviceNodeColor(node: ServiceNode): string {
   switch (node.healthStatus) {
-    case 'critical':  return '#ef4444';
-    case 'degraded':  return '#f59e0b';
-    case 'healthy':   return '#10b981';
+    case 'critical':  return CHART_SEMANTIC.critical;
+    case 'degraded':  return CHART_SEMANTIC.warning;
+    case 'healthy':   return CHART_SEMANTIC.success;
     default: {
       // Fallback: derive from error rate if healthStatus is unknown
-      if (node.traceCount === 0) return '#6b7280';
-      if (node.errorRate > 0.1) return '#ef4444';
-      if (node.errorRate > 0.02) return '#f59e0b';
-      return '#10b981';
+      if (node.traceCount === 0) return CHART_SEMANTIC.muted;
+      if (node.errorRate > 0.1) return CHART_SEMANTIC.critical;
+      if (node.errorRate > 0.02) return CHART_SEMANTIC.warning;
+      return CHART_SEMANTIC.success;
     }
   }
 }

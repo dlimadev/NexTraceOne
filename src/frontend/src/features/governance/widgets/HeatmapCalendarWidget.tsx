@@ -10,6 +10,7 @@ import { CalendarDays } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -103,7 +104,7 @@ function EChartsCalendar({ cells, maxValue, startDate, endDate, compact }: EChar
         },
       },
       visualMap: compact
-        ? { show: false, min: 0, max: maxValue, inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', '#dc2626'] } }
+        ? { show: false, min: 0, max: maxValue, inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', CHART_SEMANTIC.critical] } }
         : {
             min: 0,
             max: maxValue,
@@ -114,7 +115,7 @@ function EChartsCalendar({ cells, maxValue, startDate, endDate, compact }: EChar
             itemWidth: 12,
             itemHeight: 80,
             textStyle: { color: '#9ca3af', fontSize: 9 },
-            inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', '#dc2626'] },
+            inRange: { color: ['#1f2937', '#fef9c3', '#fde68a', '#f97316', CHART_SEMANTIC.critical] },
           },
       calendar: {
         range: [startDate, endDate],

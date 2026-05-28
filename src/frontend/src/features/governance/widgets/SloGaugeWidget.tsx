@@ -9,6 +9,7 @@ import { timeRangeToDays } from './WidgetRegistry';
 import { WidgetSkeleton, WidgetError } from './DoraMetricsWidget';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 interface SloSummaryResponse {
   compliancePercent: number;
@@ -42,7 +43,7 @@ function ArcGauge({ value, target }: { value: number; target: number }) {
   const targetX = cx + (radius + 4) * Math.cos(toRad(targetDeg));
   const targetY = cy + (radius + 4) * Math.sin(toRad(targetDeg));
 
-  const color = value >= target ? '#22c55e' : value >= target - 5 ? '#f59e0b' : '#ef4444';
+  const color = value >= target ? CHART_SEMANTIC.success : value >= target - 5 ? CHART_SEMANTIC.warning : CHART_SEMANTIC.critical;
 
   return (
     <svg viewBox="0 0 100 60" className="w-full max-w-[120px]" aria-hidden="true">
@@ -64,7 +65,7 @@ function ArcGauge({ value, target }: { value: number; target: number }) {
         strokeLinecap="round"
       />
       {/* Target tick */}
-      <circle cx={targetX} cy={targetY} r={2} fill="#94a3b8" />
+      <circle cx={targetX} cy={targetY} r={2} fill={CHART_SEMANTIC.axis} />
     </svg>
   );
 }

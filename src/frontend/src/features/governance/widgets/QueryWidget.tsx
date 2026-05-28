@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import client from '../../../api/client';
 import { NqlEditor, NqlResultViewer } from '../components/NqlEditor';
+import { CHART_RAINBOW, CHART_SEMANTIC } from '../../../lib/chartColors';
 import type { WidgetProps } from './WidgetRegistry';
 import type { NqlRenderHint } from './WidgetRegistry';
 
@@ -35,8 +36,6 @@ interface NqlExecuteResponse {
 
 // ── Render hint palette ───────────────────────────────────────────────────
 
-const PIE_COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f97316', '#14b8a6'];
-
 interface NqlResultRendererProps {
   result: NqlExecuteResponse;
   renderHint: string;
@@ -55,7 +54,7 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
         <PieChart>
           <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
             {data.map((_, i) => (
-              <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+              <Cell key={i} fill={CHART_RAINBOW[i % CHART_RAINBOW.length]} />
             ))}
           </Pie>
           <RechartsTooltip />
@@ -69,7 +68,7 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
     const raw = result.rows[0]?.[0];
     const val = Number(raw ?? 0);
     const pct = Math.min(100, Math.max(0, val));
-    const color = pct >= 80 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#10b981';
+    const color = pct >= 80 ? CHART_SEMANTIC.critical : pct >= 60 ? CHART_SEMANTIC.warning : CHART_SEMANTIC.success;
     return (
       <div className="flex flex-col items-center justify-center h-full gap-2 py-4">
         <span className="text-3xl font-bold text-neutral-100 tabular-nums">{val.toLocaleString()}</span>
@@ -116,7 +115,7 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
               );
             }}
           />
-          <Scatter data={data} fill="#6366f1" />
+          <Scatter data={data} fill={CHART_RAINBOW[0]} />
         </ScatterChart>
       </ResponsiveContainer>
     );
@@ -139,7 +138,7 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
               key={i}
               className="flex items-center justify-center rounded text-[9px] font-medium text-white overflow-hidden"
               style={{
-                backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
+                backgroundColor: CHART_RAINBOW[i % CHART_RAINBOW.length],
                 minWidth: `${minW}%`,
                 flexGrow: pct,
                 height: pct > 20 ? '48%' : '22%',
@@ -160,7 +159,7 @@ function NqlResultRenderer({ result, renderHint }: NqlResultRendererProps) {
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export function QueryWidget({ widgetId, config, environmentId, timeRange, title }: WidgetProps) {
+export function QueryWidget({ config, environmentId, timeRange, title }: WidgetProps) {
   const { t } = useTranslation();
   const [nqlQuery, setNqlQuery] = useState(config.nqlQuery ?? '');
   const [renderHint, setRenderHint] = useState<NqlRenderHint>(

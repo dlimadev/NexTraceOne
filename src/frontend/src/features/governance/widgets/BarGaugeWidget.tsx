@@ -8,6 +8,7 @@ import { Gauge } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps, WidgetConfig } from './WidgetRegistry';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -54,9 +55,9 @@ function resolveBarColor(value: number, thresholds?: WidgetConfig['thresholds'])
   }
 
   // Cores padrão quando sem thresholds configurados
-  if (value >= 95) return '#10b981'; // verde
-  if (value >= 80) return '#f59e0b'; // amarelo
-  return '#ef4444';                   // vermelho
+  if (value >= 95) return CHART_SEMANTIC.success; // verde
+  if (value >= 80) return CHART_SEMANTIC.warning; // amarelo
+  return CHART_SEMANTIC.critical;                  // vermelho
 }
 
 // ── Linha de threshold sobre a barra ──────────────────────────────────────

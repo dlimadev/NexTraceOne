@@ -14,6 +14,7 @@ import { Award, Activity, BookMarked, ExternalLink, TrendingUp, TrendingDown, Mi
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Link } from 'react-router-dom';
 import client from '../../../api/client';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 interface Props {
   serviceId: string;
@@ -67,17 +68,17 @@ function ScoreRing({ score, label, color }: { score: number; label: string; colo
 }
 
 function maturityColor(level: number): string {
-  if (level >= 4) return '#22c55e';
-  if (level >= 3) return '#3b82f6';
-  if (level >= 2) return '#f59e0b';
-  return '#ef4444';
+  if (level >= 4) return CHART_SEMANTIC.success;
+  if (level >= 3) return CHART_SEMANTIC.accent;
+  if (level >= 2) return CHART_SEMANTIC.warning;
+  return CHART_SEMANTIC.critical;
 }
 
 function scoreColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#3b82f6';
-  if (score >= 40) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 80) return CHART_SEMANTIC.success;
+  if (score >= 60) return CHART_SEMANTIC.accent;
+  if (score >= 40) return CHART_SEMANTIC.warning;
+  return CHART_SEMANTIC.critical;
 }
 
 export function ServiceScoreTab({ serviceId }: Props) {

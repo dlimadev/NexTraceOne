@@ -4,6 +4,7 @@
  */
 import { useMemo } from 'react';
 import { ReferenceLine, Tooltip } from 'recharts';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -23,17 +24,17 @@ interface ChartAnnotationsProps {
 // ── Severity colors ────────────────────────────────────────────────────────
 
 const SEVERITY_COLORS: Record<string, string> = {
-  info: '#3b82f6',
-  warning: '#f59e0b',
-  critical: '#ef4444',
-  success: '#10b981',
+  info: CHART_SEMANTIC.accent,
+  warning: CHART_SEMANTIC.warning,
+  critical: CHART_SEMANTIC.critical,
+  success: CHART_SEMANTIC.success,
 };
 
 const SEVERITY_OPACITY = 0.7;
 
 // ── Custom tooltip for annotations ─────────────────────────────────────────
 
-function AnnotationsTooltip({ active, payload }: any) {
+function AnnotationsTooltip({ active, payload }: { active?: boolean; payload?: { payload?: { __annotation?: ChartAnnotation } }[] }) {
   if (!active || !payload || payload.length === 0) return null;
   const data = payload[0]?.payload?.__annotation;
   if (!data) return null;
@@ -83,6 +84,7 @@ export function ChartAnnotations({ annotations, timeFormatter }: ChartAnnotation
 
 // ── Hook to fetch annotations ──────────────────────────────────────────────
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAnnotations(
   tenantId: string,
   from: string,

@@ -7,6 +7,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import type { GraphSeriesOption } from 'echarts/charts';
 import type { AssetGraph, ServiceNode, ApiNode } from '../../../types/index';
 import type { TFunction } from 'i18next';
+import { CHART_SEMANTIC, CHART_SERIES } from '../../../lib/chartColors';
 
 echarts.use([GraphChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -15,10 +16,10 @@ type GraphLink = NonNullable<GraphSeriesOption['links']>[number];
 
 /** Paleta de cores dos nós — alinha com o design system. */
 const COLORS = {
-  service: { fill: '#3b82f6', stroke: '#1d4ed8', label: '#eff6ff' },
-  api: { fill: '#10b981', stroke: '#059669', label: '#ecfdf5' },
-  edge: '#6b7280',
-  selectedRing: '#f59e0b',
+  service: { fill: CHART_SEMANTIC.accent, stroke: CHART_SERIES[7], label: '#eff6ff' },
+  api: { fill: CHART_SEMANTIC.success, stroke: '#059669', label: '#ecfdf5' },
+  edge: CHART_SEMANTIC.muted,
+  selectedRing: CHART_SEMANTIC.warning,
 };
 
 interface DependencyGraphProps {

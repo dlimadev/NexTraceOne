@@ -22,11 +22,9 @@ import {
   Upload,
   Shuffle,
   Search,
-  Settings,
   X,
   ChevronDown,
   ChevronUp,
-  LayoutGrid,
 } from 'lucide-react';
 import {
   GridLayout,
@@ -55,6 +53,7 @@ import { DataTransformPanel, type DataTransform } from '../components/DataTransf
 import { BuilderWidgetCard } from '../components/BuilderWidgetCard';
 import { EmptyCanvasPrompt } from '../components/EmptyCanvasPrompt';
 import { GridAlignmentGuides } from '../components/GridAlignmentGuides';
+import { CHART_SEMANTIC, CHART_SERIES } from '../../../lib/chartColors';
 
 // ── Emoji icon map ─────────────────────────────────────────────────────────
 
@@ -643,7 +642,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             onUpdate({ thresholds: JSON.stringify(updated) });
           };
 
-          const THRESHOLD_COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444', '#8b5cf6', '#6366f1'];
+          const THRESHOLD_COLORS = [CHART_SEMANTIC.success, CHART_SEMANTIC.warning, '#f97316', CHART_SEMANTIC.critical, '#8b5cf6', CHART_SERIES[0]];
 
           return (
             <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
@@ -653,7 +652,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 </p>
                 <button
                   type="button"
-                  onClick={() => updateThresholds([...thresholds, { value: 0, color: '#ef4444', label: '' }])}
+                  onClick={() => updateThresholds([...thresholds, { value: 0, color: CHART_SEMANTIC.critical, label: '' }])}
                   className="text-xs text-blue-500 hover:text-blue-400"
                 >
                   + Add
@@ -1349,7 +1348,7 @@ export function DashboardBuilderPage() {
             transforms: [],
           }))
         );
-      } catch (err) {
+      } catch {
         setImportError(
           t('governance.dashboardBuilder.importError', 'Invalid dashboard JSON file.')
         );

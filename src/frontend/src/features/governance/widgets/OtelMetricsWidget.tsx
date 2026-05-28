@@ -19,6 +19,7 @@ import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
 import { useAnnotations, type ChartAnnotation } from '../components/ChartAnnotations';
+import { CHART_SEMANTIC } from '../../../lib/chartColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -174,7 +175,7 @@ export function OtelMetricsWidget({
 
   const annotationLines = annotations.map((ann: ChartAnnotation) => ({
     x: formatTimestamp(ann.timestamp, timeRange),
-    color: ann.severity === 'critical' ? '#ef4444' : ann.severity === 'warning' ? '#f59e0b' : '#3b82f6',
+    color: ann.severity === 'critical' ? CHART_SEMANTIC.critical : ann.severity === 'warning' ? CHART_SEMANTIC.warning : CHART_SEMANTIC.accent,
     label: ann.label,
   }));
 
@@ -192,19 +193,19 @@ export function OtelMetricsWidget({
           <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="obsMetricFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor={CHART_SEMANTIC.accent} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={CHART_SEMANTIC.accent} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="time"
-              tick={{ fontSize: 9, fill: '#9ca3af' }}
+              tick={{ fontSize: 9, fill: CHART_SEMANTIC.axis }}
               tickLine={false}
               axisLine={false}
               interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fontSize: 9, fill: '#9ca3af' }}
+              tick={{ fontSize: 9, fill: CHART_SEMANTIC.axis }}
               tickLine={false}
               axisLine={false}
               width={36}
@@ -233,7 +234,7 @@ export function OtelMetricsWidget({
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#3b82f6"
+              stroke={CHART_SEMANTIC.accent}
               strokeWidth={1.5}
               fill="url(#obsMetricFill)"
               dot={false}
