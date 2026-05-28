@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { templatesApi } from '../api/templates';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 // ── Info row ──────────────────────────────────────────────────────────────────
 
@@ -27,8 +29,8 @@ function InfoRow({ label, value }: { label: string; value?: string | number | nu
   if (!value && value !== 0) return null;
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs text-neutral-500">{label}</span>
-      <span className="text-sm text-neutral-200">{value}</span>
+      <span className="text-xs text-muted">{label}</span>
+      <span className="text-sm text-body">{value}</span>
     </div>
   );
 }
@@ -45,9 +47,9 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-neutral-800 bg-neutral-900 p-4">
-      <div className="flex items-center gap-2 text-sm font-medium text-neutral-300">
-        <Icon className="h-4 w-4 text-neutral-500" />
+    <div className="flex flex-col gap-3 rounded-lg border border-edge bg-elevated p-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-body">
+        <Icon className="h-4 w-4 text-muted" />
         {title}
       </div>
       {children}
@@ -83,7 +85,7 @@ export function TemplateDetailPage() {
     return (
       <div className="flex flex-col gap-4 p-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-32 animate-pulse rounded-lg border border-neutral-800 bg-neutral-900" />
+          <div key={i} className="h-32 animate-pulse rounded-lg border border-edge bg-elevated" />
         ))}
       </div>
     );
@@ -99,10 +101,10 @@ export function TemplateDetailPage() {
 
   if (!template) {
     return (
-      <div className="flex flex-col items-center gap-3 p-16 text-neutral-400">
-        <XCircle className="h-10 w-10 text-neutral-600" />
+      <div className="flex flex-col items-center gap-3 p-16 text-muted">
+        <XCircle className="h-10 w-10 text-muted" />
         <p>{t('templates.detail.notFound')}</p>
-        <button onClick={() => navigate('/catalog/templates')} className="text-blue-400 hover:underline text-sm">
+        <button onClick={() => navigate('/catalog/templates')} className="text-accent hover:underline text-sm">
           {t('templates.detail.backToLibrary')}
         </button>
       </div>
@@ -112,12 +114,16 @@ export function TemplateDetailPage() {
   const isToggling = activateMutation.isPending || deactivateMutation.isPending;
 
   return (
-    <div className="flex flex-col gap-5 p-6">
+    <PageContainer>
+      <PageHeader
+        title={template.displayName}
+        subtitle={template.description}
+      />
       {/* Breadcrumb + actions */}
       <div className="flex items-center justify-between gap-4">
         <button
           onClick={() => navigate('/catalog/templates')}
-          className="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-200"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('templates.detail.backToLibrary')}
@@ -128,7 +134,7 @@ export function TemplateDetailPage() {
             <button
               disabled={isToggling}
               onClick={() => deactivateMutation.mutate()}
-              className="flex items-center gap-1.5 rounded border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:border-critical/50 hover:text-critical disabled:opacity-50"
             >
               <PowerOff className="h-3.5 w-3.5" />
               {t('templates.detail.deactivate')}
@@ -137,7 +143,7 @@ export function TemplateDetailPage() {
             <button
               disabled={isToggling}
               onClick={() => activateMutation.mutate()}
-              className="flex items-center gap-1.5 rounded border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-emerald-500/50 hover:text-emerald-400 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:border-success/50 hover:text-success disabled:opacity-50"
             >
               <Power className="h-3.5 w-3.5" />
               {t('templates.detail.activate')}
@@ -145,7 +151,7 @@ export function TemplateDetailPage() {
           )}
           <button
             onClick={() => navigate(`/catalog/templates/${id}/edit`)}
-            className="flex items-center gap-1.5 rounded border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:bg-neutral-700"
+            className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:bg-card"
           >
             <Edit className="h-3.5 w-3.5" />
             {t('templates.detail.edit')}
@@ -153,7 +159,7 @@ export function TemplateDetailPage() {
           {template.isActive && (
             <button
               onClick={() => navigate(`/catalog/templates/${id}/scaffold`)}
-              className="flex items-center gap-1.5 rounded bg-blue-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-blue-500"
+              className="flex items-center gap-1.5 rounded bg-accent px-4 py-1.5 text-xs font-medium text-on-accent hover:bg-accent/90"
             >
               <Zap className="h-3.5 w-3.5" />
               {t('templates.detail.scaffoldWithAi')}
@@ -163,36 +169,36 @@ export function TemplateDetailPage() {
       </div>
 
       {/* Hero */}
-      <div className="flex flex-col gap-2 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
+      <div className="flex flex-col gap-2 rounded-lg border border-edge bg-elevated p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h1 className="text-lg font-semibold text-neutral-100">{template.displayName}</h1>
-            <code className="text-xs text-neutral-500">{template.slug}</code>
+            <h1 className="text-lg font-semibold text-body">{template.displayName}</h1>
+            <code className="text-xs text-muted">{template.slug}</code>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {template.isActive ? (
-              <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
+              <span className="flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
                 <CheckCircle className="h-3.5 w-3.5" />
                 {t('templates.detail.active')}
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 rounded-full bg-neutral-700/50 px-2.5 py-1 text-xs font-medium text-neutral-400">
+              <span className="flex items-center gap-1.5 rounded-full bg-card/50 px-2.5 py-1 text-xs font-medium text-muted">
                 <XCircle className="h-3.5 w-3.5" />
                 {t('templates.detail.inactive')}
               </span>
             )}
           </div>
         </div>
-        <p className="text-sm text-neutral-400">{template.description}</p>
+        <p className="text-sm text-muted">{template.description}</p>
 
         <div className="mt-2 flex flex-wrap gap-1.5">
           <span className="rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-xs text-purple-400">
             {template.language}
           </span>
-          <span className="rounded border border-blue-500/20 bg-blue-500/10 px-1.5 py-0.5 text-xs text-blue-400">
+          <span className="rounded border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-xs text-accent">
             {template.serviceType}
           </span>
-          <span className="rounded border border-neutral-700 bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
+          <span className="rounded border border-edge bg-elevated px-1.5 py-0.5 text-xs text-muted">
             v{template.version}
           </span>
         </div>
@@ -222,7 +228,7 @@ export function TemplateDetailPage() {
             <SectionCard icon={Tag} title={t('templates.detail.tags')}>
               <div className="flex flex-wrap gap-1.5">
                 {template.tags.map(tag => (
-                  <span key={tag} className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-300">
+                  <span key={tag} className="rounded bg-elevated px-2 py-0.5 text-xs text-body">
                     {tag}
                   </span>
                 ))}
@@ -232,7 +238,7 @@ export function TemplateDetailPage() {
 
           {template.hasBaseContract && template.baseContractSpec && (
             <SectionCard icon={BookOpen} title={t('templates.detail.baseContract')}>
-              <pre className="max-h-64 overflow-auto rounded bg-neutral-950 p-3 text-xs text-neutral-300">
+              <pre className="max-h-64 overflow-auto rounded bg-elevated p-3 text-xs text-body">
                 {template.baseContractSpec}
               </pre>
             </SectionCard>
@@ -240,7 +246,7 @@ export function TemplateDetailPage() {
 
           {template.hasScaffoldingManifest && template.scaffoldingManifestJson && (
             <SectionCard icon={Layers} title={t('templates.detail.scaffoldingManifest')}>
-              <pre className="max-h-64 overflow-auto rounded bg-neutral-950 p-3 text-xs text-neutral-300">
+              <pre className="max-h-64 overflow-auto rounded bg-elevated p-3 text-xs text-body">
                 {(() => {
                   try {
                     return JSON.stringify(JSON.parse(template.scaffoldingManifestJson), null, 2);
@@ -258,15 +264,15 @@ export function TemplateDetailPage() {
           <SectionCard icon={BarChart2} title={t('templates.detail.stats')}>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-0.5">
-                <span className="text-2xl font-bold text-neutral-100">{template.usageCount}</span>
-                <span className="text-xs text-neutral-500">{t('templates.detail.timesUsed')}</span>
+                <span className="text-2xl font-bold text-body">{template.usageCount}</span>
+                <span className="text-xs text-muted">{t('templates.detail.timesUsed')}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <CheckCircle className="h-3.5 w-3.5 text-success" />
                 {template.hasBaseContract ? t('templates.detail.hasContract') : t('templates.detail.noContract')}
               </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <Layers className="h-3.5 w-3.5 text-blue-400" />
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <Layers className="h-3.5 w-3.5 text-accent" />
                 {template.hasScaffoldingManifest ? t('templates.detail.hasManifest') : t('templates.detail.noManifest')}
               </div>
             </div>
@@ -291,7 +297,7 @@ export function TemplateDetailPage() {
             <SectionCard icon={Users} title={t('templates.detail.governancePolicies')}>
               <div className="flex flex-col gap-1">
                 {template.governancePolicyIds.map(pid => (
-                  <code key={pid} className="truncate text-xs text-neutral-500">
+                  <code key={pid} className="truncate text-xs text-muted">
                     {pid}
                   </code>
                 ))}
@@ -300,6 +306,6 @@ export function TemplateDetailPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

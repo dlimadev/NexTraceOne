@@ -16,6 +16,8 @@ import {
 import { serviceCatalogApi, type DiscoveredServiceItem, type DiscoveryStatus } from '../api/serviceCatalog';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de Service Discovery Automático.
@@ -116,18 +118,13 @@ export default function ServiceDiscoveryPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-heading flex items-center gap-2">
-            <Radar size={22} className="text-accent" />
-            {t('catalog.discovery.title', 'Service Discovery')}
-          </h1>
-          <p className="text-sm text-muted mt-1">
-            {t('catalog.discovery.subtitle', 'Automatically discover services from telemetry and manage catalog registration.')}
-          </p>
-        </div>
+    <PageContainer>
+      <PageHeader
+        title={t('catalog.discovery.title', 'Service Discovery')}
+        subtitle={t('catalog.discovery.subtitle', 'Automatically discover services from telemetry and manage catalog registration.')}
+      />
+      {/* Run discovery action */}
+      <div className="flex justify-end">
         <button
           onClick={() => runDiscoveryMutation.mutate()}
           disabled={runDiscoveryMutation.isPending}
@@ -359,7 +356,7 @@ export default function ServiceDiscoveryPage() {
           isLoading={matchMutation.isPending || registerMutation.isPending || ignoreMutation.isPending}
         />
       )}
-    </div>
+    </PageContainer>
   );
 }
 

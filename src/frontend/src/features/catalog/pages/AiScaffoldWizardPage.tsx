@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import JSZip from 'jszip';
 import { templatesApi, type AiScaffoldResult, type ScaffoldedFile } from '../api/templates';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 // ── Step indicator ─────────────────────────────────────────────────────────────
 
@@ -35,10 +37,10 @@ function StepDot({ step, current }: { step: string; current: Step }) {
     <div
       className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
         done
-          ? 'bg-emerald-500 text-white'
+          ? 'bg-success text-on-accent'
           : active
-          ? 'bg-blue-600 text-white ring-2 ring-blue-500/30'
-          : 'bg-neutral-800 text-neutral-500'
+          ? 'bg-accent text-on-accent ring-2 ring-accent/30'
+          : 'bg-elevated text-muted'
       }`}
     >
       {done ? <CheckCircle className="h-4 w-4" /> : stepIdx + 1}
@@ -49,7 +51,7 @@ function StepDot({ step, current }: { step: string; current: Step }) {
 function StepLine({ done }: { done: boolean }) {
   return (
     <div
-      className={`h-px flex-1 transition-colors ${done ? 'bg-emerald-500' : 'bg-neutral-800'}`}
+      className={`h-px flex-1 transition-colors ${done ? 'bg-success' : 'bg-elevated'}`}
     />
   );
 }
@@ -73,8 +75,8 @@ function FileTree({
           onClick={() => onSelect(i)}
           className={`flex items-center gap-2 truncate rounded px-2 py-1 text-left text-xs transition-colors ${
             i === selected
-              ? 'bg-blue-600/20 text-blue-300'
-              : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+              ? 'bg-accent/20 text-accent'
+              : 'text-muted hover:bg-elevated hover:text-body'
           }`}
         >
           <FileCode className="h-3 w-3 shrink-0" />
@@ -164,39 +166,43 @@ export function AiScaffoldWizardPage() {
   if (templateLoading) {
     return (
       <div className="flex items-center justify-center p-16">
-        <Loader2 className="h-8 w-8 animate-spin text-neutral-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted" />
       </div>
     );
   }
 
   const INPUT_CLASS =
-    'w-full rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 placeholder-neutral-500 outline-none focus:border-blue-500';
+    'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted outline-none focus:border-accent';
 
   return (
-    <div className="flex flex-col gap-5 p-6">
-      {/* Header */}
+    <PageContainer>
+      <PageHeader
+        title={t('catalog.aiScaffold.title', 'AI Scaffold Wizard')}
+        subtitle={t('catalog.aiScaffold.subtitle', 'Generate service scaffolding with AI from a template')}
+      />
+      {/* Back + wizard title */}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate(`/catalog/templates/${id}`)}
-          className="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-200"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('templates.scaffold.backToTemplate')}
         </button>
         <div className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-blue-400" />
-          <h1 className="text-lg font-semibold text-neutral-100">{t('templates.scaffold.title')}</h1>
+          <Zap className="h-5 w-5 text-accent" />
+          <h2 className="text-lg font-semibold text-body">{t('templates.scaffold.title')}</h2>
         </div>
       </div>
 
       {/* Step indicator */}
-      <div className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+      <div className="flex items-center gap-2 rounded-lg border border-edge bg-elevated p-4">
         {STEPS.map((s, i) => (
           <div key={s} className="flex flex-1 items-center gap-2">
             <StepDot step={s} current={step} />
             <span
               className={`hidden text-xs font-medium sm:block ${
-                s === step ? 'text-neutral-100' : 'text-neutral-500'
+                s === step ? 'text-body' : 'text-muted'
               }`}
             >
               {t(`templates.scaffold.steps.${s}`)}
@@ -211,22 +217,22 @@ export function AiScaffoldWizardPage() {
       {/* ── Step 1: Template overview ───────────────────────────────────── */}
       {step === 'template' && template && (
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border border-neutral-800 bg-neutral-900 p-5">
+          <div className="rounded-lg border border-edge bg-elevated p-5">
             <div className="mb-3 flex items-start justify-between">
               <div>
-                <h2 className="text-sm font-semibold text-neutral-100">{template.displayName}</h2>
-                <p className="text-xs text-neutral-500">{template.slug} · v{template.version}</p>
+                <h2 className="text-sm font-semibold text-body">{template.displayName}</h2>
+                <p className="text-xs text-muted">{template.slug} · v{template.version}</p>
               </div>
               <div className="flex gap-1.5">
                 <span className="rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-xs text-purple-400">
                   {template.language}
                 </span>
-                <span className="rounded border border-blue-500/20 bg-blue-500/10 px-1.5 py-0.5 text-xs text-blue-400">
+                <span className="rounded border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-xs text-accent">
                   {template.serviceType}
                 </span>
               </div>
             </div>
-            <p className="text-sm text-neutral-400">{template.description}</p>
+            <p className="text-sm text-muted">{template.description}</p>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -256,12 +262,12 @@ export function AiScaffoldWizardPage() {
             ].map(item => (
               <div
                 key={item.label}
-                className="flex items-start gap-3 rounded-lg border border-neutral-800 bg-neutral-900 p-3"
+                className="flex items-start gap-3 rounded-lg border border-edge bg-elevated p-3"
               >
-                <item.icon className={`mt-0.5 h-4 w-4 shrink-0 ${item.ok ? 'text-emerald-400' : 'text-neutral-500'}`} />
+                <item.icon className={`mt-0.5 h-4 w-4 shrink-0 ${item.ok ? 'text-success' : 'text-muted'}`} />
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-neutral-500">{item.label}</span>
-                  <span className="text-xs font-medium text-neutral-300">{item.value}</span>
+                  <span className="text-xs text-muted">{item.label}</span>
+                  <span className="text-xs font-medium text-body">{item.value}</span>
                 </div>
               </div>
             ))}
@@ -269,7 +275,7 @@ export function AiScaffoldWizardPage() {
 
           <div className="flex justify-end">
             <button
-              className="flex items-center gap-2 rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-500"
+              className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90"
               onClick={() => setStep('intent')}
             >
               {t('templates.scaffold.next')}
@@ -282,11 +288,11 @@ export function AiScaffoldWizardPage() {
       {/* ── Step 2: Intent / parameters ────────────────────────────────── */}
       {step === 'intent' && (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 rounded-lg border border-neutral-800 bg-neutral-900 p-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 rounded-lg border border-edge bg-elevated p-5 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.serviceName')}
-                <span className="ml-0.5 text-red-400">*</span>
+                <span className="ml-0.5 text-critical">*</span>
               </label>
               <input
                 className={INPUT_CLASS}
@@ -296,13 +302,13 @@ export function AiScaffoldWizardPage() {
                   setServiceName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
                 }
               />
-              <p className="text-xs text-neutral-500">{t('templates.scaffold.hints.serviceName')}</p>
+              <p className="text-xs text-muted">{t('templates.scaffold.hints.serviceName')}</p>
             </div>
 
             <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.serviceDescription')}
-                <span className="ml-0.5 text-red-400">*</span>
+                <span className="ml-0.5 text-critical">*</span>
               </label>
               <textarea
                 className={`${INPUT_CLASS} resize-none`}
@@ -311,11 +317,11 @@ export function AiScaffoldWizardPage() {
                 value={serviceDescription}
                 onChange={e => setServiceDescription(e.target.value)}
               />
-              <p className="text-xs text-neutral-500">{t('templates.scaffold.hints.descriptionTip')}</p>
+              <p className="text-xs text-muted">{t('templates.scaffold.hints.descriptionTip')}</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.mainEntities')}
               </label>
               <input
@@ -327,7 +333,7 @@ export function AiScaffoldWizardPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.languageOverride')}
               </label>
               <select
@@ -345,7 +351,7 @@ export function AiScaffoldWizardPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.teamName')}
               </label>
               <input
@@ -357,7 +363,7 @@ export function AiScaffoldWizardPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.domain')}
               </label>
               <input
@@ -369,7 +375,7 @@ export function AiScaffoldWizardPage() {
             </div>
 
             <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-neutral-300">
+              <label className="text-xs font-medium text-body">
                 {t('templates.scaffold.fields.additionalRequirements')}
               </label>
               <textarea
@@ -384,7 +390,7 @@ export function AiScaffoldWizardPage() {
 
           <div className="flex justify-between">
             <button
-              className="flex items-center gap-2 rounded border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-300 hover:bg-neutral-700"
+              className="flex items-center gap-2 rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-elevated/80"
               onClick={() => setStep('template')}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -392,7 +398,7 @@ export function AiScaffoldWizardPage() {
             </button>
             <button
               disabled={!serviceName || !serviceDescription}
-              className="flex items-center gap-2 rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-40"
+              className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90 disabled:opacity-40"
               onClick={handleGenerate}
             >
               <Zap className="h-4 w-4" />
@@ -408,20 +414,20 @@ export function AiScaffoldWizardPage() {
           {generateMutation.isPending ? (
             <>
               <div className="relative flex items-center justify-center">
-                <div className="absolute h-20 w-20 animate-ping rounded-full bg-blue-500/10" />
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600/20">
-                  <Zap className="h-8 w-8 animate-pulse text-blue-400" />
+                <div className="absolute h-20 w-20 animate-ping rounded-full bg-accent/10" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/20">
+                  <Zap className="h-8 w-8 animate-pulse text-accent" />
                 </div>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <p className="text-sm font-medium text-neutral-200">
+                <p className="text-sm font-medium text-body">
                   {t('templates.scaffold.generating.title')}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted">
                   {t('templates.scaffold.generating.subtitle')}
                 </p>
               </div>
-              <div className="flex flex-col gap-1 text-xs text-neutral-600">
+              <div className="flex flex-col gap-1 text-xs text-muted">
                 {[
                   t('templates.scaffold.generating.step1'),
                   t('templates.scaffold.generating.step2'),
@@ -437,15 +443,15 @@ export function AiScaffoldWizardPage() {
             </>
           ) : generateMutation.isError ? (
             <div className="flex flex-col items-center gap-3">
-              <AlertCircle className="h-12 w-12 text-red-400" />
-              <p className="text-sm font-medium text-red-400">{t('templates.scaffold.generateError')}</p>
-              <p className="text-xs text-neutral-500">
+              <AlertCircle className="h-12 w-12 text-critical" />
+              <p className="text-sm font-medium text-critical">{t('templates.scaffold.generateError')}</p>
+              <p className="text-xs text-muted">
                 {generateMutation.error instanceof Error
                   ? generateMutation.error.message
                   : t('templates.scaffold.generateErrorGeneric')}
               </p>
               <button
-                className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500"
+                className="rounded bg-accent px-4 py-2 text-sm text-on-accent hover:bg-accent/90"
                 onClick={handleGenerate}
               >
                 {t('templates.scaffold.retry')}
@@ -462,22 +468,22 @@ export function AiScaffoldWizardPage() {
           <div
             className={`flex items-start gap-3 rounded-lg border p-4 ${
               result.isFallback
-                ? 'border-amber-500/30 bg-amber-500/10'
-                : 'border-emerald-500/30 bg-emerald-500/10'
+                ? 'border-warning/30 bg-warning/10'
+                : 'border-success/30 bg-success/10'
             }`}
           >
             {result.isFallback ? (
-              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
             ) : (
-              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-success" />
             )}
             <div className="flex flex-col gap-0.5">
-              <p className={`text-sm font-medium ${result.isFallback ? 'text-amber-300' : 'text-emerald-300'}`}>
+              <p className={`text-sm font-medium ${result.isFallback ? 'text-warning' : 'text-success'}`}>
                 {result.isFallback
                   ? t('templates.scaffold.review.fallbackTitle')
                   : t('templates.scaffold.review.successTitle', { count: result.files.length })}
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted">
                 {result.isFallback
                   ? t('templates.scaffold.review.fallbackHint')
                   : t('templates.scaffold.review.successHint', {
@@ -489,10 +495,10 @@ export function AiScaffoldWizardPage() {
           </div>
 
           {/* File explorer */}
-          <div className="grid grid-cols-1 gap-0 overflow-hidden rounded-lg border border-neutral-800 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-0 overflow-hidden rounded-lg border border-edge lg:grid-cols-4">
             {/* Sidebar */}
-            <div className="flex flex-col border-b border-neutral-800 bg-neutral-950 p-3 lg:border-b-0 lg:border-r">
-              <p className="mb-2 text-xs font-medium text-neutral-500">
+            <div className="flex flex-col border-b border-edge bg-elevated p-3 lg:border-b-0 lg:border-r">
+              <p className="mb-2 text-xs font-medium text-muted">
                 {result.files.length} {t('templates.scaffold.review.files')}
               </p>
               <FileTree
@@ -504,19 +510,19 @@ export function AiScaffoldWizardPage() {
 
             {/* File content */}
             <div className="flex flex-col lg:col-span-3">
-              <div className="flex items-center justify-between border-b border-neutral-800 bg-neutral-950 px-3 py-2">
-                <code className="text-xs text-neutral-400">
+              <div className="flex items-center justify-between border-b border-edge bg-elevated px-3 py-2">
+                <code className="text-xs text-muted">
                   {result.files[selectedFile]?.path}
                 </code>
                 <button
                   onClick={handleCopyFile}
-                  className="flex items-center gap-1.5 rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300"
+                  className="flex items-center gap-1.5 rounded px-2 py-1 text-xs text-muted hover:bg-elevated hover:text-body"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   {copied ? t('common.copied') : t('common.copy')}
                 </button>
               </div>
-              <pre className="flex-1 overflow-auto bg-neutral-950 p-4 text-xs text-neutral-300 max-h-[440px]">
+              <pre className="flex-1 overflow-auto bg-elevated p-4 text-xs text-body max-h-[440px]">
                 {result.files[selectedFile]?.content ?? ''}
               </pre>
             </div>
@@ -525,7 +531,7 @@ export function AiScaffoldWizardPage() {
           {/* Actions */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
-              className="flex items-center gap-2 rounded border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-300 hover:bg-neutral-700"
+              className="flex items-center gap-2 rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-elevated/80"
               onClick={() => setStep('intent')}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -535,7 +541,7 @@ export function AiScaffoldWizardPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleDownloadZip}
-                className="flex items-center gap-2 rounded bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+                className="flex items-center gap-2 rounded bg-success px-5 py-2 text-sm font-medium text-on-accent hover:bg-success/90"
               >
                 <Download className="h-4 w-4" />
                 {t('templates.scaffold.review.downloadZip')}
@@ -544,6 +550,6 @@ export function AiScaffoldWizardPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

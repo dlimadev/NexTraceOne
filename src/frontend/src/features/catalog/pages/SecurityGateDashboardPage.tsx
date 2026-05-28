@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -106,9 +108,9 @@ const securityApi = {
 
 const SEVERITY_CONFIG: Record<FindingSeverity, { color: string; bg: string; icon: React.ReactNode }> = {
   Critical: {
-    color: 'text-red-400',
-    bg: 'bg-red-500/10 border-red-500/30',
-    icon: <ShieldX className="h-3.5 w-3.5 text-red-400" />,
+    color: 'text-critical',
+    bg: 'bg-critical/10 border-critical/30',
+    icon: <ShieldX className="h-3.5 w-3.5 text-critical" />,
   },
   High: {
     color: 'text-orange-400',
@@ -116,28 +118,28 @@ const SEVERITY_CONFIG: Record<FindingSeverity, { color: string; bg: string; icon
     icon: <ShieldAlert className="h-3.5 w-3.5 text-orange-400" />,
   },
   Medium: {
-    color: 'text-yellow-400',
-    bg: 'bg-yellow-500/10 border-yellow-500/30',
-    icon: <AlertTriangle className="h-3.5 w-3.5 text-yellow-400" />,
+    color: 'text-warning',
+    bg: 'bg-warning/10 border-warning/30',
+    icon: <AlertTriangle className="h-3.5 w-3.5 text-warning" />,
   },
   Low: {
-    color: 'text-blue-400',
-    bg: 'bg-blue-500/10 border-blue-500/30',
-    icon: <Shield className="h-3.5 w-3.5 text-blue-400" />,
+    color: 'text-accent',
+    bg: 'bg-accent/10 border-accent/30',
+    icon: <Shield className="h-3.5 w-3.5 text-accent" />,
   },
   Info: {
-    color: 'text-neutral-400',
-    bg: 'bg-neutral-500/10 border-neutral-500/30',
-    icon: <Eye className="h-3.5 w-3.5 text-neutral-400" />,
+    color: 'text-muted',
+    bg: 'bg-elevated border-edge',
+    icon: <Eye className="h-3.5 w-3.5 text-muted" />,
   },
 };
 
 const RISK_CONFIG: Record<SecurityRiskLevel, { color: string; icon: React.ReactNode }> = {
-  Clean: { color: 'text-emerald-400', icon: <ShieldCheck className="h-4 w-4 text-emerald-400" /> },
-  Low: { color: 'text-blue-400', icon: <Shield className="h-4 w-4 text-blue-400" /> },
-  Medium: { color: 'text-yellow-400', icon: <AlertTriangle className="h-4 w-4 text-yellow-400" /> },
+  Clean: { color: 'text-success', icon: <ShieldCheck className="h-4 w-4 text-success" /> },
+  Low: { color: 'text-accent', icon: <Shield className="h-4 w-4 text-accent" /> },
+  Medium: { color: 'text-warning', icon: <AlertTriangle className="h-4 w-4 text-warning" /> },
   High: { color: 'text-orange-400', icon: <ShieldAlert className="h-4 w-4 text-orange-400" /> },
-  Critical: { color: 'text-red-400', icon: <ShieldX className="h-4 w-4 text-red-400" /> },
+  Critical: { color: 'text-critical', icon: <ShieldX className="h-4 w-4 text-critical" /> },
 };
 
 // ── FindingRow ─────────────────────────────────────────────────────────────────
@@ -157,36 +159,36 @@ function FindingRow({ finding }: { finding: SecurityFinding }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-xs font-semibold ${cfg.color}`}>{finding.severity}</span>
-            <span className="text-xs text-neutral-500">{finding.ruleId}</span>
+            <span className="text-xs text-muted">{finding.ruleId}</span>
             {finding.cweId && (
-              <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">{finding.cweId}</span>
+              <span className="rounded bg-elevated px-1.5 py-0.5 text-xs text-muted">{finding.cweId}</span>
             )}
             {finding.owaspCategory && (
-              <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">{finding.owaspCategory}</span>
+              <span className="rounded bg-elevated px-1.5 py-0.5 text-xs text-muted">{finding.owaspCategory}</span>
             )}
             <span className={`ml-auto rounded-full px-2 py-0.5 text-xs border ${
               finding.status === 'Open'
-                ? 'border-red-500/30 bg-red-500/10 text-red-400'
+                ? 'border-critical/30 bg-critical/10 text-critical'
                 : finding.status === 'Acknowledged'
-                ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400'
-                : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                ? 'border-warning/30 bg-warning/10 text-warning'
+                : 'border-success/30 bg-success/10 text-success'
             }`}>
               {finding.status}
             </span>
           </div>
-          <p className="mt-1 text-sm text-neutral-200">{finding.description}</p>
-          <p className="mt-0.5 text-xs text-neutral-500 font-mono truncate">{finding.filePath}{finding.lineNumber ? `:${finding.lineNumber}` : ''}</p>
+          <p className="mt-1 text-sm text-body">{finding.description}</p>
+          <p className="mt-0.5 text-xs text-muted font-mono truncate">{finding.filePath}{finding.lineNumber ? `:${finding.lineNumber}` : ''}</p>
         </div>
-        {expanded ? <ChevronDown className="h-4 w-4 text-neutral-500 shrink-0 mt-0.5" /> : <ChevronRight className="h-4 w-4 text-neutral-500 shrink-0 mt-0.5" />}
+        {expanded ? <ChevronDown className="h-4 w-4 text-muted shrink-0 mt-0.5" /> : <ChevronRight className="h-4 w-4 text-muted shrink-0 mt-0.5" />}
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 pt-2 border-t border-neutral-800/50">
-          <div className="flex items-start gap-2 rounded-md bg-neutral-950/40 px-3 py-2.5">
-            <Lock className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+        <div className="px-4 pb-4 pt-2 border-t border-edge/50">
+          <div className="flex items-start gap-2 rounded-md bg-elevated/40 px-3 py-2.5">
+            <Lock className="h-4 w-4 text-success mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs font-medium text-emerald-300 mb-1">{t('remediation')}</p>
-              <p className="text-xs text-neutral-300">{finding.remediation}</p>
+              <p className="text-xs font-medium text-success mb-1">{t('remediation')}</p>
+              <p className="text-xs text-body">{finding.remediation}</p>
             </div>
           </div>
         </div>
@@ -199,8 +201,8 @@ function FindingRow({ finding }: { finding: SecurityFinding }) {
 
 function SummaryCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3">
-      <span className="text-xs text-neutral-500">{label}</span>
+    <div className="flex flex-col gap-1 rounded-lg border border-edge bg-elevated px-4 py-3">
+      <span className="text-xs text-muted">{label}</span>
       <span className={`text-2xl font-bold ${color}`}>{value}</span>
     </div>
   );
@@ -249,29 +251,29 @@ export function SecurityGateDashboardPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-screen-xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-neutral-100">{t('title')}</h1>
-          <p className="mt-1 text-sm text-neutral-400">{t('subtitle')}</p>
-        </div>
-        <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5">
-          <Shield className="h-4 w-4 text-emerald-400" />
-          <span className="text-xs text-emerald-400">{t('sastEngine')}</span>
+    <PageContainer>
+      <PageHeader
+        title={t('catalog.securityGate.title', 'Security Gate Dashboard')}
+        subtitle={t('catalog.securityGate.subtitle', 'SAST security scanning and gate evaluation for your services')}
+      />
+      {/* Engine badge */}
+      <div className="flex">
+        <div className="flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1.5">
+          <Shield className="h-4 w-4 text-success" />
+          <span className="text-xs text-success">{t('sastEngine')}</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border border-neutral-800 bg-neutral-900/40 p-1 w-fit">
+      <div className="flex gap-1 rounded-lg border border-edge bg-elevated/40 p-1 w-fit">
         {(['scan', 'dashboard'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`rounded-md px-4 py-1.5 text-sm transition-colors ${
               activeTab === tab
-                ? 'bg-neutral-800 text-neutral-100'
-                : 'text-neutral-500 hover:text-neutral-300'
+                ? 'bg-elevated text-body'
+                : 'text-muted hover:text-body'
             }`}
           >
             {t(`tabs.${tab}`)}
@@ -285,28 +287,28 @@ export function SecurityGateDashboardPage() {
           {/* Code input */}
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-neutral-400">{t('filePath')}</label>
+              <label className="text-xs font-medium text-muted">{t('filePath')}</label>
               <input
                 type="text"
                 value={filePathInput}
                 onChange={e => setFilePathInput(e.target.value)}
                 placeholder={t('catalog.security.placeholder.filePath', 'src/MyController.cs')}
-                className="rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:border-blue-500 focus:outline-none font-mono"
+                className="rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted focus:border-accent focus:outline-none font-mono"
               />
             </div>
             <div className="flex flex-col gap-1.5 flex-1">
-              <label className="text-xs font-medium text-neutral-400">{t('sourceCode')}</label>
+              <label className="text-xs font-medium text-muted">{t('sourceCode')}</label>
               <textarea
                 value={codeInput}
                 onChange={e => setCodeInput(e.target.value)}
                 placeholder={t('sourceCodePlaceholder')}
-                className="min-h-80 rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-xs font-mono text-neutral-100 placeholder-neutral-600 focus:border-blue-500 focus:outline-none resize-none"
+                className="min-h-80 rounded-md border border-edge bg-elevated px-3 py-2 text-xs font-mono text-body placeholder-muted focus:border-accent focus:outline-none resize-none"
               />
             </div>
             <button
               onClick={() => scanMutation.mutate()}
               disabled={!canScan || scanMutation.isPending}
-              className="flex items-center justify-center gap-2 rounded-md bg-red-700/80 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-medium text-white transition-colors"
+              className="flex items-center justify-center gap-2 rounded-md bg-critical hover:bg-critical/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-medium text-white transition-colors"
             >
               {scanMutation.isPending ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> {t('scanning')}</>
@@ -323,17 +325,17 @@ export function SecurityGateDashboardPage() {
                 {/* Gate status */}
                 <div className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${
                   scanMutation.data.passedGate
-                    ? 'border-emerald-500/30 bg-emerald-500/10'
-                    : 'border-red-500/30 bg-red-500/10'
+                    ? 'border-success/30 bg-success/10'
+                    : 'border-critical/30 bg-critical/10'
                 }`}>
                   {scanMutation.data.passedGate
-                    ? <ShieldCheck className="h-5 w-5 text-emerald-400" />
-                    : <ShieldX className="h-5 w-5 text-red-400" />}
+                    ? <ShieldCheck className="h-5 w-5 text-success" />
+                    : <ShieldX className="h-5 w-5 text-critical" />}
                   <div>
-                    <p className={`text-sm font-medium ${scanMutation.data.passedGate ? 'text-emerald-300' : 'text-red-300'}`}>
+                    <p className={`text-sm font-medium ${scanMutation.data.passedGate ? 'text-success' : 'text-critical'}`}>
                       {scanMutation.data.passedGate ? t('gatePassed') : t('gateFailed')}
                     </p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted">
                       {t('riskLevel')}: {' '}
                       <span className={RISK_CONFIG[scanMutation.data.overallRisk].color}>
                         {scanMutation.data.overallRisk}
@@ -347,28 +349,28 @@ export function SecurityGateDashboardPage() {
 
                 {/* Severity summary */}
                 <div className="grid grid-cols-3 gap-2">
-                  <SummaryCard label={t('critical')} value={scanMutation.data.summary.criticalCount} color="text-red-400" />
+                  <SummaryCard label={t('critical')} value={scanMutation.data.summary.criticalCount} color="text-critical" />
                   <SummaryCard label={t('high')} value={scanMutation.data.summary.highCount} color="text-orange-400" />
-                  <SummaryCard label={t('medium')} value={scanMutation.data.summary.mediumCount} color="text-yellow-400" />
+                  <SummaryCard label={t('medium')} value={scanMutation.data.summary.mediumCount} color="text-warning" />
                 </div>
 
                 {/* Filters */}
                 {findings.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     <div className="relative flex-1 min-w-48">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         placeholder={t('searchFindings')}
-                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 pl-9 pr-3 py-2 text-xs text-neutral-100 placeholder-neutral-600 focus:border-blue-500 focus:outline-none"
+                        className="w-full rounded-md border border-edge bg-elevated pl-9 pr-3 py-2 text-xs text-body placeholder-muted focus:border-accent focus:outline-none"
                       />
                     </div>
                     <select
                       value={severityFilter}
                       onChange={e => setSeverityFilter(e.target.value as FindingSeverity | 'All')}
-                      className="rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-xs text-neutral-100 focus:border-blue-500 focus:outline-none"
+                      className="rounded-md border border-edge bg-elevated px-3 py-2 text-xs text-body focus:border-accent focus:outline-none"
                     >
                       <option value="All">{t('allSeverities')}</option>
                       {(['Critical', 'High', 'Medium', 'Low', 'Info'] as FindingSeverity[]).map(s => (
@@ -384,23 +386,23 @@ export function SecurityGateDashboardPage() {
                     {filtered.map(f => <FindingRow key={f.findingId} finding={f} />)}
                   </div>
                 ) : findings.length > 0 ? (
-                  <div className="flex items-center gap-2 rounded-md border border-neutral-800 px-4 py-3 text-sm text-neutral-500">
+                  <div className="flex items-center gap-2 rounded-md border border-edge px-4 py-3 text-sm text-muted">
                     <Filter className="h-4 w-4" />
                     {t('noMatchingFindings')}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 py-8">
-                    <ShieldCheck className="h-8 w-8 text-emerald-400" />
-                    <p className="text-sm text-emerald-300">{t('noFindings')}</p>
+                  <div className="flex flex-col items-center gap-2 rounded-lg border border-success/20 bg-success/5 py-8">
+                    <ShieldCheck className="h-8 w-8 text-success" />
+                    <p className="text-sm text-success">{t('noFindings')}</p>
                   </div>
                 )}
               </>
             )}
 
             {!scanMutation.isSuccess && !scanMutation.isPending && (
-              <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-neutral-800 py-12 text-center">
-                <ShieldAlert className="h-8 w-8 text-neutral-700" />
-                <p className="text-sm text-neutral-500">{t('emptyState')}</p>
+              <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-edge py-12 text-center">
+                <ShieldAlert className="h-8 w-8 text-muted" />
+                <p className="text-sm text-muted">{t('emptyState')}</p>
               </div>
             )}
           </div>
@@ -412,12 +414,12 @@ export function SecurityGateDashboardPage() {
         <div className="flex flex-col gap-6">
           {dashboardQuery.isLoading && (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-neutral-600" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted" />
             </div>
           )}
 
           {dashboardQuery.isError && (
-            <div className="flex items-center gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <div className="flex items-center gap-2 rounded-md border border-critical/30 bg-critical/10 px-4 py-3 text-sm text-critical">
               <XCircle className="h-4 w-4" />
               {t('dashboardError')}
             </div>
@@ -427,22 +429,22 @@ export function SecurityGateDashboardPage() {
             <>
               {/* KPI cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <SummaryCard label={t('totalScans')} value={dashboardQuery.data.totalScans} color="text-neutral-100" />
-                <SummaryCard label={t('passedScans')} value={dashboardQuery.data.passedScans} color="text-emerald-400" />
-                <SummaryCard label={t('criticalFindings')} value={dashboardQuery.data.criticalFindings} color="text-red-400" />
-                <SummaryCard label={t('securityScore')} value={dashboardQuery.data.overallSecurityScore} color="text-blue-400" />
+                <SummaryCard label={t('totalScans')} value={dashboardQuery.data.totalScans} color="text-body" />
+                <SummaryCard label={t('passedScans')} value={dashboardQuery.data.passedScans} color="text-success" />
+                <SummaryCard label={t('criticalFindings')} value={dashboardQuery.data.criticalFindings} color="text-critical" />
+                <SummaryCard label={t('securityScore')} value={dashboardQuery.data.overallSecurityScore} color="text-accent" />
               </div>
 
               {/* Top categories */}
               {dashboardQuery.data.topVulnerableCategories.length > 0 && (
-                <div className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+                <div className="rounded-lg border border-edge bg-elevated p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <BarChart3 className="h-4 w-4 text-neutral-400" />
-                    <h3 className="text-sm font-medium text-neutral-200">{t('topCategories')}</h3>
+                    <BarChart3 className="h-4 w-4 text-muted" />
+                    <h3 className="text-sm font-medium text-body">{t('topCategories')}</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {dashboardQuery.data.topVulnerableCategories.map(c => (
-                      <span key={c} className="rounded-full border border-neutral-700 bg-neutral-800 px-3 py-1 text-xs text-neutral-300">
+                      <span key={c} className="rounded-full border border-edge bg-elevated px-3 py-1 text-xs text-body">
                         {c}
                       </span>
                     ))}
@@ -452,26 +454,26 @@ export function SecurityGateDashboardPage() {
 
               {/* Recent scans */}
               {dashboardQuery.data.recentScans.length > 0 && (
-                <div className="rounded-lg border border-neutral-800 bg-neutral-900 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-800">
-                    <FileCode className="h-4 w-4 text-neutral-400" />
-                    <h3 className="text-sm font-medium text-neutral-200">{t('recentScans')}</h3>
+                <div className="rounded-lg border border-edge bg-elevated overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-edge">
+                    <FileCode className="h-4 w-4 text-muted" />
+                    <h3 className="text-sm font-medium text-body">{t('recentScans')}</h3>
                   </div>
                   <div className="divide-y divide-neutral-800">
                     {dashboardQuery.data.recentScans.map(s => (
                       <div key={s.scanId} className="flex items-center gap-4 px-4 py-3">
                         {RISK_CONFIG[s.overallRisk].icon}
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-neutral-300 font-mono truncate">{s.scanId}</p>
-                          <p className="text-xs text-neutral-600">{new Date(s.scannedAt).toLocaleString()}</p>
+                          <p className="text-xs text-body font-mono truncate">{s.scanId}</p>
+                          <p className="text-xs text-muted">{new Date(s.scannedAt).toLocaleString()}</p>
                         </div>
                         <span className={`text-xs font-medium ${RISK_CONFIG[s.overallRisk].color}`}>
                           {s.overallRisk}
                         </span>
                         {s.passedGate ? (
-                          <CheckCircle className="h-4 w-4 text-emerald-400" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-red-400" />
+                          <XCircle className="h-4 w-4 text-critical" />
                         )}
                       </div>
                     ))}
@@ -482,13 +484,13 @@ export function SecurityGateDashboardPage() {
           )}
 
           {dashboardQuery.isSuccess && dashboardQuery.data?.totalScans === 0 && (
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-neutral-800 py-16 text-center">
-              <Shield className="h-10 w-10 text-neutral-700" />
-              <p className="text-sm text-neutral-500">{t('dashboardEmpty')}</p>
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-edge py-16 text-center">
+              <Shield className="h-10 w-10 text-muted" />
+              <p className="text-sm text-muted">{t('dashboardEmpty')}</p>
             </div>
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

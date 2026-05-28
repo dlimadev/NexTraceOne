@@ -11,6 +11,8 @@ import {
   type UpdateTemplateRequest,
 } from '../api/templates';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 // ── Form field ────────────────────────────────────────────────────────────────
 
@@ -27,21 +29,21 @@ function FormField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-neutral-300">
+      <label className="text-xs font-medium text-body">
         {label}
-        {required && <span className="ml-0.5 text-red-400">*</span>}
+        {required && <span className="ml-0.5 text-critical">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-neutral-500">{hint}</p>}
+      {hint && <p className="text-xs text-muted">{hint}</p>}
     </div>
   );
 }
 
 const INPUT_CLASS =
-  'w-full rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 placeholder-neutral-500 outline-none focus:border-blue-500';
+  'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted outline-none focus:border-accent';
 
 const SELECT_CLASS =
-  'w-full rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 outline-none focus:border-blue-500';
+  'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body outline-none focus:border-accent';
 
 // ── Form state ────────────────────────────────────────────────────────────────
 
@@ -214,24 +216,24 @@ export function TemplateEditorPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+    <PageContainer>
+      <PageHeader
+        title={isEditing ? t('templates.editor.editTitle') : t('templates.editor.createTitle')}
+        subtitle={t('catalog.templateEditor.subtitle', 'Define template metadata, classification, and scaffolding manifest')}
+      />
+      {/* Back navigation */}
+      <div className="flex items-center gap-4">
         <button
           onClick={() => navigate(isEditing ? `/catalog/templates/${id}` : '/catalog/templates')}
-          className="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-200"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('common.back')}
         </button>
-        <h1 className="text-lg font-semibold text-neutral-100">
-          {isEditing ? t('templates.editor.editTitle') : t('templates.editor.createTitle')}
-        </h1>
-        <div />
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+        <div className="flex items-center gap-2 rounded border border-critical/30 bg-critical/10 p-3 text-sm text-critical">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>
@@ -239,8 +241,8 @@ export function TemplateEditorPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {/* Identity section */}
-        <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <h2 className="text-sm font-medium text-neutral-300">{t('templates.editor.sections.identity')}</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
+          <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.identity')}</h2>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {!isEditing && (
@@ -293,8 +295,8 @@ export function TemplateEditorPage() {
         </div>
 
         {/* Classification section */}
-        <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <h2 className="text-sm font-medium text-neutral-300">{t('templates.editor.sections.classification')}</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
+          <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.classification')}</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField label={t('templates.editor.fields.serviceType')} required>
               <select
@@ -330,13 +332,13 @@ export function TemplateEditorPage() {
           </div>
 
           {isEditing && (
-            <p className="text-xs text-neutral-500">{t('templates.editor.hints.typeLanguageImmutable')}</p>
+            <p className="text-xs text-muted">{t('templates.editor.hints.typeLanguageImmutable')}</p>
           )}
         </div>
 
         {/* Ownership section */}
-        <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <h2 className="text-sm font-medium text-neutral-300">{t('templates.editor.sections.ownership')}</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
+          <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.ownership')}</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField label={t('templates.editor.fields.defaultDomain')} required>
               <input
@@ -370,8 +372,8 @@ export function TemplateEditorPage() {
         </div>
 
         {/* Advanced section */}
-        <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <h2 className="text-sm font-medium text-neutral-300">{t('templates.editor.sections.advanced')}</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
+          <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.advanced')}</h2>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField label={t('templates.editor.fields.repoUrl')} hint={t('templates.editor.hints.repoUrl')}>
@@ -425,20 +427,20 @@ export function TemplateEditorPage() {
           <button
             type="button"
             onClick={() => navigate(isEditing ? `/catalog/templates/${id}` : '/catalog/templates')}
-            className="rounded border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-300 hover:bg-neutral-700"
+            className="rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-card"
           >
             {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="flex items-center gap-2 rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             {isPending ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </form>
-    </div>
+    </PageContainer>
   );
 }

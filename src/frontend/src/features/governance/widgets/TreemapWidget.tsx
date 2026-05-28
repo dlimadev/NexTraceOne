@@ -216,7 +216,7 @@ export function TreemapWidget({
   const isSimulated   = !effectiveData.isBackendAvailable;
   const unit          = config.unit ?? effectiveData.unit ?? '';
 
-  const colorPalette = getChartPalette(config.colorScheme);
+  const colorPalette = getChartPalette(config.colorScheme) as string[];
 
   function handleNodeClick(name: string): void {
     onCrossFilter?.({ serviceId: name });
