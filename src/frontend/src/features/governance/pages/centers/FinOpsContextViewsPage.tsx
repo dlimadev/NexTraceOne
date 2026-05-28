@@ -7,6 +7,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 type ContextFilter = 'service' | 'team' | 'domain' | 'environment';
@@ -48,7 +49,7 @@ function formatCost(v: number) {
 export function FinOpsContextViewsPage() {
   const { t } = useTranslation();
   const [context, setContext] = useState<ContextFilter>('service');
-  const { data, isLoading } = useFinOpsContext(context);
+  const { data, isLoading, isError, refetch } = useFinOpsContext(context);
 
   const nodes = data?.nodes ?? [];
 
@@ -91,6 +92,12 @@ export function FinOpsContextViewsPage() {
 
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <div className="space-y-2">
             {nodes.map((node) => {

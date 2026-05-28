@@ -8,6 +8,7 @@ import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { Button } from '../../../../components/Button';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 interface DeploymentWindow {
@@ -60,7 +61,7 @@ export function ReleaseCalendarGatePage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('calendar');
   const qc = useQueryClient();
-  const { data, isLoading } = useReleaseCalendar();
+  const { data, isLoading, isError, refetch } = useReleaseCalendar();
 
   const approveRelease = useMutation({
     mutationFn: (id: string) =>
@@ -91,6 +92,12 @@ export function ReleaseCalendarGatePage() {
 
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : tab === 'calendar' ? (
           <div className="space-y-2">
             {(data?.windows ?? []).map((win) => {

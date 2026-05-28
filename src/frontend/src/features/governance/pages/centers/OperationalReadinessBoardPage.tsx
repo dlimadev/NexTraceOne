@@ -6,6 +6,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 interface ReadinessService {
@@ -39,7 +40,7 @@ const READINESS_CONFIG = {
 
 export function OperationalReadinessBoardPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useReadinessBoard();
+  const { data, isLoading, isError, refetch } = useReadinessBoard();
 
   return (
     <PageContainer>
@@ -50,6 +51,12 @@ export function OperationalReadinessBoardPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <>
             <div className="space-y-3">

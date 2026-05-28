@@ -7,6 +7,7 @@ import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { Button } from '../../../../components/Button';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 interface RollbackCandidate {
@@ -50,7 +51,7 @@ const STATUS_CONFIG = {
 export function RollbackCockpitPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const { data, isLoading } = useRollbackCockpit();
+  const { data, isLoading, isError, refetch } = useRollbackCockpit();
 
   const initiateRollback = useMutation({
     mutationFn: (id: string) =>
@@ -102,6 +103,12 @@ export function RollbackCockpitPage() {
 
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <div className="space-y-2">
             {candidates.map((c) => {

@@ -7,6 +7,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 type CenterTab = 'slo' | 'chaos' | 'postmortem';
@@ -73,7 +74,7 @@ const CHAOS_RESULT = {
 export function SLOServiceCenterPage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<CenterTab>('slo');
-  const { data, isLoading } = useSLOCenter();
+  const { data, isLoading, isError, refetch } = useSLOCenter();
 
   const tabs: { key: CenterTab; label: string; icon: React.ReactNode }[] = [
     { key: 'slo', label: t('sloCenter.tabSLO'), icon: <Activity size={12} /> },
@@ -105,6 +106,12 @@ export function SLOServiceCenterPage() {
 
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : tab === 'slo' ? (
           <div className="space-y-2">
             {(data?.slos ?? []).map((slo) => {
