@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
@@ -141,7 +141,7 @@ export function AutomationRulesPage() {
       <PageSection>
         {!data?.items.length ? (
           <EmptyState
-            icon={<Zap className="w-8 h-8 text-gray-400" />}
+            icon={<Zap className="w-8 h-8 text-muted" />}
             title={t('workflows.automationRules.empty')}
             action={
               <Button size="sm" onClick={() => setShowBuilder(true)}>
@@ -160,7 +160,7 @@ export function AutomationRulesPage() {
                         onClick={() =>
                           toggleRule.mutate({ ruleId: rule.ruleId, enabled: !rule.isEnabled })
                         }
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-muted hover:text-accent transition-colors"
                         aria-label={
                           rule.isEnabled
                             ? t('workflows.automationRules.disabled')
@@ -168,16 +168,16 @@ export function AutomationRulesPage() {
                         }
                       >
                         {rule.isEnabled ? (
-                          <ToggleRight className="w-6 h-6 text-blue-600" />
+                          <ToggleRight className="w-6 h-6 text-accent" />
                         ) : (
                           <ToggleLeft className="w-6 h-6" />
                         )}
                       </button>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-heading">
                           {rule.name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                           {t('workflows.automationRules.trigger')}: {rule.trigger}
                         </p>
                       </div>
@@ -190,7 +190,7 @@ export function AutomationRulesPage() {
                       </Badge>
                       <button
                         onClick={() => deleteRule.mutate(rule.ruleId)}
-                        className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+                        className="text-muted hover:text-critical transition-colors ml-2"
                         aria-label={t('common.delete')}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -206,33 +206,33 @@ export function AutomationRulesPage() {
 
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-elevated rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-heading mb-4">
               {t('workflows.automationRules.create')}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.name')}
                 </label>
                 <input
                   type="text"
                   value={ruleName}
                   onChange={(e) => setRuleName(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder={t('workflows.automationRules.title')}
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('workflows.automationRules.trigger')}
                 </label>
                 <select
                   value={trigger}
                   onChange={(e) => setTrigger(e.target.value as Trigger)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
                 >
                   {TRIGGERS.map((tr) => (
                     <option key={tr} value={tr}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Plus, Trash2 } from 'lucide-react';
@@ -124,7 +124,7 @@ export function ChangeChecklistsPage() {
       <PageSection>
         {!data?.items.length ? (
           <EmptyState
-            icon={<ClipboardList className="w-8 h-8 text-gray-400" />}
+            icon={<ClipboardList className="w-8 h-8 text-muted" />}
             title={t('workflows.checklists.empty')}
             action={
               <Button size="sm" onClick={() => setShowBuilder(true)}>
@@ -140,7 +140,7 @@ export function ChangeChecklistsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-heading">
                           {cl.name}
                         </p>
                         <Badge variant={cl.isRequired ? 'warning' : 'neutral'}>
@@ -158,9 +158,9 @@ export function ChangeChecklistsPage() {
                           {cl.items.map((item, idx) => (
                             <li
                               key={idx}
-                              className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"
+                              className="text-xs text-muted flex items-center gap-1"
                             >
-                              <span className="w-1 h-1 rounded-full bg-gray-400 inline-block" />
+                              <span className="w-1 h-1 rounded-full bg-muted inline-block" />
                               {item}
                             </li>
                           ))}
@@ -169,7 +169,7 @@ export function ChangeChecklistsPage() {
                     </div>
                     <button
                       onClick={() => deleteChecklist.mutate(cl.checklistId)}
-                      className="text-gray-400 hover:text-red-500 transition-colors ml-2 flex-shrink-0"
+                      className="text-muted hover:text-critical transition-colors ml-2 flex-shrink-0"
                       aria-label={t('common.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -184,46 +184,46 @@ export function ChangeChecklistsPage() {
 
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-elevated rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-heading mb-4">
               {t('workflows.checklists.create')}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.name')}
                 </label>
                 <input
                   type="text"
                   value={checklistName}
                   onChange={(e) => setChecklistName(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('common.type')}
                   </label>
                   <input
                     type="text"
                     value={changeType}
                     onChange={(e) => setChangeType(e.target.value)}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                     placeholder={t('configuration.checklists.categoryPlaceholder', 'standard')}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('common.environment')}
                   </label>
                   <input
                     type="text"
                     value={environment}
                     onChange={(e) => setEnvironment(e.target.value)}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                     placeholder={t('configuration.checklists.environmentPlaceholder', 'production')}
                   />
                 </div>
@@ -237,20 +237,20 @@ export function ChangeChecklistsPage() {
                   onChange={(e) => setIsRequired(e.target.checked)}
                   className="rounded"
                 />
-                <label htmlFor="isRequired" className="text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="isRequired" className="text-sm text-body">
                   {t('workflows.checklists.required')}
                 </label>
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.items')} ({t('common.onePerLine')})
                 </label>
                 <textarea
                   value={itemsText}
                   onChange={(e) => setItemsText(e.target.value)}
                   rows={4}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder={t('configuration.checklists.itemsPlaceholder', 'Review test results\nCheck rollback plan\nNotify stakeholders')}
                 />
               </div>

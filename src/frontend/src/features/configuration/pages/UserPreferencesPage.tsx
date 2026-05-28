@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+﻿import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -792,7 +792,7 @@ export function UserPreferencesPage() {
                   type="checkbox"
                   checked={quietHoursEnabled}
                   onChange={e => setQuietHoursEnabled(e.target.checked)}
-                  className="w-4 h-4 accent-blue-600"
+                  className="w-4 h-4 accent-accent"
                 />
                 <span className="text-sm">{t('quietHours.enabled')}</span>
               </label>
@@ -821,7 +821,7 @@ export function UserPreferencesPage() {
                     <select
                       value={quietHoursTimezone}
                       onChange={e => setQuietHoursTimezone(e.target.value)}
-                      className="w-full px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-elevated"
                     >
                       {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
                     </select>
@@ -847,7 +847,7 @@ export function UserPreferencesPage() {
                 <select
                   value={digestFrequency}
                   onChange={e => setDigestFrequency(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
                 >
                   <option value="daily">{t('digestSettings.frequencyOptions.daily')}</option>
                   <option value="weekly">{t('digestSettings.frequencyOptions.weekly')}</option>
@@ -868,8 +868,8 @@ export function UserPreferencesPage() {
                         }
                         className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                           digestSections.includes(sec)
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
-                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                            ? 'border-accent bg-accent/10 text-accent font-medium'
+                            : 'border-edge text-muted hover:border-accent/50'
                         }`}
                       >
                         {sec}
@@ -920,7 +920,7 @@ export function UserPreferencesPage() {
                 <select
                   value={aiVerbosity}
                   onChange={e => setAiVerbosity(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
                 >
                   <option value="concise">{t('aiPreferences.verbosityOptions.concise')}</option>
                   <option value="standard">{t('aiPreferences.verbosityOptions.standard')}</option>
@@ -946,7 +946,7 @@ export function UserPreferencesPage() {
                 <select
                   value={aiContextScope}
                   onChange={e => setAiContextScope(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
                 >
                   <option value="service">{t('aiPreferences.scopeOptions.service')}</option>
                   <option value="team">{t('aiPreferences.scopeOptions.team')}</option>
@@ -970,8 +970,8 @@ export function UserPreferencesPage() {
                         }
                         className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                           aiKnowledgeSources.includes(src)
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
-                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                            ? 'border-accent bg-accent/10 text-accent font-medium'
+                            : 'border-edge text-muted hover:border-accent/50'
                         }`}
                       >
                         {t(`aiPreferences.knowledgeSourceOptions.${src === 'knowledge-articles' ? 'knowledgeArticles' : src === 'operational-notes' ? 'operationalNotes' : src}`)}

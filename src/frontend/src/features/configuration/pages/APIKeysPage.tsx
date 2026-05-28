@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { KeyRound, Plus, Copy, Trash2, Check } from 'lucide-react';
@@ -181,8 +181,8 @@ export function APIKeysPage() {
                       onClick={() => toggleScope(scope)}
                       className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                         scopes.includes(scope)
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                          ? 'border-accent bg-accent/10 text-accent font-medium'
+                          : 'border-edge text-muted hover:border-accent/50'
                       }`}
                     >
                       {scope}

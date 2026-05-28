@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileCode, Plus, Trash2 } from 'lucide-react';
@@ -140,8 +140,8 @@ export function ContractTemplatesPage() {
               onClick={() => setActiveType(tab)}
               className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
                 activeType === tab
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'border-edge text-muted hover:border-accent/50'
               }`}
             >
               {tab === 'All' ? t('workflows.contractTemplates.all') : tab}
@@ -151,7 +151,7 @@ export function ContractTemplatesPage() {
 
         {!data?.items.length ? (
           <EmptyState
-            icon={<FileCode className="w-8 h-8 text-gray-400" />}
+            icon={<FileCode className="w-8 h-8 text-muted" />}
             title={t('workflows.contractTemplates.empty')}
             action={
               <Button size="sm" onClick={() => setShowBuilder(true)}>
@@ -167,7 +167,7 @@ export function ContractTemplatesPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-heading">
                           {tmpl.name}
                         </p>
                         <Badge variant={TYPE_BADGE[tmpl.contractType]}>
@@ -178,7 +178,7 @@ export function ContractTemplatesPage() {
                         )}
                       </div>
                       {tmpl.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                           {tmpl.description}
                         </p>
                       )}
@@ -186,7 +186,7 @@ export function ContractTemplatesPage() {
                     {!tmpl.isBuiltIn && (
                       <button
                         onClick={() => deleteTemplate.mutate(tmpl.templateId)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-muted hover:text-critical transition-colors"
                         aria-label={t('common.delete')}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -202,33 +202,33 @@ export function ContractTemplatesPage() {
 
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-elevated rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-heading mb-4">
               {t('workflows.contractTemplates.create')}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.name')}
                 </label>
                 <input
                   type="text"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder={t('workflows.contractTemplates.title')}
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('workflows.contractTemplates.type')}
                 </label>
                 <select
                   value={contractType}
                   onChange={(e) => setContractType(e.target.value as ContractType)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
                 >
                   {CONTRACT_TYPES.map((ct) => (
                     <option key={ct} value={ct}>
@@ -239,14 +239,14 @@ export function ContractTemplatesPage() {
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.description')}
                 </label>
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                 />
               </div>
             </div>

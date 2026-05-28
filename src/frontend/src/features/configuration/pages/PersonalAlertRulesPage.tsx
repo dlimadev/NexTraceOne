@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
@@ -163,7 +163,7 @@ export function PersonalAlertRulesPage() {
       <PageSection>
         {!data?.items.length ? (
           <EmptyState
-            icon={<Bell className="w-8 h-8 text-gray-400" />}
+            icon={<Bell className="w-8 h-8 text-muted" />}
             title={t('alertRules.empty.title')}
             description={t('alertRules.empty.description')}
             action={
@@ -191,21 +191,21 @@ export function PersonalAlertRulesPage() {
                           onClick={() =>
                             toggleRule.mutate({ ruleId: rule.ruleId, enabled: !rule.isEnabled })
                           }
-                          className="text-gray-400 hover:text-blue-600 transition-colors"
+                          className="text-muted hover:text-accent transition-colors"
                           aria-label={rule.isEnabled ? t('alertRules.disable') : t('alertRules.enable')}
                         >
                           {rule.isEnabled ? (
-                            <ToggleRight className="w-6 h-6 text-blue-600" />
+                            <ToggleRight className="w-6 h-6 text-accent" />
                           ) : (
                             <ToggleLeft className="w-6 h-6" />
                           )}
                         </button>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          <p className="text-sm font-medium text-heading">
                             {rule.name}
                           </p>
                           {parsedCondition && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            <p className="text-xs text-muted mt-0.5">
                               {parsedCondition.entity} · {parsedCondition.field}{' '}
                               {parsedCondition.operator} {parsedCondition.value}
                             </p>
@@ -218,7 +218,7 @@ export function PersonalAlertRulesPage() {
                         </Badge>
                         <button
                           onClick={() => deleteRule.mutate(rule.ruleId)}
-                          className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+                          className="text-muted hover:text-critical transition-colors ml-2"
                           aria-label={t('alertRules.delete')}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -236,28 +236,28 @@ export function PersonalAlertRulesPage() {
       {/* ── Builder modal ────────────────────────────────────────────────── */}
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-elevated rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-heading mb-4">
               {t('alertRules.builder.title')}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('alertRules.builder.name')}
                 </label>
                 <input
                   type="text"
                   value={ruleName}
                   onChange={(e) => setRuleName(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder={t('alertRules.builder.namePlaceholder')}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('alertRules.builder.entity')}
                   </label>
                   <select
@@ -265,7 +265,7 @@ export function PersonalAlertRulesPage() {
                     onChange={(e) =>
                       setCondition((c) => ({ ...c, entity: e.target.value, field: '', operator: '' }))
                     }
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
                   >
                     {ENTITIES.map((e) => (
                       <option key={e} value={e}>
@@ -275,7 +275,7 @@ export function PersonalAlertRulesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('alertRules.builder.field')}
                   </label>
                   <select
@@ -283,7 +283,7 @@ export function PersonalAlertRulesPage() {
                     onChange={(e) =>
                       setCondition((c) => ({ ...c, field: e.target.value as EntityField }))
                     }
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
                   >
                     <option value="">{t('alertRules.builder.selectField')}</option>
                     {(ENTITY_FIELDS[condition.entity] ?? []).map((f) => (
@@ -297,7 +297,7 @@ export function PersonalAlertRulesPage() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('alertRules.builder.operator')}
                   </label>
                   <select
@@ -305,7 +305,7 @@ export function PersonalAlertRulesPage() {
                     onChange={(e) =>
                       setCondition((c) => ({ ...c, operator: e.target.value as Operator }))
                     }
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
                   >
                     <option value="">{t('alertRules.builder.selectOperator')}</option>
                     {OPERATORS.map((op) => (
@@ -316,21 +316,21 @@ export function PersonalAlertRulesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('alertRules.builder.value')}
                   </label>
                   <input
                     type="text"
                     value={condition.value}
                     onChange={(e) => setCondition((c) => ({ ...c, value: e.target.value }))}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                     placeholder="high"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('alertRules.builder.channel')}
                 </label>
                 <div className="flex gap-2">
@@ -340,8 +340,8 @@ export function PersonalAlertRulesPage() {
                       onClick={() => setChannel(ch)}
                       className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
                         channel === ch
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                          ? 'border-accent bg-accent/10 text-accent'
+                          : 'border-edge text-muted hover:border-accent/50'
                       }`}
                     >
                       {ch}

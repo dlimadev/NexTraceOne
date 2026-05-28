@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
@@ -141,7 +141,7 @@ export function WebhookTemplatesPage() {
                 <select
                   value={eventType}
                   onChange={e => setEventType(e.target.value as EventType)}
-                  className="w-64 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                  className="w-64 px-3 py-1.5 text-sm border rounded bg-elevated"
                 >
                   {EVENT_TYPES.map(et => (
                     <option key={et} value={et}>{et}</option>

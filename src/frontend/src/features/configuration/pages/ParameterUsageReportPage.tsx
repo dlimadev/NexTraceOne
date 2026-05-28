@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+﻿import { useTranslation } from 'react-i18next';
 import {
   BarChart3, PieChart, Activity, TrendingUp, Settings, Layers, RefreshCw,
 } from 'lucide-react';
@@ -44,7 +44,7 @@ export function ParameterUsageReportPage() {
         actions={
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-elevated hover:bg-elevated/80 text-sm"
           >
             <RefreshCw size={14} />
             {t('phase5.usage.refresh', 'Refresh')}
@@ -60,30 +60,30 @@ export function ParameterUsageReportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             <Card>
               <CardBody className="text-center">
-                <Settings size={20} className="mx-auto mb-2 text-blue-400" />
+                <Settings size={20} className="mx-auto mb-2 text-accent" />
                 <div className="text-2xl font-bold">{report.totalDefinitions}</div>
-                <div className="text-xs text-slate-400">{t('phase5.usage.totalDefinitions', 'Total Definitions')}</div>
+                <div className="text-xs text-muted">{t('phase5.usage.totalDefinitions', 'Total Definitions')}</div>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
-                <Layers size={20} className="mx-auto mb-2 text-green-400" />
+                <Layers size={20} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold">{report.totalOverrides}</div>
-                <div className="text-xs text-slate-400">{t('phase5.usage.totalOverrides', 'Total Overrides')}</div>
+                <div className="text-xs text-muted">{t('phase5.usage.totalOverrides', 'Total Overrides')}</div>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
-                <PieChart size={20} className="mx-auto mb-2 text-amber-400" />
+                <PieChart size={20} className="mx-auto mb-2 text-warning" />
                 <div className="text-2xl font-bold">{report.overrideCoveragePercent}%</div>
-                <div className="text-xs text-slate-400">{t('phase5.usage.overrideCoverage', 'Override Coverage')}</div>
+                <div className="text-xs text-muted">{t('phase5.usage.overrideCoverage', 'Override Coverage')}</div>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
-                <TrendingUp size={20} className="mx-auto mb-2 text-purple-400" />
+                <TrendingUp size={20} className="mx-auto mb-2 text-accent" />
                 <div className="text-2xl font-bold">{report.definitionsUsingDefault}</div>
-                <div className="text-xs text-slate-400">{t('phase5.usage.usingDefault', 'Using Default')}</div>
+                <div className="text-xs text-muted">{t('phase5.usage.usingDefault', 'Using Default')}</div>
               </CardBody>
             </Card>
           </div>
@@ -97,11 +97,11 @@ export function ParameterUsageReportPage() {
               </CardHeader>
               <CardBody>
                 {report.mostOverridden.length === 0 ? (
-                  <p className="text-sm text-slate-400">{t('phase5.usage.noOverrides', 'No overrides found.')}</p>
+                  <p className="text-sm text-muted">{t('phase5.usage.noOverrides', 'No overrides found.')}</p>
                 ) : (
                   <div className="space-y-2">
                     {report.mostOverridden.map((item) => (
-                      <div key={item.key} className="flex items-center justify-between py-1 border-b border-slate-700/40">
+                      <div key={item.key} className="flex items-center justify-between py-1 border-b border-edge/40">
                         <div>
                           <span className="text-sm font-medium">{item.key}</span>
                         </div>
@@ -121,11 +121,11 @@ export function ParameterUsageReportPage() {
               </CardHeader>
               <CardBody>
                 {report.overridesByScope.length === 0 ? (
-                  <p className="text-sm text-slate-400">{t('phase5.usage.noScopes', 'No scope data available.')}</p>
+                  <p className="text-sm text-muted">{t('phase5.usage.noScopes', 'No scope data available.')}</p>
                 ) : (
                   <div className="space-y-2">
                     {report.overridesByScope.map((scope) => (
-                      <div key={scope.scope} className="flex items-center justify-between py-1 border-b border-slate-700/40">
+                      <div key={scope.scope} className="flex items-center justify-between py-1 border-b border-edge/40">
                         <span className="text-sm">{scope.scope}</span>
                         <Badge variant="default">{scope.count}</Badge>
                       </div>
@@ -143,15 +143,15 @@ export function ParameterUsageReportPage() {
               </CardHeader>
               <CardBody>
                 {report.recentlyChanged.length === 0 ? (
-                  <p className="text-sm text-slate-400">{t('phase5.usage.noRecent', 'No recent changes.')}</p>
+                  <p className="text-sm text-muted">{t('phase5.usage.noRecent', 'No recent changes.')}</p>
                 ) : (
                   <div className="space-y-2">
                     {report.recentlyChanged.map((item) => (
-                      <div key={item.key} className="flex items-center justify-between py-1 border-b border-slate-700/40">
+                      <div key={item.key} className="flex items-center justify-between py-1 border-b border-edge/40">
                         <div>
                           <span className="text-sm font-medium">{item.key}</span>
                           {item.lastChangedAt && (
-                            <span className="text-xs text-slate-500 ml-2">
+                            <span className="text-xs text-faded ml-2">
                               {new Date(item.lastChangedAt).toLocaleString()}
                             </span>
                           )}
