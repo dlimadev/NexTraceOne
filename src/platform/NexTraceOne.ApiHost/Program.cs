@@ -263,7 +263,7 @@ builder.Services.AddRateLimiter(options =>
         {
             ({ } t, { } u) => $"ai:t:{t}:u:{u}",
             ({ } t, _)     => $"ai:t:{t}",
-            _              => $"ai:ip:{context.Connection.RemoteIpAddress ?? "unresolved"}"
+            _              => $"ai:ip:{context.Connection.RemoteIpAddress?.ToString() ?? "unresolved"}"
         };
 
         return RateLimitPartition.GetFixedWindowLimiter(
