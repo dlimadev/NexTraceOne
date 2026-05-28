@@ -7,6 +7,7 @@ import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { Button } from '../../../../components/Button';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 const useExecutiveBrief = () =>
@@ -26,7 +27,7 @@ const useExecutiveBrief = () =>
 
 export function ExecutiveBriefCenterPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useExecutiveBrief();
+  const { data, isLoading, isError, refetch } = useExecutiveBrief();
 
   return (
     <PageContainer>
@@ -43,6 +44,12 @@ export function ExecutiveBriefCenterPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

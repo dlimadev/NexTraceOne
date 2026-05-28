@@ -7,6 +7,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 const usePlatformAdminHome = () =>
@@ -38,7 +39,7 @@ const QUICK_LINKS = [
 
 export function PlatformAdminCockpitPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = usePlatformAdminHome();
+  const { data, isLoading, isError, refetch } = usePlatformAdminHome();
 
   return (
     <PageContainer>
@@ -50,6 +51,12 @@ export function PlatformAdminCockpitPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <>
             {/* Stats Row */}

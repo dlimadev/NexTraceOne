@@ -7,6 +7,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 const useEngineerHome = () =>
@@ -40,7 +41,7 @@ const SEVERITY_COLOR: Record<string, string> = {
 
 export function EngineerCockpitPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useEngineerHome();
+  const { data, isLoading, isError, refetch } = useEngineerHome();
 
   return (
     <PageContainer>
@@ -57,6 +58,12 @@ export function EngineerCockpitPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <>
             {/* Quick Actions */}

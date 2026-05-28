@@ -8,6 +8,7 @@ import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { StatCard } from '../../../../components/StatCard';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 const useTechLeadHome = () =>
@@ -23,7 +24,7 @@ const useTechLeadHome = () =>
 
 export function TechLeadCommandCenterPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useTechLeadHome();
+  const { data, isLoading, isError, refetch } = useTechLeadHome();
 
   return (
     <PageContainer>
@@ -40,6 +41,12 @@ export function TechLeadCommandCenterPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : (
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
