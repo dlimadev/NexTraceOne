@@ -11,15 +11,18 @@ import {
   ArrowUpRight,
   BookOpen,
 } from 'lucide-react';
+import { Badge } from '../../../components/Badge';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
+import { stateToVariant } from '../lib/contractVariants';
 import { useCanonicalEntities, useCanonicalEntityUsages } from '../hooks';
 import type { CanonicalEntity, CanonicalEntityState } from '../types';
 
-const STATE_COLORS: Record<CanonicalEntityState, string> = {
+/** Cores para cards de stat — uso restrito a contêineres de sumário, não a badges de estado. */
+const STATE_CARD_COLORS: Record<CanonicalEntityState, string> = {
   Draft: 'bg-muted/15 text-muted border border-muted/25',
   Published: 'bg-mint/15 text-mint border border-mint/25',
   Deprecated: 'bg-warning/15 text-warning border border-warning/25',
@@ -109,7 +112,7 @@ export function CanonicalEntityCatalogPage() {
       {/* Stats */}
       <StatsGrid columns={4}>
         {(['Draft', 'Published', 'Deprecated', 'Retired'] as const).map((state) => (
-          <div key={state} className={`rounded-lg border p-4 ${STATE_COLORS[state]}`}>
+          <div key={state} className={`rounded-lg border p-4 ${STATE_CARD_COLORS[state]}`}>
             <p className="text-xs opacity-70">{state}</p>
             <p className="text-2xl font-bold mt-1">{entities.filter((e) => e.state === state).length}</p>
           </div>
@@ -166,9 +169,9 @@ function CanonicalEntityCard({
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-heading truncate">{entity.name}</p>
               <span className="text-[10px] text-muted">v{entity.version}</span>
-              <span className={`px-2 py-0.5 text-[10px] rounded-full ${STATE_COLORS[entity.state]}`}>
+              <Badge variant={stateToVariant(entity.state)} size="xs">
                 {entity.state}
-              </span>
+              </Badge>
             </div>
             <p className="text-xs text-muted truncate">{entity.description}</p>
           </div>
@@ -267,15 +270,11 @@ function CanonicalEntityCard({
                         <span className="text-heading">{u.apiAssetId}</span>
                         <span className="text-muted">· {u.referencePath}</span>
                       </div>
-                      <span className={`px-2 py-0.5 text-[10px] rounded-full ${
-                        u.isConformant
-                          ? 'bg-mint/15 text-mint border border-mint/25'
-                          : 'bg-danger/15 text-danger border border-danger/25'
-                      }`}>
+                      <Badge variant={u.isConformant ? 'success' : 'danger'} size="xs">
                         {u.isConformant
                           ? t('contracts.canonical.catalog.conformant', 'Conformant')
                           : t('contracts.canonical.catalog.nonConformant', 'Non-conformant')}
-                      </span>
+                      </Badge>
                     </div>
                   ))}
                 </div>

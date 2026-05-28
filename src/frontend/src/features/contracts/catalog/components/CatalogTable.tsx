@@ -52,8 +52,8 @@ function ScoreBadge({ score }: { score?: number | null }) {
   const color =
     pct >= 80 ? 'text-mint border-mint/40 bg-mint/5' :
     pct >= 60 ? 'text-cyan border-cyan/40 bg-cyan/5' :
-    pct >= 40 ? 'text-amber border-amber/40 bg-amber/5' :
-               'text-error border-error/40 bg-error/5';
+    pct >= 40 ? 'text-warning border-warning/40 bg-warning/5' :
+               'text-critical border-critical/40 bg-critical/5';
 
   return (
     <span

@@ -61,7 +61,7 @@ interface DraftValidationPanelProps {
 export function DraftValidationPanel({
   state,
   isRunning,
-  protocol,
+  protocol, // eslint-disable-line @typescript-eslint/no-unused-vars
   onRunValidation,
   className = '',
 }: DraftValidationPanelProps) {
@@ -297,11 +297,11 @@ function IssueRow({ issue }: { issue: ValidationIssue }) {
         <div className="flex items-center gap-2 mt-0.5 text-muted flex-wrap">
           <span className={`px-1 py-px rounded text-[9px] font-medium ${
             issue.source === 'schema'
-              ? 'bg-blue-500/15 text-blue-400'
+              ? 'bg-info/15 text-info'
               : issue.source === 'internal'
-                ? 'bg-purple-500/15 text-purple-400'
+                ? 'bg-accent/15 text-accent'
                 : issue.source === 'canonical'
-                  ? 'bg-amber-500/15 text-amber-400'
+                  ? 'bg-warning/15 text-warning'
                   : 'bg-muted/15 text-muted'
           }`}>
             {SOURCE_LABELS[issue.source] ?? issue.source}
