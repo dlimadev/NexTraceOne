@@ -7,6 +7,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 const useBlastRadius = (releaseId?: string) =>
@@ -38,7 +39,29 @@ const BUCKET_COLOR = {
 export function BlastRadiusExplorerPage() {
   const { t } = useTranslation();
   const { releaseId } = useParams<{ releaseId: string }>();
-  const { data, isLoading } = useBlastRadius(releaseId);
+  const { data, isLoading, isError, refetch } = useBlastRadius(releaseId);
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageHeader title={t('blastRadius.title')} subtitle={t('blastRadius.subtitle')} />
+        <PageLoadingState />
+      </PageContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageContainer>
+        <PageHeader title={t('blastRadius.title')} subtitle={t('blastRadius.subtitle')} />
+        <PageErrorState
+          title={t('common.error.loadTitle')}
+          message={t('common.error.loadDescription')}
+          onRetry={refetch}
+        />
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -47,82 +70,76 @@ export function BlastRadiusExplorerPage() {
         subtitle={t('blastRadius.subtitle')}
       />
       <PageSection>
-        {isLoading ? (
-          <PageLoadingState />
-        ) : (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardBody className="p-4">
-                  <p className="text-xs text-muted-foreground mb-1">{t('blastRadius.bucket')}</p>
-                  <p className={`text-2xl font-bold ${BUCKET_COLOR[data?.bucket as keyof typeof BUCKET_COLOR] ?? 'text-foreground'}`}>
-                    {data?.bucket ?? 'Medium'}
-                  </p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody className="p-4">
-                  <div className="flex items-center gap-1 text-warning mb-1">
-                    <Users size={12} />
-                    <p className="text-xs">{t('blastRadius.directImpact')}</p>
-                  </div>
-                  <p className="text-2xl font-bold">{data?.directImpact ?? 0}</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody className="p-4">
-                  <div className="flex items-center gap-1 text-info mb-1">
-                    <GitBranch size={12} />
-                    <p className="text-xs">{t('blastRadius.transitiveImpact')}</p>
-                  </div>
-                  <p className="text-2xl font-bold">{data?.transitiveImpact ?? 0}</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody className="p-4">
-                  <div className="flex items-center gap-1 text-accent mb-1">
-                    <Globe size={12} />
-                    <p className="text-xs">{t('blastRadius.domains')}</p>
-                  </div>
-                  <p className="text-2xl font-bold">{data?.domains?.length ?? 0}</p>
-                </CardBody>
-              </Card>
-            </div>
-
-            {/* Impacted Nodes */}
-            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <BarChart3 size={14} />
-              {t('blastRadius.impactedServices')}
-            </h3>
-            <div className="space-y-2">
-              {(data?.impactedNodes ?? []).map((node) => (
-                <Card key={node.service}>
-                  <CardBody className="p-3 flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{node.service}</p>
-                      <p className="text-xs text-muted-foreground">{node.reason}</p>
-                    </div>
-                    <Badge
-                      variant={node.impactLevel === 'critical' ? 'destructive' : node.impactLevel === 'high' ? 'warning' : 'secondary'}
-                    >
-                      {node.impactLevel}
-                    </Badge>
-                  </CardBody>
-                </Card>
-              ))}
-              {(data?.impactedNodes ?? []).length === 0 && (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  {t('blastRadius.noImpact')}
-                </div>
-              )}
-            </div>
-
-            {data?.isSimulated && (
-              <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
-                {t('sotCenter.simulatedBanner')}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardBody className="p-4">
+              <p className="text-xs text-muted-foreground mb-1">{t('blastRadius.bucket')}</p>
+              <p className={`text-2xl font-bold ${BUCKET_COLOR[data?.bucket as keyof typeof BUCKET_COLOR] ?? 'text-foreground'}`}>
+                {data?.bucket ?? 'Medium'}
+              </p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody className="p-4">
+              <div className="flex items-center gap-1 text-warning mb-1">
+                <Users size={12} />
+                <p className="text-xs">{t('blastRadius.directImpact')}</p>
               </div>
-            )}
-          </>
+              <p className="text-2xl font-bold">{data?.directImpact ?? 0}</p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody className="p-4">
+              <div className="flex items-center gap-1 text-info mb-1">
+                <GitBranch size={12} />
+                <p className="text-xs">{t('blastRadius.transitiveImpact')}</p>
+              </div>
+              <p className="text-2xl font-bold">{data?.transitiveImpact ?? 0}</p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody className="p-4">
+              <div className="flex items-center gap-1 text-accent mb-1">
+                <Globe size={12} />
+                <p className="text-xs">{t('blastRadius.domains')}</p>
+              </div>
+              <p className="text-2xl font-bold">{data?.domains?.length ?? 0}</p>
+            </CardBody>
+          </Card>
+        </div>
+
+        {/* Impacted Nodes */}
+        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+          <BarChart3 size={14} />
+          {t('blastRadius.impactedServices')}
+        </h3>
+        <div className="space-y-2">
+          {(data?.impactedNodes ?? []).map((node) => (
+            <Card key={node.service}>
+              <CardBody className="p-3 flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{node.service}</p>
+                  <p className="text-xs text-muted-foreground">{node.reason}</p>
+                </div>
+                <Badge
+                  variant={node.impactLevel === 'critical' ? 'destructive' : node.impactLevel === 'high' ? 'warning' : 'secondary'}
+                >
+                  {node.impactLevel}
+                </Badge>
+              </CardBody>
+            </Card>
+          ))}
+          {(data?.impactedNodes ?? []).length === 0 && (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              {t('blastRadius.noImpact')}
+            </div>
+          )}
+        </div>
+
+        {data?.isSimulated && (
+          <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            {t('sotCenter.simulatedBanner')}
+          </div>
         )}
       </PageSection>
     </PageContainer>

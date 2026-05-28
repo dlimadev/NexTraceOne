@@ -24,10 +24,24 @@ const useChangeConfidence = (changeId?: string) =>
 export function ChangeConfidenceHubPage() {
   const { t } = useTranslation();
   const { changeId } = useParams<{ changeId: string }>();
-  const { data, isLoading, isError } = useChangeConfidence(changeId);
+  const { data, isLoading, isError, refetch } = useChangeConfidence(changeId);
 
-  if (isLoading) return <PageLoadingState />;
-  if (isError) return <PageErrorState />;
+  if (isLoading) return (
+    <PageContainer>
+      <PageHeader title={t('changeConfidenceHub.title')} subtitle={t('changeConfidenceHub.subtitle')} />
+      <PageLoadingState />
+    </PageContainer>
+  );
+  if (isError) return (
+    <PageContainer>
+      <PageHeader title={t('changeConfidenceHub.title')} subtitle={t('changeConfidenceHub.subtitle')} />
+      <PageErrorState
+        title={t('common.error.loadTitle')}
+        message={t('common.error.loadDescription')}
+        onRetry={refetch}
+      />
+    </PageContainer>
+  );
 
   const score = (data as { overallScore?: number })?.overallScore ?? 85;
   const level = score >= 80 ? 'high' : score >= 60 ? 'medium' : 'low';

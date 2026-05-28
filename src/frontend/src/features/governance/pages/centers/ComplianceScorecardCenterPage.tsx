@@ -6,6 +6,7 @@ import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 interface ComplianceControl {
@@ -49,7 +50,29 @@ const STATUS_CONFIG = {
 
 export function ComplianceScorecardCenterPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useComplianceScorecard();
+  const { data, isLoading, isError, refetch } = useComplianceScorecard();
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageHeader title={t('complianceScorecard.title')} subtitle={t('complianceScorecard.subtitle')} />
+        <PageLoadingState />
+      </PageContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageContainer>
+        <PageHeader title={t('complianceScorecard.title')} subtitle={t('complianceScorecard.subtitle')} />
+        <PageErrorState
+          title={t('common.error.loadTitle')}
+          message={t('common.error.loadDescription')}
+          onRetry={refetch}
+        />
+      </PageContainer>
+    );
+  }
 
   const controls = data?.controls ?? [];
   const standards = [...new Set(controls.map((c) => c.standard))];
@@ -61,11 +84,8 @@ export function ComplianceScorecardCenterPage() {
         subtitle={t('complianceScorecard.subtitle')}
       />
       <PageSection>
-        {isLoading ? (
-          <PageLoadingState />
-        ) : (
-          <>
-            {/* Score overview */}
+        <>
+          {/* Score overview */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
               <Card className="md:col-span-1">
                 <CardBody className="p-4 text-center">
@@ -136,7 +156,6 @@ export function ComplianceScorecardCenterPage() {
               {t('sotCenter.simulatedBanner')}
             </div>
           </>
-        )}
       </PageSection>
     </PageContainer>
   );

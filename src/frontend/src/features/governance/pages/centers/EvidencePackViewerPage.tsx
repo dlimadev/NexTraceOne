@@ -9,6 +9,7 @@ import { Card, CardBody } from '../../../../components/Card';
 import { Badge } from '../../../../components/Badge';
 import { Button } from '../../../../components/Button';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
+import { PageErrorState } from '../../../../components/PageErrorState';
 import client from '../../../../api/client';
 
 interface EvidenceArtifact {
@@ -56,7 +57,7 @@ export function EvidencePackViewerPage() {
   const { t } = useTranslation();
   const { packId } = useParams<{ packId: string }>();
   const [filter, setFilter] = useState('');
-  const { data, isLoading } = useEvidencePack(packId);
+  const { data, isLoading, isError, refetch } = useEvidencePack(packId);
 
   const artifacts = (data?.artifacts ?? []).filter(
     (a) => !filter || a.name.toLowerCase().includes(filter.toLowerCase()) || a.type.toLowerCase().includes(filter.toLowerCase())
@@ -79,6 +80,12 @@ export function EvidencePackViewerPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
+        ) : isError ? (
+          <PageErrorState
+            title={t('common.error.loadTitle')}
+            message={t('common.error.loadDescription')}
+            onRetry={refetch}
+          />
         ) : data ? (
           <>
             {/* Pack header */}
