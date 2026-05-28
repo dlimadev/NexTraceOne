@@ -250,13 +250,24 @@ builder.Services.AddRateLimiter(options =>
     });
 
     // Política "ai" — endpoints de IA (chat, geração, retrieval, análise).
+    // Particionada por tenant+user (extraído do JWT) para isolamento multi-tenant correcto.
+    // Fallback para IP quando JWT não está disponível (ex: endpoints públicos).
     var aiOpts = rateLimitingOptions.Ai;
     options.AddPolicy("ai", context =>
     {
-        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+        var tenantId = context.User.FindFirst("tenant_id")?.Value;
+        var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                     ?? context.User.FindFirst("sub")?.Value;
+
+        var partitionKey = (tenantId, userId) switch
+        {
+            ({ } t, { } u) => $"ai:t:{t}:u:{u}",
+            ({ } t, _)     => $"ai:t:{t}",
+            _              => $"ai:ip:{context.Connection.RemoteIpAddress ?? "unresolved"}"
+        };
 
         return RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: $"ai:{remoteIp ?? "unresolved-ip"}",
+            partitionKey: partitionKey,
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = aiOpts.PermitLimit,

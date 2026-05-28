@@ -56,7 +56,7 @@ public sealed class TokenCounterServiceTests
     public void CountTokens_WithModelName_ShouldUseConservativeEstimate()
     {
         var text = "hello world";
-        var count = _sut.CountTokens(text, "qwen2.5-coder-32b");
+        var count = _sut.CountTokens(text, "codellama:7b");
         count.Should().BeGreaterThan(0);
     }
 }

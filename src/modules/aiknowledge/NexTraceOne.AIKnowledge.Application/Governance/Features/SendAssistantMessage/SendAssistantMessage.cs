@@ -92,6 +92,9 @@ public static class SendAssistantMessage
         {
             Guard.Against.Null(request);
 
+            if (!currentTenant.HasCapability("ai_enabled"))
+                return Error.Forbidden("AI.Disabled", "AI features are disabled for this tenant.");
+
             var correlationId = Guid.NewGuid().ToString();
             var clientType = Enum.TryParse<AIClientType>(request.ClientType, ignoreCase: true, out var ct)
                 ? ct
