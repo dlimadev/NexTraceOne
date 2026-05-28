@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, AlertTriangle, Filter } from 'lucide-react';
+import { ArrowRight, AlertTriangle, Filter, BarChart2 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -96,7 +97,11 @@ export function AdoptionFunnelPage() {
       </div>
 
       {funnels.length === 0 ? (
-        <div className="text-center py-12 text-faded">{t('common.noData')}</div>
+        <EmptyState
+          icon={<BarChart2 />}
+          title={t('analytics.funnel.empty.title')}
+          description={t('analytics.funnel.empty.description')}
+        />
       ) : (
         <div className="space-y-6">
           {funnels.map((funnel) => (

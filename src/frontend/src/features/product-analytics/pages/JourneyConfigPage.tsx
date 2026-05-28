@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Globe, Building2, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Pencil, Trash2, Globe, Building2, CheckCircle, XCircle, Route } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 import type {
   JourneyDefinitionDto,
@@ -271,17 +272,21 @@ export function JourneyConfigPage() {
       <Card>
         {definitions.length === 0 ? (
           <CardBody>
-            <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-              <p className="text-muted text-sm">{t('analytics.journeyConfig.empty')}</p>
-              <button
-                type="button"
-                onClick={() => setModal({ mode: 'create' })}
-                className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent text-white text-xs hover:bg-accent/80"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {t('analytics.journeyConfig.addJourney')}
-              </button>
-            </div>
+            <EmptyState
+              icon={<Route />}
+              title={t('analytics.journeyConfig.empty.title')}
+              description={t('analytics.journeyConfig.empty.description')}
+              action={
+                <button
+                  type="button"
+                  onClick={() => setModal({ mode: 'create' })}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent text-white text-xs hover:bg-accent/80"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {t('analytics.journeyConfig.addJourney')}
+                </button>
+              }
+            />
           </CardBody>
         ) : (
           <div className="overflow-x-auto">

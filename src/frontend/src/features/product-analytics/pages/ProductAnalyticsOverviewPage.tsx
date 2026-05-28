@@ -13,6 +13,7 @@ import {
   Filter,
   Flame,
   Clock,
+  LayoutDashboard,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
@@ -20,6 +21,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, PageSection, StatsGrid } from '../../../components/shell';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -205,9 +207,11 @@ export function ProductAnalyticsOverviewPage() {
       </StatsGrid>
 
       {d.totalEvents === 0 && (
-        <div className="text-center py-10 text-faded text-sm">
-          {t('common.noData')}
-        </div>
+        <EmptyState
+          icon={<LayoutDashboard />}
+          title={t('analytics.overview.empty.title')}
+          description={t('analytics.overview.empty.description')}
+        />
       )}
     </PageContainer>
   );

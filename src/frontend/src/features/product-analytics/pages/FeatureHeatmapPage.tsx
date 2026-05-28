@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { Grid3X3 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -107,7 +109,11 @@ export function FeatureHeatmapPage() {
         </CardHeader>
         <CardBody>
           {cells.length === 0 ? (
-            <p className="text-center text-faded py-8">{t('common.noData')}</p>
+            <EmptyState
+              icon={<Grid3X3 />}
+              title={t('analytics.heatmap.empty.title')}
+              description={t('analytics.heatmap.empty.description')}
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {sortedCells.map((cell) => (

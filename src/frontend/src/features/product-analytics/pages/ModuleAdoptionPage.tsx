@@ -12,6 +12,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -160,7 +161,11 @@ export function ModuleAdoptionPage() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-faded">{t('analytics.adoption.noResults')}</div>
+        <EmptyState
+          icon={<TrendingUp />}
+          title={t('analytics.adoption.empty.title')}
+          description={t('analytics.adoption.empty.description')}
+        />
       )}
     </PageContainer>
   );

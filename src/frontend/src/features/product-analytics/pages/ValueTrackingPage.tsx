@@ -7,6 +7,7 @@ import {
   CheckCircle,
   Clock,
   Users,
+  Target,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
@@ -14,6 +15,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 import type { MilestoneTrend } from '../../../types';
 
@@ -123,7 +125,11 @@ export function ValueTrackingPage() {
       </StatsGrid>
 
       {milestones.length === 0 ? (
-        <div className="text-center py-12 text-faded">{t('common.noData')}</div>
+        <EmptyState
+          icon={<Target />}
+          title={t('analytics.value.empty.title')}
+          description={t('analytics.value.empty.description')}
+        />
       ) : (
         <Card>
           <CardHeader>

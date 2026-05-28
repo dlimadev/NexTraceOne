@@ -5,12 +5,14 @@ import {
   ArrowRight,
   Clock,
   AlertTriangle,
+  Route,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 import type { JourneyItemDto } from '../../../types';
 
@@ -107,7 +109,11 @@ export function JourneyFunnelPage() {
       </div>
 
       {journeys.length === 0 ? (
-        <div className="text-center py-12 text-faded">{t('common.noData')}</div>
+        <EmptyState
+          icon={<Route />}
+          title={t('analytics.journey.empty.title')}
+          description={t('analytics.journey.empty.description')}
+        />
       ) : (
         /* Journey cards */
         <div className="space-y-6">

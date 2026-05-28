@@ -8,12 +8,14 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
+  UserCircle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 import type { PersonaUsageProfileDto } from '../../../types';
 
@@ -111,7 +113,11 @@ export function PersonaUsagePage() {
       </div>
 
       {profiles.length === 0 ? (
-        <div className="text-center py-12 text-faded">{t('common.noData')}</div>
+        <EmptyState
+          icon={<UserCircle />}
+          title={t('analytics.persona.empty.title')}
+          description={t('analytics.persona.empty.description')}
+        />
       ) : (
         /* Persona cards */
         <div className="space-y-4">

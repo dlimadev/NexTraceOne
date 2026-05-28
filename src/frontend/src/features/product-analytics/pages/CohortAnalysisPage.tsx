@@ -7,6 +7,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 import type { CohortRow } from '../api/productAnalyticsApi';
 
@@ -173,10 +174,11 @@ export function CohortAnalysisPage() {
       {cohorts.length === 0 ? (
         <Card>
           <CardBody>
-            <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-              <Users className="w-10 h-10 text-muted opacity-50" />
-              <p className="text-muted text-sm">{t('analytics.cohort.empty')}</p>
-            </div>
+            <EmptyState
+              icon={<Users />}
+              title={t('analytics.cohort.empty.title')}
+              description={t('analytics.cohort.empty.description')}
+            />
           </CardBody>
         </Card>
       ) : (
