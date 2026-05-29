@@ -51,6 +51,12 @@ import {
 import { NqlMonacoEditor } from '../components/NqlMonacoEditor';
 import { DataTransformPanel, type DataTransform } from '../components/DataTransformPanel';
 import { BuilderWidgetCard } from '../components/BuilderWidgetCard';
+import { DashboardVariablesBar } from '../components/DashboardVariablesBar';
+import { PanelEditorOverlay, type PanelEditorSlot } from '../components/PanelEditorOverlay';
+import {
+  type DashboardVariable,
+  type VisualQueryRow,
+} from '../types/dashboardBuilder';
 import { EmptyCanvasPrompt } from '../components/EmptyCanvasPrompt';
 import { GridAlignmentGuides } from '../components/GridAlignmentGuides';
 import { CHART_SEMANTIC, CHART_SERIES } from '../../../lib/chartColors';
@@ -149,6 +155,8 @@ interface BuilderSlot {
   thresholds: string;
   bucketSize: string;
   transforms: DataTransform[];
+  /** Persists visual query state across panel editor open/close */
+  visualQueryRows?: VisualQueryRow[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -190,6 +198,7 @@ function widgetFromSlot(w: WidgetSlot): BuilderSlot {
     thresholds: '[]',
     bucketSize: '',
     transforms: [],
+    visualQueryRows: undefined,
   };
 }
 
@@ -994,7 +1003,7 @@ function GridCanvas({
                   h={slot.h}
                   isSelected={activeConfigId === slot.tempId}
                   isReadOnly={isReadOnly}
-                  onConfigOpen={onConfigOpen}
+                  onEditOpen={onConfigOpen}
                   onRemove={onRemove}
                   onSelect={onSelect}
                 />
@@ -1070,6 +1079,9 @@ export function DashboardBuilderPage() {
   // UI state
   const [isPreview, setIsPreview] = useState(false);
   const [activeConfigId, setActiveConfigId] = useState<string | null>(null);
+  const [variables, setVariables] = useState<DashboardVariable[]>([]);
+  const [timeRange, setTimeRange] = useState('6h');
+  const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
   const [draggingType, setDraggingType] = useState<WidgetType | null>(null);
   const [ghostPreview, setGhostPreview] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [paletteSearch, setPaletteSearch] = useState('');
@@ -1088,6 +1100,9 @@ export function DashboardBuilderPage() {
     setPersona(data.persona ?? 'Engineer');
     setTags((data.tags ?? []).join(', '));
     setSlots(data.widgets.map(widgetFromSlot));
+    if ((data as { variables?: DashboardVariable[] }).variables) {
+      setVariables((data as { variables?: DashboardVariable[] }).variables ?? []);
+    }
     setInitialized(true);
   }
 
@@ -1137,14 +1152,17 @@ export function DashboardBuilderPage() {
       thresholds: '[]',
       bucketSize: '',
       transforms: [],
+      visualQueryRows: undefined,
     };
     setSlots((prev) => [...prev, newSlot]);
     setActiveConfigId(newSlot.tempId);
+    setEditingSlotId(newSlot.tempId);
   }, [slots]);
 
   const removeSlot = useCallback((tempId: string) => {
     setSlots((prev) => prev.filter((s) => s.tempId !== tempId));
     setActiveConfigId((id) => (id === tempId ? null : id));
+    setEditingSlotId((id) => (id === tempId ? null : id));
   }, []);
 
   const selectSlot = useCallback((tempId: string) => {
@@ -1205,11 +1223,13 @@ export function DashboardBuilderPage() {
         thresholds: '[]',
         bucketSize: '',
         transforms: [],
+        visualQueryRows: undefined,
       };
       setSlots((prev) => [...prev, newSlot]);
       setDraggingType(null);
       setGhostPreview(null);
       setActiveConfigId(newSlot.tempId);
+      setEditingSlotId(newSlot.tempId);
     },
     []
   );
@@ -1407,6 +1427,7 @@ export function DashboardBuilderPage() {
           persona,
           tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
           widgets: widgetPayload,
+          variables,   // DashboardVariable[] persisted in layout JSONB column
         });
         navigate(`/governance/dashboards/${result.dashboardId}`);
       } else {
@@ -1418,6 +1439,7 @@ export function DashboardBuilderPage() {
           layout,
           tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
           widgets: widgetPayload,
+          variables,   // DashboardVariable[] persisted in layout JSONB column
         });
         navigate(`/governance/dashboards/${effectiveDashboardId}`);
       }
@@ -1557,6 +1579,22 @@ export function DashboardBuilderPage() {
         </div>
       )}
 
+      {/* ── Variables toolbar ─────────────────────────────────────────────────── */}
+      {!isPreview && (
+        <DashboardVariablesBar
+          variables={variables}
+          timeRange={timeRange}
+          isReadOnly={isReadOnly}
+          onVariableChange={(name, value) => {
+            setVariables((prev) =>
+              prev.map((v) => (v.name === name ? { ...v, value } : v))
+            );
+          }}
+          onTimeRangeChange={setTimeRange}
+          onAddVariable={(variable) => setVariables((prev) => [...prev, variable])}
+        />
+      )}
+
       {/* ── Body (sidebar + canvas) ────────────────────────────────────────── */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
@@ -1662,22 +1700,26 @@ export function DashboardBuilderPage() {
             onLayoutChange={handleLayoutChange}
             onDrop={handleDrop}
             onDropDragOver={handleDropDragOver}
-            onConfigOpen={(id) => setActiveConfigId((cur) => (cur === id ? null : id))}
+            onConfigOpen={(id) => setEditingSlotId(id)}
             onRemove={removeSlot}
             onSelect={selectSlot}
           />
         </main>
       </div>
 
-      {/* ── Widget config drawer ───────────────────────────────────────────── */}
-      {activeConfigId && !isPreview && (() => {
-        const slot = slots.find((s) => s.tempId === activeConfigId);
+      {/* ── Panel Editor Overlay ───────────────────────────────────────────── */}
+      {editingSlotId && !isPreview && (() => {
+        const slot = slots.find((s) => s.tempId === editingSlotId);
         if (!slot) return null;
         return (
-          <ConfigDrawer
-            slot={slot}
-            onUpdate={(patch) => updateSlot(activeConfigId, patch)}
-            onClose={() => setActiveConfigId(null)}
+          <PanelEditorOverlay
+            slot={slot as PanelEditorSlot}
+            variables={variables}
+            onApply={(updatedSlot) => {
+              updateSlot(editingSlotId, updatedSlot as Partial<BuilderSlot>);
+              setEditingSlotId(null);
+            }}
+            onClose={() => setEditingSlotId(null)}
           />
         );
       })()}
