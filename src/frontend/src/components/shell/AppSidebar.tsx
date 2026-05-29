@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation, NavLink } from 'react-router-dom';
+import { useLocation, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/cn';
-import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { usePersona } from '../../contexts/PersonaContext';
-import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_RAIL_WIDTH, SIDEBAR_CONTENT_WIDTH, SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
@@ -174,17 +172,10 @@ interface AppSidebarProps {
 
 export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false, className }: AppSidebarProps) {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
-  const { can, roleName } = usePermissions();
-  const { persona, config } = usePersona();
+  const { can } = usePermissions();
+  const { config } = usePersona();
   const [activeSection, setActiveSection] = useState<NavSection>('home');
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const { openIncidents } = useNavCounters();
 
@@ -331,14 +322,6 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           </div>
         )}
 
-        {/* User avatar — rail mode */}
-        <AppSidebarFooter
-          collapsed
-          email={user?.email}
-          persona={persona}
-          roleName={roleName}
-          onLogout={handleLogout}
-        />
       </div>
 
       {/* ─── Content Panel ─────────────────────────────────────────────────── */}
@@ -353,13 +336,11 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           background: 'linear-gradient(180deg, #0D1C35, #081120)',
         }}
       >
-        {/* Brand header + collapse toggle */}
+        {/* Section header + collapse toggle */}
         <div className="flex items-center justify-between h-[70px] px-5 shrink-0 border-b border-edge">
-          <img
-            src="/brand/logo.svg"
-            alt={t('brand.name')}
-            className="h-8 object-contain"
-          />
+          <span className="text-sm font-semibold text-[rgba(181,196,216,.9)] tracking-wide select-none">
+            {t('brand.name')}
+          </span>
           {onToggleCollapse && !mobile && (
             <button
               onClick={onToggleCollapse}
