@@ -6076,7 +6076,7 @@
         "metric": "Métrica",
         "filters": "Filtros",
         "addFilter": "+ Adicionar",
-        "groupBy": "Group by",
+        "groupBy": "Agrupar por",
         "function": "Função",
         "aggregation": "Agregação",
         "switchToNql": "Editar como NQL",
