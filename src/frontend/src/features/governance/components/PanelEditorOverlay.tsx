@@ -277,7 +277,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
 
         {/* Right panel: visualization picker (230px) */}
         <PanelVisualizationPicker
-          currentViz={draftSlot.chartType as VizType}
+          currentViz={(draftSlot.chartType as VizType) || 'timeseries'}
           unit={draftSlot.unit}
           yAxisMin={draftSlot.yAxisMin}
           yAxisMax={draftSlot.yAxisMax}
