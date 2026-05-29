@@ -6,7 +6,7 @@
  * NQL mode: NqlMonacoEditor.
  * Uses TanStack Query to fetch service list from /catalog/services.
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, Trash2, Copy, MoreHorizontal } from 'lucide-react';
@@ -38,6 +38,23 @@ export interface VisualQueryBuilderProps {
 export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQueryBuilderProps) {
   const { t } = useTranslation();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenMenuId(null); };
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    document.addEventListener('mousedown', handleClick);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [openMenuId]);
 
   const { data: services = [] } = useQuery<ServiceOption[]>({
     queryKey: ['catalog-services-for-builder'],
@@ -77,6 +94,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
   const switchToNql = useCallback((queryId: string) => {
     const row = rows.find((r) => r.queryId === queryId);
     if (!row) return;
+    if (row.mode === 'nql') return;  // already in NQL mode, don't overwrite user's text
     updateRow(queryId, { mode: 'nql', nqlText: compileToNql(row) });
   }, [rows, updateRow]);
 
@@ -126,10 +144,10 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
             <div className="flex-1" />
 
             {/* Row ⋮ menu */}
-            <div className="relative">
+            <div ref={openMenuId === row.queryId ? menuRef : null} className="relative">
               <button
                 type="button"
-                onClick={() => setOpenMenuId(openMenuId === row.queryId ? null : row.queryId)}
+                onClick={() => setOpenMenuId((prev) => prev === row.queryId ? null : row.queryId)}
                 className="p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 aria-label="Row menu"
               >
@@ -240,7 +258,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
               {/* Inline filter editors for incomplete filters */}
               {row.filters.map((f, i) =>
                 (f.key === '' || f.value === '') ? (
-                  <div key={`fe-${i}`} className="grid grid-cols-[80px_1fr] items-center gap-2">
+                  <div key={`fe-${i}-${f.key}`} className="grid grid-cols-[80px_1fr] items-center gap-2">
                     <span />
                     <div className="flex items-center gap-1">
                       <input
@@ -320,13 +338,11 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
 
           {/* NQL mode */}
           {row.mode === 'nql' && (
-            <div className="h-[180px] rounded overflow-hidden border border-gray-200 dark:border-gray-700">
-              <NqlMonacoEditor
-                value={row.nqlText}
-                onChange={(val) => updateRow(row.queryId, { nqlText: val })}
-                height="180px"
-              />
-            </div>
+            <NqlMonacoEditor
+              value={row.nqlText}
+              onChange={(val) => updateRow(row.queryId, { nqlText: val })}
+              height="180px"
+            />
           )}
         </div>
       ))}
