@@ -40,10 +40,11 @@ describe('WizardOverlay', () => {
   });
 
   it('Back button is enabled on step 2', () => {
-    renderOverlay({ currentStep: 2 });
+    const { props } = renderOverlay({ currentStep: 2 });
     const backBtn = screen.getByRole('button', { name: /back|voltar/i });
     expect(backBtn).not.toBeDisabled();
     fireEvent.click(backBtn);
+    expect(props.onBack).toHaveBeenCalledOnce();
   });
 
   it('clicking Next calls onNext', async () => {
@@ -75,6 +76,15 @@ describe('WizardOverlay', () => {
     const user = userEvent.setup();
     const { props } = renderOverlay();
     await user.click(screen.getByRole('button', { name: /close|fechar/i }));
+    expect(props.onClose).toHaveBeenCalledOnce();
+  });
+
+  it('clicking the backdrop calls onClose', async () => {
+    const user = userEvent.setup();
+    const { props } = renderOverlay();
+    // The backdrop is the first child of the root div — it has aria-hidden="true"
+    const backdrop = document.querySelector('[aria-hidden="true"]') as HTMLElement;
+    await user.click(backdrop);
     expect(props.onClose).toHaveBeenCalledOnce();
   });
 });

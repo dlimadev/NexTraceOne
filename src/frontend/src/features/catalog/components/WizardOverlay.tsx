@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { X, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
@@ -13,7 +14,7 @@ export interface WizardStep {
 
 export interface WizardOverlayProps {
   title: string;
-  headerIcon: React.ReactNode;
+  headerIcon: ReactNode;
   steps: WizardStep[];
   currentStep: number; // 1-based
   onClose: () => void;
@@ -23,7 +24,7 @@ export interface WizardOverlayProps {
   isSubmitting?: boolean;
   isNextDisabled?: boolean;
   isLastStep: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /**
@@ -46,13 +47,17 @@ export function WizardOverlay({
 }: WizardOverlayProps) {
   const { t } = useTranslation();
 
-  // Fecha com Escape
+  // Fecha com Escape + trava scroll do body
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
     }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
   }, [onClose]);
 
   const stepLabel = steps[currentStep - 1]
@@ -69,13 +74,18 @@ export function WizardOverlay({
       />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-3xl mx-4 bg-panel border border-edge rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wizard-title"
+        className="relative z-10 w-full max-w-3xl mx-4 bg-panel border border-edge rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-fade-in"
+      >
 
         {/* Header */}
         <div className="flex items-center gap-3 px-6 py-4 border-b border-edge shrink-0">
           <div className="text-accent">{headerIcon}</div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-semibold text-heading truncate">{title}</h2>
+            <h2 id="wizard-title" className="text-base font-semibold text-heading truncate">{title}</h2>
             <p className="text-xs text-muted">
               {t('catalog.wizard.stepOf', { current: currentStep, total: steps.length })} — {stepLabel}
             </p>
