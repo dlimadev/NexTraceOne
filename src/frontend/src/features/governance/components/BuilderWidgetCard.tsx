@@ -3,7 +3,7 @@
  * Inclui header bar com título e ações (configurar, remover), estados visuais
  * para hover/selected/dragging/resizing, e integração com react-grid-layout.
  */
-import { Settings, X, GripVertical } from 'lucide-react';
+import { X, GripVertical, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { WidgetType } from '../widgets/WidgetRegistry';
 import { WIDGET_META } from '../widgets/WidgetRegistry';
@@ -53,7 +53,10 @@ export interface BuilderWidgetCardProps {
   h: number;
   isSelected: boolean;
   isReadOnly: boolean;
-  onConfigOpen: (tempId: string) => void;
+  /** Opens the Panel Editor overlay for this widget */
+  onEditOpen: (tempId: string) => void;
+  /** Opens the legacy config drawer (deprecated — will be removed in v2) */
+  onConfigOpen?: (tempId: string) => void;
   onRemove: (tempId: string) => void;
   onSelect: (tempId: string) => void;
   children?: React.ReactNode;
@@ -67,7 +70,7 @@ export function BuilderWidgetCard({
   h,
   isSelected,
   isReadOnly,
-  onConfigOpen,
+  onEditOpen,
   onRemove,
   onSelect,
   children,
@@ -103,12 +106,12 @@ export function BuilderWidgetCard({
               className="builder-widget-header__btn"
               onClick={(e) => {
                 e.stopPropagation();
-                onConfigOpen(tempId);
+                onEditOpen(tempId);
               }}
-              title={t('governance.dashboardBuilder.configWidget', 'Configure widget')}
-              aria-label={t('governance.dashboardBuilder.configWidget', 'Configure widget')}
+              title={t('governance.dashboardBuilder.panelEditor.title', 'Edit panel')}
+              aria-label={t('governance.dashboardBuilder.panelEditor.title', 'Edit panel')}
             >
-              <Settings size={11} />
+              <Pencil size={11} />
             </button>
             <button
               type="button"
