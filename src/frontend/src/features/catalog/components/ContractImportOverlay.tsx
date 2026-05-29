@@ -160,8 +160,7 @@ export function ContractImportOverlay({
             {/* Protocol badge */}
             {detectedProtocol ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-success/15 text-success border border-success/30">
-                {detectedProtocol}{' '}
-                {t('catalog.contract.protocolDetectedSuffix', { defaultValue: 'detected' })}
+                {t('catalog.contract.protocolDetected', { protocol: detectedProtocol, defaultValue: '{{protocol}} detected' })}
               </span>
             ) : specContent ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-warning/15 text-warning border border-warning/30">
