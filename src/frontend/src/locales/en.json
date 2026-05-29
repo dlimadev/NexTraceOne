@@ -1870,7 +1870,9 @@
     "step_upcoming": "upcoming",
     "days": "days",
     "pass": "Pass",
-    "fail": "Fail"
+    "fail": "Fail",
+    "isRequired": "is required",
+    "errorSaving": "Something went wrong. Please try again."
   },
   "config": {
     "changegovernance": {

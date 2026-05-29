@@ -28,9 +28,7 @@ interface ServiceFormData {
   criticality: string;
   exposureType: string;
   dataClassification: string;
-  regulatoryScope: string;
   infrastructureProvider: string;
-  runtimeLanguage: string;
   team: string;
   technicalOwner: string;
   businessOwner: string;
@@ -44,7 +42,7 @@ interface ServiceFormData {
 const INITIAL_FORM: ServiceFormData = {
   name: '', domain: '', subDomain: '', capability: '',
   serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-  dataClassification: '', regulatoryScope: '', infrastructureProvider: '', runtimeLanguage: '',
+  dataClassification: '', infrastructureProvider: '',
   team: '', technicalOwner: '', businessOwner: '', productOwner: '', contactChannel: '',
   description: '', documentationUrl: '', repositoryUrl: '',
 };

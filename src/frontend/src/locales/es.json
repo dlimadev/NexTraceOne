@@ -1870,7 +1870,9 @@
     "step_upcoming": "pendiente",
     "days": "días",
     "pass": "Aprobado",
-    "fail": "Reprobado"
+    "fail": "Reprobado",
+    "isRequired": "es requerido",
+    "errorSaving": "Algo salió mal. Por favor, inténtelo de nuevo."
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
