@@ -195,11 +195,24 @@ describe('ContractsPage', () => {
     expect(contractsApi.lockVersion).toHaveBeenCalledWith('cv-001', 'Locked via UI');
   });
 
-  it('opens ContractImportOverlay when Import Contract button clicked', async () => {
-    const user = userEvent.setup();
+  it('chama importContract ao submeter o formulário', async () => {
+    vi.mocked(contractsApi.importContract).mockResolvedValue({ id: 'cv-new' });
     renderContracts();
-    await user.click(screen.getByRole('button', { name: /import contract/i }));
-    // Overlay step 1 shows the apiAssetId input (no preselectedApiAssetId)
-    expect(screen.getByPlaceholderText(/asset id|uuid/i)).toBeInTheDocument();
+    // Wait for graph data to be loaded first (populates API selects)
+    await waitFor(() => {
+      expect(screen.getAllByText(/order api/i).length).toBeGreaterThan(0);
+    });
+    await userEvent.click(screen.getByRole('button', { name: /import contract/i }));
+    // Select an API asset from the import form's select (first combobox in the import form)
+    const selects = screen.getAllByRole('combobox');
+    await userEvent.selectOptions(selects[0], 'api-001');
+    await userEvent.type(screen.getByPlaceholderText(/e\.g\., 1\.0\.0/), '3.0.0');
+    await userEvent.type(screen.getByPlaceholderText(/paste your specification here/i), 'openapi-spec-content');
+    await userEvent.click(screen.getByRole('button', { name: /^import$/i }));
+    await waitFor(() => {
+      expect(contractsApi.importContract).toHaveBeenCalled();
+      const [firstArg] = vi.mocked(contractsApi.importContract).mock.calls[0];
+      expect(firstArg).toMatchObject({ apiAssetId: 'api-001', version: '3.0.0' });
+    });
   });
 });

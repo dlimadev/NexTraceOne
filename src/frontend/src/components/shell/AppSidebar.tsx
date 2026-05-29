@@ -99,6 +99,7 @@ const navItems: NavItem[] = [
   // Grupo estratégico (sem sub-grupo visual)
   { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
+  { labelKey: 'sidebar.customDashboards', to: '/governance/custom-dashboards', icon: <LayoutDashboard size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },
   // Fase 4 — GreenOps: sustentabilidade e eficiência de carbono, contextualizado em Governança
   { labelKey: 'sidebar.greenOps', to: '/governance/greenops', icon: <Leaf size={18} />, permission: 'governance:finops:read', section: 'governance' },
@@ -263,7 +264,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         {/* Logo */}
         <div className="flex items-center justify-center h-[70px] shrink-0 border-b border-edge">
           <img
-            src="/logo.svg"
+            src="/brand/logo-icon.svg"
             alt={t('brand.name')}
             className="w-10 h-10 object-contain"
           />
@@ -354,7 +355,11 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
       >
         {/* Brand header + collapse toggle */}
         <div className="flex items-center justify-between h-[70px] px-5 shrink-0 border-b border-edge">
-          <span className="text-base font-semibold text-heading truncate">{t('brand.name')}</span>
+          <img
+            src="/brand/logo.svg"
+            alt={t('brand.name')}
+            className="h-8 object-contain"
+          />
           {onToggleCollapse && !mobile && (
             <button
               onClick={onToggleCollapse}
@@ -424,14 +429,6 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           </ul>
         </nav>
 
-        {/* User card — expanded mode */}
-        <AppSidebarFooter
-          collapsed={false}
-          email={user?.email}
-          persona={persona}
-          roleName={roleName}
-          onLogout={handleLogout}
-        />
       </div>
     </div>
   );

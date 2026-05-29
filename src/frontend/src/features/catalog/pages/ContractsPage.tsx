@@ -12,7 +12,6 @@ import { Badge } from '../../../components/Badge';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { ContractVersionDetailPanel } from '../components/ContractVersionDetailPanel';
-import { ContractImportOverlay } from '../components/ContractImportOverlay';
 import { contractsApi, serviceCatalogApi } from '../api';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -68,9 +67,15 @@ export function ContractsPage() {
   const queryClient = useQueryClient();
   const { activeEnvironmentId } = useEnvironment();
 
-  // Estado do filtro e overlay de importação
+  // Estado do filtro e formulário de importação
   const [apiAssetId, setApiAssetId] = useState('');
-  const [showContractOverlay, setShowContractOverlay] = useState(false);
+  const [showImportForm, setShowImportForm] = useState(false);
+  const [importForm, setImportForm] = useState({
+    apiAssetId: '',
+    content: '',
+    version: '',
+    protocol: 'OpenApi' as ContractProtocol,
+  });
 
   // Estado do painel de detalhes
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
@@ -141,6 +146,15 @@ export function ContractsPage() {
   });
 
   // ─── Mutations ──────────────────────────────────────────────────────────────
+
+  const importMutation = useMutation({
+    mutationFn: contractsApi.importContract,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      setShowImportForm(false);
+      setImportForm({ apiAssetId: '', content: '', version: '', protocol: 'OpenApi' });
+    },
+  });
 
   const createVersionMutation = useMutation({
     mutationFn: contractsApi.createVersion,
@@ -234,7 +248,7 @@ export function ContractsPage() {
             <Button variant="secondary" onClick={() => { setShowDiffPanel((v) => !v); setDiffResult(null); }}>
               <GitCompare size={16} /> {t('contracts.diffCompare.title')}
             </Button>
-            <Button onClick={() => setShowContractOverlay(true)}>
+            <Button onClick={() => setShowImportForm((v) => !v)}>
               <Plus size={16} /> {t('contracts.importContract')}
             </Button>
             <Button variant="secondary" onClick={() => setShowCreateVersionForm((v) => !v)}>
@@ -243,6 +257,77 @@ export function ContractsPage() {
           </div>
         }
       />
+
+      {/* Import Form */}
+      {showImportForm && (
+        <Card className="mb-6">
+          <CardHeader><h2 className="font-semibold text-heading">{t('contracts.importTitle')}</h2></CardHeader>
+          <CardBody>
+            <form
+              onSubmit={(e) => { e.preventDefault(); importMutation.mutate(importForm); }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
+                  <select
+                    value={importForm.apiAssetId}
+                    onChange={(e) => setImportForm((f) => ({ ...f, apiAssetId: e.target.value }))}
+                    required
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="">{t('contracts.selectApiAsset')}</option>
+                    {availableApis.map((api) => (
+                      <option key={api.apiAssetId} value={api.apiAssetId}>
+                        {api.name} — {api.routePattern}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
+                  <input
+                    type="text"
+                    value={importForm.version}
+                    onChange={(e) => setImportForm((f) => ({ ...f, version: e.target.value }))}
+                    required
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    placeholder={t('contracts.versionExample')}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.protocol')}</label>
+                  <select
+                    value={importForm.protocol}
+                    onChange={(e) => setImportForm((f) => ({ ...f, protocol: e.target.value as ContractProtocol }))}
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="OpenApi">{t('contracts.protocols.OpenApi')}</option>
+                    <option value="Swagger">{t('contracts.protocols.Swagger')}</option>
+                    <option value="Wsdl">{t('contracts.protocols.Wsdl')}</option>
+                    <option value="AsyncApi">{t('contracts.protocols.AsyncApi')}</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('contracts.specContent')}</label>
+                <textarea
+                  value={importForm.content}
+                  onChange={(e) => setImportForm((f) => ({ ...f, content: e.target.value }))}
+                  required
+                  rows={6}
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading font-mono placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  placeholder={t('contracts.specContentPlaceholder')}
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="secondary" type="button" onClick={() => setShowImportForm(false)}>{t('common.cancel')}</Button>
+                <Button type="submit" loading={importMutation.isPending}>{t('contracts.import')}</Button>
+              </div>
+            </form>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Create Version Form */}
       {showCreateVersionForm && (
@@ -556,17 +641,6 @@ export function ContractsPage() {
             </pre>
           </CardBody>
         </Card>
-      )}
-      {/* Contract Import Overlay */}
-      {showContractOverlay && (
-        <ContractImportOverlay
-          onClose={() => setShowContractOverlay(false)}
-          onSuccess={() => {
-            setShowContractOverlay(false);
-            queryClient.invalidateQueries({ queryKey: ['contract-governance-list'] });
-            queryClient.invalidateQueries({ queryKey: ['contract-governance-summary'] });
-          }}
-        />
       )}
     </PageContainer>
   );

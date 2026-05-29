@@ -1594,54 +1594,6 @@
     "aiScaffold": {
       "serviceNamePlaceholder": "api-pagos",
       "entitiesPlaceholder": "Pago, Reembolso, Extracto"
-    },
-    "wizard": {
-      "close": "Cerrar",
-      "back": "Volver",
-      "next": "Siguiente",
-      "submit": "Guardar",
-      "submitting": "Guardando…",
-      "stepOf": "Paso {{current}} de {{total}}"
-    },
-    "registration": {
-      "step": {
-        "identity": "Identidad",
-        "classification": "Clasificación",
-        "ownership": "Responsables",
-        "references": "Referencias",
-        "review": "Revisión"
-      },
-      "title": "Registrar Servicio",
-      "subtitle": "Agregue un nuevo servicio al catálogo"
-    },
-    "interface": {
-      "step": {
-        "type": "Tipo",
-        "details": "Detalles",
-        "review": "Revisión"
-      },
-      "title": "Nueva Interfaz",
-      "subtitle": "Agregar una interfaz a {{serviceName}}"
-    },
-    "contract": {
-      "step": {
-        "interface": "Interfaz",
-        "spec": "Especificación",
-        "version": "Versión"
-      },
-      "title": "Importar Contrato",
-      "subtitle": "Importe una especificación para una interfaz",
-      "protocolDetected": "{{protocol}} detectado",
-      "protocolUnknown": "Seleccionar manualmente",
-      "dropZone": {
-        "hint": "Suelte openapi.yaml o haga clic para navegar",
-        "formats": "YAML · JSON · WSDL · Proto"
-      },
-      "tab": {
-        "upload": "Subir",
-        "url": "URL",
-        "editor": "Editor"
-      }
     }
   },
   "catalogContractsConfig": {
@@ -1870,9 +1822,7 @@
     "step_upcoming": "pendiente",
     "days": "días",
     "pass": "Aprobado",
-    "fail": "Reprobado",
-    "isRequired": "es requerido",
-    "errorSaving": "Algo salió mal. Por favor, inténtelo de nuevo."
+    "fail": "Reprobado"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
