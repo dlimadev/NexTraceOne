@@ -6,6 +6,9 @@
 import { useTranslation } from 'react-i18next';
 import { type VizType, VIZ_TYPE_META } from '../types/dashboardBuilder';
 
+const SIDEBAR_WIDTH_PX = 230;
+const UNIT_OPTIONS = ['none', 'req/s', 'ms', 'bytes', '%', 'rpm', 'errors/s'] as const;
+
 const SUGGESTIONS: Record<string, VizType[]> = {
   timeseries: ['timeseries', 'bar', 'stat', 'gauge'],
   categorical: ['donut', 'bar', 'table', 'histogram'],
@@ -18,6 +21,14 @@ function getSuggestions(currentViz: VizType): VizType[] {
   if (['stat', 'gauge'].includes(currentViz)) return SUGGESTIONS.single;
   if (['donut', 'histogram'].includes(currentViz)) return SUGGESTIONS.categorical;
   return SUGGESTIONS.tabular;
+}
+
+function parseThresholdCount(json: string): number {
+  try {
+    return (JSON.parse(json) as unknown[]).length;
+  } catch {
+    return 0;
+  }
 }
 
 interface PanelVisualizationPickerProps {
@@ -46,12 +57,10 @@ export function PanelVisualizationPicker({
   const { t } = useTranslation();
 
   const suggested = getSuggestions(currentViz);
-  const thresholdCount = (() => {
-    try { return (JSON.parse(thresholds) as unknown[]).length; } catch { return 0; }
-  })();
+  const thresholdCount = parseThresholdCount(thresholds);
 
   return (
-    <div className="flex flex-col gap-3 h-full overflow-y-auto p-3 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 w-[230px] shrink-0">
+    <div style={{ width: SIDEBAR_WIDTH_PX }} className="flex flex-col gap-3 h-full overflow-y-auto p-3 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0">
 
       {/* Current selection */}
       <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -140,7 +149,7 @@ export function PanelVisualizationPicker({
             onChange={(e) => onUnitChange(e.target.value)}
             className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-1.5 py-0.5 focus:outline-none focus:border-accent"
           >
-            {['none', 'req/s', 'ms', 'bytes', '%', 'rpm', 'errors/s'].map((u) => (
+            {UNIT_OPTIONS.map((u) => (
               <option key={u} value={u}>{u}</option>
             ))}
           </select>
