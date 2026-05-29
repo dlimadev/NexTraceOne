@@ -72,6 +72,7 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
       grpcServiceName: form.grpcServiceName || undefined,
       scheduleCron: form.scheduleCron || undefined,
       documentationUrl: form.documentationUrl || undefined,
+      requiresContract: form.requiresContract || undefined,
     }),
     onSuccess: () => onSuccess(),
     onError: () => toast.error(t('common.errorSaving')),
@@ -189,12 +190,20 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
               ...(form.basePath ? [[t('catalog.interface.basePath', { defaultValue: 'Base Path' }), form.basePath]] : []),
               ...(form.topicName ? [[t('catalog.interface.topicName', { defaultValue: 'Topic' }), form.topicName]] : []),
               ...(form.grpcServiceName ? [[t('catalog.interface.grpcServiceName', { defaultValue: 'gRPC' }), form.grpcServiceName]] : []),
+              ...(form.wsdlNamespace ? [[t('catalog.interface.wsdlNamespace', { defaultValue: 'WSDL Namespace' }), form.wsdlNamespace]] : []),
+              ...(form.scheduleCron ? [[t('catalog.interface.scheduleCron', { defaultValue: 'Schedule (cron)' }), form.scheduleCron]] : []),
             ] as [string, string][]).map(([label, value]) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-muted">{label}</span>
                 <span className="font-medium text-heading font-mono">{value}</span>
               </div>
             ))}
+            {form.requiresContract && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted">{t('catalog.interface.requiresContract', { defaultValue: 'Requires contract' })}</span>
+                <span className="font-medium text-success">✓</span>
+              </div>
+            )}
             <div className="text-xs text-muted mt-2">
               {t('catalog.interface.service', { defaultValue: 'Service' })}: <span className="text-heading">{serviceName}</span>
             </div>
