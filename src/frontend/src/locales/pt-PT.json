@@ -1594,6 +1594,54 @@
     "aiScaffold": {
       "serviceNamePlaceholder": "api-pagamentos",
       "entitiesPlaceholder": "Pagamento, Reembolso, Extrato"
+    },
+    "wizard": {
+      "close": "Fechar",
+      "back": "Voltar",
+      "next": "Avançar",
+      "submit": "Guardar",
+      "submitting": "A guardar…",
+      "stepOf": "Passo {{current}} de {{total}}"
+    },
+    "registration": {
+      "step": {
+        "identity": "Identidade",
+        "classification": "Classificação",
+        "ownership": "Responsáveis",
+        "references": "Referências",
+        "review": "Revisão"
+      },
+      "title": "Registar Serviço",
+      "subtitle": "Adicione um novo serviço ao catálogo"
+    },
+    "interface": {
+      "step": {
+        "type": "Tipo",
+        "details": "Detalhes",
+        "review": "Revisão"
+      },
+      "title": "Nova Interface",
+      "subtitle": "Adicione uma interface a {{serviceName}}"
+    },
+    "contract": {
+      "step": {
+        "interface": "Interface",
+        "spec": "Especificação",
+        "version": "Versão"
+      },
+      "title": "Importar Contrato",
+      "subtitle": "Importe uma especificação para uma interface",
+      "protocolDetected": "{{protocol}} detectado",
+      "protocolUnknown": "Selecionar manualmente",
+      "dropZone": {
+        "hint": "Arraste openapi.yaml ou clique para navegar",
+        "formats": "YAML · JSON · WSDL · Proto"
+      },
+      "tab": {
+        "upload": "Upload",
+        "url": "URL",
+        "editor": "Editor"
+      }
     }
   },
   "catalogContractsConfig": {

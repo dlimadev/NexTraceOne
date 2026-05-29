@@ -1579,6 +1579,54 @@
     "aiScaffold": {
       "serviceNamePlaceholder": "payment-api",
       "entitiesPlaceholder": "Payment, Refund, Statement"
+    },
+    "wizard": {
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit",
+      "submitting": "Saving…",
+      "stepOf": "Step {{current}} of {{total}}"
+    },
+    "registration": {
+      "step": {
+        "identity": "Identity",
+        "classification": "Classification",
+        "ownership": "Ownership",
+        "references": "References",
+        "review": "Review"
+      },
+      "title": "Register Service",
+      "subtitle": "Add a new service to the catalog"
+    },
+    "interface": {
+      "step": {
+        "type": "Type",
+        "details": "Details",
+        "review": "Review"
+      },
+      "title": "New Interface",
+      "subtitle": "Add an interface to {{serviceName}}"
+    },
+    "contract": {
+      "step": {
+        "interface": "Interface",
+        "spec": "Specification",
+        "version": "Version"
+      },
+      "title": "Import Contract",
+      "subtitle": "Import a specification for an interface",
+      "protocolDetected": "{{protocol}} detected",
+      "protocolUnknown": "Select manually",
+      "dropZone": {
+        "hint": "Drop openapi.yaml or click to browse",
+        "formats": "YAML · JSON · WSDL · Proto"
+      },
+      "tab": {
+        "upload": "Upload",
+        "url": "URL",
+        "editor": "Editor"
+      }
     }
   },
   "catalogContractsConfig": {
