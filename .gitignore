@@ -45,3 +45,6 @@ src/frontend/package-lock.json
 # Windows build artifacts (backslash-path prevention)
 src/frontend/obj*/
 src/**/obj*/
+
+# Superpowers visual brainstorming sessions
+.superpowers/
