@@ -4774,7 +4774,19 @@
         "timeRange": "Time range",
         "refresh": "Refresh",
         "allValues": "All",
-        "refreshOff": "Off"
+        "refreshOff": "Off",
+        "modal": {
+          "nameLabel": "Name (used as $name)",
+          "labelLabel": "Label (display)",
+          "typeLabel": "Type",
+          "optionsLabel": "Options (comma-separated)",
+          "multiValue": "Multi-value",
+          "includeAll": "Include \"All\"",
+          "cancel": "Cancel",
+          "add": "Add",
+          "nameRequired": "Name is required",
+          "nameNoDollar": "Variable name cannot contain $"
+        }
       },
       "viz": {
         "selected": "Selected",

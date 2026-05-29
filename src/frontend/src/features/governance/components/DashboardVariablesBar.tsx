@@ -39,8 +39,8 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
 
   const handleAdd = () => {
     const trimmedName = name.trim();
-    if (!trimmedName) { setError('Name is required'); return; }
-    if (trimmedName.includes('$')) { setError('Variable name cannot contain $'); return; }
+    if (!trimmedName) { setError(t('governance.dashboardBuilder.variablesBar.modal.nameRequired')); return; }
+    if (trimmedName.includes('$')) { setError(t('governance.dashboardBuilder.variablesBar.modal.nameNoDollar')); return; }
     const options: string[] = type === 'interval'
       ? [...INTERVAL_OPTIONS]
       : optionsRaw.split(',').map((s) => s.trim()).filter(Boolean);
@@ -70,7 +70,9 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Name (used as $name)</label>
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
+              {t('governance.dashboardBuilder.variablesBar.modal.nameLabel')}
+            </label>
             <input
               type="text"
               value={name}
@@ -80,7 +82,9 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Label (display)</label>
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
+              {t('governance.dashboardBuilder.variablesBar.modal.labelLabel')}
+            </label>
             <input
               type="text"
               value={label}
@@ -90,7 +94,9 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Type</label>
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
+              {t('governance.dashboardBuilder.variablesBar.modal.typeLabel')}
+            </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as 'custom' | 'text' | 'interval')}
@@ -103,7 +109,9 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
           </div>
           {type === 'custom' && (
             <div>
-              <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Options (comma-separated)</label>
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
+                {t('governance.dashboardBuilder.variablesBar.modal.optionsLabel')}
+              </label>
               <input
                 type="text"
                 value={optionsRaw}
@@ -116,11 +124,11 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 cursor-pointer">
               <input type="checkbox" checked={multi} onChange={(e) => setMulti(e.target.checked)} className="rounded" />
-              Multi-value
+              {t('governance.dashboardBuilder.variablesBar.modal.multiValue')}
             </label>
             <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 cursor-pointer">
               <input type="checkbox" checked={includeAll} onChange={(e) => setIncludeAll(e.target.checked)} className="rounded" />
-              Include "All"
+              {t('governance.dashboardBuilder.variablesBar.modal.includeAll')}
             </label>
           </div>
         </div>
@@ -131,14 +139,14 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
             onClick={onClose}
             className="text-xs px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-            Cancel
+            {t('governance.dashboardBuilder.variablesBar.modal.cancel')}
           </button>
           <button
             type="button"
             onClick={handleAdd}
             className="text-xs px-3 py-1.5 rounded bg-accent text-white hover:bg-accent/80 font-semibold"
           >
-            Add
+            {t('governance.dashboardBuilder.variablesBar.modal.add')}
           </button>
         </div>
       </div>

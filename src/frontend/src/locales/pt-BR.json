@@ -6090,7 +6090,19 @@
         "timeRange": "Intervalo de tempo",
         "refresh": "Atualizar",
         "allValues": "Todas",
-        "refreshOff": "Off"
+        "refreshOff": "Off",
+        "modal": {
+          "nameLabel": "Nome (usado como $nome)",
+          "labelLabel": "Rótulo (exibição)",
+          "typeLabel": "Tipo",
+          "optionsLabel": "Opções (separadas por vírgula)",
+          "multiValue": "Multi-valor",
+          "includeAll": "Incluir \"Todas\"",
+          "cancel": "Cancelar",
+          "add": "Adicionar",
+          "nameRequired": "O nome é obrigatório",
+          "nameNoDollar": "O nome da variável não pode conter $"
+        }
       },
       "viz": {
         "selected": "Selecionado",

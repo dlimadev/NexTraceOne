@@ -6075,7 +6075,19 @@
         "timeRange": "Rango de tiempo",
         "refresh": "Actualizar",
         "allValues": "Todas",
-        "refreshOff": "Desactivado"
+        "refreshOff": "Desactivado",
+        "modal": {
+          "nameLabel": "Nombre (usado como $nombre)",
+          "labelLabel": "Etiqueta (mostrar)",
+          "typeLabel": "Tipo",
+          "optionsLabel": "Opciones (separadas por coma)",
+          "multiValue": "Multi-valor",
+          "includeAll": "Incluir \"Todas\"",
+          "cancel": "Cancelar",
+          "add": "Añadir",
+          "nameRequired": "El nombre es obligatorio",
+          "nameNoDollar": "El nombre de variable no puede contener $"
+        }
       },
       "viz": {
         "selected": "Seleccionado",
