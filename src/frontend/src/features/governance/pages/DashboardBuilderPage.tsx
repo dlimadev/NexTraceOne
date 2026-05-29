@@ -1713,7 +1713,7 @@ export function DashboardBuilderPage() {
         if (!slot) return null;
         return (
           <PanelEditorOverlay
-            slot={slot as PanelEditorSlot}
+            slot={slot as unknown as PanelEditorSlot}
             variables={variables}
             onApply={(updatedSlot) => {
               updateSlot(editingSlotId, updatedSlot as Partial<BuilderSlot>);
