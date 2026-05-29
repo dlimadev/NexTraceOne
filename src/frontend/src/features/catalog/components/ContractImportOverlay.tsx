@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Layers, FileCode, Tag } from 'lucide-react';
 import { WizardOverlay } from './WizardOverlay';
 import { contractsApi } from '../../contracts/api/contracts';
+import type { ContractProtocol } from '../../../types';
 
 const inputClass =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -24,12 +25,11 @@ const STEPS = [
 ];
 
 type SpecTab = 'upload' | 'url' | 'editor';
-type DetectedProtocol = string | null;
 
 /**
  * Detecta o protocolo de uma spec a partir dos primeiros 2KB do conteúdo.
  */
-function detectProtocol(content: string): DetectedProtocol {
+function detectProtocol(content: string): ContractProtocol | null {
   const sample = content.slice(0, 2048);
   if (/openapi[:\s"']/i.test(sample)) return 'OpenApi';
   if (/asyncapi[:\s"']/i.test(sample)) return 'AsyncApi';
@@ -53,21 +53,18 @@ export function ContractImportOverlay({
   const [specContent, setSpecContent] = useState('');
   const [specTab, setSpecTab] = useState<SpecTab>('upload');
   const [specUrl, setSpecUrl] = useState('');
-  const [detectedProtocol, setDetectedProtocol] = useState<DetectedProtocol>(null);
+  const [detectedProtocol, setDetectedProtocol] = useState<ContractProtocol | null>(null);
   const [version, setVersion] = useState('');
-  const [protocol, setProtocol] = useState('OpenApi');
+  const [protocol, setProtocol] = useState<ContractProtocol>('OpenApi');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  // Uncontrolled ref for the editor textarea — avoids React setting textContent
-  // which would cause Testing Library's findByText to match both textarea and badge.
-  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const mutation = useMutation({
     mutationFn: () =>
       contractsApi.importContract({
         apiAssetId,
-        content: specContent,
+        content: specTab === 'url' ? specUrl : specContent,
         version,
-        protocol: (detectedProtocol ?? protocol) as never,
+        protocol: detectedProtocol ?? protocol,
       }),
     onSuccess: () => onSuccess(),
     onError: () => toast.error(t('common.errorSaving')),
@@ -88,11 +85,14 @@ export function ContractImportOverlay({
         ' ' +
         t('common.isRequired', 'is required');
     }
-    if (step === 2 && !specContent.trim()) {
-      errs.spec =
-        t('catalog.contract.step.spec', 'Spec') +
-        ' ' +
-        t('common.isRequired', 'is required');
+    if (step === 2) {
+      const hasContent = specTab === 'url' ? specUrl.trim() !== '' : specContent.trim() !== '';
+      if (!hasContent) {
+        errs.spec =
+          t('catalog.contract.step.spec', 'Spec') +
+          ' ' +
+          t('common.isRequired', 'is required');
+      }
     }
     if (step === 3 && !version.trim()) {
       errs.version =
@@ -245,7 +245,6 @@ export function ContractImportOverlay({
 
             {specTab === 'editor' && (
               <textarea
-                ref={editorRef}
                 className={`${inputClass} font-mono resize-none`}
                 rows={12}
                 onChange={(e) => handleContentChange(e.target.value)}
@@ -288,9 +287,12 @@ export function ContractImportOverlay({
               <select
                 className={inputClass}
                 value={detectedProtocol ?? protocol}
-                onChange={(e) => setProtocol(e.target.value)}
+                onChange={(e) => {
+                  setProtocol(e.target.value as ContractProtocol);
+                  setDetectedProtocol(null);
+                }}
               >
-                {['OpenApi', 'Swagger', 'AsyncApi', 'Wsdl', 'Protobuf', 'GraphQl'].map(
+                {(['OpenApi', 'Swagger', 'AsyncApi', 'Wsdl', 'Protobuf', 'GraphQl', 'WorkerService'] as ContractProtocol[]).map(
                   (p) => (
                     <option key={p} value={p}>
                       {t(`contracts.protocols.${p}`, { defaultValue: p })}
