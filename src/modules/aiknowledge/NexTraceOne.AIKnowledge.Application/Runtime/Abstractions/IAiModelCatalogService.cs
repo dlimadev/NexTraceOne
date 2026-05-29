@@ -15,6 +15,17 @@ public interface IAiModelCatalogService
     Task<ResolvedModel?> ResolveModelByIdAsync(
         Guid modelId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Resolve o modelo para uma funcionalidade específica da plataforma.
+    /// Consulta a vinculação de feature (AiFeatureModelBinding) do tenant;
+    /// se não existir ou estiver inativa, usa o modelo default para a finalidade indicada.
+    /// </summary>
+    Task<ResolvedModel?> ResolveModelForFeatureAsync(
+        string featureKey,
+        string fallbackPurpose,
+        Guid tenantId,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>Modelo resolvido com informação de provider.</summary>

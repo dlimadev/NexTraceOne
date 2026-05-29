@@ -20,7 +20,7 @@ public sealed class SendAssistantMessageLlmTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 3, 1, 10, 0, 0, TimeSpan.Zero);
     private const string OllamaProviderId = "ollama";
-    private const string ModelId = "qwen3.5:9b";
+    private const string ModelId = "llama3.2:3b";
 
     // ── Mocks ────────────────────────────────────────────────────────────
     private readonly IAiUsageEntryRepository _usageRepo = Substitute.For<IAiUsageEntryRepository>();

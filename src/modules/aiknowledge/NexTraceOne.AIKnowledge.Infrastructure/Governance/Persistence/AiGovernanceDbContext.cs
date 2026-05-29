@@ -96,6 +96,9 @@ public sealed class AiGovernanceDbContext(
     public DbSet<ModelRoutingPolicy> ModelRoutingPolicies => Set<ModelRoutingPolicy>();
     public DbSet<AgentExecutionPlan> AgentExecutionPlans => Set<AgentExecutionPlan>();
 
+    // ── Feature Model Bindings (Phase 3 AI Governance) ───────────────────────
+    public DbSet<AiFeatureModelBinding> FeatureModelBindings => Set<AiFeatureModelBinding>();
+
     // ── AI Model Quality & Drift Governance (Wave AT.1) ───────────────────────
     public DbSet<ModelPredictionSample> ModelPredictionSamples => Set<ModelPredictionSample>();
 

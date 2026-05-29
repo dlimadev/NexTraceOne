@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -10,6 +12,7 @@ public sealed class AiModelCatalogServiceTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
     private readonly IAiModelRepository _modelRepository = Substitute.For<IAiModelRepository>();
+    private readonly IAiFeatureModelBindingRepository _bindingRepository = Substitute.For<IAiFeatureModelBindingRepository>();
 
     private AIModel CreateActiveModel(string name = "llama3", string provider = "ollama")
     {
@@ -17,6 +20,9 @@ public sealed class AiModelCatalogServiceTests
             name, name, provider, ModelType.Chat,
             isInternal: true, "chat", 1, FixedNow);
     }
+
+    private AiModelCatalogService CreateService()
+        => new(_modelRepository, _bindingRepository, Substitute.For<ILogger<AiModelCatalogService>>());
 
     // ── ResolveDefaultModelAsync ────────────────────────────────────────
 
@@ -27,8 +33,7 @@ public sealed class AiModelCatalogServiceTests
         _modelRepository.ListAsync(null, ModelType.Chat, ModelStatus.Active, null, Arg.Any<CancellationToken>())
             .Returns([model]);
 
-        var service = new AiModelCatalogService(_modelRepository);
-        var result = await service.ResolveDefaultModelAsync("chat", CancellationToken.None);
+        var result = await CreateService().ResolveDefaultModelAsync("chat", CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.ModelName.Should().Be("llama3");
@@ -41,8 +46,7 @@ public sealed class AiModelCatalogServiceTests
         _modelRepository.ListAsync(null, ModelType.Chat, ModelStatus.Active, null, Arg.Any<CancellationToken>())
             .Returns(new List<AIModel>());
 
-        var service = new AiModelCatalogService(_modelRepository);
-        var result = await service.ResolveDefaultModelAsync("chat", CancellationToken.None);
+        var result = await CreateService().ResolveDefaultModelAsync("chat", CancellationToken.None);
 
         result.Should().BeNull();
     }
@@ -56,8 +60,7 @@ public sealed class AiModelCatalogServiceTests
         _modelRepository.GetByIdAsync(Arg.Any<AIModelId>(), Arg.Any<CancellationToken>())
             .Returns(model);
 
-        var service = new AiModelCatalogService(_modelRepository);
-        var result = await service.ResolveModelByIdAsync(model.Id.Value, CancellationToken.None);
+        var result = await CreateService().ResolveModelByIdAsync(model.Id.Value, CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.ModelName.Should().Be("gpt-4o");
@@ -69,8 +72,7 @@ public sealed class AiModelCatalogServiceTests
         _modelRepository.GetByIdAsync(Arg.Any<AIModelId>(), Arg.Any<CancellationToken>())
             .Returns((AIModel?)null);
 
-        var service = new AiModelCatalogService(_modelRepository);
-        var result = await service.ResolveModelByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        var result = await CreateService().ResolveModelByIdAsync(Guid.NewGuid(), CancellationToken.None);
 
         result.Should().BeNull();
     }

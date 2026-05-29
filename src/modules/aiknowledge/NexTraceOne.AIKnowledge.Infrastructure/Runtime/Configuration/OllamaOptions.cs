@@ -17,8 +17,8 @@ public sealed class OllamaOptions
     /// <summary>Número máximo de retries em caso de falha (default: 2).</summary>
     public int MaxRetries { get; set; } = 2;
 
-    /// <summary>Modelo default para chat/completion (default: deepseek-r1:1.5b).</summary>
-    public string DefaultChatModel { get; set; } = "deepseek-r1:1.5b";
+    /// <summary>Modelo default para chat/completion (default: llama3.2:3b).</summary>
+    public string DefaultChatModel { get; set; } = "llama3.2:3b";
 
     /// <summary>Indica se o provider está habilitado (default: true).</summary>
     public bool Enabled { get; set; } = true;

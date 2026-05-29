@@ -49,7 +49,7 @@ public sealed class ConversationQueryTests
         return new List<AiMessage>
         {
             AiMessage.UserMessage(conversationId, "What is the service health?", t1),
-            AiMessage.AssistantMessage(conversationId, "All services are nominal.", "qwen3.5:9b", "ollama",
+            AiMessage.AssistantMessage(conversationId, "All services are nominal.", "llama3.2:3b", "ollama",
                 isInternal: true, promptTokens: 40, completionTokens: 12, appliedPolicyName: null,
                 groundingSources: string.Empty, contextReferences: string.Empty,
                 correlationId: Guid.NewGuid().ToString(), timestamp: t2),
