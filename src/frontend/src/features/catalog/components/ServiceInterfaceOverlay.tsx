@@ -60,6 +60,9 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
   const set = (key: keyof InterfaceFormData, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  const clearError = (key: keyof InterfaceFormData) =>
+    setErrors((e) => { const n = { ...e }; delete n[key]; return n; });
+
   const mutation = useMutation({
     mutationFn: () => serviceCatalogApi.createServiceInterface({
       serviceAssetId: serviceId,
@@ -72,7 +75,7 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
       grpcServiceName: form.grpcServiceName || undefined,
       scheduleCron: form.scheduleCron || undefined,
       documentationUrl: form.documentationUrl || undefined,
-      requiresContract: form.requiresContract || undefined,
+      requiresContract: form.requiresContract,
     }),
     onSuccess: () => onSuccess(),
     onError: () => toast.error(t('common.errorSaving')),
@@ -107,7 +110,7 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
                 type="text"
                 className={inputClass}
                 value={form.name}
-                onChange={(e) => { set('name', e.target.value); setErrors({}); }}
+                onChange={(e) => { set('name', e.target.value); clearError('name'); }}
                 placeholder="Interface name, e.g., POST /payments"
               />
               {errors.name && <p className="mt-1 text-xs text-danger">{errors.name}</p>}
