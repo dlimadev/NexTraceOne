@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Shield,
   Users,
@@ -37,6 +37,8 @@ import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
 import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
+import { ServiceInterfaceOverlay } from '../components/ServiceInterfaceOverlay';
+import { ContractImportOverlay } from '../components/ContractImportOverlay';
 import { ServiceObservabilityTab } from '../components/ServiceObservabilityTab';
 import { ServiceReliabilityTab } from '../components/ServiceReliabilityTab';
 import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
@@ -95,7 +97,12 @@ export function ServiceDetailPage() {
   const { serviceId } = useParams<{ serviceId: string}>();
   const { activeEnvironment } = useEnvironment();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<ServiceTab>('overview');
+  const [showInterfaceOverlay, setShowInterfaceOverlay] = useState(false);
+  const [showContractOverlay, setShowContractOverlay] = useState(false);
+  const [contractApiAssetId, setContractApiAssetId] = useState<string | undefined>(undefined);
+  const [contractApiAssetName, setContractApiAssetName] = useState<string | undefined>(undefined);
 
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['catalog-service-detail', serviceId],
@@ -435,14 +442,28 @@ export function ServiceDetailPage() {
                       </span>
                     )}
                     {service.serviceType && supportsContracts(service.serviceType as ServiceType) ? (
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
-                        className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
-                      >
-                        <Plus size={13} aria-hidden="true" />
-                        {t('catalog.services.addContract', 'Add Contract')}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setContractApiAssetId(undefined);
+                            setContractApiAssetName(undefined);
+                            setShowContractOverlay(true);
+                          }}
+                          className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                        >
+                          <Plus size={13} aria-hidden="true" />
+                          {t('catalog.contract.title', 'Import Contract')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+                          className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                        >
+                          <Plus size={13} aria-hidden="true" />
+                          {t('catalog.services.addContract', 'Add Contract')}
+                        </button>
+                      </div>
                     ) : service.serviceType ? (
                       <div className="flex items-center gap-1 text-xs text-muted border border-edge rounded px-2.5 py-1">
                         <Info size={12} aria-hidden="true" />
@@ -528,6 +549,19 @@ export function ServiceDetailPage() {
           {/* INTERFACES TAB */}
           {activeTab === 'interfaces' && (
             <PageSection>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-semibold text-heading">
+                  {t('serviceDetail.tabInterfaces', 'Interfaces')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setShowInterfaceOverlay(true)}
+                  className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                >
+                  <Plus size={13} aria-hidden="true" />
+                  {t('catalog.interface.title', 'New Interface')}
+                </button>
+              </div>
               <ServiceInterfacesTab serviceId={serviceId!} />
             </PageSection>
           )}
@@ -688,6 +722,30 @@ export function ServiceDetailPage() {
           isNonProductionEnvironment={activeEnvironment ? !activeEnvironment.isProductionLike : false}
         />
       </div>
+
+      {showInterfaceOverlay && (
+        <ServiceInterfaceOverlay
+          serviceId={serviceId!}
+          serviceName={service.displayName || service.name}
+          onClose={() => setShowInterfaceOverlay(false)}
+          onSuccess={() => {
+            setShowInterfaceOverlay(false);
+            queryClient.invalidateQueries({ queryKey: ['catalog-service-detail', serviceId] });
+          }}
+        />
+      )}
+
+      {showContractOverlay && (
+        <ContractImportOverlay
+          preselectedApiAssetId={contractApiAssetId}
+          preselectedApiAssetName={contractApiAssetName}
+          onClose={() => setShowContractOverlay(false)}
+          onSuccess={() => {
+            setShowContractOverlay(false);
+            queryClient.invalidateQueries({ queryKey: ['catalog-service-contracts', serviceId] });
+          }}
+        />
+      )}
     </PageContainer>
   );
 }
