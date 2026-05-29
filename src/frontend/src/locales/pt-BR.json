@@ -6054,6 +6054,68 @@
         "m": "M",
         "w": "L",
         "l": "G"
+      },
+      "panelEditor": {
+        "title": "Editor de Painel",
+        "apply": "Aplicar",
+        "discard": "Descartar",
+        "preview": "Pré-visualização",
+        "tableView": "Ver Tabela",
+        "backToDashboard": "← Voltar ao dashboard",
+        "tabs": {
+          "query": "Query",
+          "transforms": "Transformações",
+          "alerts": "Alertas"
+        }
+      },
+      "queryBuilder": {
+        "visual": "Visual",
+        "nql": "NQL",
+        "addQuery": "+ Adicionar Query",
+        "service": "Serviço",
+        "metric": "Métrica",
+        "filters": "Filtros",
+        "addFilter": "+ Adicionar",
+        "groupBy": "Group by",
+        "function": "Função",
+        "aggregation": "Agregação",
+        "switchToNql": "Editar como NQL",
+        "nqlComplexHint": "NQL complexo — use o editor de código",
+        "duplicate": "Duplicar",
+        "delete": "Eliminar",
+        "copyNql": "Copiar NQL"
+      },
+      "variablesBar": {
+        "addVariable": "+ Variável",
+        "timeRange": "Intervalo de tempo",
+        "refresh": "Atualizar",
+        "allValues": "Todas",
+        "refreshOff": "Off"
+      },
+      "viz": {
+        "selected": "Selecionado",
+        "suggestions": "Sugestões",
+        "allTypes": "Todos os tipos",
+        "options": "Opções",
+        "unit": "Unidade",
+        "decimals": "Decimais",
+        "minY": "Min Y",
+        "maxY": "Max Y",
+        "thresholds": "Thresholds",
+        "thresholdsActive": "{{count}} ativos",
+        "types": {
+          "timeseries": "Série Temporal",
+          "bar": "Barras",
+          "stat": "Stat",
+          "gauge": "Gauge",
+          "donut": "Donut",
+          "heatmap": "Heatmap",
+          "table": "Tabela",
+          "state-timeline": "State Timeline",
+          "histogram": "Histograma",
+          "scatter": "Scatter",
+          "candlestick": "Candlestick"
+        }
       }
     },
     "dora": {

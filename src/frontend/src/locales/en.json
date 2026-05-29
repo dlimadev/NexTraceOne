@@ -4738,6 +4738,68 @@
         "m": "M",
         "w": "W",
         "l": "L"
+      },
+      "panelEditor": {
+        "title": "Panel Editor",
+        "apply": "Apply",
+        "discard": "Discard",
+        "preview": "Preview",
+        "tableView": "Table View",
+        "backToDashboard": "← Back to dashboard",
+        "tabs": {
+          "query": "Query",
+          "transforms": "Transforms",
+          "alerts": "Alerts"
+        }
+      },
+      "queryBuilder": {
+        "visual": "Visual",
+        "nql": "NQL",
+        "addQuery": "+ Add Query",
+        "service": "Service",
+        "metric": "Metric",
+        "filters": "Filters",
+        "addFilter": "+ Add",
+        "groupBy": "Group by",
+        "function": "Function",
+        "aggregation": "Aggregation",
+        "switchToNql": "Edit as NQL",
+        "nqlComplexHint": "Complex NQL — use the code editor",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "copyNql": "Copy NQL"
+      },
+      "variablesBar": {
+        "addVariable": "+ Variable",
+        "timeRange": "Time range",
+        "refresh": "Refresh",
+        "allValues": "All",
+        "refreshOff": "Off"
+      },
+      "viz": {
+        "selected": "Selected",
+        "suggestions": "Suggestions",
+        "allTypes": "All types",
+        "options": "Options",
+        "unit": "Unit",
+        "decimals": "Decimals",
+        "minY": "Min Y",
+        "maxY": "Max Y",
+        "thresholds": "Thresholds",
+        "thresholdsActive": "{{count}} active",
+        "types": {
+          "timeseries": "Time Series",
+          "bar": "Bar",
+          "stat": "Stat",
+          "gauge": "Gauge",
+          "donut": "Donut",
+          "heatmap": "Heatmap",
+          "table": "Table",
+          "state-timeline": "State Timeline",
+          "histogram": "Histogram",
+          "scatter": "Scatter",
+          "candlestick": "Candlestick"
+        }
       }
     },
     "dora": {
