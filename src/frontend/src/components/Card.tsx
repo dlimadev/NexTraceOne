@@ -35,13 +35,13 @@ export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
-  default: 'bg-card rounded-2xl border border-edge shadow-surface overflow-hidden',
+  default: 'bg-card rounded-md border border-edge shadow-sm overflow-hidden',
   interactive:
-    'bg-card rounded-2xl border border-edge shadow-surface overflow-hidden cursor-pointer hover:shadow-elevated hover:border-edge-strong transition-all duration-[var(--nto-motion-base)]',
-  elevated: 'bg-card rounded-2xl border border-edge shadow-elevated overflow-hidden',
-  flat: 'bg-card rounded-2xl overflow-hidden',
-  glass: 'backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-surface overflow-hidden',
-  gradient: 'rounded-2xl border-0 shadow-elevated overflow-hidden text-white bg-gradient-to-br from-accent via-blue to-cyan',
+    'bg-card rounded-md border border-edge shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-edge-strong transition-all duration-[var(--nto-motion-base)]',
+  elevated: 'bg-card rounded-md border border-edge shadow-md overflow-hidden',
+  flat: 'bg-card rounded-md overflow-hidden',
+  glass: 'backdrop-blur-xl bg-white/5 rounded-md border border-white/10 shadow-sm overflow-hidden',
+  gradient: 'rounded-md border-0 shadow-md overflow-hidden text-white bg-gradient-to-br from-accent via-blue to-cyan',
 };
 
 /**
@@ -75,14 +75,14 @@ export function Card({ children, variant = 'default', loading, className, ...res
 
 export function CardHeader({ children, dot, pulsing, className, ...rest }: CardHeaderProps) {
   return (
-    <div className={cn('px-5 py-4 border-b border-edge/60 flex items-center gap-2.5', className)} {...rest}>
+    <div className={cn('px-4 py-3 border-b border-edge/60 flex items-center gap-2.5', className)} {...rest}>
       {dot && (
         <span
           data-testid="card-header-dot"
           style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
+            width: 3,
+            height: 20,
+            borderRadius: 2,
             background: dot,
             flexShrink: 0,
             animation: pulsing ? 'pulse-badge 1.5s ease-in-out infinite' : undefined,
@@ -96,7 +96,7 @@ export function CardHeader({ children, dot, pulsing, className, ...rest }: CardH
 }
 
 export function CardBody({ children, className, ...rest }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
-  return <div className={cn('px-5 py-5', className)} {...rest}>{children}</div>;
+  return <div className={cn('px-4 py-4', className)} {...rest}>{children}</div>;
 }
 
 export function CardTitle({ children, className, ...rest }: CardTitleProps) {
@@ -129,7 +129,7 @@ export function CardContent({ children, className, ...rest }: CardContentProps) 
  */
 export function CardFooter({ children, className, ...rest }: CardFooterProps) {
   return (
-    <div className={cn('px-5 py-3 border-t border-edge/60 bg-elevated/30', className)} {...rest}>
+    <div className={cn('px-4 py-2.5 border-t border-edge/60 bg-elevated/30', className)} {...rest}>
       {children}
     </div>
   );

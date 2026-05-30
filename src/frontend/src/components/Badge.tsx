@@ -27,38 +27,38 @@ export interface BadgeProps {
  * pulsing=true: anima o dot com pulse-badge 1.5s ease-in-out infinite.
  */
 const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'bg-elevated text-body border border-edge',
-  neutral: 'bg-elevated text-muted border border-edge',
-  success: 'bg-success/12 text-success border border-success/25',
-  warning: 'bg-warning/12 text-warning border border-warning/25',
-  danger: 'bg-critical/12 text-critical border border-critical/25',
-  info: 'bg-info/12 text-info border border-info/25',
+  default: 'bg-elevated text-muted',
+  neutral: 'bg-elevated text-muted',
+  success: 'bg-success/15 text-success',
+  warning: 'bg-warning/15 text-warning',
+  danger: 'bg-critical/15 text-critical',
+  info: 'bg-info/15 text-info',
   // Aliases
-  secondary: 'bg-elevated text-muted border border-edge',
-  error: 'bg-critical/12 text-critical border border-critical/25',
-  destructive: 'bg-critical/12 text-critical border border-critical/25',
-  critical: 'bg-critical/12 text-critical border border-critical/25',
+  secondary: 'bg-elevated text-muted',
+  error: 'bg-critical/15 text-critical',
+  destructive: 'bg-critical/15 text-critical',
+  critical: 'bg-critical/15 text-critical',
   outline: 'bg-transparent text-body border border-edge',
-  muted: 'bg-elevated text-muted border border-edge',
-  primary: 'bg-info/12 text-info border border-info/25',
-  blue: 'bg-info/12 text-info border border-info/25',
-  gray: 'bg-elevated text-muted border border-edge',
-  green: 'bg-success/12 text-success border border-success/25',
-  yellow: 'bg-warning/12 text-warning border border-warning/25',
-  purple: 'bg-info/12 text-info border border-info/25',
+  muted: 'bg-elevated text-muted',
+  primary: 'bg-accent/15 text-accent',
+  blue: 'bg-accent/15 text-accent',
+  gray: 'bg-elevated text-muted',
+  green: 'bg-success/15 text-success',
+  yellow: 'bg-warning/15 text-warning',
+  purple: 'bg-accent/15 text-accent',
 };
 
 const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {
-  xs: 'px-1 py-px text-[10px]',
-  sm: 'px-1.5 py-px type-micro',
-  md: 'px-2.5 py-0.5 text-xs',
+  xs: 'px-1 py-px text-[9px]',
+  sm: 'px-1.5 py-px text-[10px]',
+  md: 'px-2 py-0.5 text-[11px]',
 };
 
 export const Badge = memo(function Badge({ children, variant = 'default', size = 'md', icon, dot, pulsing, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-pill font-semibold',
+        'inline-flex items-center gap-1 rounded-[3px] font-medium tracking-wide',
         sizeClasses[size],
         variantClasses[variant],
         className,
