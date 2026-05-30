@@ -18,11 +18,11 @@ interface InlineMessageProps {
 }
 
 const severityStyles: Record<Severity, string> = {
-  info: 'bg-info-muted border-info/25 text-info',
-  success: 'bg-success-muted border-success/25 text-success',
-  warning: 'bg-warning-muted border-warning/25 text-warning',
-  danger: 'bg-critical-muted border-danger/25 text-danger',
-  critical: 'bg-critical-muted border-critical/25 text-critical',
+  info: 'bg-info-muted border border-info/25 border-l-2 border-l-info text-info',
+  success: 'bg-success-muted border border-success/25 border-l-2 border-l-success text-success',
+  warning: 'bg-warning-muted border border-warning/25 border-l-2 border-l-warning text-warning',
+  danger: 'bg-critical-muted border border-danger/25 border-l-2 border-l-danger text-danger',
+  critical: 'bg-critical-muted border border-critical/25 border-l-2 border-l-critical text-critical',
 };
 
 /**
@@ -45,7 +45,7 @@ export function InlineMessage({
     <div
       role={severity === 'danger' || severity === 'critical' ? 'alert' : 'status'}
       className={cn(
-        'flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
+        'flex items-start gap-3 rounded-sm px-4 py-3 text-sm',
         severityStyles[severity],
         className,
       )}
