@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeftRight, Code2, Copy, ChevronDown, ChevronUp, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
@@ -84,7 +84,7 @@ export function ContractMigrationPage() {
               <span className={severityBadge(suggestion.severity)}>
                 {t(`contracts.migrationSeverity${suggestion.severity.charAt(0).toUpperCase() + suggestion.severity.slice(1) as 'High' | 'Medium' | 'Low'}`)}
               </span>
-              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+              <span className="rounded-sm bg-elevated px-2 py-0.5 text-xs text-muted">
                 {suggestion.kind}
               </span>
             </div>
@@ -136,14 +136,14 @@ export function ContractMigrationPage() {
       {/* Configuration Panel */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
-          <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationBaseVersion')}
           </h3>
           <select
             aria-label={t('contracts.migrationSelectBaseVersion')}
             value={baseVersionId}
             onChange={(e) => setBaseVersionId(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-heading focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           >
             <option value="">{t('contracts.migrationSelectBaseVersion')}</option>
             {contracts.map((c) => (
@@ -155,14 +155,14 @@ export function ContractMigrationPage() {
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
-          <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationTargetVersion')}
           </h3>
           <select
             aria-label={t('contracts.migrationSelectTargetVersion')}
             value={targetVersionId}
             onChange={(e) => setTargetVersionId(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-heading focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
           >
             <option value="">{t('contracts.migrationSelectTargetVersion')}</option>
             {contracts.map((c) => (
@@ -174,7 +174,7 @@ export function ContractMigrationPage() {
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
-          <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationTargetSide')}
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -187,7 +187,7 @@ export function ContractMigrationPage() {
                   'rounded-md px-4 py-2 text-sm font-medium transition-colors',
                   targetSide === side
                     ? 'bg-blue-600 text-white'
-                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
+                    : 'border border-edge bg-card text-body hover:bg-hover',
                 )}
               >
                 {t(`contracts.migrationSide${side.charAt(0).toUpperCase() + side.slice(1) as 'All' | 'Provider' | 'Consumer'}`)}
@@ -197,7 +197,7 @@ export function ContractMigrationPage() {
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
-          <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationLanguage')}
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -210,7 +210,7 @@ export function ContractMigrationPage() {
                   'rounded-md px-4 py-2 text-sm font-medium transition-colors',
                   language === lang
                     ? 'bg-blue-600 text-white'
-                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
+                    : 'border border-edge bg-card text-body hover:bg-hover',
                 )}
               >
                 {lang}
@@ -257,7 +257,7 @@ export function ContractMigrationPage() {
               { label: t('contracts.migrationBreakingCount'), value: String(patch.breakingChangeCount) },
             ].map(({ label, value }) => (
               <div key={label} className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/60">
-                <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+                <p className="text-xs text-muted">{label}</p>
                 <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{value}</p>
               </div>
             ))}
@@ -266,7 +266,7 @@ export function ContractMigrationPage() {
           {/* Provider Suggestions */}
           {patch.providerSuggestions.length > 0 && (
             <section>
-              <h2 className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-100">
+              <h2 className="mb-3 text-base font-semibold text-heading">
                 {t('contracts.migrationProviderSuggestions')}
                 <span className="ml-2 text-sm font-normal text-gray-500">({patch.providerSuggestions.length})</span>
               </h2>
@@ -281,7 +281,7 @@ export function ContractMigrationPage() {
           {/* Consumer Suggestions */}
           {patch.consumerSuggestions.length > 0 && (
             <section>
-              <h2 className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-100">
+              <h2 className="mb-3 text-base font-semibold text-heading">
                 {t('contracts.migrationConsumerSuggestions')}
                 <span className="ml-2 text-sm font-normal text-gray-500">({patch.consumerSuggestions.length})</span>
               </h2>
@@ -297,7 +297,7 @@ export function ContractMigrationPage() {
           {patch.providerSuggestions.length === 0 && patch.consumerSuggestions.length === 0 && (
             <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-700 dark:bg-gray-800/60">
               <CheckCircle2 className="mx-auto mb-3 h-8 w-8 text-green-500" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('contracts.migrationEmpty')}</p>
+              <p className="text-sm text-muted">{t('contracts.migrationEmpty')}</p>
             </div>
           )}
 

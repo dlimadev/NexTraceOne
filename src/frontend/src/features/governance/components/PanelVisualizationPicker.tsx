@@ -60,10 +60,10 @@ export function PanelVisualizationPicker({
   const thresholdCount = parseThresholdCount(thresholds);
 
   return (
-    <div style={{ width: SIDEBAR_WIDTH_PX }} className="flex flex-col gap-3 h-full overflow-y-auto p-3 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0">
+    <div style={{ width: SIDEBAR_WIDTH_PX }} className="flex flex-col gap-3 h-full overflow-y-auto p-3 border-l border-edge bg-canvas shrink-0">
 
       {/* Current selection */}
-      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <p className="text-[10px] font-semibold text-muted uppercase tracking-wider">
         {t('governance.dashboardBuilder.viz.selected', 'Selected')}
       </p>
       {(() => {
@@ -79,7 +79,7 @@ export function PanelVisualizationPicker({
       })()}
 
       {/* Suggestions */}
-      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-1">
+      <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mt-1">
         {t('governance.dashboardBuilder.viz.suggestions', 'Suggestions')}
       </p>
       <div className="grid grid-cols-2 gap-1.5">
@@ -94,7 +94,7 @@ export function PanelVisualizationPicker({
               className={`flex flex-col items-center gap-1 p-2 rounded-md border transition-colors cursor-pointer
                 ${isActive
                   ? 'border-accent bg-accent/10 text-accent'
-                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:border-accent/50 hover:bg-accent/5'
+                  : 'border-edge bg-card text-muted hover:border-accent/50 hover:bg-accent/5'
                 }`}
               title={meta.label}
             >
@@ -108,7 +108,7 @@ export function PanelVisualizationPicker({
       </div>
 
       {/* All types */}
-      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-1">
+      <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mt-1">
         {t('governance.dashboardBuilder.viz.allTypes', 'All types')}
       </p>
       <div className="grid grid-cols-2 gap-1.5">
@@ -122,7 +122,7 @@ export function PanelVisualizationPicker({
               className={`flex flex-col items-center gap-1 p-1.5 rounded-md border transition-colors cursor-pointer
                 ${isActive
                   ? 'border-accent bg-accent/10 text-accent'
-                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:border-accent/40'
+                  : 'border-edge bg-card text-muted hover:border-accent/40'
                 }`}
               title={meta.label}
             >
@@ -136,18 +136,18 @@ export function PanelVisualizationPicker({
       </div>
 
       {/* Display options */}
-      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-1">
+      <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mt-1">
         {t('governance.dashboardBuilder.viz.options', 'Options')}
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <label className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+          <label className="text-xs text-muted shrink-0">
             {t('governance.dashboardBuilder.viz.unit', 'Unit')}
           </label>
           <select
             value={unit}
             onChange={(e) => onUnitChange(e.target.value)}
-            className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-1.5 py-0.5 focus:outline-none focus:border-accent"
+            className="text-xs rounded border border-edge bg-card text-heading px-1.5 py-0.5 focus:outline-none focus:border-accent"
           >
             {UNIT_OPTIONS.map((u) => (
               <option key={u} value={u}>{u}</option>
@@ -155,7 +155,7 @@ export function PanelVisualizationPicker({
           </select>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <label className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+          <label className="text-xs text-muted shrink-0">
             {t('governance.dashboardBuilder.viz.minY', 'Min Y')}
           </label>
           <input
@@ -163,11 +163,11 @@ export function PanelVisualizationPicker({
             value={yAxisMin}
             onChange={(e) => onYAxisMinChange(e.target.value)}
             placeholder="auto"
-            className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-1.5 py-0.5 w-16 focus:outline-none focus:border-accent"
+            className="text-xs rounded border border-edge bg-card text-heading px-1.5 py-0.5 w-16 focus:outline-none focus:border-accent"
           />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <label className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+          <label className="text-xs text-muted shrink-0">
             {t('governance.dashboardBuilder.viz.maxY', 'Max Y')}
           </label>
           <input
@@ -175,18 +175,18 @@ export function PanelVisualizationPicker({
             value={yAxisMax}
             onChange={(e) => onYAxisMaxChange(e.target.value)}
             placeholder="auto"
-            className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-1.5 py-0.5 w-16 focus:outline-none focus:border-accent"
+            className="text-xs rounded border border-edge bg-card text-heading px-1.5 py-0.5 w-16 focus:outline-none focus:border-accent"
           />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <label className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+          <label className="text-xs text-muted shrink-0">
             {t('governance.dashboardBuilder.viz.thresholds', 'Thresholds')}
           </label>
           <span
             className={`text-xs px-1.5 py-0.5 rounded border ${
               thresholdCount > 0
                 ? 'border-green-500 bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
-                : 'border-gray-200 dark:border-gray-700 text-gray-400'
+                : 'border-edge text-gray-400'
             }`}
           >
             {thresholdCount > 0

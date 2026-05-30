@@ -65,10 +65,10 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div
-        className={`flex items-center gap-2 rounded-lg border bg-white dark:bg-gray-900 px-3 py-2 transition-all ${
+        className={`flex items-center gap-2 rounded-lg border bg-card px-3 py-2 transition-all ${
           isFocused
             ? 'border-accent shadow-sm ring-1 ring-accent/20'
-            : 'border-gray-200 dark:border-gray-700'
+            : 'border-edge'
         }`}
       >
         <Search size={14} className="text-gray-400 shrink-0" />
@@ -81,7 +81,7 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
           placeholder={t('dashboard.queryBarPlaceholder', 'Search logs, traces, metrics... (e.g., level:error service:auth)')}
-          className="flex-1 bg-transparent text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none"
+          className="flex-1 bg-transparent text-xs text-heading placeholder:text-gray-400 focus:outline-none"
         />
         {value && (
           <button
@@ -103,9 +103,9 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
 
       {/* Suggestions dropdown */}
       {showSuggestions && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl py-1">
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-lg border border-edge bg-card shadow-xl py-1">
           <div className="px-3 py-1.5 border-b border-gray-100 dark:border-gray-800">
-            <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">
               {t('dashboard.querySuggestions', 'Suggested queries')}
             </span>
           </div>

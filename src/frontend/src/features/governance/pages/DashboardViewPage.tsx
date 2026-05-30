@@ -258,7 +258,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
     <div
       ref={menuRef}
       role="menu"
-      className="absolute top-6 right-0 z-50 w-48 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl"
+      className="absolute top-6 right-0 z-50 w-48 rounded-lg border border-edge bg-card shadow-xl"
     >
       <button
         type="button"
@@ -326,11 +326,11 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
       aria-label={t('governance.dashboardView.inspectWidget', 'Inspect widget')}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl overflow-auto max-h-[80vh]">
+      <div className="relative w-full max-w-lg rounded-md border border-edge bg-card shadow-2xl overflow-auto max-h-[80vh]">
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
           <div className="flex items-center gap-2">
             <BarChart2 size={14} className="text-accent" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-heading">
               {t('governance.dashboardView.inspectTitle', 'Widget Inspector')}
             </h3>
           </div>
@@ -361,12 +361,12 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
               ['renderHint', slot.renderHint ?? '—'],
             ] as [string, string | number][]).map(([key, val]) => (
               <div key={key} className="contents">
-                <dt className="text-gray-500 dark:text-gray-400 font-medium">{key}</dt>
-                <dd className="text-gray-900 dark:text-white font-mono truncate">{String(val)}</dd>
+                <dt className="text-muted font-medium">{key}</dt>
+                <dd className="text-heading font-mono truncate">{String(val)}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-4 rounded bg-gray-50 dark:bg-gray-800 p-2">
+          <div className="mt-4 rounded bg-elevated p-2">
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
               {t('governance.dashboardView.inspectRawJson', 'Raw JSON')}
             </p>
@@ -619,11 +619,11 @@ function DashboardViewInner() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <LayoutDashboard size={20} className="text-accent" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{data.name}</h1>
+              <h1 className="text-xl font-bold text-heading">{data.name}</h1>
               <Badge variant="secondary">{data.persona}</Badge>
             </div>
             {data.description && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 ml-7 leading-snug">
+              <p className="text-sm text-muted ml-7 leading-snug">
                 {data.description}
               </p>
             )}
@@ -638,7 +638,7 @@ function DashboardViewInner() {
             <select
               value={autoRefreshSeconds}
               onChange={(e) => setAutoRefreshSeconds(Number(e.target.value))}
-              className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-2 py-1 focus:outline-none"
+              className="text-xs rounded border border-edge bg-card text-gray-700 dark:text-gray-300 px-2 py-1 focus:outline-none"
               aria-label={t('governance.dashboardView.autoRefreshLabel', 'Auto-refresh')}
             >
               {AUTO_REFRESH_OPTIONS.map((opt) => (
@@ -669,7 +669,7 @@ function DashboardViewInner() {
                   ? isLive
                     ? 'border-green-600 bg-green-950 text-green-300'
                     : 'border-yellow-600 bg-yellow-950 text-yellow-300 animate-pulse'
-                  : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 hover:text-accent'
+                  : 'border-gray-300 dark:border-gray-700 bg-card text-gray-500 hover:text-accent'
               }`}
             >
               <span className={`inline-block h-2 w-2 rounded-full ${isLiveEnabled && isLive ? 'bg-green-400' : isLiveEnabled ? 'bg-yellow-400' : 'bg-gray-500'}`} />
@@ -832,7 +832,7 @@ function DashboardViewInner() {
                   key={slot.widgetId}
                   id={`widget-${slot.widgetId}`}
                   style={style}
-                  className="group relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden"
+                  className="group relative rounded-lg border border-edge bg-card shadow-sm overflow-hidden"
                 >
                   {WidgetComponent ? (
                     <WidgetComponent
@@ -931,10 +931,10 @@ function DashboardViewInner() {
             aria-label={t('governance.dashboardView.expandedWidget', 'Expanded widget')}
             onClick={(e) => { if (e.target === e.currentTarget) setExpandedWidgetId(null); }}
           >
-            <div className="relative w-full max-w-3xl max-h-[80vh] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl overflow-auto">
+            <div className="relative w-full max-w-3xl max-h-[80vh] rounded-md border border-edge bg-card shadow-2xl overflow-auto">
               <button
                 onClick={() => setExpandedWidgetId(null)}
-                className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors z-10"
+                className="absolute top-3 right-3 p-1.5 rounded-full bg-elevated text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors z-10"
                 aria-label={t('governance.dashboardView.closeExpanded', 'Close expanded view')}
               >
                 <X size={16} />

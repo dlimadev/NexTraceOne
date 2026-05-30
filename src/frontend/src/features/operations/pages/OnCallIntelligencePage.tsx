@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Phone, TrendingDown, Clock, AlertTriangle, BarChart2, Calendar } from 'lucide-react';
@@ -88,15 +88,15 @@ export function OnCallIntelligencePage() {
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
               placeholder={t('operations.onCall.filterByTeam')}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-1 w-36"
+              className="rounded border border-edge bg-card text-sm px-2 py-1 w-36"
             />
-            <label className="text-sm text-gray-600 dark:text-gray-400">
+            <label className="text-sm text-muted">
               {t('operations.onCall.period')}:
             </label>
             <select
               value={periodDays}
               onChange={(e) => setPeriodDays(Number(e.target.value))}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-1"
+              className="rounded border border-edge bg-card text-sm px-2 py-1"
             >
               {[7, 14, 30, 60, 90].map((d) => (
                 <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
@@ -156,12 +156,12 @@ export function OnCallIntelligencePage() {
               <Card key={tf.teamName}>
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-sm text-gray-900 dark:text-white">{tf.teamName}</span>
+                    <span className="font-medium text-sm text-heading">{tf.teamName}</span>
                     <Badge variant={FATIGUE_VARIANT[tf.fatigueLevel] ?? 'secondary'} className="text-xs">
                       {tf.fatigueLevel}
                     </Badge>
                   </div>
-                  <div className="space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="space-y-1 text-xs text-muted">
                     <div className="flex items-center gap-1">
                       <Clock size={12} />
                       {t('operations.onCall.avgResponse', { minutes: tf.avgResponseMinutes })}
@@ -189,9 +189,9 @@ export function OnCallIntelligencePage() {
             <CardBody className="p-4">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {data.distribution.slice(0, 8).map((slot, idx) => (
-                  <div key={idx} className="rounded bg-gray-50 dark:bg-gray-800 p-2 text-center">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{slot.dayOfWeek} {slot.hour}:00</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">{slot.incidentCount}</p>
+                  <div key={idx} className="rounded bg-elevated p-2 text-center">
+                    <p className="text-xs text-muted">{slot.dayOfWeek} {slot.hour}:00</p>
+                    <p className="text-lg font-bold text-heading">{slot.incidentCount}</p>
                   </div>
                 ))}
               </div>

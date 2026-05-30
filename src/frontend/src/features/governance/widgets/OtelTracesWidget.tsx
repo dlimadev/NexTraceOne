@@ -83,7 +83,7 @@ function TraceDetail({
         <ArrowLeft size={11} />
         {t('obs.traces.backToList', 'Back')}
       </button>
-      <span className="text-[10px] font-mono text-gray-500 dark:text-gray-400 truncate shrink-0">
+      <span className="text-[10px] font-mono text-muted truncate shrink-0">
         {traceId}
       </span>
 
@@ -109,8 +109,8 @@ function TraceDetail({
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-[10px] border-collapse">
-            <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <tr className="text-gray-500 dark:text-gray-400">
+            <thead className="sticky top-0 bg-card z-10">
+              <tr className="text-muted">
                 <th className="text-left pb-1 pr-1 font-medium">
                   {t('obs.traces.colOperation', 'Operation')}
                 </th>
@@ -138,7 +138,7 @@ function TraceDetail({
                     )}
                     {span.operationName}
                   </td>
-                  <td className="py-0.5 pr-1 text-gray-500 dark:text-gray-400 truncate max-w-[80px]">
+                  <td className="py-0.5 pr-1 text-muted truncate max-w-[80px]">
                     {span.serviceName}
                   </td>
                   <td className={`py-0.5 text-right tabular-nums ${durationColour(span.durationMs)}`}>
@@ -205,7 +205,7 @@ export function OtelTracesWidget({
       {/* Header */}
       <div className="flex items-center gap-1.5 shrink-0">
         <GitBranch size={13} className="text-purple-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
       </div>
@@ -232,22 +232,22 @@ export function OtelTracesWidget({
         </div>
       ) : data && !data.isBackendAvailable ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <Settings size={18} className="text-faded" />
+          <span className="text-xs text-muted text-center">
             {t('obs.backendNotConfigured', 'Backend not configured')}
           </span>
         </div>
       ) : (data?.traces ?? []).length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-faded">
             {t('obs.traces.noData', 'No traces')}
           </span>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-[10px] border-collapse">
-            <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <tr className="text-gray-500 dark:text-gray-400">
+            <thead className="sticky top-0 bg-card z-10">
+              <tr className="text-muted">
                 <th className="text-left pb-1 pr-1 font-medium">
                   {t('obs.traces.colId', 'Trace ID')}
                 </th>
@@ -273,10 +273,10 @@ export function OtelTracesWidget({
                   onClick={() => setSelectedTraceId(trace.traceId)}
                   aria-label={`${t('obs.traces.openTrace', 'Open trace')} ${trace.traceId}`}
                 >
-                  <td className="py-0.5 pr-1 font-mono text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  <td className="py-0.5 pr-1 font-mono text-muted whitespace-nowrap">
                     {trace.traceId.slice(0, 8)}
                   </td>
-                  <td className="py-0.5 pr-1 text-gray-600 dark:text-gray-300 truncate max-w-[80px]">
+                  <td className="py-0.5 pr-1 text-muted truncate max-w-[80px]">
                     {trace.serviceName}
                   </td>
                   <td className="py-0.5 pr-1 text-gray-700 dark:text-gray-300 truncate max-w-[120px]">

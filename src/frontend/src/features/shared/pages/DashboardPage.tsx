@@ -243,7 +243,7 @@ export function DashboardPage() {
               <Link
                 key={`${alert.to}-${idx}`}
                 to={alert.to}
-                className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${styles.wrap}`}
+                className={`flex items-center gap-3 rounded-md border px-4 py-3 transition-colors ${styles.wrap}`}
               >
                 {/* Icon box 28×28 tonal */}
                 <div

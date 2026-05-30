@@ -205,16 +205,16 @@ export function ScheduledReportsPage() {
                         )}
                       </button>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-heading">
                           {report.name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                           {t('scheduledReports.schedule')}: {report.schedule} ·{' '}
                           {t('scheduledReports.recipients')}:{' '}
                           {parseRecipients(report.recipientsJson) || '—'}
                         </p>
                         {report.lastSentAt && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                          <p className="text-xs text-faded mt-0.5">
                             {t('scheduledReports.lastSent')}:{' '}
                             {new Date(report.lastSentAt).toLocaleDateString()}
                           </p>
@@ -248,46 +248,46 @@ export function ScheduledReportsPage() {
 
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-heading mb-4">
               {t('scheduledReports.create')}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.name')}
                 </label>
                 <input
                   type="text"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('common.type')}
                 </label>
                 <input
                   type="text"
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                   placeholder="compliance"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('scheduledReports.schedule')}
                   </label>
                   <select
                     value={schedule}
                     onChange={(e) => setSchedule(e.target.value as Schedule)}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-gray-700 dark:text-gray-300"
                   >
                     {SCHEDULES.map((s) => (
                       <option key={s} value={s}>
@@ -297,13 +297,13 @@ export function ScheduledReportsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('scheduledReports.format')}
                   </label>
                   <select
                     value={format}
                     onChange={(e) => setFormat(e.target.value as Format)}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-gray-700 dark:text-gray-300"
                   >
                     {FORMATS.map((f) => (
                       <option key={f} value={f}>
@@ -315,14 +315,14 @@ export function ScheduledReportsPage() {
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                <label className="text-xs text-muted mb-1 block">
                   {t('scheduledReports.recipients')} ({t('common.commaSeparated')})
                 </label>
                 <input
                   type="text"
                   value={recipients}
                   onChange={(e) => setRecipients(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                   placeholder="user@example.com, team@example.com"
                 />
               </div>

@@ -216,7 +216,7 @@ export function TenantProvisioningPage() {
                       <button
                         key={plan}
                         onClick={() => setForm((f) => ({ ...f, plan }))}
-                        className={`text-left p-4 rounded-xl border-2 transition-all ${
+                        className={`text-left p-4 rounded-md border-2 transition-all ${
                           form.plan === plan
                             ? `${desc.color} bg-accent/5`
                             : 'border-edge hover:border-edge-strong'
@@ -295,7 +295,7 @@ export function TenantProvisioningPage() {
               <div className="text-center py-6 space-y-4">
                 <CheckCircle size={48} className="mx-auto text-success" />
                 <h2 className="text-lg font-semibold text-heading">{t('step3.title')}</h2>
-                <div className="bg-elevated rounded-xl p-4 text-left text-sm space-y-2">
+                <div className="bg-elevated rounded-md p-4 text-left text-sm space-y-2">
                   <div>
                     <span className="text-muted">{t('step3.tenantId')}: </span>
                     <span className="font-mono text-xs text-body">{result.tenantId}</span>

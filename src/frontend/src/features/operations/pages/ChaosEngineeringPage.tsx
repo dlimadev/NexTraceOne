@@ -104,8 +104,8 @@ function ExperimentResultCard({ result }: { result: CreateChaosExperimentRespons
             <Badge variant={RISK_VARIANT[result.riskLevel] ?? 'secondary'}>
               {t(`chaosEngineering.${result.riskLevel.toLowerCase()}` as never, { defaultValue: result.riskLevel })}
             </Badge>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">{result.serviceName}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">— {result.experimentType}</span>
+            <span className="text-sm font-medium text-heading">{result.serviceName}</span>
+            <span className="text-xs text-muted">— {result.experimentType}</span>
           </div>
           <span className="text-xs text-gray-400">{result.estimatedDurationSeconds}s / {result.targetPercentage}%</span>
         </div>
@@ -124,7 +124,7 @@ function ExperimentResultCard({ result }: { result: CreateChaosExperimentRespons
           {stepsOpen && (
             <ol className="mt-2 space-y-1 pl-5 list-decimal">
               {result.steps.map((step, i) => (
-                <li key={i} className="text-xs text-gray-600 dark:text-gray-400">{step}</li>
+                <li key={i} className="text-xs text-muted">{step}</li>
               ))}
             </ol>
           )}
@@ -169,8 +169,8 @@ function ExperimentSummaryCard({ experiment }: { experiment: ChaosExperimentSumm
             {new Date(experiment.createdAt).toLocaleString()}
           </span>
         </div>
-        <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">{experiment.serviceName}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{experiment.experimentType} — {experiment.environment}</p>
+        <p className="mt-2 text-sm font-medium text-heading">{experiment.serviceName}</p>
+        <p className="text-xs text-muted">{experiment.experimentType} — {experiment.environment}</p>
       </CardBody>
     </Card>
   );
@@ -197,7 +197,7 @@ export function ChaosEngineeringPage() {
   };
 
   const inputClass =
-    'w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
   const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
 
   return (

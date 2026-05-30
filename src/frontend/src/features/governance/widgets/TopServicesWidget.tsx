@@ -60,7 +60,7 @@ export function TopServicesWidget({ config, timeRange, title }: WidgetProps) {
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <ListOrdered size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
         <span className="ml-auto text-[10px] text-gray-400 shrink-0">

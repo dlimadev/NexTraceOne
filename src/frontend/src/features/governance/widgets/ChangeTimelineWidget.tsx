@@ -85,7 +85,7 @@ export function ChangeTimelineWidget({ config, timeRange, title }: WidgetProps) 
     <div className="h-full flex flex-col gap-1 p-1 overflow-hidden">
       <div className="flex items-center gap-2 mb-1">
         <GitCommit size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         <span className="ml-auto text-xs text-gray-400">{data.totalCount} total</span>
       </div>
 
@@ -98,11 +98,11 @@ export function ChangeTimelineWidget({ config, timeRange, title }: WidgetProps) 
           {items.map((ev) => (
             <div
               key={ev.changeId}
-              className="flex items-start gap-1.5 rounded bg-gray-50 dark:bg-gray-800/50 px-2 py-1"
+              className="flex items-start gap-1.5 rounded bg-elevated px-2 py-1"
             >
               {STATUS_ICON[ev.status] ?? defaultIcon()}
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-medium text-gray-900 dark:text-white truncate leading-tight">
+                <span className="text-xs font-medium text-heading truncate leading-tight">
                   {ev.title}
                 </span>
                 <span className="text-[10px] text-gray-400 truncate leading-tight">

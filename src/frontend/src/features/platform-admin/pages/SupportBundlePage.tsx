@@ -110,7 +110,7 @@ export function SupportBundlePage() {
       />
 
       {/* Info box — what's included */}
-      <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-3">
+      <div className="bg-accent/5 border border-accent/20 rounded-md p-4 space-y-3">
         <div className="flex items-center gap-2">
           <PackageOpen size={16} className="text-accent" />
           <span className="text-sm font-medium text-accent">{t('supportBundle.contentsTitle')}</span>
@@ -155,7 +155,7 @@ export function SupportBundlePage() {
 
       {/* Just-generated bundle download */}
       {generatedBundle && !generateMutation.isPending && (
-        <div className="flex items-center justify-between bg-success/10 border border-success/20 rounded-xl p-4">
+        <div className="flex items-center justify-between bg-success/10 border border-success/20 rounded-md p-4">
           <div className="flex items-center gap-3">
             <CheckCircle2 size={18} className="text-success" />
             <div>
@@ -188,7 +188,7 @@ export function SupportBundlePage() {
           </button>
         </div>
 
-        <div className="bg-card border border-border rounded-xl divide-y divide-border">
+        <div className="bg-card border border-border rounded-md divide-y divide-border">
           {listQuery.isLoading ? (
             <div className="flex items-center justify-center py-8 gap-2 text-muted">
               <Loader2 size={16} className="animate-spin" />

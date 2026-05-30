@@ -70,7 +70,7 @@ export function MtlsManagerPage() {
         {/* Revoke Confirm Dialog */}
         {revokeConfirmId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-card border border-edge rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="bg-card border border-edge rounded-md shadow-xl p-6 max-w-sm w-full mx-4">
               <div className="flex items-center gap-3 mb-4">
                 <AlertTriangle size={22} className="text-critical" />
                 <h2 className="text-lg font-semibold text-heading">{t('revokeConfirmTitle')}</h2>

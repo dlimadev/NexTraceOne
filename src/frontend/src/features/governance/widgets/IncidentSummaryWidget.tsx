@@ -48,7 +48,7 @@ export function IncidentSummaryWidget({ config, timeRange, title, environmentId 
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <AlertTriangle size={14} className="text-red-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         <span className="ml-auto text-xs font-semibold text-red-500">{data.totalCount} open</span>
       </div>
       <div className="flex-1 overflow-auto">

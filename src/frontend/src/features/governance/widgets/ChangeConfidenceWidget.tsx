@@ -52,7 +52,7 @@ export function ChangeConfidenceWidget({ config, environmentId, timeRange, title
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <ShieldCheck size={14} className="text-green-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         <span className="ml-auto text-xs font-semibold text-green-500">
           {t('governance.dashboardView.avgScore', 'Avg')}: {(data.averageConfidence ?? 0).toFixed(0)}%
         </span>

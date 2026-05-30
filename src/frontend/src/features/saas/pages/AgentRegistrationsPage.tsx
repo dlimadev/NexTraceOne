@@ -164,7 +164,7 @@ export function AgentRegistrationsPage() {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-edge rounded-xl overflow-hidden">
+        <div className="bg-card border border-edge rounded-md overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center text-faded text-sm">{t('loading')}</div>
           ) : agents.length === 0 && !isLoading ? (

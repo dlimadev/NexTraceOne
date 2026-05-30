@@ -84,7 +84,7 @@ export function OtelLogsWidget({
       {/* Header */}
       <div className="flex items-center gap-1.5 shrink-0">
         <ScrollText size={13} className="text-blue-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
         {severity && (
@@ -116,22 +116,22 @@ export function OtelLogsWidget({
         </div>
       ) : data && !data.isBackendAvailable ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <Settings size={18} className="text-faded" />
+          <span className="text-xs text-muted text-center">
             {t('obs.backendNotConfigured', 'Backend not configured')}
           </span>
         </div>
       ) : (data?.entries ?? []).length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-faded">
             {t('obs.logs.noData', 'No log entries')}
           </span>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-[10px] border-collapse">
-            <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <tr className="text-gray-500 dark:text-gray-400">
+            <thead className="sticky top-0 bg-card z-10">
+              <tr className="text-muted">
                 <th className="text-left pb-1 pr-1.5 font-medium whitespace-nowrap">
                   {t('obs.logs.colTime', 'Timestamp')}
                 </th>
@@ -172,7 +172,7 @@ export function OtelLogsWidget({
                       {entry.severity.toUpperCase().slice(0, 5)}
                     </span>
                   </td>
-                  <td className="py-0.5 pr-1.5 text-gray-500 dark:text-gray-400 truncate max-w-[80px]">
+                  <td className="py-0.5 pr-1.5 text-muted truncate max-w-[80px]">
                     {entry.serviceName ?? '—'}
                   </td>
                   <td className="py-0.5 max-w-[160px] truncate text-gray-700 dark:text-gray-300">

@@ -77,7 +77,7 @@ export function LicensingPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-28 bg-elevated rounded-xl animate-pulse" />
+              <div key={i} className="h-28 bg-elevated rounded-md animate-pulse" />
             ))}
           </div>
         ) : data ? (
@@ -200,7 +200,7 @@ export function LicensingPage() {
         {/* Upgrade confirmation modal */}
         {upgradeTarget && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-card rounded-xl shadow-xl p-6 w-full max-w-sm mx-4 border border-edge">
+            <div className="bg-card rounded-md shadow-xl p-6 w-full max-w-sm mx-4 border border-edge">
               <h3 className="text-lg font-semibold text-heading mb-2">
                 {t('confirmUpgrade')} {upgradeTarget}?
               </h3>

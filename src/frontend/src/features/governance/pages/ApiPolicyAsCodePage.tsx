@@ -111,7 +111,7 @@ export function ApiPolicyAsCodePage() {
   });
 
   const inputClass =
-    'w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
   const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
   const codeClass = `${inputClass} font-mono text-xs`;
 
@@ -134,7 +134,7 @@ export function ApiPolicyAsCodePage() {
               {ENFORCEMENT_MODES.map((mode) => (
                 <span
                   key={mode}
-                  className="rounded-full border border-gray-200 dark:border-gray-700 px-3 py-0.5 text-xs text-gray-600 dark:text-gray-400"
+                  className="rounded-full border border-edge px-3 py-0.5 text-xs text-muted"
                 >
                   {t(`apiPolicyAsCode.${mode.charAt(0).toLowerCase() + mode.slice(1)}` as never, {
                     defaultValue: mode,
@@ -345,7 +345,7 @@ export function ApiPolicyAsCodePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-sm font-medium text-heading">
                   {t('apiPolicyAsCode.isCompliant')}
                 </span>
                 <Badge variant={simulateResult.isCompliant ? 'success' : 'danger'}>

@@ -141,7 +141,7 @@ export function StatWidget({ config, timeRange, title }: WidgetProps) {
     <div
       className={`h-full flex flex-col items-center justify-center gap-1 p-2 rounded ${healthBg(data.healthScore)}`}
     >
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate max-w-full text-center">
+      <span className="text-xs font-medium text-muted truncate max-w-full text-center">
         {displayTitle}
       </span>
       <div className="flex items-end gap-1">

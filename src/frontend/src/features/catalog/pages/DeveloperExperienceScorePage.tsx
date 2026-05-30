@@ -83,7 +83,7 @@ function ScoreResultCard({ score }: { score: ScoreResponse }) {
       </CardHeader>
       <CardBody className="space-y-4">
         <div className="flex items-end gap-2">
-          <span className={`text-5xl font-bold ${SCORE_LEVEL_COLOR[score.scoreLevel] ?? 'text-gray-900 dark:text-white'}`}>
+          <span className={`text-5xl font-bold ${SCORE_LEVEL_COLOR[score.scoreLevel] ?? 'text-heading'}`}>
             {score.overallScore}
           </span>
           <span className="text-sm text-muted mb-1">

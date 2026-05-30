@@ -183,7 +183,7 @@ function ServiceMapFallbackList({ nodes }: { nodes: ServiceNode[] }): React.Reac
   return (
     <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-1">
       {nodes.length === 0 ? (
-        <span className="text-xs text-gray-400 dark:text-gray-500 self-center mt-4">
+        <span className="text-xs text-faded self-center mt-4">
           {t('obs.serviceMap.noServices', 'No services')}
         </span>
       ) : (
@@ -200,7 +200,7 @@ function ServiceMapFallbackList({ nodes }: { nodes: ServiceNode[] }): React.Reac
             <span className="text-[11px] text-gray-700 dark:text-gray-300 truncate flex-1">
               {node.name}
             </span>
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
+            <span className="text-[10px] text-faded tabular-nums shrink-0">
               {node.traceCount} {t('obs.serviceMap.traces', 'traces')}
             </span>
           </div>
@@ -258,7 +258,7 @@ export function OtelServiceMapWidget({
       <div className="h-full flex flex-col gap-1 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
           <Network size={13} className="text-indigo-500 shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-xs font-semibold text-heading truncate">
             {displayTitle}
           </span>
         </div>
@@ -291,13 +291,13 @@ export function OtelServiceMapWidget({
       <div className="h-full flex flex-col gap-1 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
           <Network size={13} className="text-indigo-500 shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-xs font-semibold text-heading truncate">
             {displayTitle}
           </span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <Settings size={18} className="text-faded" />
+          <span className="text-xs text-muted text-center">
             {t('obs.backendNotConfigured', 'Backend not configured')}
           </span>
         </div>
@@ -313,10 +313,10 @@ export function OtelServiceMapWidget({
       {/* Header */}
       <div className="flex items-center gap-1.5 shrink-0">
         <Network size={13} className="text-indigo-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
-        <span className="ml-auto text-[10px] text-gray-400 dark:text-gray-500">
+        <span className="ml-auto text-[10px] text-faded">
           {nodes.length} {t('obs.serviceMap.services', 'services')}
         </span>
       </div>
@@ -324,7 +324,7 @@ export function OtelServiceMapWidget({
       {/* Chart / list */}
       {nodes.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-faded">
             {t('obs.serviceMap.noData', 'No service data')}
           </span>
         </div>
@@ -336,7 +336,7 @@ export function OtelServiceMapWidget({
 
       {/* Footer — observability backend info */}
       {backendName && (
-        <div className="shrink-0 text-[9px] text-gray-400 dark:text-gray-500 text-right">
+        <div className="shrink-0 text-[9px] text-faded text-right">
           {t('obs.backendInfo', 'Data: {{backend}}', { backend: backendName })}
         </div>
       )}

@@ -48,7 +48,7 @@ export function KnowledgeGraphWidget({ config, timeRange, title }: WidgetProps) 
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <BookOpen size={14} className="text-purple-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.slice(0, 5).map((item) => (

@@ -38,8 +38,8 @@ export function ServiceScorecardWidget({ config, timeRange, title }: WidgetProps
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <Star size={14} className="text-yellow-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
-        <span className="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
+        <span className="ml-auto text-xs font-medium text-muted">
           {t('governance.dashboardView.avgScore', 'Avg')}: {data.averageScore?.toFixed(0) ?? '—'}
         </span>
       </div>
@@ -47,7 +47,7 @@ export function ServiceScorecardWidget({ config, timeRange, title }: WidgetProps
         {data.items.slice(0, 5).map((s) => (
           <div key={s.serviceName} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
             <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{s.serviceName}</span>
-            <span className="text-xs font-semibold tabular-nums text-gray-900 dark:text-white">
+            <span className="text-xs font-semibold tabular-nums text-heading">
               {s.finalScore} <span className="font-normal text-gray-400">/ 100</span>
             </span>
           </div>

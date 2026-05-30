@@ -184,7 +184,7 @@ export function ScorecardSection({ contractVersionId, className = '' }: Scorecar
         <CardBody>
           <div className="flex flex-col md:flex-row items-center gap-8">
             <OverallGauge score={scorecard.overallScore} />
-            <div className={`flex-1 rounded-xl p-4 ${scoreBgLight(scorecard.overallScore)}`}>
+            <div className={`flex-1 rounded-md p-4 ${scoreBgLight(scorecard.overallScore)}`}>
               <p className="text-xs text-body leading-relaxed">
                 {scorecard.overallScore >= 0.8
                   ? t('contracts.scorecard.overall.high', 'This contract has a high quality score. It is well-documented, structurally complete, and follows best practices.')

@@ -43,11 +43,11 @@ export function NotebooksPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
             <BookOpen className="h-6 w-6 text-indigo-500" />
             {t('notebook.title')}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-muted mt-1">
             {t('notebook.emptyHint')}
           </p>
         </div>
@@ -91,7 +91,7 @@ export function NotebooksPage() {
             <Card key={nb.notebookId} className="p-4 hover:shadow-md transition-shadow">
               <Link to={`/governance/notebooks/${nb.notebookId}`} className="block">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                  <h3 className="font-semibold text-heading truncate">
                     {nb.title}
                   </h3>
                   <Badge variant={STATUS_COLORS[nb.status] ?? 'gray'} size="sm">
@@ -100,12 +100,12 @@ export function NotebooksPage() {
                 </div>
 
                 {nb.description && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-3">
+                  <p className="text-sm text-muted line-clamp-2 mb-3">
                     {nb.description}
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+                <div className="flex items-center gap-4 text-xs text-faded">
                   <span className="flex items-center gap-1">
                     <Layers className="h-3 w-3" />
                     {t('notebook.cellCount', { count: nb.cellCount })}

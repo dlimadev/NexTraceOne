@@ -81,7 +81,7 @@ export function DeploymentFrequencyWidget({ config, timeRange, title }: WidgetPr
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <Rocket size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         <span className={`ml-auto text-xs font-medium ${ratingColor}`}>
           {data.deploymentFrequency.rating}
         </span>
@@ -103,7 +103,7 @@ export function DeploymentFrequencyWidget({ config, timeRange, title }: WidgetPr
         ))}
       </div>
 
-      <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-between text-[10px] text-muted">
         <span>{data.deploymentFrequency.value} / {data.deploymentFrequency.unit}</span>
         <span>{t('governance.dashboardView.timeRange.label', timeRange)}</span>
       </div>

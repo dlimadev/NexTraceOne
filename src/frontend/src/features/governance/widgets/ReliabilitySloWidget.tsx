@@ -44,7 +44,7 @@ export function ReliabilitySloWidget({ config, environmentId, timeRange, title }
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <CheckCircle size={14} className="text-green-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.slice(0, 5).map((item) => (
@@ -55,7 +55,7 @@ export function ReliabilitySloWidget({ config, environmentId, timeRange, title }
                 {item.sloActual?.toFixed(2)}%
               </span>
             </div>
-            <div className="mt-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <div className="mt-1 h-1 rounded-full bg-elevated overflow-hidden">
               <div
                 className={`h-full rounded-full ${item.sloActual >= item.sloTarget ? 'bg-green-500' : 'bg-red-500'}`}
                 style={{ width: `${Math.min(100, item.sloActual ?? 0)}%` }}

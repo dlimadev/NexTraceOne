@@ -86,7 +86,7 @@ const ScoreBar = ({ score }: { score: number }) => {
     score >= 60 ? 'bg-amber-400' : 'bg-red-400';
 
   return (
-    <div className="relative h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+    <div className="relative h-2 w-full rounded-full bg-elevated">
       <div
         className={`h-2 rounded-full transition-all ${color}`}
         style={{ width: `${score}%` }}
@@ -154,12 +154,12 @@ export function ServiceScorecardPage() {
                   value={teamFilter}
                   onChange={(e) => setTeamFilter(e.target.value)}
                   placeholder={t('governance.scorecard.filterByTeam')}
-                  className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+                  className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
                 />
                 <select
                   value={levelFilter}
                   onChange={(e) => setLevelFilter(e.target.value)}
-                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-2"
+                  className="rounded border border-edge bg-card text-sm px-2 py-2"
                 >
                   <option value="">{t('governance.scorecard.allLevels')}</option>
                   {['Gold', 'Silver', 'Bronze', 'Below Standard'].map((l) => (
@@ -215,11 +215,11 @@ export function ServiceScorecardPage() {
                     <CardBody className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <p className="font-medium text-sm text-gray-900 dark:text-white">{item.serviceName}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{item.teamName}</p>
+                          <p className="font-medium text-sm text-heading">{item.serviceName}</p>
+                          <p className="text-xs text-muted">{item.teamName}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900 dark:text-white">{item.finalScore}</span>
+                          <span className="text-lg font-bold text-heading">{item.finalScore}</span>
                           <Badge variant={LEVEL_VARIANT[item.maturityLevel] ?? 'secondary'}>
                             {item.maturityLevel}
                           </Badge>
@@ -243,7 +243,7 @@ export function ServiceScorecardPage() {
                   >
                     {t('common.previous')}
                   </Button>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-muted">
                     {t('common.pageOf', { page, total: Math.ceil(listQuery.data.totalCount / listQuery.data.pageSize) })}
                   </span>
                   <Button
@@ -273,12 +273,12 @@ export function ServiceScorecardPage() {
                   onChange={(e) => setServiceInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder={t('governance.scorecard.serviceNamePlaceholder')}
-                  className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+                  className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
                 />
                 <select
                   value={periodDays}
                   onChange={(e) => setPeriodDays(Number(e.target.value))}
-                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-2"
+                  className="rounded border border-edge bg-card text-sm px-2 py-2"
                 >
                   {[7, 30, 60, 90].map((d) => (
                     <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
@@ -304,13 +304,13 @@ export function ServiceScorecardPage() {
             <>
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-heading">
                     {detailQuery.data.serviceName}
                   </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{detailQuery.data.summary}</p>
+                  <p className="text-sm text-muted">{detailQuery.data.summary}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">{detailQuery.data.finalScore}</p>
+                  <p className="text-3xl font-bold text-heading">{detailQuery.data.finalScore}</p>
                   <Badge variant={LEVEL_VARIANT[detailQuery.data.maturityLevel] ?? 'secondary'}>
                     {detailQuery.data.maturityLevel}
                   </Badge>
@@ -323,11 +323,11 @@ export function ServiceScorecardPage() {
                     <Card key={dim.name}>
                       <CardBody className="p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">{dim.name}</p>
-                          <span className="text-lg font-bold text-gray-900 dark:text-white">{dim.score}</span>
+                          <p className="text-sm font-medium text-heading">{dim.name}</p>
+                          <span className="text-lg font-bold text-heading">{dim.score}</span>
                         </div>
                         <ScoreBar score={dim.score} />
-                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{dim.note}</p>
+                        <p className="mt-2 text-xs text-muted">{dim.note}</p>
                       </CardBody>
                     </Card>
                   ))}
@@ -337,7 +337,7 @@ export function ServiceScorecardPage() {
           )}
 
           {!searchedService && !detailQuery.isLoading && (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-12 text-muted">
               <Star size={40} className="mx-auto mb-3 opacity-40" />
               <p>{t('governance.scorecard.enterServiceName')}</p>
             </div>

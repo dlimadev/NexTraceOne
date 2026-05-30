@@ -53,8 +53,8 @@ export function AlertStatusWidget({ config, timeRange, title }: WidgetProps) {
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <AlertTriangle size={14} className="text-orange-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
-        <span className="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
+        <span className="ml-auto text-xs font-medium text-muted">
           {t('governance.dashboardView.alertTotal', 'Total')}: {data.total}
         </span>
       </div>

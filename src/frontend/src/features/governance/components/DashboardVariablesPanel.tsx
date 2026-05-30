@@ -104,7 +104,7 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
       <button
         type="button"
         onClick={() => setIsOpen(v => !v)}
-        className="flex items-center gap-1.5 rounded border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:border-accent transition-colors min-w-[120px]"
+        className="flex items-center gap-1.5 rounded border border-edge bg-card px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:border-accent transition-colors min-w-[120px]"
       >
         <span className="font-medium text-accent">${variable.key}</span>
         <span className="truncate max-w-[100px]">{displayLabel}</span>
@@ -112,16 +112,16 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl">
+        <div className="absolute top-full left-0 z-50 mt-1 w-56 rounded-lg border border-edge bg-card shadow-xl">
           <div className="p-2 border-b border-gray-100 dark:border-gray-800">
-            <div className="flex items-center gap-1 rounded border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-1.5 py-1">
+            <div className="flex items-center gap-1 rounded border border-edge bg-elevated px-1.5 py-1">
               <Search size={10} className="text-gray-400 shrink-0" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('common.search', 'Search...')}
-                className="bg-transparent text-xs text-gray-900 dark:text-white focus:outline-none w-full"
+                className="bg-transparent text-xs text-heading focus:outline-none w-full"
                 autoFocus
               />
             </div>
@@ -131,9 +131,9 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
               <button
                 type="button"
                 onClick={() => onChange([])}
-                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-muted hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
               >
-                <span className={`w-3.5 h-3.5 rounded border ${selected.length === 0 ? 'bg-accent border-accent' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center`}>
+                <span className={`w-3.5 h-3.5 rounded border ${selected.length === 0 ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center`}>
                   {selected.length === 0 && <Check size={10} className="text-white" />}
                 </span>
                 {t('governance.dashboardView.varAll', 'All')}
@@ -147,11 +147,11 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
                 className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
               >
                 {variable.allowMultiple ? (
-                  <span className={`w-3.5 h-3.5 rounded border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center shrink-0`}>
+                  <span className={`w-3.5 h-3.5 rounded border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center shrink-0`}>
                     {selected.includes(val) && <Check size={10} className="text-white" />}
                   </span>
                 ) : (
-                  <span className={`w-3.5 h-3.5 rounded-full border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center shrink-0`}>
+                  <span className={`w-3.5 h-3.5 rounded-full border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center shrink-0`}>
                     {selected.includes(val) && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </span>
                 )}

@@ -165,21 +165,21 @@ export function AlertsPage() {
         {data && (
           <div className="grid grid-cols-3 gap-4">
             <div
-              className={`bg-card border rounded-xl p-4 cursor-pointer transition-all ${statusFilter === 'Firing' ? 'border-critical/40 shadow-sm' : 'border-edge hover:border-edge-strong'}`}
+              className={`bg-card border rounded-md p-4 cursor-pointer transition-all ${statusFilter === 'Firing' ? 'border-critical/40 shadow-sm' : 'border-edge hover:border-edge-strong'}`}
               onClick={() => setStatusFilter(statusFilter === 'Firing' ? undefined : 'Firing')}
             >
               <div className="text-sm text-muted">{t('firing')}</div>
               <div className="text-2xl font-bold text-critical">{data.firingCount}</div>
             </div>
             <div
-              className={`bg-card border rounded-xl p-4 cursor-pointer transition-all ${statusFilter === 'Resolved' ? 'border-success/40 shadow-sm' : 'border-edge hover:border-edge-strong'}`}
+              className={`bg-card border rounded-md p-4 cursor-pointer transition-all ${statusFilter === 'Resolved' ? 'border-success/40 shadow-sm' : 'border-edge hover:border-edge-strong'}`}
               onClick={() => setStatusFilter(statusFilter === 'Resolved' ? undefined : 'Resolved')}
             >
               <div className="text-sm text-muted">{t('resolved')}</div>
               <div className="text-2xl font-bold text-success">{data.resolvedCount}</div>
             </div>
             <div
-              className={`bg-card border rounded-xl p-4 cursor-pointer transition-all ${statusFilter === 'Silenced' ? 'border-edge-strong shadow-sm' : 'border-edge hover:border-edge-strong'}`}
+              className={`bg-card border rounded-md p-4 cursor-pointer transition-all ${statusFilter === 'Silenced' ? 'border-edge-strong shadow-sm' : 'border-edge hover:border-edge-strong'}`}
               onClick={() => setStatusFilter(statusFilter === 'Silenced' ? undefined : 'Silenced')}
             >
               <div className="text-sm text-muted">{t('silenced')}</div>
@@ -220,7 +220,7 @@ export function AlertsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-card border border-edge rounded-xl overflow-hidden">
+        <div className="bg-card border border-edge rounded-md overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center text-faded text-sm">{t('loading')}</div>
           ) : alerts.length === 0 && !isLoading ? (

@@ -171,7 +171,7 @@ function ConfigHealthTab() {
           { label: t('platformHealth.config.warning'), count: counts.warning, variant: 'warning' as const },
           { label: t('platformHealth.config.degraded'), count: counts.degraded, variant: 'danger' as const },
         ].map(({ label, count, variant }) => (
-          <div key={label} className="bg-surface border border-border rounded-xl p-3 text-center">
+          <div key={label} className="bg-surface border border-border rounded-md p-3 text-center">
             <p className="text-2xl font-bold text-heading">{count}</p>
             <Badge variant={variant} className="mt-1 text-xs">{label}</Badge>
           </div>
@@ -230,7 +230,7 @@ function MigrationsTab() {
   return (
     <div className="space-y-4">
       {/* Summary banner */}
-      <div className={`rounded-xl p-4 border ${data.totalPending === 0 ? 'bg-success/5 border-success/20' : data.isSafeToApply ? 'bg-warning/5 border-warning/20' : 'bg-critical/5 border-critical/20'}`}>
+      <div className={`rounded-md p-4 border ${data.totalPending === 0 ? 'bg-success/5 border-success/20' : data.isSafeToApply ? 'bg-warning/5 border-warning/20' : 'bg-critical/5 border-critical/20'}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {data.totalPending === 0
@@ -349,7 +349,7 @@ export function PlatformHealthDashboardPage() {
             <a
               key={to}
               href={to}
-              className="flex items-center justify-between px-4 py-3 bg-surface border border-border rounded-xl hover:border-accent/40 transition-colors"
+              className="flex items-center justify-between px-4 py-3 bg-surface border border-border rounded-md hover:border-accent/40 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <span className={color}>{icon}</span>

@@ -91,7 +91,7 @@ export function AutoDocumentationPage() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('knowledge.autoDoc.serviceNamePlaceholder')}
-              className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+              className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
             />
             <Button onClick={handleSearch} disabled={!inputValue.trim()}>
               <Search size={14} className="mr-1" />
@@ -106,7 +106,7 @@ export function AutoDocumentationPage() {
                 className={`flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition-colors ${
                   selectedSections.includes(key)
                     ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                    : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400'
+                    : 'border-edge text-muted'
                 }`}
               >
                 {SECTION_ICONS[key]}
@@ -124,8 +124,8 @@ export function AutoDocumentationPage() {
         <>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{data.serviceName}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <h2 className="text-lg font-semibold text-heading">{data.serviceName}</h2>
+              <p className="text-sm text-muted">
                 {t('knowledge.autoDoc.generatedAt', { date: new Date(data.generatedAt).toLocaleString() })}
               </p>
             </div>
@@ -149,7 +149,7 @@ export function AutoDocumentationPage() {
                   </CardBody>
                 </Card>
               ) : (
-                <div className="rounded border border-dashed border-gray-300 dark:border-gray-600 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                <div className="rounded border border-dashed border-edge py-6 text-center text-sm text-muted">
                   {t('knowledge.autoDoc.sectionUnavailable')}
                 </div>
               )}
@@ -159,7 +159,7 @@ export function AutoDocumentationPage() {
       )}
 
       {!serviceName && !isLoading && (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-12 text-muted">
           <FileText size={40} className="mx-auto mb-3 opacity-40" />
           <p>{t('knowledge.autoDoc.enterServiceName')}</p>
         </div>

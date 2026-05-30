@@ -69,7 +69,7 @@ export function OtelErrorRateWidget({
       <div className="h-full flex flex-col gap-2 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
           <AlertTriangle size={13} className="text-orange-500 shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-xs font-semibold text-heading truncate">
             {displayTitle}
           </span>
         </div>
@@ -106,13 +106,13 @@ export function OtelErrorRateWidget({
       <div className="h-full flex flex-col gap-2 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
           <AlertTriangle size={13} className="text-orange-500 shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-xs font-semibold text-heading truncate">
             {displayTitle}
           </span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <Settings size={18} className="text-faded" />
+          <span className="text-xs text-muted text-center">
             {t('obs.backendNotConfigured', 'Backend not configured')}
           </span>
         </div>
@@ -133,7 +133,7 @@ export function OtelErrorRateWidget({
           size={13}
           className={hasErrors ? 'text-red-500 shrink-0' : 'text-emerald-500 shrink-0'}
         />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
       </div>
@@ -189,7 +189,7 @@ export function OtelErrorRateWidget({
                 </span>
               </div>
               {/* Proportional count bar */}
-              <div className="h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-elevated rounded-full overflow-hidden">
                 <div
                   className="h-full bg-red-400 dark:bg-red-500 rounded-full transition-all"
                   style={{ width: countBarWidth(error.count, maxCount) }}
@@ -199,7 +199,7 @@ export function OtelErrorRateWidget({
                   aria-label={error.message}
                 />
               </div>
-              <span className="text-[9px] text-gray-400 dark:text-gray-500">
+              <span className="text-[9px] text-faded">
                 {error.serviceName}
               </span>
             </div>
@@ -208,7 +208,7 @@ export function OtelErrorRateWidget({
       )}
 
       {/* Footer */}
-      <div className="shrink-0 text-[9px] text-gray-400 dark:text-gray-500 text-right">
+      <div className="shrink-0 text-[9px] text-faded text-right">
         {environment} · {timeRange}
       </div>
     </div>

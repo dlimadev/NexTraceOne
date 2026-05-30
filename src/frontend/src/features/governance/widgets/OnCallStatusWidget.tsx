@@ -41,14 +41,14 @@ export function OnCallStatusWidget({ config, title }: WidgetProps) {
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <Phone size={14} className="text-indigo-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <div className="flex-1 overflow-auto">
         {data.entries.map((e) => (
           <div key={e.teamName} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
             <div>
-              <div className="text-xs font-medium text-gray-900 dark:text-white">{e.teamName}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{e.oncallName}</div>
+              <div className="text-xs font-medium text-heading">{e.teamName}</div>
+              <div className="text-xs text-muted">{e.oncallName}</div>
             </div>
             <span className="text-xs text-gray-400">{e.until}</span>
           </div>

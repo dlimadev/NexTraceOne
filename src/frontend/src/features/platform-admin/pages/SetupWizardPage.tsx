@@ -128,7 +128,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
     case 'welcome':
       return (
         <div className="space-y-4">
-          <div className="bg-accent/5 border border-accent/20 rounded-xl p-4">
+          <div className="bg-accent/5 border border-accent/20 rounded-md p-4">
             <p className="text-sm text-muted">{t('setup.welcome.introText')}</p>
           </div>
           <ul className="space-y-2">
@@ -248,7 +248,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
       const aiMode = formData['ai_deployment_mode'] ?? 'local';
       return (
         <div className="space-y-4">
-          <div className="bg-accent/5 border border-accent/20 rounded-xl p-3">
+          <div className="bg-accent/5 border border-accent/20 rounded-md p-3">
             <p className="text-xs text-muted">{t('setup.ai.intro')}</p>
           </div>
 
@@ -492,7 +492,7 @@ export function SetupWizardPage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">
       {/* Header */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-xl mb-3">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-md mb-3">
           <Server size={22} className="text-accent" />
         </div>
         <h1 className="text-xl font-bold text-heading">{t('setup.title')}</h1>

@@ -113,10 +113,10 @@ export function AiComposeDashboardModal({
             <Bot className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-heading">
               {t('aiCompose.title')}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{t('aiCompose.subtitle')}</p>
+            <p className="text-sm text-muted">{t('aiCompose.subtitle')}</p>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ export function AiComposeDashboardModal({
               {t('aiCompose.promptLabel')}
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-heading placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={4}
               placeholder={t('aiCompose.promptPlaceholder')}
               value={prompt}
@@ -169,7 +169,7 @@ export function AiComposeDashboardModal({
               <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                 {t('aiCompose.proposalTitle')}
               </div>
-              <div className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="text-base font-semibold text-heading flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4 text-indigo-500" />
                 {proposal.proposedTitle}
               </div>
@@ -210,7 +210,7 @@ export function AiComposeDashboardModal({
             </div>
 
             {/* Actions */}
-            <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center pt-2 border-t border-edge">
               <Button
                 variant="ghost"
                 size="sm"
@@ -253,7 +253,7 @@ function WidgetProposalRow({
     <div
       className={`flex items-center gap-3 p-2 rounded-lg border transition-colors cursor-pointer ${
         removed
-          ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-50'
+          ? 'border-edge bg-elevated opacity-50'
           : 'border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20'
       }`}
       onClick={onToggle}
@@ -264,10 +264,10 @@ function WidgetProposalRow({
         <CheckCircle className="h-4 w-4 text-indigo-500 shrink-0" />
       )}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+        <div className="text-sm font-medium text-heading truncate">
           {widget.title ?? widget.widgetType}
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="text-xs text-muted">
           {widget.widgetType}
           {widget.serviceFilter ? ` · ${widget.serviceFilter}` : ''}
           {` · ${widget.gridWidth}×${widget.gridHeight}`}

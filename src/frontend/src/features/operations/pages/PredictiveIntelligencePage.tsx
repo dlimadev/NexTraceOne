@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { BrainCircuit } from 'lucide-react';
@@ -93,7 +93,7 @@ function ServiceFailurePredictionForm() {
   });
 
   const inputClass =
-    'w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
   const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
 
   return (
@@ -213,7 +213,7 @@ function ServiceFailurePredictionForm() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{result.serviceName}</span>
+              <span className="text-sm font-medium text-heading">{result.serviceName}</span>
               <Badge variant={RISK_VARIANT[result.riskLevel] ?? 'secondary'}>
                 {t(`predictiveIntelligence.${result.riskLevel.toLowerCase()}` as never, {
                   defaultValue: result.riskLevel,
@@ -223,11 +223,11 @@ function ServiceFailurePredictionForm() {
           </CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-end gap-2">
-              <span className="text-5xl font-bold text-gray-900 dark:text-white">
+              <span className="text-5xl font-bold text-heading">
                 {result.failureProbabilityPercent}
                 <span className="text-2xl">%</span>
               </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              <span className="text-sm text-muted mb-1">
                 {t('predictiveIntelligence.failureProbability')}
               </span>
             </div>
@@ -263,7 +263,7 @@ function ServiceFailurePredictionForm() {
       )}
 
       {!result && !mutation.isPending && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t('predictiveIntelligence.noResult')}</p>
+        <p className="text-sm text-muted">{t('predictiveIntelligence.noResult')}</p>
       )}
     </div>
   );
@@ -301,7 +301,7 @@ function ChangeRiskAssessmentForm() {
   });
 
   const inputClass =
-    'w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
   const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
   const checkboxClass = 'mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-400';
 
@@ -413,7 +413,7 @@ function ChangeRiskAssessmentForm() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{result.serviceId}</span>
+              <span className="text-sm font-medium text-heading">{result.serviceId}</span>
               <Badge variant={RISK_VARIANT[result.riskLevel] ?? 'secondary'}>
                 {t(`predictiveIntelligence.${result.riskLevel.toLowerCase()}` as never, {
                   defaultValue: result.riskLevel,
@@ -423,8 +423,8 @@ function ChangeRiskAssessmentForm() {
           </CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-end gap-2">
-              <span className="text-5xl font-bold text-gray-900 dark:text-white">{result.riskScore}</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              <span className="text-5xl font-bold text-heading">{result.riskScore}</span>
+              <span className="text-sm text-muted mb-1">
                 {t('predictiveIntelligence.riskScore')}
               </span>
             </div>
@@ -469,7 +469,7 @@ function ChangeRiskAssessmentForm() {
       )}
 
       {!result && !mutation.isPending && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t('predictiveIntelligence.noResult')}</p>
+        <p className="text-sm text-muted">{t('predictiveIntelligence.noResult')}</p>
       )}
     </div>
   );
@@ -487,7 +487,7 @@ export function PredictiveIntelligencePage() {
     `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors ${
       activeTab === tab
         ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+        : 'border-transparent text-muted hover:text-gray-900 dark:hover:text-white'
     }`;
 
   return (
@@ -499,7 +499,7 @@ export function PredictiveIntelligencePage() {
       />
 
       <PageSection title={t('predictiveIntelligence.analysisPanel')}>
-        <div className="mb-4 flex gap-1 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-4 flex gap-1 border-b border-edge">
           <button
             type="button"
             className={tabClass('serviceFailure')}

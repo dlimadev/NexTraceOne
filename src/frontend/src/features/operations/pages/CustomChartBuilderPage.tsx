@@ -191,12 +191,12 @@ export function CustomChartBuilderPage() {
               <Card key={chart.chartId}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm text-gray-900 dark:text-white">{chart.name}</span>
+                    <span className="font-medium text-sm text-heading">{chart.name}</span>
                     <Badge variant={CHART_TYPE_COLORS[chart.chartType]}>{chart.chartType}</Badge>
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  <p className="text-xs text-muted mb-3">
                     {t('customCharts.timeRange')}: {chart.timeRange}
                   </p>
                   <div className="flex justify-end">
@@ -218,11 +218,11 @@ export function CustomChartBuilderPage() {
       {/* Builder Modal */}
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-lg p-6">
+            <h2 className="text-lg font-semibold text-heading mb-1">
               {t('customCharts.builder.title')}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+            <p className="text-sm text-muted mb-5">
               {t('customCharts.builder.step', { step: builder.step, total: 5 })}
             </p>
 
@@ -239,7 +239,7 @@ export function CustomChartBuilderPage() {
                       className={`text-sm border rounded-lg p-3 text-left transition-colors ${
                         builder.source === src
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                          : 'border-edge hover:border-blue-300'
                       }`}
                     >
                       {src}
@@ -262,7 +262,7 @@ export function CustomChartBuilderPage() {
                       className={`text-sm border rounded-lg p-3 text-left transition-colors ${
                         builder.chartType === ct
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                          : 'border-edge hover:border-blue-300'
                       }`}
                     >
                       {ct}
@@ -278,25 +278,25 @@ export function CustomChartBuilderPage() {
                   {t('customCharts.builder.defineFilters')}
                 </p>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('customCharts.builder.groupBy')}
                   </label>
                   <input
                     type="text"
                     value={builder.groupBy}
                     onChange={(e) => setBuilder((b) => ({ ...b, groupBy: e.target.value }))}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                     placeholder={t('customCharts.builder.groupByPlaceholder')}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted mb-1 block">
                     {t('customCharts.builder.timeRange')}
                   </label>
                   <select
                     value={builder.timeRange}
                     onChange={(e) => setBuilder((b) => ({ ...b, timeRange: e.target.value as TimeRange }))}
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                   >
                     {TIME_RANGES.map((tr) => (
                       <option key={tr} value={tr}>{tr}</option>
@@ -311,7 +311,7 @@ export function CustomChartBuilderPage() {
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   {t('customCharts.builder.preview')}
                 </p>
-                <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 flex items-center justify-center">
+                <div className="border border-dashed border-edge rounded-lg p-8 flex items-center justify-center">
                   <div className="text-center text-gray-400">
                     <BarChart2 className="w-10 h-10 mx-auto mb-2" />
                     <p className="text-sm">{builder.source} / {builder.chartType} / {builder.timeRange}</p>
@@ -329,7 +329,7 @@ export function CustomChartBuilderPage() {
                   type="text"
                   value={builder.name}
                   onChange={(e) => setBuilder((b) => ({ ...b, name: e.target.value }))}
-                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
                   placeholder={t('customCharts.builder.namePlaceholder')}
                   autoFocus
                 />

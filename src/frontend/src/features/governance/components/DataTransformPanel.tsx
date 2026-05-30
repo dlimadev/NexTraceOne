@@ -48,14 +48,14 @@ function FilterTransformConfig({ config, onChange }: { config: Record<string, un
         <button
           type="button"
           onClick={() => onChange({ ...config, mode: 'include' })}
-          className={`text-[10px] px-2 py-1 rounded border ${mode === 'include' ? 'bg-accent text-white border-accent' : 'border-gray-300 dark:border-gray-600'}`}
+          className={`text-[10px] px-2 py-1 rounded border ${mode === 'include' ? 'bg-accent text-white border-accent' : 'border-edge'}`}
         >
           {t('transforms.include', 'Include')}
         </button>
         <button
           type="button"
           onClick={() => onChange({ ...config, mode: 'exclude' })}
-          className={`text-[10px] px-2 py-1 rounded border ${mode === 'exclude' ? 'bg-accent text-white border-accent' : 'border-gray-300 dark:border-gray-600'}`}
+          className={`text-[10px] px-2 py-1 rounded border ${mode === 'exclude' ? 'bg-accent text-white border-accent' : 'border-edge'}`}
         >
           {t('transforms.exclude', 'Exclude')}
         </button>
@@ -65,7 +65,7 @@ function FilterTransformConfig({ config, onChange }: { config: Record<string, un
         value={pattern}
         onChange={(e) => onChange({ ...config, pattern: e.target.value })}
         placeholder={t('transforms.patternPlaceholder', 'Field name pattern (e.g., cpu_* or *memory*)')}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+        className="w-full rounded border border-edge bg-card text-xs px-2 py-1 text-heading focus:outline-none focus:border-accent"
       />
     </div>
   );
@@ -83,14 +83,14 @@ function CalculateTransformConfig({ config, onChange }: { config: Record<string,
         value={alias}
         onChange={(e) => onChange({ ...config, alias: e.target.value })}
         placeholder={t('transforms.aliasPlaceholder', 'New field name')}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+        className="w-full rounded border border-edge bg-card text-xs px-2 py-1 text-heading focus:outline-none focus:border-accent"
       />
       <input
         type="text"
         value={expression}
         onChange={(e) => onChange({ ...config, expression: e.target.value })}
         placeholder={t('transforms.expressionPlaceholder', 'Expression: $A + $B or $value * 100')}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white font-mono focus:outline-none focus:border-accent"
+        className="w-full rounded border border-edge bg-card text-xs px-2 py-1 text-heading font-mono focus:outline-none focus:border-accent"
       />
     </div>
   );
@@ -108,12 +108,12 @@ function GroupByTransformConfig({ config, onChange }: { config: Record<string, u
         value={field}
         onChange={(e) => onChange({ ...config, field: e.target.value })}
         placeholder={t('transforms.groupByField', 'Group by field')}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+        className="w-full rounded border border-edge bg-card text-xs px-2 py-1 text-heading focus:outline-none focus:border-accent"
       />
       <select
         value={aggregation}
         onChange={(e) => onChange({ ...config, aggregation: e.target.value })}
-        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+        className="w-full rounded border border-edge bg-card text-xs px-2 py-1 text-heading focus:outline-none focus:border-accent"
       >
         <option value="sum">Sum</option>
         <option value="avg">Average</option>
@@ -177,9 +177,9 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
   }, [transforms, onChange]);
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+    <div className="border-t border-edge pt-2 mt-2">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <p className="text-xs font-semibold text-muted uppercase tracking-wide">
           {t('transforms.title', 'Transformations')}
         </p>
         <button
@@ -199,7 +199,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
               key={def.type}
               type="button"
               onClick={() => addTransform(def.type)}
-              className="flex flex-col items-start gap-0.5 rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-1.5 text-left hover:border-accent transition-colors"
+              className="flex flex-col items-start gap-0.5 rounded border border-edge bg-elevated p-1.5 text-left hover:border-accent transition-colors"
             >
               <span className="flex items-center gap-1 text-[10px] font-medium text-gray-700 dark:text-gray-300">
                 {def.icon}
@@ -217,7 +217,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
           return (
             <div
               key={transform.id}
-              className={`rounded border ${transform.enabled ? 'border-gray-200 dark:border-gray-700' : 'border-gray-100 dark:border-gray-800 opacity-50'} bg-white dark:bg-gray-900`}
+              className={`rounded border ${transform.enabled ? 'border-edge' : 'border-gray-100 dark:border-gray-800 opacity-50'} bg-card`}
             >
               <div className="flex items-center gap-1 px-2 py-1">
                 <GripVertical size={10} className="text-gray-300 cursor-grab" />

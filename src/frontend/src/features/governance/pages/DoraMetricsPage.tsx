@@ -148,13 +148,13 @@ export function DoraMetricsPage() {
         icon={<Activity size={24} />}
         actions={
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">
+            <label className="text-sm text-muted">
               {t('governance.dora.period')}:
             </label>
             <select
               value={periodDays}
               onChange={(e) => setPeriodDays(Number(e.target.value))}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-1"
+              className="rounded border border-edge bg-card text-sm px-2 py-1"
             >
               {[7, 30, 60, 90].map((d) => (
                 <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
@@ -189,10 +189,10 @@ export function DoraMetricsPage() {
                 </div>
               </CardHeader>
               <CardBody className="pt-2">
-                <p className={`text-3xl font-bold ${RATING_COLOR[metric.rating] ?? 'text-gray-900 dark:text-white'}`}>
+                <p className={`text-3xl font-bold ${RATING_COLOR[metric.rating] ?? 'text-heading'}`}>
                   {metric.value} <span className="text-sm font-normal text-gray-400">{metric.unit}</span>
                 </p>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{metric.description}</p>
+                <p className="mt-1 text-xs text-muted">{metric.description}</p>
               </CardBody>
             </Card>
           ))}
@@ -208,8 +208,8 @@ export function DoraMetricsPage() {
                 <div className="flex items-center gap-2">
                   <TrendIcon trend={trendData.summary.deploymentFrequencyTrend} />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('governance.dora.dfTrend')}</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-xs text-muted">{t('governance.dora.dfTrend')}</p>
+                    <p className="text-sm font-medium text-heading">
                       {trendData.summary.deploymentFrequencyTrend}
                     </p>
                   </div>
@@ -217,8 +217,8 @@ export function DoraMetricsPage() {
                 <div className="flex items-center gap-2">
                   <TrendIcon trend={trendData.summary.mttrTrend} />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('governance.dora.mttrTrend')}</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-xs text-muted">{t('governance.dora.mttrTrend')}</p>
+                    <p className="text-sm font-medium text-heading">
                       {trendData.summary.mttrTrend}
                     </p>
                   </div>
@@ -226,8 +226,8 @@ export function DoraMetricsPage() {
                 <div className="flex items-center gap-2">
                   <TrendIcon trend={trendData.summary.changeFailureRateTrend} />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('governance.dora.cfrTrend')}</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-xs text-muted">{t('governance.dora.cfrTrend')}</p>
+                    <p className="text-sm font-medium text-heading">
                       {trendData.summary.changeFailureRateTrend}
                     </p>
                   </div>
@@ -259,7 +259,7 @@ export function DoraMetricsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-edge">
                     <th className="py-2 px-3 text-left text-xs text-gray-500">{t('governance.dora.period')}</th>
                     <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.deployFreq')}</th>
                     <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.leadTime')}</th>

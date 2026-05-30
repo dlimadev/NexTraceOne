@@ -130,7 +130,7 @@ const WIDGET_KEY_MAP: Record<string, string> = {
 };
 
 const LIFECYCLE_COLORS: Record<string, string> = {
-  Draft:      'text-gray-500 bg-gray-100 dark:bg-gray-800',
+  Draft:      'text-gray-500 bg-elevated',
   Published:  'text-green-700 bg-green-100 dark:bg-green-900/30',
   Deprecated: 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30',
   Archived:   'text-red-700 bg-red-100 dark:bg-red-900/30',
@@ -230,7 +230,7 @@ function DashboardCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
             <SharingIcon isShared={dashboard.isShared} isSystem={dashboard.isSystem} />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+            <h3 className="text-sm font-semibold text-heading truncate">
               {dashboard.name}
             </h3>
           </div>
@@ -250,7 +250,7 @@ function DashboardCard({
       </CardHeader>
       <CardBody className="pt-2 space-y-2 flex-1 flex flex-col">
         {/* Meta row */}
-        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-3 text-xs text-muted">
           <span>{dashboard.layout}</span>
           <span>
             {dashboard.widgetCount} {t('governance.customDashboards.widgets', 'widgets')}
@@ -268,7 +268,7 @@ function DashboardCard({
             {dashboard.tags!.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-0.5 rounded-full bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] text-gray-600 dark:text-gray-400"
+                className="inline-flex items-center gap-0.5 rounded-full bg-elevated px-1.5 py-0.5 text-[10px] text-muted"
               >
                 <Tag size={8} />
                 {tag}
@@ -464,8 +464,8 @@ export function CustomDashboardsPage() {
       {/* Clone Dialog */}
       {cloneTargetId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-heading mb-3">
               {t('governance.customDashboards.cloneTitle', 'Clone Dashboard')}
             </h2>
             <input
@@ -473,7 +473,7 @@ export function CustomDashboardsPage() {
               value={cloneName}
               onChange={(e) => setCloneName(e.target.value)}
               maxLength={100}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white mb-3"
+              className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading mb-3"
               autoFocus
             />
             {cloneError && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{cloneError}</p>}
@@ -492,11 +492,11 @@ export function CustomDashboardsPage() {
       {/* Delete Confirm */}
       {deleteTargetId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-heading mb-2">
               {t('governance.customDashboards.confirmDeleteTitle', 'Delete Dashboard')}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-muted mb-4">
               {t('governance.customDashboards.confirmDelete', 'This action cannot be undone. Are you sure?')}
             </p>
             {deleteError && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>}
@@ -557,7 +557,7 @@ export function CustomDashboardsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('governance.customDashboards.searchPlaceholder', 'Search by name…')}
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pl-8 pr-3 py-2 text-gray-900 dark:text-white"
+                className="w-full rounded border border-edge bg-card text-sm pl-8 pr-3 py-2 text-heading"
               />
             </div>
 
@@ -567,7 +567,7 @@ export function CustomDashboardsPage() {
               className={`flex items-center gap-1.5 rounded border px-3 py-2 text-xs transition-colors ${
                 showOnlyFavorites
                   ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400'
-                  : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-accent/50'
+                  : 'border-edge text-muted hover:border-accent/50'
               }`}
             >
               <Star size={13} fill={showOnlyFavorites ? 'currentColor' : 'none'} />
@@ -578,7 +578,7 @@ export function CustomDashboardsPage() {
             {hasActiveFilters && (
               <button
                 onClick={() => { setSearchQuery(''); setPersonaFilter(''); setTagFilter(''); setShowOnlyFavorites(false); }}
-                className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors"
+                className="flex items-center gap-1 text-xs text-muted hover:text-red-500 transition-colors"
               >
                 <X size={12} />
                 {t('governance.customDashboards.clearFilters', 'Clear')}
@@ -588,13 +588,13 @@ export function CustomDashboardsPage() {
 
           {/* Persona chips */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 shrink-0">
+            <span className="flex items-center gap-1 text-xs text-muted shrink-0">
               <Filter size={11} />
               {t('governance.customDashboards.filterByPersona', 'Persona')}:
             </span>
             <button
               onClick={() => setPersonaFilter('')}
-              className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${!personaFilter ? 'bg-accent text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'}`}
+              className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${!personaFilter ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
             >
               {t('governance.customDashboards.allPersonas', 'All')}
             </button>
@@ -602,7 +602,7 @@ export function CustomDashboardsPage() {
               <button
                 key={p}
                 onClick={() => setPersonaFilter(personaFilter === p ? '' : p)}
-                className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${personaFilter === p ? 'bg-accent text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'}`}
+                className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${personaFilter === p ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
               >
                 {p}
               </button>
@@ -612,7 +612,7 @@ export function CustomDashboardsPage() {
           {/* Tag chips */}
           {allTags.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 shrink-0">
+              <span className="flex items-center gap-1 text-xs text-muted shrink-0">
                 <Tag size={11} />
                 {t('governance.customDashboards.filterByTag', 'Tag')}:
               </span>
@@ -620,7 +620,7 @@ export function CustomDashboardsPage() {
                 <button
                   key={tag}
                   onClick={() => setTagFilter(tagFilter === tag ? '' : tag)}
-                  className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${tagFilter === tag ? 'bg-accent text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${tagFilter === tag ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
                 >
                   #{tag}
                 </button>
@@ -630,7 +630,7 @@ export function CustomDashboardsPage() {
 
           {/* Sort controls */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-1 text-xs text-muted">
               <ArrowUpDown size={11} />
               {t('governance.customDashboards.sortBy', 'Sort')}:
             </span>
@@ -641,7 +641,7 @@ export function CustomDashboardsPage() {
                   if (sortBy === field) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
                   else { setSortBy(field); setSortDir('asc'); }
                 }}
-                className={`text-xs rounded px-2 py-1 border transition-colors ${sortBy === field ? 'border-accent bg-accent/10 text-accent font-semibold' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-accent/50'}`}
+                className={`text-xs rounded px-2 py-1 border transition-colors ${sortBy === field ? 'border-accent bg-accent/10 text-accent font-semibold' : 'border-edge text-muted hover:border-accent/50'}`}
               >
                 {t(`governance.customDashboards.sortField.${field}`, field)}
                 {sortBy === field && <span className="ml-0.5">{sortDir === 'asc' ? ' ↑' : ' ↓'}</span>}
@@ -686,7 +686,7 @@ export function CustomDashboardsPage() {
             {(showOnlyFavorites ? filteredDashboards : otherDashboards).length > 0 && (
               <>
                 {favoriteDashboards.length > 0 && !showOnlyFavorites && (
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">
+                  <h3 className="text-xs font-semibold text-muted mb-3 uppercase tracking-wide">
                     {t('governance.customDashboards.allDashboards', 'All Dashboards')}
                   </h3>
                 )}

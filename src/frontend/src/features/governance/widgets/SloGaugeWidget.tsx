@@ -110,11 +110,11 @@ export function SloGaugeWidget({ config, timeRange, title }: WidgetProps) {
     <div className="h-full flex flex-col items-center justify-center gap-1 p-1">
       <div className="flex items-center gap-2 w-full">
         <Target size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <ArcGauge value={data.compliancePercent} target={data.target} />
       <div className="flex flex-col items-center -mt-1">
-        <span className="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
+        <span className="text-2xl font-bold text-heading tabular-nums">
           {data.compliancePercent.toFixed(1)}%
         </span>
         <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>

@@ -176,31 +176,31 @@ export function ProductAnalyticsOverviewPage() {
 
       {/* Quick links */}
       <StatsGrid columns={4}>
-        <Link to="/analytics/adoption" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/adoption" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <BarChart3 size={24} className="mx-auto mb-2 text-accent" />
           <span className="text-sm text-body">{t('analytics.viewModuleAdoption')}</span>
         </Link>
-        <Link to="/analytics/personas" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/personas" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Users size={24} className="mx-auto mb-2 text-info" />
           <span className="text-sm text-body">{t('analytics.viewPersonaUsage')}</span>
         </Link>
-        <Link to="/analytics/journeys" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/journeys" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Target size={24} className="mx-auto mb-2 text-success" />
           <span className="text-sm text-body">{t('analytics.viewJourneys')}</span>
         </Link>
-        <Link to="/analytics/value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/value" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Award size={24} className="mx-auto mb-2 text-warning" />
           <span className="text-sm text-body">{t('analytics.viewValueTracking')}</span>
         </Link>
-        <Link to="/analytics/funnel" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/funnel" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Filter size={24} className="mx-auto mb-2 text-accent" />
           <span className="text-sm text-body">{t('analytics.funnel.title')}</span>
         </Link>
-        <Link to="/analytics/heatmap" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/heatmap" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Flame size={24} className="mx-auto mb-2 text-critical" />
           <span className="text-sm text-body">{t('analytics.heatmap.title')}</span>
         </Link>
-        <Link to="/analytics/time-to-value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+        <Link to="/analytics/time-to-value" className="p-4 rounded-md bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Clock size={24} className="mx-auto mb-2 text-success" />
           <span className="text-sm text-body">{t('analytics.timeToValue.title')}</span>
         </Link>

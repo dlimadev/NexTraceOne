@@ -95,7 +95,7 @@ export function ExecutiveOverviewPage() {
       <PageSection>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {/* Overall Risk — primary KPI, biggest visual weight */}
-          <div className="col-span-2 md:col-span-1 bg-card border border-edge rounded-xl p-5 flex flex-col gap-2">
+          <div className="col-span-2 md:col-span-1 bg-card border border-edge rounded-md p-5 flex flex-col gap-2">
             <p className="text-xs font-medium text-muted uppercase tracking-wider">
               {t('governance.executive.overallRisk')}
             </p>
@@ -137,7 +137,7 @@ export function ExecutiveOverviewPage() {
       {/* ── Immediate Action Panel (critical focus areas) ──────────────────── */}
       {criticalFocusAreas.length > 0 && (
         <PageSection>
-          <div className="mb-6 rounded-xl border border-critical/30 bg-critical/5 overflow-hidden">
+          <div className="mb-6 rounded-md border border-critical/30 bg-critical/5 overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-critical/20 bg-critical/10">
               <Zap size={15} className="text-critical" aria-hidden="true" />
               <h2 className="text-sm font-semibold text-critical">

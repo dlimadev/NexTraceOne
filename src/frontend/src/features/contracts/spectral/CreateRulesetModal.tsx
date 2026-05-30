@@ -314,7 +314,7 @@ export function CreateRulesetModal({ isOpen, onClose, onSubmit, isSubmitting, er
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl mx-4 rounded-xl bg-panel border border-edge shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-2xl mx-4 rounded-md bg-panel border border-edge shadow-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
           <div className="flex items-center gap-2">

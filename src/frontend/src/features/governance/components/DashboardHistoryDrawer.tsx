@@ -124,15 +124,15 @@ export function DashboardHistoryDrawer({
 
       {/* Drawer */}
       <aside
-        className="fixed right-0 top-0 h-full w-96 bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col"
+        className="fixed right-0 top-0 h-full w-96 bg-card shadow-2xl z-50 flex flex-col"
         role="complementary"
         aria-label={t('dashboardHistory.title', 'Dashboard History')}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-edge">
           <div className="flex items-center gap-2">
             <Clock size={18} className="text-accent" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">
+            <h2 className="font-semibold text-heading">
               {t('dashboardHistory.title', 'Dashboard History')}
             </h2>
           </div>
@@ -143,8 +143,8 @@ export function DashboardHistoryDrawer({
 
         {/* Subtitle + count */}
         {data && (
-          <div className="px-5 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="px-5 py-2 bg-elevated border-b border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-muted">
               {t('dashboardHistory.subtitle', 'Revision history for this dashboard')}
               {' · '}
               <span className="font-medium">{data.totalRevisions}</span>
@@ -166,13 +166,13 @@ export function DashboardHistoryDrawer({
           {isLoading && (
             <div className="space-y-3 animate-pulse">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-gray-100 dark:bg-gray-800 rounded-lg" />
+                <div key={i} className="h-20 bg-elevated rounded-lg" />
               ))}
             </div>
           )}
 
           {!isLoading && data?.revisions.length === 0 && (
-            <div className="text-center py-10 text-gray-400 dark:text-gray-500">
+            <div className="text-center py-10 text-faded">
               <Clock size={32} className="mx-auto mb-2 opacity-40" />
               <p className="text-sm font-medium">
                 {t('dashboardHistory.noHistory', 'No revision history yet')}
@@ -193,12 +193,12 @@ export function DashboardHistoryDrawer({
                 className={`rounded-lg border px-4 py-3 transition-colors ${
                   isCurrent
                     ? 'border-accent/40 bg-accent/5'
-                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                    : 'border-edge bg-card hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 {/* Row 1: number + badge + timestamp */}
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  <span className="text-sm font-semibold text-heading">
                     {t('dashboardHistory.revisionNumber', 'Revision #{{number}}', {
                       number: rev.revisionNumber,
                     })}
@@ -209,22 +209,22 @@ export function DashboardHistoryDrawer({
                         current
                       </Badge>
                     )}
-                    <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                    <span className="text-xs text-faded whitespace-nowrap">
                       {formatDistanceToNow(new Date(rev.createdAt))}
                     </span>
                   </div>
                 </div>
 
                 {/* Row 2: name + widget count */}
-                <p className="text-xs text-gray-600 dark:text-gray-300 truncate mb-1">
+                <p className="text-xs text-muted truncate mb-1">
                   {rev.name}
-                  <span className="ml-2 text-gray-400 dark:text-gray-500">
+                  <span className="ml-2 text-faded">
                     · {t('dashboardHistory.widgetCount', '{{count}} widget(s)', { count: rev.widgetCount })}
                   </span>
                 </p>
 
                 {/* Row 3: author + change note */}
-                <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500 mb-2">
+                <div className="flex items-center gap-3 text-xs text-faded mb-2">
                   <span className="flex items-center gap-1">
                     <User size={11} />
                     {t('dashboardHistory.author', 'by {{user}}', { user: rev.authorUserId })}
@@ -284,8 +284,8 @@ export function DashboardHistoryDrawer({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+        <div className="px-5 py-3 border-t border-edge bg-elevated">
+          <p className="text-xs text-faded">
             {t('dashboardRevision.autoSaveNote', 'Revisions are saved automatically on every update')}
           </p>
         </div>

@@ -63,13 +63,13 @@ export function KnowledgeGraphPage() {
         icon={<Network size={24} />}
         actions={
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">
+            <label className="text-sm text-muted">
               {t('knowledge.graph.maxDepth')}:
             </label>
             <select
               value={maxDepth}
               onChange={(e) => setMaxDepth(Number(e.target.value))}
-              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-1"
+              className="rounded border border-edge bg-card text-sm px-2 py-1"
             >
               {[1, 2, 3, 4, 5].map((d) => (
                 <option key={d} value={d}>{d}</option>
@@ -108,7 +108,7 @@ export function KnowledgeGraphPage() {
                   <div className="flex items-start gap-3">
                     <Circle size={16} className="mt-1 text-indigo-500 flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                      <p className="font-medium text-sm text-heading truncate">
                         {node.label}
                       </p>
                       <Badge variant="info" className="mt-1 text-xs">{node.type}</Badge>

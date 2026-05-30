@@ -107,23 +107,23 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
       {rows.map((row) => (
         <div
           key={row.queryId}
-          className="flex flex-col gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3"
+          className="flex flex-col gap-2 rounded-lg border border-edge bg-card p-3"
         >
           {/* Row header */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-4">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-wider w-4">
               {row.queryId}
             </span>
 
             {/* Mode toggle */}
-            <div className="flex rounded overflow-hidden border border-gray-200 dark:border-gray-700 text-[10px]">
+            <div className="flex rounded overflow-hidden border border-edge text-[10px]">
               <button
                 type="button"
                 onClick={() => updateRow(row.queryId, { mode: 'visual' })}
                 className={`px-2.5 py-1 font-semibold transition-colors ${
                   row.mode === 'visual'
                     ? 'bg-accent text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-card text-muted hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {t('governance.dashboardBuilder.queryBuilder.visual', 'Visual')}
@@ -134,7 +134,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 className={`px-2.5 py-1 font-mono font-semibold transition-colors ${
                   row.mode === 'nql'
                     ? 'bg-accent text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-card text-muted hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {t('governance.dashboardBuilder.queryBuilder.nql', 'NQL')}
@@ -154,7 +154,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 <MoreHorizontal size={12} />
               </button>
               {openMenuId === row.queryId && (
-                <div className="absolute right-0 top-full mt-1 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 min-w-[120px]">
+                <div className="absolute right-0 top-full mt-1 z-10 bg-card border border-edge rounded-md shadow-lg py-1 min-w-[120px]">
                   <button
                     type="button"
                     onClick={() => { duplicateRow(row.queryId); setOpenMenuId(null); }}
@@ -190,13 +190,13 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
             <div className="grid gap-2 text-xs">
               {/* Service */}
               <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-                <label className="text-gray-500 dark:text-gray-400 text-right text-[11px]">
+                <label className="text-muted text-right text-[11px]">
                   {t('governance.dashboardBuilder.queryBuilder.service', 'Service')}
                 </label>
                 <select
                   value={row.serviceId}
                   onChange={(e) => updateRow(row.queryId, { serviceId: e.target.value })}
-                  className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="rounded border border-edge bg-card px-2 py-1 text-xs text-heading focus:outline-none focus:border-accent"
                 >
                   <option value="">— select —</option>
                   {serviceOptions.map((s) => (
@@ -207,7 +207,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
 
               {/* Metric */}
               <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-                <label className="text-gray-500 dark:text-gray-400 text-right text-[11px]">
+                <label className="text-muted text-right text-[11px]">
                   {t('governance.dashboardBuilder.queryBuilder.metric', 'Metric')}
                 </label>
                 <input
@@ -215,13 +215,13 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   value={row.metric}
                   onChange={(e) => updateRow(row.queryId, { metric: e.target.value })}
                   placeholder="http_requests_total"
-                  className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-accent font-mono"
+                  className="rounded border border-edge bg-card px-2 py-1 text-xs text-heading focus:outline-none focus:border-accent font-mono"
                 />
               </div>
 
               {/* Filters */}
               <div className="grid grid-cols-[80px_1fr] items-start gap-2">
-                <label className="text-gray-500 dark:text-gray-400 text-right text-[11px] pt-1">
+                <label className="text-muted text-right text-[11px] pt-1">
                   {t('governance.dashboardBuilder.queryBuilder.filters', 'Filters')}
                 </label>
                 <div className="flex flex-wrap gap-1 items-center">
@@ -270,7 +270,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                           updateRow(row.queryId, { filters: updated });
                         }}
                         placeholder="key"
-                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 py-0.5 text-[10px] w-20 font-mono focus:outline-none focus:border-accent"
+                        className="rounded border border-edge bg-card px-1.5 py-0.5 text-[10px] w-20 font-mono focus:outline-none focus:border-accent"
                       />
                       <select
                         value={f.op}
@@ -279,7 +279,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                           updated[i] = { ...updated[i], op: e.target.value };
                           updateRow(row.queryId, { filters: updated });
                         }}
-                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1 py-0.5 text-[10px] focus:outline-none focus:border-accent"
+                        className="rounded border border-edge bg-card px-1 py-0.5 text-[10px] focus:outline-none focus:border-accent"
                       >
                         {FILTER_OPS.map((op) => <option key={op} value={op}>{op}</option>)}
                       </select>
@@ -292,7 +292,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                           updateRow(row.queryId, { filters: updated });
                         }}
                         placeholder="value or $var"
-                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 py-0.5 text-[10px] flex-1 font-mono focus:outline-none focus:border-accent"
+                        className="rounded border border-edge bg-card px-1.5 py-0.5 text-[10px] flex-1 font-mono focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
@@ -301,7 +301,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
 
               {/* Group by */}
               <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-                <label className="text-gray-500 dark:text-gray-400 text-right text-[11px]">
+                <label className="text-muted text-right text-[11px]">
                   {t('governance.dashboardBuilder.queryBuilder.groupBy', 'Group by')}
                 </label>
                 <input
@@ -309,26 +309,26 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   value={row.groupBy}
                   onChange={(e) => updateRow(row.queryId, { groupBy: e.target.value })}
                   placeholder="endpoint, status_code..."
-                  className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-accent font-mono"
+                  className="rounded border border-edge bg-card px-2 py-1 text-xs text-heading focus:outline-none focus:border-accent font-mono"
                 />
               </div>
 
               {/* Function + Aggregation */}
               <div className="grid grid-cols-[80px_1fr_1fr] items-center gap-2">
-                <label className="text-gray-500 dark:text-gray-400 text-right text-[11px]">
+                <label className="text-muted text-right text-[11px]">
                   {t('governance.dashboardBuilder.queryBuilder.function', 'Function')}
                 </label>
                 <select
                   value={row.fn}
                   onChange={(e) => updateRow(row.queryId, { fn: e.target.value })}
-                  className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-accent font-mono"
+                  className="rounded border border-edge bg-card px-2 py-1 text-xs text-heading focus:outline-none focus:border-accent font-mono"
                 >
                   {FUNCTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
                 <select
                   value={row.aggFn}
                   onChange={(e) => updateRow(row.queryId, { aggFn: e.target.value })}
-                  className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-accent font-mono"
+                  className="rounded border border-edge bg-card px-2 py-1 text-xs text-heading focus:outline-none focus:border-accent font-mono"
                 >
                   {AGG_FUNCTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
@@ -352,7 +352,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
         <button
           type="button"
           onClick={addRow}
-          className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-2 text-xs text-gray-500 dark:text-gray-400 hover:border-accent hover:text-accent transition-colors"
+          className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-dashed border-edge py-2 text-xs text-muted hover:border-accent hover:text-accent transition-colors"
         >
           <Plus size={12} />
           {t('governance.dashboardBuilder.queryBuilder.addQuery', '+ Add Query')}

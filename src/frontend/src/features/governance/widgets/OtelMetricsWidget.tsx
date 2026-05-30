@@ -53,7 +53,7 @@ function WidgetShell({ title, children }: { title: string; children: React.React
     <div className="h-full flex flex-col gap-1 p-2">
       <div className="flex items-center gap-1.5 shrink-0">
         <Activity size={13} className="text-blue-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{title}</span>
+        <span className="text-xs font-semibold text-heading truncate">{title}</span>
       </div>
       {children}
     </div>
@@ -145,8 +145,8 @@ export function OtelMetricsWidget({
     return (
       <WidgetShell title={displayTitle}>
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <Settings size={18} className="text-gray-400 dark:text-gray-500" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <Settings size={18} className="text-faded" />
+          <span className="text-xs text-muted text-center">
             {t('obs.backendNotConfigured', 'Backend not configured')}
           </span>
         </div>
@@ -160,7 +160,7 @@ export function OtelMetricsWidget({
     return (
       <WidgetShell title={displayTitle}>
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-faded">
             {t('obs.metrics.noData', 'No metric data')}
           </span>
         </div>
@@ -184,7 +184,7 @@ export function OtelMetricsWidget({
   return (
     <WidgetShell title={displayTitle}>
       {subtitle && (
-        <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate shrink-0">
+        <span className="text-[10px] text-muted truncate shrink-0">
           {subtitle}
         </span>
       )}

@@ -107,20 +107,20 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
   }, [draftSlot, onApply]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-white">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-950 text-heading">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+      <header className="flex items-center gap-3 px-4 py-2 border-b border-edge bg-card shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
         >
           <ArrowLeft size={16} />
           <span>{t('governance.dashboardBuilder.panelEditor.backToDashboard')}</span>
         </button>
 
-        <div className="h-5 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="h-5 w-px bg-elevated" />
 
         <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
           {t('governance.dashboardBuilder.panelEditor.title')}
@@ -130,7 +130,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
           type="text"
           value={draftSlot.customTitle}
           onChange={(e) => updateDraft('customTitle', e.target.value)}
-          className="flex-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-accent min-w-0"
+          className="flex-1 rounded border border-edge bg-card px-2 py-1 text-sm text-heading focus:outline-none focus:border-accent min-w-0"
           placeholder={t('governance.dashboardBuilder.panelEditor.title')}
         />
 
@@ -138,7 +138,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 text-sm rounded border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="px-3 py-1.5 text-sm rounded border border-edge text-muted hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             {t('governance.dashboardBuilder.panelEditor.discard')}
           </button>
@@ -154,15 +154,15 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
 
       {/* ── Preview (top 40vh) ──────────────────────────────────────────── */}
       <section
-        className="shrink-0 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex flex-col"
+        className="shrink-0 border-b border-edge bg-canvas flex flex-col"
         style={{ height: '40vh' }}
       >
         {/* Preview header */}
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-edge">
+          <span className="text-xs font-semibold text-muted uppercase tracking-wider">
             {t('governance.dashboardBuilder.panelEditor.preview')}
           </span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-mono border border-gray-200 dark:border-gray-700">
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted font-mono border border-edge">
             {previewSlot.chartType}
           </span>
           <div className="ml-auto flex items-center gap-2">
@@ -172,7 +172,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
               className={`text-xs px-2 py-1 rounded border transition-colors ${
                 tableView
                   ? 'bg-accent/10 border-accent/40 text-accent'
-                  : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-edge text-muted hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               {t('governance.dashboardBuilder.panelEditor.tableView')}
@@ -191,7 +191,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
             </div>
           ) : previewSlot.nqlQuery ? (
             <div className="w-full h-full flex flex-col items-start justify-start gap-2">
-              <div className="w-full rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 overflow-auto max-h-full">
+              <div className="w-full rounded border border-edge bg-card p-3 overflow-auto max-h-full">
                 <pre className="text-xs font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all">
                   {previewSlot.nqlQuery}
                 </pre>
@@ -213,7 +213,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
           {/* Tab bar */}
-          <div className="flex items-center border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+          <div className="flex items-center border-b border-edge bg-card shrink-0">
             {(
               [
                 { id: 'query' as EditorTab, label: t('governance.dashboardBuilder.panelEditor.tabs.query') },
@@ -228,7 +228,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
                 className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
+                    : 'border-transparent text-muted hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 {tab.label}

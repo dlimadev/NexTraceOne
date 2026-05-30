@@ -38,8 +38,8 @@ export function CostTrendWidget({ config, environmentId, timeRange, title }: Wid
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <TrendingUp size={14} className="text-blue-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
-        <span className="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
+        <span className="ml-auto text-xs font-medium text-muted">
           ${(data.totalCost ?? 0).toLocaleString()}
         </span>
       </div>
@@ -47,7 +47,7 @@ export function CostTrendWidget({ config, environmentId, timeRange, title }: Wid
         {data.items.slice(0, 5).map((item, i) => (
           <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
             <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{item.service}</span>
-            <span className="text-xs font-semibold tabular-nums text-gray-900 dark:text-white">
+            <span className="text-xs font-semibold tabular-nums text-heading">
               ${item.cost.toLocaleString()}
             </span>
           </div>

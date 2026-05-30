@@ -184,7 +184,7 @@ export function NqlMonacoEditor({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="rounded border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="rounded border border-edge overflow-hidden">
         <Editor
           height={height}
           defaultLanguage="nql"
@@ -216,7 +216,7 @@ export function NqlMonacoEditor({
             type="button"
             onClick={handleValidate}
             disabled={isValidating || !value.trim()}
-            className="flex items-center gap-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-[10px] text-gray-600 dark:text-gray-400 hover:text-accent disabled:opacity-40 transition-colors"
+            className="flex items-center gap-1 rounded border border-edge bg-card px-2 py-1 text-[10px] text-muted hover:text-accent disabled:opacity-40 transition-colors"
           >
             {isValidating ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle size={10} />}
             {t('nqlEditor.validate', 'Validate')}

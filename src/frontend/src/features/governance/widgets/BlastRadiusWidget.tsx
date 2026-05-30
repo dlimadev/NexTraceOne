@@ -59,14 +59,14 @@ export function BlastRadiusWidget({ config, environmentId, title }: WidgetProps)
       {/* Header */}
       <div className="flex items-center gap-2">
         <Zap size={14} className="text-orange-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
       </div>
 
       {/* Change name */}
       <p
-        className="text-[10px] text-gray-500 dark:text-gray-400 truncate"
+        className="text-[10px] text-muted truncate"
         title={data.changeName}
       >
         {data.changeName}
@@ -98,7 +98,7 @@ export function BlastRadiusWidget({ config, environmentId, title }: WidgetProps)
         <span className="text-[10px] text-gray-400">
           {t('governance.customDashboards.blastRadius.confidence', 'Confidence')}
         </span>
-        <span className="text-[10px] font-semibold tabular-nums text-gray-600 dark:text-gray-300">
+        <span className="text-[10px] font-semibold tabular-nums text-muted">
           {data.confidenceScore}%
         </span>
       </div>

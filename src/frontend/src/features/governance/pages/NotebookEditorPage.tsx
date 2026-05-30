@@ -178,13 +178,13 @@ export function NotebookEditorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-4 pb-16">
       {/* Toolbar */}
-      <div className="flex items-center gap-3 sticky top-0 z-20 bg-white dark:bg-gray-900 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-3 sticky top-0 z-20 bg-card py-3 border-b border-edge">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <BookOpen className="h-5 w-5 text-indigo-500" />
         <input
-          className="flex-1 text-lg font-semibold bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400"
+          className="flex-1 text-lg font-semibold bg-transparent border-none outline-none text-heading placeholder-gray-400"
           placeholder={t('notebook.edit')}
           value={title}
           onChange={(e) => { setTitle(e.target.value); setDirty(true); }}
@@ -210,7 +210,7 @@ export function NotebookEditorPage() {
 
       {/* Description */}
       <textarea
-        className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm text-gray-700 dark:text-gray-300 resize-none"
+        className="w-full rounded-lg border border-edge bg-transparent px-3 py-2 text-sm text-gray-700 dark:text-gray-300 resize-none"
         rows={2}
         placeholder={t('notebook.edit')}
         value={description}
@@ -222,9 +222,9 @@ export function NotebookEditorPage() {
         {cells.map((cell, idx) => (
           <Card key={cell.localId} className="overflow-hidden">
             {/* Cell header */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 px-3 py-2 bg-elevated border-b border-edge">
               <span className="text-gray-500">{CELL_ICONS[cell.cellType]}</span>
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex-1">
+              <span className="text-xs font-medium text-muted flex-1">
                 {t(`notebook.cellType${cell.cellType}`)}
               </span>
               <div className="flex items-center gap-1">
@@ -275,7 +275,7 @@ export function NotebookEditorPage() {
                   rows={cell.cellType === 'Markdown' ? 4 : 3}
                 />
                 {cell.outputJson && (
-                  <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs font-mono text-gray-600 dark:text-gray-400 max-h-40 overflow-auto">
+                  <div className="mt-2 p-2 bg-elevated rounded text-xs font-mono text-muted max-h-40 overflow-auto">
                     {cell.outputJson}
                   </div>
                 )}
@@ -292,7 +292,7 @@ export function NotebookEditorPage() {
           <button
             key={type}
             onClick={() => addCell(type)}
-            className="flex items-center gap-1 px-2 py-1 text-xs rounded border border-dashed border-gray-300 dark:border-gray-600 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs rounded border border-dashed border-edge hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
             {CELL_ICONS[type]}
             {t(`notebook.cellType${type}`)}

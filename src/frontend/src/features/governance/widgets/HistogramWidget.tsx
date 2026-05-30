@@ -159,7 +159,7 @@ export function HistogramWidget({
       <div className="flex flex-col h-full gap-2 p-2">
         <div className="flex items-center gap-1.5 shrink-0">
           <BarChart2 size={13} className="text-blue-500 shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+          <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
           <span className="text-xs text-red-500 dark:text-red-400 text-center">
@@ -205,7 +205,7 @@ export function HistogramWidget({
       {/* Título */}
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <BarChart2 size={13} className="text-blue-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
 
       {/* Banner de dados simulados */}
@@ -218,7 +218,7 @@ export function HistogramWidget({
       {/* Sub-título com percentis */}
       {percentilesLabel && (
         <div className="shrink-0 px-1">
-          <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">{percentilesLabel}</span>
+          <span className="text-[10px] text-muted font-mono">{percentilesLabel}</span>
         </div>
       )}
 

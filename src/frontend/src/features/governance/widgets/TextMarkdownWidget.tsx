@@ -25,7 +25,7 @@ function applyInlineFormatting(text: string): string {
   return escapeHtml(text)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="text-xs bg-gray-100 dark:bg-gray-800 px-0.5 rounded font-mono">$1</code>')
+    .replace(/`(.+?)`/g, '<code class="text-xs bg-elevated px-0.5 rounded font-mono">$1</code>')
     .replace(
       /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-accent underline">$1</a>',
@@ -44,7 +44,7 @@ function parseMarkdown(raw: string): string[] {
     if (trimmed === '' || trimmed === '---' || trimmed === '***') {
       if (inList) { result.push('</ul>'); inList = false; }
       if (trimmed === '---' || trimmed === '***') {
-        result.push('<hr class="border-gray-200 dark:border-gray-700 my-1" />');
+        result.push('<hr class="border-edge my-1" />');
       } else {
         result.push('<div class="h-1"></div>');
       }
@@ -56,10 +56,10 @@ function parseMarkdown(raw: string): string[] {
       result.push(`<h3 class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide leading-tight">${applyInlineFormatting(trimmed.slice(4))}</h3>`);
     } else if (trimmed.startsWith('## ')) {
       if (inList) { result.push('</ul>'); inList = false; }
-      result.push(`<h2 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">${applyInlineFormatting(trimmed.slice(3))}</h2>`);
+      result.push(`<h2 class="text-sm font-bold text-heading leading-tight">${applyInlineFormatting(trimmed.slice(3))}</h2>`);
     } else if (trimmed.startsWith('# ')) {
       if (inList) { result.push('</ul>'); inList = false; }
-      result.push(`<h1 class="text-base font-bold text-gray-900 dark:text-white leading-tight">${applyInlineFormatting(trimmed.slice(2))}</h1>`);
+      result.push(`<h1 class="text-base font-bold text-heading leading-tight">${applyInlineFormatting(trimmed.slice(2))}</h1>`);
     } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       if (!inList) { result.push('<ul class="list-disc pl-4 space-y-0.5">'); inList = true; }
       result.push(`<li class="text-xs text-gray-700 dark:text-gray-300">${applyInlineFormatting(trimmed.slice(2))}</li>`);
@@ -97,7 +97,7 @@ export function TextMarkdownWidget({ config, title }: WidgetProps) {
     <div className="h-full flex flex-col gap-1 p-2 overflow-hidden">
       <div className="flex items-center gap-1.5 mb-1">
         <FileText size={13} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-thin space-y-1">
         {htmlLines.map((html, i) => (

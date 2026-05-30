@@ -82,19 +82,19 @@ export function FeatureHeatmapPage() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-panel border border-edge rounded-xl p-4">
+        <div className="bg-panel border border-edge rounded-md p-4">
           <span className="text-xs text-faded uppercase tracking-widest">
             {t('analytics.heatmap.totalModules')}
           </span>
           <p className="text-2xl font-bold text-heading mt-1">{cells.length}</p>
         </div>
-        <div className="bg-panel border border-edge rounded-xl p-4">
+        <div className="bg-panel border border-edge rounded-md p-4">
           <span className="text-xs text-faded uppercase tracking-widest">
             {t('analytics.heatmap.uniqueUsers')}
           </span>
           <p className="text-2xl font-bold text-heading mt-1">{totalUniqueUsers}</p>
         </div>
-        <div className="bg-panel border border-edge rounded-xl p-4">
+        <div className="bg-panel border border-edge rounded-md p-4">
           <span className="text-xs text-faded uppercase tracking-widest">
             {t('analytics.heatmap.period')}
           </span>
@@ -119,7 +119,7 @@ export function FeatureHeatmapPage() {
               {sortedCells.map((cell) => (
                 <div
                   key={cell.module}
-                  className={`rounded-xl border p-4 transition hover:scale-[1.02] ${intensityClass(cell.intensity)} ${intensityBorder(cell.intensity)}`}
+                  className={`rounded-md border p-4 transition hover:scale-[1.02] ${intensityClass(cell.intensity)} ${intensityBorder(cell.intensity)}`}
                 >
                   <p className="font-semibold text-sm truncate">{cell.moduleName}</p>
                   <p className="text-2xl font-bold mt-1">{cell.adoptionPercent}%</p>

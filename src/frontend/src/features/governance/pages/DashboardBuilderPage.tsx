@@ -316,7 +316,7 @@ interface PaletteCardProps {
 function PaletteCard({ type, label, meta, onAdd, onDragStart }: PaletteCardProps) {
   return (
     <div
-      className="flex flex-col items-center gap-1 p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-grab active:cursor-grabbing hover:border-accent/60 hover:shadow-md transition-all select-none"
+      className="flex flex-col items-center gap-1 p-2 rounded-lg border border-edge bg-card cursor-grab active:cursor-grabbing hover:border-accent/60 hover:shadow-md transition-all select-none"
       draggable
       onDragStart={(e) => {
         e.dataTransfer.effectAllowed = 'copy';
@@ -357,21 +357,21 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
   return (
     <div
-      className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 flex flex-col"
+      className="fixed top-0 right-0 h-full w-80 bg-card border-l border-edge shadow-2xl z-50 flex flex-col"
       role="dialog"
       aria-label={t('governance.dashboardBuilder.configPanel', 'Widget configuration')}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-edge shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-lg">{widgetIcon(slot.type)}</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-sm font-semibold text-heading truncate">
             {slot.customTitle || t(WIDGET_META[slot.type]?.labelKey ?? slot.type, slot.type)}
           </span>
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+          className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-muted transition-colors"
           aria-label={t('common.close', 'Close')}
         >
           <X size={16} />
@@ -383,7 +383,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
         {/* Custom title */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             {t('governance.dashboardBuilder.customTitle', 'Custom Title')}
           </label>
           <input
@@ -392,19 +392,19 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             onChange={(e) => onUpdate({ customTitle: e.target.value })}
             maxLength={80}
             placeholder={t('governance.dashboardBuilder.customTitlePlaceholder', 'Optional override')}
-            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
           />
         </div>
 
         {/* Time range */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             {t('governance.dashboardBuilder.timeRangeOverride', 'Time Range Override')}
           </label>
           <select
             value={slot.timeRange}
             onChange={(e) => onUpdate({ timeRange: e.target.value })}
-            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
           >
             {TIME_RANGE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -416,7 +416,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
         {/* Service */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             {t('governance.dashboardBuilder.serviceFilter', 'Service')}
           </label>
           <input
@@ -424,13 +424,13 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             value={slot.serviceId}
             onChange={(e) => onUpdate({ serviceId: e.target.value })}
             placeholder={t('governance.dashboardBuilder.serviceFilterPlaceholder', 'All services')}
-            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
           />
         </div>
 
         {/* Team */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             {t('governance.dashboardBuilder.teamFilter', 'Team')}
           </label>
           <input
@@ -438,20 +438,20 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             value={slot.teamId}
             onChange={(e) => onUpdate({ teamId: e.target.value })}
             placeholder={t('governance.dashboardBuilder.teamFilterPlaceholder', 'All teams')}
-            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
           />
         </div>
 
         {/* Conditional: stat */}
         {slot.type === 'stat' && (
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-muted mb-1">
               {t('governance.dashboardBuilder.statMetric', 'KPI Metric')}
             </label>
             <select
               value={slot.metric || 'incidents-open'}
               onChange={(e) => onUpdate({ metric: e.target.value })}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
             >
               {STAT_METRIC_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -465,7 +465,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
         {/* Conditional: text-markdown */}
         {slot.type === 'text-markdown' && (
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-muted mb-1">
               {t('governance.dashboardBuilder.textContent', 'Content (Markdown)')}
             </label>
             <textarea
@@ -474,7 +474,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
               rows={8}
               maxLength={2000}
               placeholder={t('governance.dashboardBuilder.textContentPlaceholder', 'Supports **bold**, *italic*, # headings')}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono focus:outline-none focus:border-accent resize-y"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading font-mono focus:outline-none focus:border-accent resize-y"
             />
             <p className="mt-1 text-[9px] text-gray-400">{slot.content.length}/2000</p>
           </div>
@@ -484,7 +484,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
         {slot.type === 'query-widget' && (
           <>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-muted mb-1">
                 {t('governance.dashboardBuilder.nqlQuery', 'NQL Query')}
               </label>
               <NqlMonacoEditor
@@ -494,13 +494,13 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-muted mb-1">
                 {t('governance.dashboardBuilder.renderHint', 'Render Hint')}
               </label>
               <select
                 value={slot.renderHint || 'table'}
                 onChange={(e) => onUpdate({ renderHint: e.target.value })}
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
               >
                 {NQL_RENDER_HINTS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -521,7 +521,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
           <>
             {isObsMetricsType && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-muted mb-1">
                   {t('governance.dashboardBuilder.metricName', 'Metric Name')}
                 </label>
                 <input
@@ -529,12 +529,12 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                   value={slot.metricName}
                   onChange={(e) => onUpdate({ metricName: e.target.value })}
                   placeholder="http.server.request.duration"
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 />
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-muted mb-1">
                 {t('governance.dashboardBuilder.otelEnvironment', 'Environment')}
               </label>
               <input
@@ -542,18 +542,18 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 value={slot.otelEnvironment}
                 onChange={(e) => onUpdate({ otelEnvironment: e.target.value })}
                 placeholder="production"
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
               />
             </div>
             {isObsLogs && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-muted mb-1">
                   {t('governance.dashboardBuilder.logSeverity', 'Log Severity')}
                 </label>
                 <select
                   value={slot.logSeverity}
                   onChange={(e) => onUpdate({ logSeverity: e.target.value })}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 >
                   {['ERROR', 'WARN', 'INFO', 'DEBUG'].map((s) => (
                     <option key={s} value={s}>{s}</option>
@@ -563,7 +563,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             )}
             {isObsTraces && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-muted mb-1">
                   {t('governance.dashboardBuilder.minDurationMs', 'Min Duration (ms)')}
                 </label>
                 <input
@@ -572,7 +572,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                   value={slot.minDurationMs}
                   onChange={(e) => onUpdate({ minDurationMs: e.target.value })}
                   placeholder="100"
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 />
               </div>
             )}
@@ -582,13 +582,13 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
         {/* Visualization section for time-series obs widgets */}
         {(slot.type === 'obs-metrics' || slot.type === 'obs-error-rate') && (
           <>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+            <div className="border-t border-edge pt-2 mt-2">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
                 Visualization
               </p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Chart Type</label>
+              <label className="block text-xs font-medium text-muted mb-1">Chart Type</label>
               <div className="flex gap-1">
                 {(['line', 'bar', 'area', 'step'] as const).map(ct => (
                   <button
@@ -598,7 +598,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                     className={`flex-1 rounded border text-xs py-1 capitalize transition-colors ${
                       (slot.chartType || 'area') === ct
                         ? 'border-blue-500 bg-blue-600 text-white'
-                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-400'
+                        : 'border-edge bg-card text-gray-700 dark:text-gray-300 hover:border-blue-400'
                     }`}
                   >
                     {ct}
@@ -608,34 +608,34 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Min</label>
+                <label className="block text-xs font-medium text-muted mb-1">Y-Axis Min</label>
                 <input
                   type="number"
                   value={slot.yAxisMin}
                   onChange={(e) => onUpdate({ yAxisMin: e.target.value })}
                   placeholder="auto"
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Y-Axis Max</label>
+                <label className="block text-xs font-medium text-muted mb-1">Y-Axis Max</label>
                 <input
                   type="number"
                   value={slot.yAxisMax}
                   onChange={(e) => onUpdate({ yAxisMax: e.target.value })}
                   placeholder="auto"
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <label className="block text-xs font-medium text-muted mb-1">Unit</label>
               <input
                 type="text"
                 value={slot.unit}
                 onChange={(e) => onUpdate({ unit: e.target.value })}
                 placeholder="ms, %, req/s, $..."
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
               />
             </div>
           </>
@@ -654,9 +654,9 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
           const THRESHOLD_COLORS = [CHART_SEMANTIC.success, CHART_SEMANTIC.warning, '#f97316', CHART_SEMANTIC.critical, '#8b5cf6', CHART_SERIES[0]];
 
           return (
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <div className="border-t border-edge pt-2 mt-2">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-muted uppercase tracking-wide">
                   Thresholds
                 </p>
                 <button
@@ -677,7 +677,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                       updated[i] = { ...threshold, value: parseFloat(e.target.value) || 0 };
                       updateThresholds(updated);
                     }}
-                    className="w-16 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white focus:outline-none"
+                    className="w-16 rounded border border-edge bg-card text-xs px-2 py-1 text-heading focus:outline-none"
                     placeholder="value"
                   />
                   <div className="flex gap-1">
@@ -713,16 +713,16 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
         {/* Pie / Donut chart options */}
         {slot.type === 'obs-pie-chart' && (
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+          <div className="border-t border-edge pt-2 mt-2">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
               Chart Options
             </p>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Group By</label>
+              <label className="block text-xs font-medium text-muted mb-1">Group By</label>
               <select
                 value={slot.groupBy || 'service'}
                 onChange={(e) => onUpdate({ groupBy: e.target.value })}
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
               >
                 {['service', 'team', 'severity', 'domain'].map(g => (
                   <option key={g} value={g}>{g}</option>
@@ -737,7 +737,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 onChange={(e) => onUpdate({ donut: e.target.checked })}
                 className="rounded"
               />
-              <label htmlFor={`donut-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Donut style</label>
+              <label htmlFor={`donut-${slot.tempId}`} className="text-xs text-muted">Donut style</label>
             </div>
             <div className="flex items-center gap-2 mt-1.5">
               <input
@@ -747,14 +747,14 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 onChange={(e) => onUpdate({ showDataLabels: e.target.checked })}
                 className="rounded"
               />
-              <label htmlFor={`labels-${slot.tempId}`} className="text-xs text-gray-600 dark:text-gray-400">Show labels</label>
+              <label htmlFor={`labels-${slot.tempId}`} className="text-xs text-muted">Show labels</label>
             </div>
             <div className="mt-1.5">
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Color Scheme</label>
+              <label className="block text-xs font-medium text-muted mb-1">Color Scheme</label>
               <select
                 value={slot.colorScheme || 'rainbow'}
                 onChange={(e) => onUpdate({ colorScheme: e.target.value })}
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
               >
                 {['rainbow', 'blue', 'green', 'red', 'purple'].map(cs => (
                   <option key={cs} value={cs}>{cs}</option>
@@ -766,19 +766,19 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
         {/* Treemap and heatmap-calendar options */}
         {(slot.type === 'obs-treemap' || slot.type === 'obs-heatmap-calendar') && (
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+          <div className="border-t border-edge pt-2 mt-2">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
               Data Options
             </p>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-muted mb-1">
                 {slot.type === 'obs-treemap' ? 'Group By' : 'Metric'}
               </label>
               {slot.type === 'obs-treemap' ? (
                 <select
                   value={slot.groupBy || 'service'}
                   onChange={(e) => onUpdate({ groupBy: e.target.value })}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
                 >
                   {['service', 'team', 'domain'].map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
@@ -786,7 +786,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 <select
                   value={slot.metricName || 'incidents'}
                   onChange={(e) => onUpdate({ metricName: e.target.value })}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                  className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
                 >
                   {['incidents', 'deployments', 'errors', 'changes'].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
@@ -797,29 +797,29 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
 
         {/* Histogram options */}
         {slot.type === 'obs-histogram' && (
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+          <div className="border-t border-edge pt-2 mt-2">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
               Histogram Options
             </p>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bucket Size</label>
+              <label className="block text-xs font-medium text-muted mb-1">Bucket Size</label>
               <input
                 type="number"
                 min={1}
                 value={slot.bucketSize}
                 onChange={(e) => onUpdate({ bucketSize: e.target.value })}
                 placeholder="50"
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
               />
             </div>
             <div className="mt-1.5">
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Unit</label>
+              <label className="block text-xs font-medium text-muted mb-1">Unit</label>
               <input
                 type="text"
                 value={slot.unit}
                 onChange={(e) => onUpdate({ unit: e.target.value })}
                 placeholder="ms"
-                className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none"
+                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none"
               />
             </div>
           </div>
@@ -852,7 +852,7 @@ function MetaAccordion({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3">
+    <div className="border-t border-edge mt-3 pt-3">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -865,7 +865,7 @@ function MetaAccordion({
       {open && (
         <div className="mt-3 space-y-3">
           <div>
-            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-[10px] font-medium text-muted mb-1">
               {t('governance.customDashboards.dashboardName', 'Name')}
             </label>
             <input
@@ -873,28 +873,28 @@ function MetaAccordion({
               value={name}
               onChange={(e) => onChangeName(e.target.value)}
               maxLength={100}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-[10px] font-medium text-muted mb-1">
               {t('governance.customDashboards.description', 'Description')}
             </label>
             <textarea
               value={description}
               onChange={(e) => onChangeDescription(e.target.value)}
               rows={2}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent resize-none"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent resize-none"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-[10px] font-medium text-muted mb-1">
               {t('governance.customDashboards.layout', 'Layout')}
             </label>
             <select
               value={layout}
               onChange={(e) => onChangeLayout(e.target.value)}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
             >
               {LAYOUTS.map((l) => (
                 <option key={l} value={l}>{l}</option>
@@ -902,13 +902,13 @@ function MetaAccordion({
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-[10px] font-medium text-muted mb-1">
               {t('governance.dashboardBuilder.persona', 'Persona')}
             </label>
             <select
               value={persona}
               onChange={(e) => onChangePersona(e.target.value)}
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
             >
               {PERSONAS.map((p) => (
                 <option key={p} value={p}>{p}</option>
@@ -916,7 +916,7 @@ function MetaAccordion({
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-[10px] font-medium text-muted mb-1">
               {t('governance.dashboardBuilder.tags', 'Tags (comma-separated)')}
             </label>
             <input
@@ -924,7 +924,7 @@ function MetaAccordion({
               value={tags}
               onChange={(e) => onChangeTags(e.target.value)}
               placeholder="sre, dora, executive"
-              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
             />
           </div>
         </div>
@@ -972,7 +972,7 @@ function GridCanvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 min-h-[600px] relative rounded-xl overflow-hidden rgl-canvas"
+      className="flex-1 min-h-[600px] relative rounded-md overflow-hidden rgl-canvas"
     >
       {slots.length === 0 && !draggingType && <EmptyCanvasPrompt />}
 
@@ -1469,10 +1469,10 @@ export function DashboardBuilderPage() {
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden">
 
       {/* ── Toolbar ────────────────────────────────────────────────────────── */}
-      <header className="shrink-0 flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm z-30">
+      <header className="shrink-0 flex items-center gap-3 px-4 py-2 bg-card border-b border-edge shadow-sm z-30">
         <Link
           to={isCreateMode ? '/governance/custom-dashboards' : `/governance/dashboards/${effectiveDashboardId}`}
-          className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-accent transition-colors shrink-0"
+          className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors shrink-0"
           aria-label={isCreateMode ? t('governance.dashboardBuilder.backToList', 'Back to Dashboards') : t('governance.dashboardBuilder.backToView', 'Back to Dashboard')}
         >
           <ArrowLeft size={16} />
@@ -1489,13 +1489,13 @@ export function DashboardBuilderPage() {
               onBlur={() => setEditingTitle(false)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === 'Escape') setEditingTitle(false); }}
               maxLength={100}
-              className="w-full max-w-sm text-sm font-semibold bg-transparent border-b border-accent text-gray-900 dark:text-white focus:outline-none"
+              className="w-full max-w-sm text-sm font-semibold bg-transparent border-b border-accent text-heading focus:outline-none"
             />
           ) : (
             <button
               type="button"
               onClick={() => !isReadOnly && setEditingTitle(true)}
-              className={`text-sm font-semibold text-gray-900 dark:text-white truncate max-w-sm text-left ${!isReadOnly ? 'hover:text-accent cursor-text' : 'cursor-default'}`}
+              className={`text-sm font-semibold text-heading truncate max-w-sm text-left ${!isReadOnly ? 'hover:text-accent cursor-text' : 'cursor-default'}`}
               title={isReadOnly ? undefined : t('governance.dashboardBuilder.clickToEditTitle', 'Click to edit title')}
             >
               {name || t('governance.dashboardBuilder.untitled', 'Untitled Dashboard')}
@@ -1600,7 +1600,7 @@ export function DashboardBuilderPage() {
 
         {/* ── Left sidebar: palette ──────────────────────────────────────── */}
         {!isPreview && (
-          <aside className="w-60 shrink-0 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 overflow-hidden">
+          <aside className="w-60 shrink-0 flex flex-col bg-card border-r border-edge overflow-hidden">
             {/* Search */}
             <div className="px-3 pt-3 pb-2 shrink-0">
               <div className="relative">
@@ -1613,7 +1613,7 @@ export function DashboardBuilderPage() {
                   placeholder={t('governance.dashboardBuilder.searchWidgets', 'Search widgets…')}
                   value={paletteSearch}
                   onChange={(e) => setPaletteSearch(e.target.value)}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs pl-6 pr-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+                  className="w-full rounded border border-edge bg-card text-xs pl-6 pr-2 py-1.5 text-heading focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -1628,7 +1628,7 @@ export function DashboardBuilderPage() {
                   className={`rounded-full px-2 py-0.5 text-[9px] font-semibold transition-colors ${
                     paletteCategory === cat.value
                       ? 'bg-accent text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
+                      : 'bg-elevated text-muted hover:bg-accent/20'
                   }`}
                 >
                   {t(cat.labelKey, cat.value)}

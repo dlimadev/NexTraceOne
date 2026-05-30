@@ -82,7 +82,7 @@ export function ContractCoverageWidget({ config, title }: WidgetProps) {
       {/* Header */}
       <div className="flex items-center gap-2">
         <FileCheck size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
         <span className={`ml-auto text-lg font-bold tabular-nums ${coverageColour(pct)}`}>
@@ -92,7 +92,7 @@ export function ContractCoverageWidget({ config, title }: WidgetProps) {
 
       {/* Coverage progress bar */}
       <div
-        className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+        className="w-full h-2 rounded-full bg-elevated overflow-hidden"
         role="presentation"
       >
         <div

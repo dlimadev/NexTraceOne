@@ -64,7 +64,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
       <div className="h-full flex flex-col gap-1 p-1">
         <div className="flex items-center gap-2">
           <Users size={14} className="text-accent shrink-0" />
-          <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-xs font-semibold text-heading truncate">
             {displayTitle}
           </span>
         </div>
@@ -85,7 +85,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
       {/* Header */}
       <div className="flex items-center gap-2">
         <Users size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+        <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
         <span className={`ml-auto text-[10px] font-bold tabular-nums ${healthColorClass}`}>
@@ -94,7 +94,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
       </div>
 
       {/* Team name */}
-      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate" title={data.teamName}>
+      <p className="text-[10px] text-muted truncate" title={data.teamName}>
         {data.teamName}
       </p>
 
@@ -104,14 +104,14 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
           className={`flex flex-col items-center justify-center rounded p-2 ${
             data.openIncidentsP1 > 0
               ? 'bg-red-50 dark:bg-red-900/20'
-              : 'bg-gray-50 dark:bg-gray-800/50'
+              : 'bg-elevated'
           }`}
         >
           <span
             className={`text-2xl font-bold tabular-nums ${
               data.openIncidentsP1 > 0
                 ? 'text-red-600 dark:text-red-400'
-                : 'text-gray-500 dark:text-gray-400'
+                : 'text-muted'
             }`}
           >
             {data.openIncidentsP1}
@@ -125,14 +125,14 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
           className={`flex flex-col items-center justify-center rounded p-2 ${
             data.openIncidentsP2 > 0
               ? 'bg-amber-50 dark:bg-amber-900/20'
-              : 'bg-gray-50 dark:bg-gray-800/50'
+              : 'bg-elevated'
           }`}
         >
           <span
             className={`text-2xl font-bold tabular-nums ${
               data.openIncidentsP2 > 0
                 ? 'text-amber-600 dark:text-amber-400'
-                : 'text-gray-500 dark:text-gray-400'
+                : 'text-muted'
             }`}
           >
             {data.openIncidentsP2}
@@ -148,14 +148,14 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
         {data.onCallEngineer && (
           <div className="flex items-center gap-1">
             <PhoneCall size={10} className="text-gray-400 shrink-0" />
-            <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+            <span className="text-[10px] text-muted truncate">
               {data.onCallEngineer}
             </span>
           </div>
         )}
         <div className="flex items-center gap-1">
           <Clock size={10} className="text-gray-400 shrink-0" />
-          <span className="text-[10px] text-gray-500 dark:text-gray-400">
+          <span className="text-[10px] text-muted">
             {t('governance.customDashboards.teamHealth.lastDeploy', 'Last deploy')}:{' '}
             {formatRelativeTime(data.lastDeployAt)}
           </span>

@@ -122,7 +122,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
   });
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+    <div className="bg-card border border-border rounded-md p-5 space-y-4">
       <h2 className="text-base font-semibold text-heading">{t('backup.scheduleTitle')}</h2>
 
       <div className="flex items-center gap-3">
@@ -262,7 +262,7 @@ export function BackupCoordinatorPage() {
           <>
             {/* Last successful backup summary */}
             {data.lastSuccessfulBackup ? (
-              <div className="flex items-center gap-4 bg-success/10 border border-success/20 rounded-xl p-4">
+              <div className="flex items-center gap-4 bg-success/10 border border-success/20 rounded-md p-4">
                 <CheckCircle2 size={20} className="text-success shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-heading">
@@ -287,7 +287,7 @@ export function BackupCoordinatorPage() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-4 bg-warning/10 border border-warning/20 rounded-xl p-4">
+              <div className="flex items-center gap-4 bg-warning/10 border border-warning/20 rounded-md p-4">
                 <AlertTriangle size={20} className="text-warning shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-heading">{t('backup.noBackupYet')}</p>
@@ -314,7 +314,7 @@ export function BackupCoordinatorPage() {
             {/* Backup history */}
             <div>
               <h2 className="text-base font-semibold text-heading mb-3">{t('backup.historyTitle')}</h2>
-              <div className="bg-card border border-border rounded-xl">
+              <div className="bg-card border border-border rounded-md">
                 {data.recentBackups.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-muted text-sm gap-2">
                     <DatabaseBackup size={24} className="text-muted/40" />

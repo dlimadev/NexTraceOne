@@ -172,24 +172,24 @@ export function TechnicalDebtPage() {
                 <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                   {data.totalDebtScore}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-muted mt-1">
                   {t('governance.technicalDebt.totalScore')}
                 </p>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center py-4">
-                <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-xl font-semibold text-heading">
                   {data.highestRiskService}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-muted mt-1">
                   {t('governance.technicalDebt.highestRisk')}
                 </p>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="py-4">
-                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                <p className="text-xs text-muted italic">
                   {data.recommendedAction}
                 </p>
               </CardBody>
@@ -201,7 +201,7 @@ export function TechnicalDebtPage() {
             {data.byType.map((item) => (
               <span
                 key={item.debtType}
-                className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-700 dark:text-gray-300"
+                className="inline-flex items-center gap-1 rounded-full bg-elevated px-3 py-1 text-xs text-gray-700 dark:text-gray-300"
               >
                 <span className="font-medium">
                   {t(`governance.technicalDebt.${item.debtType.replace('-', '')}`, {
@@ -232,7 +232,7 @@ export function TechnicalDebtPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
+                <tr className="border-b border-edge">
                   <th className="py-2 px-3 text-left text-xs text-gray-500">
                     {t('governance.technicalDebt.serviceName')}
                   </th>
@@ -276,7 +276,7 @@ export function TechnicalDebtPage() {
                     <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
                       {item.estimatedEffortDays}d
                     </td>
-                    <td className="py-2 px-3 text-right font-semibold text-gray-900 dark:text-white">
+                    <td className="py-2 px-3 text-right font-semibold text-heading">
                       {item.debtScore}
                     </td>
                   </tr>
@@ -291,7 +291,7 @@ export function TechnicalDebtPage() {
       <PageSection title={t('governance.technicalDebt.recordDebt')}>
         <Card>
           <CardHeader>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-heading">
               {t('governance.technicalDebt.recordDebt')}
             </h3>
           </CardHeader>
@@ -309,7 +309,7 @@ export function TechnicalDebtPage() {
                     onChange={(e) => setServiceName(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                   />
                 </div>
                 <div>
@@ -319,7 +319,7 @@ export function TechnicalDebtPage() {
                   <select
                     value={debtType}
                     onChange={(e) => setDebtType(e.target.value)}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                   >
                     {DEBT_TYPES.map((dt) => (
                       <option key={dt} value={dt}>
@@ -343,7 +343,7 @@ export function TechnicalDebtPage() {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   maxLength={200}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                  className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                 />
               </div>
 
@@ -358,7 +358,7 @@ export function TechnicalDebtPage() {
                   required
                   maxLength={1000}
                   rows={3}
-                  className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                  className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                 />
               </div>
 
@@ -371,7 +371,7 @@ export function TechnicalDebtPage() {
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                   >
                     {SEVERITIES.map((s) => (
                       <option key={s} value={s}>
@@ -391,7 +391,7 @@ export function TechnicalDebtPage() {
                     value={effortDays}
                     onChange={(e) => setEffortDays(Number(e.target.value))}
                     required
-                    className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white"
+                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
                   />
                 </div>
               </div>
