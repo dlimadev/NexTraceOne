@@ -86,10 +86,10 @@ export function PreflightPage() {
         : 'bg-critical/10 border border-critical/20';
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-canvas flex flex-col items-center justify-center py-12 px-4">
       {/* Logo / Title area */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 bg-accent/10 rounded-2xl mb-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-accent/10 rounded-md mb-4">
           <Server size={28} className="text-accent" />
         </div>
         <h1 className="text-2xl font-bold text-heading">{t('preflight.title')}</h1>
@@ -114,7 +114,7 @@ export function PreflightPage() {
         {report && (
           <>
             {/* Overall status banner */}
-            <div className={`rounded-xl p-4 ${overallBg}`}>
+            <div className={`rounded-md p-4 ${overallBg}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {statusIcon(report.overallStatus, 22)}

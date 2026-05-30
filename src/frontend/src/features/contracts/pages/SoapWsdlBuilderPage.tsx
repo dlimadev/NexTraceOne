@@ -57,15 +57,15 @@ export function SoapWsdlBuilderPage() {
                 <div className="space-y-2">
                   <div>
                     <label className="text-xs text-muted-foreground">{t('soapBuilder.serviceName')}</label>
-                    <input value={serviceName} onChange={(e) => setServiceName(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background" />
+                    <input value={serviceName} onChange={(e) => setServiceName(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground">{t('soapBuilder.targetNamespace')}</label>
-                    <input value={targetNamespace} onChange={(e) => setTargetNamespace(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-background font-mono" />
+                    <input value={targetNamespace} onChange={(e) => setTargetNamespace(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated font-mono" />
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground">{t('soapBuilder.wsdlVersion')}</label>
-                    <select value={wsdlVersion} onChange={(e) => setWsdlVersion(e.target.value as '1.1' | '2.0')} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                    <select value={wsdlVersion} onChange={(e) => setWsdlVersion(e.target.value as '1.1' | '2.0')} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="1.1">WSDL 1.1</option>
                       <option value="2.0">WSDL 2.0</option>
                     </select>
@@ -121,22 +121,22 @@ export function SoapWsdlBuilderPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('soapBuilder.operationName')}</label>
-                      <input value={active.name} onChange={(e) => update(active.id, { name: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background" />
+                      <input value={active.name} onChange={(e) => update(active.id, { name: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('soapBuilder.style')}</label>
-                      <select value={active.style} onChange={(e) => update(active.id, { style: e.target.value as 'document' | 'rpc' })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                      <select value={active.style} onChange={(e) => update(active.id, { style: e.target.value as 'document' | 'rpc' })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         <option value="document">document</option>
                         <option value="rpc">rpc</option>
                       </select>
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('soapBuilder.inputMessage')}</label>
-                      <input value={active.inputMessage} onChange={(e) => update(active.id, { inputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono text-xs" />
+                      <input value={active.inputMessage} onChange={(e) => update(active.id, { inputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono text-xs" />
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('soapBuilder.outputMessage')}</label>
-                      <input value={active.outputMessage} onChange={(e) => update(active.id, { outputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono text-xs" />
+                      <input value={active.outputMessage} onChange={(e) => update(active.id, { outputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono text-xs" />
                     </div>
                   </div>
 
@@ -146,7 +146,7 @@ export function SoapWsdlBuilderPage() {
                       value={active.documentation}
                       onChange={(e) => update(active.id, { documentation: e.target.value })}
                       rows={4}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background"
+                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated"
                     />
                   </div>
                 </CardBody>
@@ -166,3 +166,4 @@ export function SoapWsdlBuilderPage() {
     </PageContainer>
   );
 }
+

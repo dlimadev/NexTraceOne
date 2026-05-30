@@ -148,7 +148,7 @@ export function ProtobufBuilderPage() {
                   <textarea
                     value={proto}
                     onChange={(e) => setProto(e.target.value)}
-                    className="w-full h-[480px] p-4 text-xs font-mono bg-background rounded-lg resize-none border-0 focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="w-full h-[480px] p-4 text-xs font-mono bg-elevated rounded-lg resize-none border-0 focus:outline-none focus:ring-1 focus:ring-accent"
                     spellCheck={false}
                   />
                 </CardBody>
@@ -197,3 +197,4 @@ export function ProtobufBuilderPage() {
     </PageContainer>
   );
 }
+

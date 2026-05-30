@@ -61,7 +61,7 @@ export function ActivationPage() {
             <p className="text-sm text-muted mb-8">{t('activation.invalidTokenMessage')}</p>
             <Link
               to="/login"
-              className="text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+              className="text-sm text-accent hover:text-heading transition-colors font-medium"
             >
               {t('auth.signInButton')}
             </Link>

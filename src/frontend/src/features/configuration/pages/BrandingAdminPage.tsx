@@ -292,16 +292,16 @@ export function BrandingAdminPage() {
               <div
                 className="rounded-lg border border-edge overflow-hidden"
                 style={{
-                  background: previewTheme === 'dark' ? '#081120' : '#F8F9FC',
-                  color: previewTheme === 'dark' ? '#F2F7FF' : '#0C243C',
+                  background: previewTheme === 'dark' ? '#141419' : '#f5f5fa',
+                  color: previewTheme === 'dark' ? '#ebecff' : '#1c1c2e',
                 }}
               >
                 {/* Mini sidebar header */}
                 <div
                   className="px-4 py-3 border-b flex items-center gap-2"
                   style={{
-                    borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.14)' : 'rgba(15,23,42,0.12)',
-                    background: previewTheme === 'dark' ? '#0F1E38' : '#FFFFFF',
+                    borderColor: previewTheme === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.12)',
+                    background: previewTheme === 'dark' ? '#19192c' : '#ffffff',
                   }}
                 >
                   <div className="flex items-center gap-1.5">
@@ -337,7 +337,7 @@ export function BrandingAdminPage() {
                 <div
                   className="border-t px-4 py-2 flex items-center justify-between text-[10px] opacity-60"
                   style={{
-                    borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.14)' : 'rgba(15,23,42,0.12)',
+                    borderColor: previewTheme === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.12)',
                   }}
                 >
                   <span className="flex-1 text-center">
@@ -361,8 +361,8 @@ export function BrandingAdminPage() {
               <div
                 className="rounded-lg border border-edge overflow-hidden"
                 style={{
-                  background: previewTheme === 'dark' ? '#081120' : '#F8F9FC',
-                  color: previewTheme === 'dark' ? '#F2F7FF' : '#0C243C',
+                  background: previewTheme === 'dark' ? '#141419' : '#f5f5fa',
+                  color: previewTheme === 'dark' ? '#ebecff' : '#1c1c2e',
                 }}
               >
                 {/* Login background area */}
@@ -406,11 +406,11 @@ export function BrandingAdminPage() {
                   <div className="w-full space-y-2 mt-2">
                     <div
                       className="h-7 rounded-md border w-full"
-                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.2)' : 'rgba(15,23,42,0.15)' }}
+                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.15)' }}
                     />
                     <div
                       className="h-7 rounded-md border w-full"
-                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.2)' : 'rgba(15,23,42,0.15)' }}
+                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.15)' }}
                     />
                     <div
                       className="h-7 rounded-md w-full text-center text-[10px] text-white font-medium flex items-center justify-center bg-accent"
@@ -423,7 +423,7 @@ export function BrandingAdminPage() {
                   {values['branding.login_sso_button_text'] && (
                     <div
                       className="h-7 rounded-md border w-full text-center text-[10px] flex items-center justify-center"
-                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.2)' : 'rgba(15,23,42,0.15)' }}
+                      style={{ borderColor: previewTheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.15)' }}
                     >
                       {values['branding.login_sso_button_text']}
                     </div>
@@ -516,7 +516,7 @@ function BrandingFieldEditor({
             onChange={(e) => onChange(field.key, e.target.checked ? 'true' : 'false')}
             className="sr-only peer"
           />
-          <div className="w-9 h-5 bg-gray-500/30 peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent" />
+          <div className="w-9 h-5 bg-muted/30 peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent" />
         </label>
       ) : field.type === 'color' ? (
         <div className="flex items-center gap-3">

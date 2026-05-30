@@ -84,7 +84,7 @@ export function RestOpenApiBuilderPage() {
                     <input
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background"
+                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated"
                     />
                   </div>
                   <div>
@@ -92,7 +92,7 @@ export function RestOpenApiBuilderPage() {
                     <input
                       value={version}
                       onChange={(e) => setVersion(e.target.value)}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono"
+                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono"
                     />
                   </div>
                   <div>
@@ -100,7 +100,7 @@ export function RestOpenApiBuilderPage() {
                     <input
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono"
+                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono"
                     />
                   </div>
                 </div>
@@ -170,7 +170,7 @@ export function RestOpenApiBuilderPage() {
                             <select
                               value={ep.method}
                               onChange={(e) => updateEndpoint(ep.id, { method: e.target.value as Endpoint['method'] })}
-                              className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-background"
+                              className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated"
                             >
                               {['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
                                 <option key={m} value={m}>{m}</option>
@@ -182,7 +182,7 @@ export function RestOpenApiBuilderPage() {
                             <input
                               value={ep.path}
                               onChange={(e) => updateEndpoint(ep.id, { path: e.target.value })}
-                              className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-background font-mono"
+                              className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated font-mono"
                             />
                           </div>
                         </div>
@@ -191,7 +191,7 @@ export function RestOpenApiBuilderPage() {
                           <input
                             value={ep.summary}
                             onChange={(e) => updateEndpoint(ep.id, { summary: e.target.value })}
-                            className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-background"
+                            className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated"
                           />
                         </div>
                         <div className="flex justify-end">
@@ -216,3 +216,4 @@ export function RestOpenApiBuilderPage() {
     </PageContainer>
   );
 }
+

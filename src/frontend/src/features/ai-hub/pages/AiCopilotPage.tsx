@@ -664,7 +664,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                 </button>
 
                 {isModelSelectorOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-[300px] bg-card border border-edge rounded-lg shadow-lg z-50 max-h-[400px] overflow-y-auto">
+                  <div className="absolute right-0 top-full mt-1 w-[300px] bg-card border border-edge rounded-md shadow-lg z-50 max-h-[400px] overflow-y-auto">
                     {availableModels.appliedPolicyName && (
                       <div className="px-3 py-2 border-b border-edge flex items-center gap-1.5 text-[10px] text-muted">
                         <Lock size={10} />
@@ -770,7 +770,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
             {/* ── Hero / Welcome screen (Copilot-style) ───────────────── */}
             {showHero && !isLoadingMessages && !messagesError && (
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center animate-fade-in">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-blue flex items-center justify-center mb-6 shadow-lg">
+                <div className="w-16 h-16 rounded-md bg-gradient-to-br from-accent to-blue flex items-center justify-center mb-6 shadow-lg">
                   <Bot size={32} className="text-white" />
                 </div>
                 <h2 className="text-2xl font-semibold text-heading mb-2">
@@ -789,7 +789,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                         setInputValue(t(promptKey));
                         inputRef.current?.focus();
                       }}
-                      className="group text-left px-4 py-3 rounded-xl border border-edge bg-card hover:bg-hover hover:border-accent/30 transition-all duration-200 shadow-sm hover:shadow-md"
+                      className="group text-left px-4 py-3 rounded-md border border-edge bg-card hover:bg-hover hover:border-accent/30 transition-all duration-200 shadow-sm hover:shadow-md"
                     >
                       <div className="flex items-start gap-2.5">
                         <Sparkles size={16} className="text-accent shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
@@ -814,7 +814,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                         </div>
                       )}
 
-                      <div className={`rounded-2xl px-4 py-3 ${
+                      <div className={`rounded-md px-4 py-3 ${
                         msg.role === 'assistant'
                           ? 'bg-elevated'
                           : 'bg-accent text-white'
@@ -946,7 +946,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-blue flex items-center justify-center shrink-0">
                         <Bot size={14} className="text-white" />
                       </div>
-                      <div className="bg-elevated rounded-2xl px-4 py-3 flex items-center gap-2">
+                      <div className="bg-elevated rounded-md px-4 py-3 flex items-center gap-2">
                         <span className="text-xs text-muted animate-pulse">{t('aiHub.typing')}</span>
                         <span className="flex gap-1">
                           <span className="w-1.5 h-1.5 bg-accent/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -994,7 +994,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                   onKeyDown={handleKeyDown}
                   placeholder={t('aiHub.copilot.inputPlaceholder')}
                   rows={1}
-                  className="w-full bg-elevated border border-edge rounded-2xl px-4 py-3 pr-12 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent resize-none overflow-hidden"
+                  className="w-full bg-elevated border border-edge rounded-md px-4 py-3 pr-12 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent resize-none overflow-hidden"
                   disabled={isTyping}
                   style={{ minHeight: '44px', maxHeight: '120px' }}
                   onInput={e => {

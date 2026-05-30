@@ -95,7 +95,7 @@ export function MfaPage() {
           <button
             type="button"
             onClick={handleResend}
-            className="text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+            className="text-sm text-accent hover:text-heading transition-colors font-medium"
           >
             {t('mfa.resend')}
           </button>

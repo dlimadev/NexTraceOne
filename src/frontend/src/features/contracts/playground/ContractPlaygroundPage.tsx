@@ -92,7 +92,7 @@ export function ContractPlaygroundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-6 py-6 text-body">
+    <div className="min-h-screen bg-elevated px-6 py-6 text-body">
       {/* ─── Header ─── */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
@@ -354,3 +354,4 @@ function formatJson(s: string): string {
     return s;
   }
 }
+

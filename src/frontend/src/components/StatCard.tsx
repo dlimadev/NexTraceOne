@@ -66,7 +66,7 @@ export function StatCard({
   const content = (
     <div
       className={cn(
-        'bg-card rounded-2xl border border-edge shadow-surface',
+        'bg-card rounded-md border border-edge shadow-surface',
         'flex flex-col overflow-hidden',
         'transition-all duration-[var(--nto-motion-base)]',
         'hover:border-edge-strong hover:shadow-elevated hover:-translate-y-0.5',

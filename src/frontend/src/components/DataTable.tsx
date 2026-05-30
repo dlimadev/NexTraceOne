@@ -154,13 +154,13 @@ export function DataTable<T>({
   const SortIcon = ({ columnId }: { columnId: string }) => {
     if (currentSort?.columnId !== columnId) return <ArrowUpDown size={14} className="text-faded" />;
     return currentSort.direction === 'asc'
-      ? <ArrowUp size={14} className="text-cyan" />
-      : <ArrowDown size={14} className="text-cyan" />;
+      ? <ArrowUp size={14} className="text-accent" />
+      : <ArrowDown size={14} className="text-accent" />;
   };
 
   if (!loading && data.length === 0) {
     return (
-      <div className={cn('bg-card rounded-2xl border border-edge shadow-surface overflow-hidden', className)}>
+      <div className={cn('bg-card rounded-md border border-edge shadow-surface overflow-hidden', className)}>
         <EmptyState
           title={emptyTitle ?? ''}
           description={emptyDescription}

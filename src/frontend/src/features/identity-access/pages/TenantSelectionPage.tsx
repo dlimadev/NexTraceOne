@@ -46,7 +46,7 @@ export function TenantSelectionPage() {
     <AuthShell cardMaxWidth="max-w-lg">
       <AuthCard>
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-accent/15 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-md bg-accent/15 mb-4">
             <Building2 size={28} className="text-accent" />
           </div>
           <h2 className="text-2xl font-bold text-heading">{t('tenants.selectTenant')}</h2>
@@ -62,13 +62,13 @@ export function TenantSelectionPage() {
               key={tenant.id}
               onClick={() => handleSelect(tenant)}
               disabled={!tenant.isActive || loading !== null}
-              className={`w-full bg-elevated rounded-xl border px-6 py-4 flex items-center gap-4 text-left transition-all duration-[var(--nto-motion-base)] ${
+              className={`w-full bg-elevated rounded-md border px-6 py-4 flex items-center gap-4 text-left transition-all duration-[var(--nto-motion-base)] ${
                 tenant.isActive
                   ? 'border-edge hover:border-accent/40 hover:shadow-glow-sm cursor-pointer'
                   : 'border-edge opacity-50 cursor-not-allowed'
               }`}
             >
-              <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center text-accent font-bold text-sm shrink-0">
+              <div className="w-10 h-10 rounded-sm bg-accent/15 flex items-center justify-center text-accent font-bold text-sm shrink-0">
                 {tenant.name[0]?.toUpperCase() ?? 'T'}
               </div>
               <div className="flex-1 min-w-0">

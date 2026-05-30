@@ -60,11 +60,11 @@ export function AsyncApiBuilderPage() {
                 <div className="space-y-2">
                   <div>
                     <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.apiTitle')}</label>
-                    <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background" />
+                    <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.version')}</label>
-                    <input value={version} onChange={(e) => setVersion(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono" />
+                    <input value={version} onChange={(e) => setVersion(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono" />
                   </div>
                 </div>
               </CardBody>
@@ -122,24 +122,24 @@ export function AsyncApiBuilderPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.address')}</label>
-                      <input value={active.address} onChange={(e) => update(active.id, { address: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background font-mono" />
+                      <input value={active.address} onChange={(e) => update(active.id, { address: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono" />
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.protocol')}</label>
-                      <select value={active.protocol} onChange={(e) => update(active.id, { protocol: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                      <select value={active.protocol} onChange={(e) => update(active.id, { protocol: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         {PROTOCOLS.map((p) => <option key={p} value={p}>{p}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.operation')}</label>
-                      <select value={active.operation} onChange={(e) => update(active.id, { operation: e.target.value as ChannelOperation })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                      <select value={active.operation} onChange={(e) => update(active.id, { operation: e.target.value as ChannelOperation })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         <option value="publish">publish</option>
                         <option value="subscribe">subscribe</option>
                       </select>
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.description')}</label>
-                      <input value={active.description} onChange={(e) => update(active.id, { description: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background" />
+                      <input value={active.description} onChange={(e) => update(active.id, { description: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                     </div>
                   </div>
 
@@ -149,7 +149,7 @@ export function AsyncApiBuilderPage() {
                       value={active.messageSchema}
                       onChange={(e) => update(active.id, { messageSchema: e.target.value })}
                       rows={8}
-                      className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-background font-mono"
+                      className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated font-mono"
                     />
                   </div>
                 </CardBody>
@@ -169,3 +169,4 @@ export function AsyncApiBuilderPage() {
     </PageContainer>
   );
 }
+

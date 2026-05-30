@@ -61,7 +61,7 @@ export function ForgotPasswordPage() {
             </p>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-accent hover:text-heading transition-colors font-medium"
             >
               <ArrowLeft size={16} />
               {t('forgotPassword.backToLogin')}
@@ -99,7 +99,7 @@ export function ForgotPasswordPage() {
             <div className="mt-6 text-center">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+                className="inline-flex items-center gap-2 text-sm text-accent hover:text-heading transition-colors font-medium"
               >
                 <ArrowLeft size={16} />
                 {t('forgotPassword.backToLogin')}

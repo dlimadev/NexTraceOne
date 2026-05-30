@@ -62,7 +62,7 @@ export function GraphQlSchemaExplorer({ items, onSelect }: Props) {
         <Search className="absolute left-2 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
         <input
           type="text"
-          className="w-full pl-7 pr-3 py-2 text-xs border border-border rounded bg-background"
+          className="w-full pl-7 pr-3 py-2 text-xs border border-border rounded bg-elevated"
           placeholder={t('graphqlDiffViewer.filter')}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -108,3 +108,4 @@ export function GraphQlSchemaExplorer({ items, onSelect }: Props) {
     </div>
   );
 }
+

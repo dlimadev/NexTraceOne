@@ -63,7 +63,7 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
       {/* Background radial halos — animação pulse suave nos orbs */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
-          className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px] bg-[radial-gradient(circle,rgba(27,127,232,0.10)_0%,transparent_70%)]"
+          className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px] bg-[radial-gradient(circle,rgba(173,176,255,0.10)_0%,transparent_70%)]"
           style={{ animation: 'pulse-soft 4s ease-in-out infinite' }}
         />
         <div

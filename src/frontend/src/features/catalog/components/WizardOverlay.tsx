@@ -78,7 +78,7 @@ export function WizardOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby="wizard-title"
-        className="relative z-10 w-full max-w-3xl mx-4 bg-panel border border-edge rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-fade-in"
+        className="relative z-10 w-full max-w-3xl mx-4 bg-panel border border-edge rounded-md shadow-2xl flex flex-col max-h-[90vh] animate-fade-in"
       >
 
         {/* Header */}

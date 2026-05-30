@@ -69,7 +69,7 @@ export function ResetPasswordPage() {
               </Link>
               <Link
                 to="/login"
-                className="text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+                className="text-sm text-accent hover:text-heading transition-colors font-medium"
               >
                 {t('resetPassword.backToLogin')}
               </Link>
@@ -134,7 +134,7 @@ export function ResetPasswordPage() {
             <div className="mt-6 text-center">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 text-sm text-cyan hover:text-cyan-hover transition-colors font-medium"
+                className="inline-flex items-center gap-2 text-sm text-accent hover:text-heading transition-colors font-medium"
               >
                 <ArrowLeft size={16} />
                 {t('resetPassword.backToLogin')}

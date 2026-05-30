@@ -54,14 +54,14 @@ export function DoraMetricsWidget({ config, timeRange, title }: WidgetProps) {
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
         <Activity size={14} className="text-accent shrink-0" />
-        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
         <span className="ml-auto text-xs font-medium text-accent">{data.overallRating}</span>
       </div>
       <div className="grid grid-cols-2 gap-2 flex-1">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded bg-gray-50 dark:bg-gray-800/50 p-2">
-            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{m.label}</div>
-            <div className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+          <div key={m.label} className="rounded-sm bg-elevated p-2">
+            <div className="text-xs text-muted truncate">{m.label}</div>
+            <div className="text-sm font-bold text-heading tabular-nums">
               {m.value} <span className="text-xs font-normal">{m.unit}</span>
             </div>
           </div>
@@ -91,7 +91,7 @@ export function WidgetError({ title }: { title: string }) {
   const { t } = useTranslation();
   return (
     <div className="h-full flex flex-col items-center justify-center gap-2 p-2">
-      <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
+      <span className="text-xs text-muted text-center">
         {title} — {t('governance.dashboardView.widgetError', 'Could not load data')}
       </span>
     </div>

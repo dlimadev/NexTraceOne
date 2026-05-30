@@ -90,7 +90,7 @@ export function ConsumerDrivenContractPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-6 py-6 text-body">
+    <div className="min-h-screen bg-canvas px-6 py-6 text-body">
       {/* ─── Header ─── */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">

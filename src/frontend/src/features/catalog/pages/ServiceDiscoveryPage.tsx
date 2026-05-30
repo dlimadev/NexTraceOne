@@ -399,7 +399,7 @@ function ActionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-panel border border-edge rounded-xl shadow-lg w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-panel border border-edge rounded-md shadow-lg w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-base font-semibold text-heading mb-1">
           {actionType === 'match' && t('catalog.discovery.modal.matchTitle', 'Match to Existing Service')}
           {actionType === 'register' && t('catalog.discovery.modal.registerTitle', 'Register as New Service')}

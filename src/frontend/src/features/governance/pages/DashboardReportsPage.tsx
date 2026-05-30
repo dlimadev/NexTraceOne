@@ -244,7 +244,7 @@ export function DashboardReportsPage() {
       {/* New Schedule modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card rounded-2xl border border-edge shadow-elevated w-full max-w-md p-6">
+          <div className="bg-card rounded-md border border-edge shadow-elevated w-full max-w-md p-6">
             <h2 className="text-base font-semibold text-heading mb-4">
               {t('governance.dashboardReports.newSchedule', 'New Schedule')}
             </h2>
@@ -259,7 +259,7 @@ export function DashboardReportsPage() {
                   value={form.dashboardId}
                   onChange={(e) => handleFormChange('dashboardId', e.target.value)}
                   placeholder="db-engineer-home"
-                  className="w-full rounded-lg border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
+                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export function DashboardReportsPage() {
                   value={form.cronExpression}
                   onChange={(e) => handleFormChange('cronExpression', e.target.value)}
                   placeholder="0 8 * * 1"
-                  className="w-full rounded-lg border border-edge bg-elevated px-3 py-2 text-sm text-body font-mono focus:outline-none focus:border-accent"
+                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body font-mono focus:outline-none focus:border-accent"
                 />
                 <p className="mt-1 text-xs text-muted">{humanCron(form.cronExpression)}</p>
               </div>
@@ -285,7 +285,7 @@ export function DashboardReportsPage() {
                   <select
                     value={form.format}
                     onChange={(e) => handleFormChange('format', e.target.value as ReportFormat)}
-                    className="w-full rounded-lg border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
+                    className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
                   >
                     <option value="PDF">PDF</option>
                     <option value="PNG">PNG</option>
@@ -303,7 +303,7 @@ export function DashboardReportsPage() {
                     onChange={(e) =>
                       handleFormChange('retentionDays', parseInt(e.target.value, 10) || 30)
                     }
-                    className="w-full rounded-lg border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
+                    className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
                   />
                 </div>
               </div>
@@ -317,7 +317,7 @@ export function DashboardReportsPage() {
                   value={form.recipients}
                   onChange={(e) => handleFormChange('recipients', e.target.value)}
                   placeholder="team@example.com, cto@example.com"
-                  className="w-full rounded-lg border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
+                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
