@@ -167,8 +167,8 @@ export function Tabs({
             'inline-flex items-center gap-2 border-b-2 font-medium transition-colors',
             size === 'sm' ? 'px-3 pb-2 text-xs' : 'px-4 pb-3 text-sm',
             tab.id === activeId
-              ? 'border-cyan text-cyan'
-              : 'border-transparent text-muted hover:text-body hover:border-edge-strong',
+              ? 'border-accent text-heading font-medium'
+              : 'border-transparent text-muted hover:text-body',
             tab.disabled && 'opacity-40 cursor-not-allowed',
           )}
           style={{ transitionDuration: 'var(--nto-motion-fast)' }}
