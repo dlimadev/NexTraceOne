@@ -11,6 +11,7 @@
    Semântica: success · info · warning · danger · critical · neutral
    ═══════════════════════════════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 /* ─── Theme Variables (light/dark) ─────────────────────────────────────────────
@@ -21,156 +22,176 @@
 /* ─── LIGHT THEME ─────────────────────────────────────────────────────────── */
 :root,
 [data-theme="light"] {
-  --t-canvas: #F8F9FC;
-  --t-deep: #F0F1F5;
-  --t-panel: #FFFFFF;
-  --t-card: #FFFFFF;
-  --t-elevated: #F2F3F7;
-  --t-subtle: #F5F6FA;
-  --t-hover: #ECEDF2;
-  --t-active: #E4E5EB;
-  --t-selected: #E8EAEF;
-  --t-input: #FFFFFF;
-  --t-overlay: rgba(15, 23, 42, 0.45);
+  /* ── Backgrounds (Strato light — levemente purple-tinted) ── */
+  --t-canvas: #f8f9ff;
+  --t-deep: #f0f0f8;
+  --t-panel: #ffffff;
+  --t-card: #ffffff;
+  --t-elevated: #f4f4fc;
+  --t-subtle: #f6f6fc;
+  --t-hover: #ededf8;
+  --t-active: #e4e4f2;
+  --t-selected: #e8e8f5;
+  --t-input: #ffffff;
+  --t-overlay: rgba(15, 15, 30, 0.45);
 
-  --t-edge: rgba(15, 23, 42, 0.12);
-  --t-edge-strong: rgba(15, 23, 42, 0.20);
-  --t-edge-focus: rgba(27, 127, 232, 0.42);
-  --t-divider: rgba(15, 23, 42, 0.06);
+  --t-edge: rgba(60, 60, 100, 0.12);
+  --t-edge-strong: rgba(60, 60, 100, 0.20);
+  --t-edge-focus: rgba(89, 101, 217, 0.42);
+  --t-divider: rgba(60, 60, 100, 0.06);
 
-  --t-heading: #0C243C;
-  --t-body: #4A5568;
-  --t-muted: #718096;
-  --t-faded: #A0AEC0;
-  --t-on-accent: #FFFFFF;
+  --t-heading: #14142a;
+  --t-body: #3c3c5a;
+  --t-muted: #6b6b8a;
+  --t-faded: #9090aa;
+  --t-on-accent: #ffffff;
 
-  --t-accent: #1B7FE8;
-  --t-accent-hover: #1468CC;
-  --t-accent-muted: rgba(27, 127, 232, 0.10);
-  --t-focus-ring: rgba(27, 127, 232, 0.40);
+  /* ── Primary: Strato purple-blue (escuro no light) ── */
+  --t-accent: #5965d9;
+  --t-accent-hover: #4756c8;
+  --t-accent-muted: rgba(89, 101, 217, 0.10);
+  --t-focus-ring: rgba(89, 101, 217, 0.40);
   --t-cyan: #0891B2;
   --t-cyan-hover: #0E7490;
-  --t-mint: #059669;
-  --t-mint-hover: #047857;
+  --t-mint: #1a7a5e;
+  --t-mint-hover: #156649;
 
   --t-blue: #1B7FE8;
   --t-blue-hover: #1468CC;
   --t-blue-muted: rgba(27, 127, 232, 0.10);
-  --t-blue-glow: rgba(27, 127, 232, 0.20);
+  --t-blue-glow: rgba(27, 127, 232, 0.15);
 
-  --t-success: #059669;
-  --t-success-muted: rgba(5, 150, 105, 0.10);
-  --t-info: #0891B2;
-  --t-info-muted: rgba(8, 145, 178, 0.10);
-  --t-warning: #D97706;
-  --t-warning-muted: rgba(217, 119, 6, 0.10);
-  --t-critical: #DC2626;
-  --t-critical-muted: rgba(220, 38, 38, 0.10);
-  --t-danger: #DC2626;
-  --t-neutral: #718096;
+  --t-success: #1a7a5e;
+  --t-success-muted: rgba(26, 122, 94, 0.10);
+  --t-info: #2563aa;
+  --t-info-muted: rgba(37, 99, 170, 0.10);
+  --t-warning: #92580a;
+  --t-warning-muted: rgba(146, 88, 10, 0.10);
+  --t-critical: #b02244;
+  --t-critical-muted: rgba(176, 34, 68, 0.10);
+  --t-danger: #b02244;
+  --t-neutral: #6b6b8a;
 
-  --t-data-1: #0891B2;
-  --t-data-2: #059669;
-  --t-data-3: #718096;
-  --t-data-4: #D97706;
-  --t-data-5: #DC2626;
-  --t-data-6: #4F6EE5;
+  /* ── Data viz (light — Strato palette adaptada) ── */
+  --t-data-1: #2e5bd9;
+  --t-data-2: #1a7a5e;
+  --t-data-3: #2a8a84;
+  --t-data-4: #92580a;
+  --t-data-5: #b02244;
+  --t-data-6: #5a42d4;
+  --t-data-7: #5a6a8a;
+  --t-data-8: #2563aa;
+  --t-data-9: #8a3a7a;
+  --t-data-10: #5a3a9a;
 
-  --t-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --t-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --t-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --t-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
-  --t-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.10), 0 8px 10px rgba(0, 0, 0, 0.04);
-  --t-shadow-glow-cyan: 0 0 0 1px rgba(8, 145, 178, 0.18), 0 0 16px rgba(8, 145, 178, 0.10);
-  --t-shadow-glow-mint: 0 0 0 1px rgba(5, 150, 105, 0.16), 0 0 16px rgba(5, 150, 105, 0.08);
-  --t-shadow-glow-danger: 0 0 0 1px rgba(220, 38, 38, 0.20), 0 0 16px rgba(220, 38, 38, 0.08);
-  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.22), 0 0 16px rgba(27, 127, 232, 0.12);
-  --t-shadow-glow: 0 0 16px rgba(27, 127, 232, 0.10);
-  --t-shadow-glow-sm: 0 0 8px rgba(27, 127, 232, 0.06);
+  --t-shadow-xs: 0px 0px 0px 1px rgba(60, 60, 100, 0.08);
+  --t-shadow-sm: 0 1px 2px rgba(60, 60, 100, 0.08), 0 1px 3px rgba(60, 60, 100, 0.05);
+  --t-shadow-md: 0 2px 8px rgba(60, 60, 100, 0.08), 0 1px 3px rgba(60, 60, 100, 0.05);
+  --t-shadow-lg: 0 8px 24px rgba(60, 60, 100, 0.10), 0 2px 6px rgba(60, 60, 100, 0.06);
+  --t-shadow-xl: 0 16px 40px rgba(60, 60, 100, 0.12), 0 4px 10px rgba(60, 60, 100, 0.08);
+  --t-shadow-glow-cyan: 0 0 0 1px rgba(8, 145, 178, 0.16), 0 0 12px rgba(8, 145, 178, 0.08);
+  --t-shadow-glow-mint: 0 0 0 1px rgba(26, 122, 94, 0.14), 0 0 12px rgba(26, 122, 94, 0.07);
+  --t-shadow-glow-danger: 0 0 0 1px rgba(176, 34, 68, 0.18), 0 0 12px rgba(176, 34, 68, 0.08);
+  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.18), 0 0 12px rgba(27, 127, 232, 0.10);
+  --t-shadow-glow: 0 0 12px rgba(89, 101, 217, 0.10);
+  --t-shadow-glow-sm: 0 0 6px rgba(89, 101, 217, 0.06);
 
-  --t-sidebar-bg: #FFFFFF;
-  --t-sidebar-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8F9FC 100%);
-  --t-header-bg: rgba(248, 249, 252, 0.92);
-  --t-scrollbar: rgba(15, 23, 42, 0.14);
-  --t-scrollbar-hover: rgba(15, 23, 42, 0.24);
-  --t-selection-bg: rgba(27, 127, 232, 0.18);
+  --t-sidebar-bg: #1e1e2e;
+  --t-sidebar-gradient: linear-gradient(180deg, #1e1e2e 0%, #141419 100%);
+  --t-header-bg: rgba(248, 249, 255, 0.95);
+  --t-scrollbar: rgba(60, 60, 100, 0.14);
+  --t-scrollbar-hover: rgba(60, 60, 100, 0.24);
+  --t-selection-bg: rgba(89, 101, 217, 0.18);
 }
 
 /* ─── DARK THEME ──────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --t-canvas: #081120;
-  --t-deep: #0A1730;
-  --t-panel: #0F1E38;
-  --t-card: #0F1E38;
-  --t-elevated: #132543;
-  --t-subtle: #0D1B32;
-  --t-hover: #132543;
-  --t-active: #1A2E50;
-  --t-selected: #162A48;
-  --t-input: #091729;
-  --t-overlay: rgba(3, 10, 22, 0.72);
+  /* ── Backgrounds (Dynatrace Strato near-black) ── */
+  --t-canvas: #141419;
+  --t-deep: #19192c;
+  --t-panel: #19192c;
+  --t-card: #19192c;
+  --t-elevated: #212135;
+  --t-subtle: #1a1a2e;
+  --t-hover: #2a2a40;
+  --t-active: #32324e;
+  --t-selected: #2a2a44;
+  --t-input: #141419;
+  --t-overlay: rgba(0, 0, 0, 0.72);
 
-  --t-edge: rgba(129, 170, 214, 0.14);
-  --t-edge-strong: rgba(129, 170, 214, 0.22);
-  --t-edge-focus: rgba(55, 190, 233, 0.42);
+  --t-edge: rgba(255, 255, 255, 0.10);
+  --t-edge-strong: rgba(255, 255, 255, 0.16);
+  --t-edge-focus: rgba(173, 176, 255, 0.50);
   --t-divider: rgba(255, 255, 255, 0.06);
 
-  --t-heading: #F2F7FF;
-  --t-body: #B5C4D8;
-  --t-muted: #8EA0B7;
-  --t-faded: #6D7E96;
-  --t-on-accent: #04111E;
+  --t-heading: #ebecff;
+  --t-body: #a0a1c0;
+  --t-muted: #6b6b8a;
+  --t-faded: #50506a;
+  --t-on-accent: #19192c;
 
-  --t-accent: #27ABDA;
-  --t-accent-hover: #62CBEC;
-  --t-accent-muted: rgba(39, 171, 218, 0.12);
-  --t-focus-ring: rgba(39, 171, 218, 0.50);
+  /* ── Primary: Strato purple-blue ── */
+  --t-accent: #adb0ff;
+  --t-accent-hover: #c4c6ff;
+  --t-accent-muted: rgba(173, 176, 255, 0.12);
+  --t-focus-ring: rgba(173, 176, 255, 0.50);
+
+  /* ── Cyan: mantido como cor de suporte (telemetria/health) ── */
   --t-cyan: #12C4E8;
   --t-cyan-hover: #3DD2F5;
-  --t-mint: #18E8B8;
-  --t-mint-hover: #6CF5D8;
+
+  /* ── Mint: Strato success teal ── */
+  --t-mint: #47ae8f;
+  --t-mint-hover: #60c5a6;
 
   --t-blue: #1B7FE8;
   --t-blue-hover: #3D96F2;
   --t-blue-muted: rgba(27, 127, 232, 0.14);
-  --t-blue-glow: rgba(27, 127, 232, 0.30);
+  --t-blue-glow: rgba(27, 127, 232, 0.20);
 
-  --t-success: #18E8B8;
-  --t-success-muted: rgba(24, 232, 184, 0.12);
-  --t-info: #12C4E8;
-  --t-info-muted: rgba(18, 196, 232, 0.12);
-  --t-warning: #F5C062;
-  --t-warning-muted: rgba(245, 192, 98, 0.12);
-  --t-critical: #FF7A86;
-  --t-critical-muted: rgba(255, 122, 134, 0.12);
-  --t-danger: #FF7A86;
-  --t-neutral: #8EA0B7;
+  /* ── Semantic status (Strato palette) ── */
+  --t-success: #47ae8f;
+  --t-success-muted: rgba(71, 174, 143, 0.12);
+  --t-info: #65a2ce;
+  --t-info-muted: rgba(101, 162, 206, 0.12);
+  --t-warning: #e9b86e;
+  --t-warning-muted: rgba(233, 184, 110, 0.12);
+  --t-critical: #da7288;
+  --t-critical-muted: rgba(218, 114, 136, 0.12);
+  --t-danger: #da7288;
+  --t-neutral: #6b6b8a;
 
-  --t-data-1: #12C4E8;
-  --t-data-2: #18E8B8;
-  --t-data-3: #8EA0B7;
-  --t-data-4: #F5C062;
-  --t-data-5: #FF7A86;
-  --t-data-6: #5F8DFF;
+  /* ── Data viz: 10-color Strato app palette ── */
+  --t-data-1: #528dee;
+  --t-data-2: #47ae8f;
+  --t-data-3: #61bab1;
+  --t-data-4: #e9b86e;
+  --t-data-5: #da7288;
+  --t-data-6: #7d6afa;
+  --t-data-7: #8793af;
+  --t-data-8: #65a2ce;
+  --t-data-9: #c16aad;
+  --t-data-10: #8261cf;
 
-  --t-shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.18);
-  --t-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.20);
-  --t-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
-  --t-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.20);
-  --t-shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.40), 0 8px 20px rgba(0, 0, 0, 0.24);
-  --t-shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.22), 0 0 24px rgba(18, 196, 232, 0.16);
-  --t-shadow-glow-mint: 0 0 0 1px rgba(24, 232, 184, 0.20), 0 0 24px rgba(24, 232, 184, 0.14);
-  --t-shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
-  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.30), 0 0 24px rgba(27, 127, 232, 0.20);
-  --t-shadow-glow: 0 0 24px rgba(18, 196, 232, 0.16);
-  --t-shadow-glow-sm: 0 0 12px rgba(18, 196, 232, 0.10);
+  /* ── Shadows: Strato 3-level system (flat/raised/floating) ── */
+  --t-shadow-xs: 0px 0px 0px 1px rgba(240, 240, 245, 0.08);
+  --t-shadow-sm: 0px 0px 0px 1px rgba(240, 240, 245, 0.08), 0px 1px 2px rgba(240, 240, 245, 0.05), 0px 4px 8px -2px rgba(240, 240, 245, 0.07);
+  --t-shadow-md: 0px 0px 0px 1px rgba(240, 240, 245, 0.08), 0px 1px 2px rgba(240, 240, 245, 0.05), 0px 5px 11px -2px rgba(240, 240, 245, 0.10);
+  --t-shadow-lg: 0px 0px 0px 1px rgba(240, 240, 245, 0.08), 0px 1px 2px rgba(240, 240, 245, 0.05), 0px 5px 11px -2px rgba(240, 240, 245, 0.16);
+  --t-shadow-xl: 0px 0px 0px 1px rgba(240, 240, 245, 0.10), 0px 2px 4px rgba(240, 240, 245, 0.06), 0px 8px 20px -4px rgba(240, 240, 245, 0.20);
+  --t-shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.20), 0 0 16px rgba(18, 196, 232, 0.12);
+  --t-shadow-glow-mint: 0 0 0 1px rgba(71, 174, 143, 0.18), 0 0 16px rgba(71, 174, 143, 0.10);
+  --t-shadow-glow-danger: 0 0 0 1px rgba(218, 114, 136, 0.22), 0 0 16px rgba(218, 114, 136, 0.12);
+  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.24), 0 0 16px rgba(27, 127, 232, 0.14);
+  --t-shadow-glow: 0 0 16px rgba(173, 176, 255, 0.14);
+  --t-shadow-glow-sm: 0 0 8px rgba(173, 176, 255, 0.08);
 
-  --t-sidebar-bg: #081120;
-  --t-sidebar-gradient: linear-gradient(180deg, #0A1730 0%, #081120 100%);
-  --t-header-bg: rgba(10, 23, 48, 0.90);
-  --t-scrollbar: rgba(129, 170, 214, 0.18);
-  --t-scrollbar-hover: rgba(129, 170, 214, 0.28);
-  --t-selection-bg: rgba(24, 207, 242, 0.25);
+  --t-sidebar-bg: #141419;
+  --t-sidebar-gradient: linear-gradient(180deg, #141419 0%, #141419 100%);
+  --t-header-bg: rgba(20, 20, 25, 0.95);
+  --t-scrollbar: rgba(173, 176, 255, 0.14);
+  --t-scrollbar-hover: rgba(173, 176, 255, 0.24);
+  --t-selection-bg: rgba(173, 176, 255, 0.20);
 }
 
 /* ─── Tailwind @theme — maps semantic tokens to CSS variables ─────────────── */
@@ -229,36 +250,40 @@
   --color-danger: var(--t-danger);
   --color-neutral: var(--t-neutral);
 
-  /* Data Visualization */
+  /* Data Visualization (Strato 10-color) */
   --color-data-1: var(--t-data-1);
   --color-data-2: var(--t-data-2);
   --color-data-3: var(--t-data-3);
   --color-data-4: var(--t-data-4);
   --color-data-5: var(--t-data-5);
   --color-data-6: var(--t-data-6);
+  --color-data-7: var(--t-data-7);
+  --color-data-8: var(--t-data-8);
+  --color-data-9: var(--t-data-9);
+  --color-data-10: var(--t-data-10);
 
   /* Typography */
-  --font-sans: 'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: 'Roboto Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* Border Radius */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
+  /* Border Radius — Strato (sutil, profissional) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-pill: 999px;
 
-  /* Shadows */
+  /* Shadows: Strato 3-level (flat=xs, raised=sm/md, floating=lg/xl) */
   --shadow-xs: var(--t-shadow-xs);
   --shadow-sm: var(--t-shadow-sm);
   --shadow-md: var(--t-shadow-md);
-  --shadow-surface: var(--t-shadow-md);
+  --shadow-surface: var(--t-shadow-sm);
   --shadow-lg: var(--t-shadow-lg);
-  --shadow-elevated: var(--t-shadow-lg);
+  --shadow-elevated: var(--t-shadow-md);
   --shadow-xl: var(--t-shadow-xl);
-  --shadow-floating: var(--t-shadow-xl);
+  --shadow-floating: var(--t-shadow-lg);
   --shadow-glow-cyan: var(--t-shadow-glow-cyan);
   --shadow-glow-mint: var(--t-shadow-glow-mint);
   --shadow-glow-danger: var(--t-shadow-glow-danger);
@@ -291,7 +316,7 @@
    ──────────────────────────────────────────────────────────────────────────── */
 :root {
   /* Layout dimensions — alinhados com Template NexLink */
-  --nto-header-height: 56px;
+  --nto-header-height: 48px;
   --nto-sidebar-width-expanded: 320px;
   --nto-sidebar-width-collapsed: 80px;
 
@@ -309,7 +334,7 @@
   --nto-gradient-page: var(--t-sidebar-gradient);
   --nto-gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
   --nto-gradient-accent: linear-gradient(135deg, rgba(24,207,242,0.18) 0%, rgba(30,242,193,0.08) 100%);
-  --nto-gradient-cta: linear-gradient(135deg, #29C0E5 0%, #2BB7E3 100%);
+  --nto-gradient-cta: linear-gradient(135deg, #adb0ff 0%, #999bed 100%);
   --nto-gradient-blue: linear-gradient(135deg, #1B7FE8 0%, #1468CC 100%);
   --nto-gradient-logo: linear-gradient(135deg, #1B7FE8 0%, #12C4E8 50%, #18E8B8 100%);
   --nto-gradient-hero: radial-gradient(ellipse at 30% 40%, rgba(27,127,232,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 70%, rgba(18,196,232,0.08) 0%, transparent 55%);
@@ -367,31 +392,32 @@
    dark values, enabling an always-dark sidebar without duplicating classes.
    ────────────────────────────────────────────────────────────────────────────── */
 [data-sidebar] {
-  --t-canvas: #081120;
-  --t-deep: #0A1730;
-  --t-panel: #0F1E38;
-  --t-card: #0F1E38;
-  --t-elevated: #132543;
-  --t-subtle: #0D1B32;
-  --t-hover: rgba(255, 255, 255, 0.04);
-  --t-active: #1A2E50;
-  --t-edge: rgba(129, 170, 214, 0.08);
-  --t-edge-strong: rgba(129, 170, 214, 0.20);
-  --t-edge-focus: rgba(55, 190, 233, 0.42);
+  /* Dynatrace Strato dock — always near-black */
+  --t-canvas: #141419;
+  --t-deep: #19192c;
+  --t-panel: #141419;
+  --t-card: #19192c;
+  --t-elevated: #212135;
+  --t-subtle: #1a1a2e;
+  --t-hover: rgba(255, 255, 255, 0.05);
+  --t-active: #2a2a40;
+  --t-edge: rgba(255, 255, 255, 0.08);
+  --t-edge-strong: rgba(255, 255, 255, 0.14);
+  --t-edge-focus: rgba(173, 176, 255, 0.40);
   --t-divider: rgba(255, 255, 255, 0.06);
-  --t-heading: #F2F7FF;
-  --t-body: rgba(181, 196, 216, 0.9);
-  --t-muted: rgba(129, 170, 214, 0.6);
-  --t-faded: rgba(129, 170, 214, 0.4);
-  --t-accent: #1B7FE8;
-  --t-accent-hover: #1468CC;
-  --t-accent-muted: rgba(27, 127, 232, 0.15);
+  --t-heading: #ebecff;
+  --t-body: rgba(160, 161, 192, 0.9);
+  --t-muted: rgba(107, 107, 138, 0.8);
+  --t-faded: rgba(80, 80, 106, 0.7);
+  --t-accent: #adb0ff;
+  --t-accent-hover: #c4c6ff;
+  --t-accent-muted: rgba(173, 176, 255, 0.12);
   --t-blue: #1B7FE8;
   --t-blue-muted: rgba(27, 127, 232, 0.15);
-  --t-success: #10B981;
-  --t-warning: #F59E0B;
-  --t-critical: #EF4444;
-  --t-sidebar-gradient: linear-gradient(180deg, #0D1C35, #081120);
+  --t-success: #47ae8f;
+  --t-warning: #e9b86e;
+  --t-critical: #da7288;
+  --t-sidebar-gradient: linear-gradient(180deg, #141419, #141419);
 }
 
 /* ─── Global Base ────────────────────────────────────────────────────────────── */
