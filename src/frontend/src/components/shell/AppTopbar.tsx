@@ -29,9 +29,9 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
     <div className="shrink-0">
       <header
         className={cn(
-          'h-14 border-b border-edge',
+          'h-12 border-b border-edge',
           'flex items-center justify-between px-5 lg:px-6 gap-3',
-          'backdrop-blur-md sticky top-0 z-[var(--z-header)]',
+          'sticky top-0 z-[var(--z-header)]',
         )}
         style={{ backgroundColor: 'var(--t-header-bg)' }}
         role="banner"

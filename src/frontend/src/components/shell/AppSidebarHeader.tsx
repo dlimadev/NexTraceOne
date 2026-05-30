@@ -29,8 +29,8 @@ export function AppSidebarHeader({ collapsed = false }: AppSidebarHeaderProps) {
       'shrink-0 border-b border-edge flex items-center',
       'transition-all duration-[var(--nto-motion-medium)]',
       collapsed
-        ? 'justify-center px-2 py-4 h-20'
-        : 'px-5 py-0 h-20',
+        ? 'justify-center px-3 h-12'
+        : 'px-3 h-12',
     )}>
       {activeLogo ? (
         // Custom branding logo

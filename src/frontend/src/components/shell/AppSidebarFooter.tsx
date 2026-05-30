@@ -35,20 +35,20 @@ export function AppSidebarFooter({
 
   const avatarStyle: React.CSSProperties = {
     background: 'linear-gradient(135deg, #1B7FE8, #12C4E8, #18E8B8)',
-    borderRadius: '8px',
-    width: 30,
-    height: 30,
+    borderRadius: '50%',
+    width: 28,
+    height: 28,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 700,
     color: '#FFFFFF',
   };
 
   return (
-    <div className="border-t border-[rgba(129,170,214,0.08)] shrink-0 relative">
+    <div className="border-t border-edge shrink-0 relative">
       {collapsed ? (
         /* Rail mode — avatar only, click opens menu */
         <div className="p-2 flex justify-center">
@@ -81,10 +81,11 @@ export function AppSidebarFooter({
             <p style={{ fontSize: 11, fontWeight: 600, color: '#F2F7FF' }} className="truncate leading-tight">
               {displayName}
             </p>
-            <p style={{ fontSize: 9, color: 'rgba(142,160,183,.6)' }} className="truncate leading-tight">
-              {persona ? t(`persona.${persona}.label`) : ''}
-              {roleName ? ` · ${roleName}` : ''}
-            </p>
+            {roleName && (
+              <p style={{ fontSize: 9, color: 'rgba(142,160,183,.6)' }} className="truncate leading-tight">
+                {roleName}
+              </p>
+            )}
           </div>
           <ChevronUp
             size={14}
