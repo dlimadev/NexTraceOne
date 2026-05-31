@@ -5,7 +5,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Abstractions;
 /// <summary>
 /// Repositório de <see cref="FeatureFlagRecord"/> — persiste e consulta o estado
 /// de feature flags por serviço e tenant.
-/// Por omissão satisfeita por <c>NullFeatureFlagRepository</c> (honest-null).
+/// Implementação EF Core em Infrastructure/Contracts/Persistence/Repositories/EfFeatureFlagRepository.
 /// Wave AS.1 — Feature Flag &amp; Experimentation Governance.
 /// </summary>
 public interface IFeatureFlagRepository

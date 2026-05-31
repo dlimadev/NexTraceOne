@@ -7,7 +7,7 @@ namespace NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de dead letters do event consumer.
-/// Substitui o NullEventConsumerDeadLetterRepository que armazenava em memória (perdido ao reiniciar).
+/// Persistência EF Core para dead letters de eventos de integração.
 /// </summary>
 internal sealed class EfEventConsumerDeadLetterRepository(IntegrationsDbContext context)
     : IEventConsumerDeadLetterRepository

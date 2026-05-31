@@ -5,7 +5,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 /// <summary>
 /// Repositório de <see cref="ModelPredictionSample"/> — persiste e consulta amostras
 /// de predição de modelos de IA para detecção de drift e análise de qualidade.
-/// Por omissão satisfeita por <c>NullModelPredictionRepository</c> (honest-null).
+/// Implementação EF Core em Governance/Persistence/Repositories/EfModelPredictionRepository.
 /// Wave AT.1 — AI Model Quality &amp; Drift Governance.
 /// </summary>
 public interface IModelPredictionRepository

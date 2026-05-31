@@ -3,7 +3,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Abstractions;
 /// <summary>
 /// Repositório de SbomRecord — regista o Bill of Materials (SBOM) de um serviço
 /// para análise de supply chain, vulnerabilidades e proveniência de dependências.
-/// Por omissão satisfeita por <c>NullSbomRepository</c> (honest-null).
+/// Implementação EF Core em Infrastructure/Contracts/Persistence/Repositories/EfSbomRepository.
 /// Wave AO.1 — Supply Chain &amp; Dependency Provenance.
 /// </summary>
 public interface ISbomRepository

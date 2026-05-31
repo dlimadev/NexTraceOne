@@ -4,7 +4,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
 /// <summary>
 /// Repositório de agendamentos de deprecação de contratos.
-/// Por omissão satisfeita por <c>NullDeprecationScheduleRepository</c> (honest-null).
+/// Implementação EF Core em Infrastructure/Contracts/Persistence/Repositories/EfDeprecationScheduleRepository.
 /// Wave AV.3 — ScheduleContractDeprecation.
 /// </summary>
 public interface IDeprecationScheduleRepository

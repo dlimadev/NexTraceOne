@@ -156,7 +156,6 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetModelDriftReport.Query>, GetModelDriftReport.Validator>();
         services.AddTransient<IValidator<GetAiModelQualityReport.Query>, GetAiModelQualityReport.Validator>();
         services.AddTransient<IValidator<GetAiGovernanceComplianceReport.Query>, GetAiGovernanceComplianceReport.Validator>();
-        services.AddSingleton<IModelPredictionRepository, NullModelPredictionRepository>();
         services.AddSingleton<IModelDriftReader, NullModelDriftReader>();
         services.AddSingleton<IAiModelQualityReader, NullAiModelQualityReader>();
         services.AddSingleton<IAiGovernanceComplianceReader, NullAiGovernanceComplianceReader>();

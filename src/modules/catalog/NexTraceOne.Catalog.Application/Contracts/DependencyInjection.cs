@@ -175,7 +175,6 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetFeatureFlagRiskReport.Query>, GetFeatureFlagRiskReport.Validator>();
         services.AddTransient<IValidator<GetExperimentGovernanceReport.Query>, GetExperimentGovernanceReport.Validator>();
 
-        services.AddSingleton<IFeatureFlagRepository, NullFeatureFlagRepository>();
         services.AddSingleton<IFeatureFlagRiskReader, NullFeatureFlagRiskReader>();
         services.AddSingleton<IExperimentGovernanceReader, NullExperimentGovernanceReader>();
 
