@@ -97,14 +97,14 @@ export function ReleaseCalendarWidget({ config, environmentId, timeRange, title 
         <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
-        <span className="ml-auto text-[10px] text-gray-400 shrink-0 tabular-nums">
+        <span className="ml-auto text-[10px] text-faded shrink-0 tabular-nums">
           {data.items.length}{' '}
           {t('governance.customDashboards.releaseCalendar.changes', 'changes')}
         </span>
       </div>
 
       {data.items.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-gray-400">
+        <div className="flex-1 flex items-center justify-center text-xs text-faded">
           {t('governance.customDashboards.releaseCalendar.noChanges', 'No changes scheduled')}
         </div>
       ) : (
@@ -112,14 +112,14 @@ export function ReleaseCalendarWidget({ config, environmentId, timeRange, title 
           {sortedDays.map((day) => (
             <div key={day} className="flex gap-2 items-start min-h-[20px]">
               {/* Day label */}
-              <span className="text-[9px] text-gray-400 font-mono w-14 shrink-0 pt-0.5 tabular-nums">
+              <span className="text-[9px] text-faded font-mono w-14 shrink-0 pt-0.5 tabular-nums">
                 {formatDayLabel(day)}
               </span>
 
               {/* Change tags */}
               <div className="flex flex-wrap gap-1 flex-1">
                 {byDay[day].map((c) => {
-                  const colorClass = CHANGE_TYPE_COLOR[c.type] ?? 'bg-gray-400';
+                  const colorClass = CHANGE_TYPE_COLOR[c.type] ?? 'bg-elevated';
                   const statusClass = STATUS_CLASSES[c.status] ?? '';
                   return (
                     <span
@@ -142,7 +142,7 @@ export function ReleaseCalendarWidget({ config, environmentId, timeRange, title 
         {(['deploy', 'release', 'patch', 'rollback'] as ChangeType[]).map((type) => (
           <span key={type} className="flex items-center gap-1">
             <span className={`inline-block w-2 h-2 rounded-full ${CHANGE_TYPE_COLOR[type]}`} />
-            <span className="text-[9px] text-gray-400 capitalize">{type}</span>
+            <span className="text-[9px] text-faded capitalize">{type}</span>
           </span>
         ))}
       </div>

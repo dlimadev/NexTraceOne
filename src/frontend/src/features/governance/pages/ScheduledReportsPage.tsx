@@ -169,7 +169,7 @@ export function ScheduledReportsPage() {
       <PageSection>
         {!data?.items.length ? (
           <EmptyState
-            icon={<BarChart3 className="w-8 h-8 text-gray-400" />}
+            icon={<BarChart3 className="w-8 h-8 text-faded" />}
             title={t('scheduledReports.empty')}
             action={
               <Button size="sm" onClick={() => setShowBuilder(true)}>
@@ -191,7 +191,7 @@ export function ScheduledReportsPage() {
                             enabled: !report.isEnabled,
                           })
                         }
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-faded hover:text-blue-600 transition-colors"
                         aria-label={
                           report.isEnabled
                             ? t('scheduledReports.disabled')
@@ -232,7 +232,7 @@ export function ScheduledReportsPage() {
                       </Badge>
                       <button
                         onClick={() => deleteReport.mutate(report.reportId)}
-                        className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+                        className="text-faded hover:text-red-500 transition-colors ml-2"
                         aria-label={t('common.delete')}
                       >
                         <Trash2 className="w-4 h-4" />

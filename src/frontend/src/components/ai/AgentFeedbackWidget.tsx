@@ -96,7 +96,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder={t('ai.feedback.commentPlaceholder')}
-        className="w-full text-xs resize-none rounded border border-border bg-background p-2 focus:outline-none focus:ring-1 focus:ring-ring"
+        className="w-full text-xs resize-none rounded border border-border bg-elevated p-2 focus:outline-none focus:ring-1 focus:ring-ring"
         rows={2}
         maxLength={500}
       />

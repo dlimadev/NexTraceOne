@@ -50,7 +50,7 @@ export function OnCallStatusWidget({ config, title }: WidgetProps) {
               <div className="text-xs font-medium text-heading">{e.teamName}</div>
               <div className="text-xs text-muted">{e.oncallName}</div>
             </div>
-            <span className="text-xs text-gray-400">{e.until}</span>
+            <span className="text-xs text-faded">{e.until}</span>
           </div>
         ))}
       </div>

@@ -98,7 +98,7 @@ export function DeploymentFrequencyWidget({ config, timeRange, title }: WidgetPr
               role="img"
               aria-label={`${bar.label}: ${bar.count} ${t('governance.deploymentFreq.deploys', 'deploys')}`}
             />
-            <span className="text-[9px] text-gray-400 truncate">{bar.label}</span>
+            <span className="text-[9px] text-faded truncate">{bar.label}</span>
           </div>
         ))}
       </div>

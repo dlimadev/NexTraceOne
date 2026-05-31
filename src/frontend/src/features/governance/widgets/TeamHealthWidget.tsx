@@ -68,7 +68,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
             {displayTitle}
           </span>
         </div>
-        <div className="flex-1 flex items-center justify-center text-xs text-gray-400 text-center px-2">
+        <div className="flex-1 flex items-center justify-center text-xs text-faded text-center px-2">
           {t('governance.customDashboards.teamHealth.noTeam', 'Select a team in widget settings')}
         </div>
       </div>
@@ -116,7 +116,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
           >
             {data.openIncidentsP1}
           </span>
-          <span className="text-[9px] text-gray-500 font-medium text-center">
+          <span className="text-[9px] text-muted font-medium text-center">
             {t('governance.customDashboards.teamHealth.p1Incidents', 'P1 Incidents')}
           </span>
         </div>
@@ -137,7 +137,7 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
           >
             {data.openIncidentsP2}
           </span>
-          <span className="text-[9px] text-gray-500 font-medium text-center">
+          <span className="text-[9px] text-muted font-medium text-center">
             {t('governance.customDashboards.teamHealth.p2Incidents', 'P2 Incidents')}
           </span>
         </div>
@@ -147,14 +147,14 @@ export function TeamHealthWidget({ config, environmentId, title }: WidgetProps) 
       <div className="flex flex-col gap-0.5">
         {data.onCallEngineer && (
           <div className="flex items-center gap-1">
-            <PhoneCall size={10} className="text-gray-400 shrink-0" />
+            <PhoneCall size={10} className="text-faded shrink-0" />
             <span className="text-[10px] text-muted truncate">
               {data.onCallEngineer}
             </span>
           </div>
         )}
         <div className="flex items-center gap-1">
-          <Clock size={10} className="text-gray-400 shrink-0" />
+          <Clock size={10} className="text-faded shrink-0" />
           <span className="text-[10px] text-muted">
             {t('governance.customDashboards.teamHealth.lastDeploy', 'Last deploy')}:{' '}
             {formatRelativeTime(data.lastDeployAt)}

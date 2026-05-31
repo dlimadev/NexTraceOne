@@ -208,7 +208,7 @@ export function TechnicalDebtPage() {
                     defaultValue: item.debtType,
                   })}
                 </span>
-                <span className="text-gray-400">·</span>
+                <span className="text-faded">·</span>
                 <span>
                   {item.count} / {item.totalScore} {t('governance.technicalDebt.score')}
                 </span>
@@ -233,22 +233,22 @@ export function TechnicalDebtPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-edge">
-                  <th className="py-2 px-3 text-left text-xs text-gray-500">
+                  <th className="py-2 px-3 text-left text-xs text-muted">
                     {t('governance.technicalDebt.serviceName')}
                   </th>
-                  <th className="py-2 px-3 text-left text-xs text-gray-500">
+                  <th className="py-2 px-3 text-left text-xs text-muted">
                     {t('governance.technicalDebt.debtType')}
                   </th>
-                  <th className="py-2 px-3 text-left text-xs text-gray-500">
+                  <th className="py-2 px-3 text-left text-xs text-muted">
                     {t('governance.technicalDebt.debtTitle')}
                   </th>
-                  <th className="py-2 px-3 text-left text-xs text-gray-500">
+                  <th className="py-2 px-3 text-left text-xs text-muted">
                     {t('governance.technicalDebt.severity')}
                   </th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">
+                  <th className="py-2 px-3 text-right text-xs text-muted">
                     {t('governance.technicalDebt.effortDays')}
                   </th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">
+                  <th className="py-2 px-3 text-right text-xs text-muted">
                     {t('governance.technicalDebt.score')}
                   </th>
                 </tr>
@@ -257,7 +257,7 @@ export function TechnicalDebtPage() {
                 {data?.debtItems.map((item) => (
                   <tr
                     key={item.debtId}
-                    className="border-b border-edge hover:bg-gray-50 dark:hover:bg-gray-900/20"
+                    className="border-b border-edge hover:bg-hover dark:hover:bg-canvas/20"
                   >
                     <td className="py-2 px-3 text-body font-medium">
                       {item.serviceName}

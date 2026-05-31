@@ -107,7 +107,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
   }, [draftSlot, onApply]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-950 text-heading">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-canvas text-heading">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="flex items-center gap-3 px-4 py-2 border-b border-edge bg-card shrink-0">
@@ -122,7 +122,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
 
         <div className="h-5 w-px bg-elevated" />
 
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">
+        <span className="text-xs font-semibold text-faded uppercase tracking-wider shrink-0">
           {t('governance.dashboardBuilder.panelEditor.title')}
         </span>
 
@@ -138,7 +138,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 text-sm rounded border border-edge text-muted hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="px-3 py-1.5 text-sm rounded border border-edge text-muted hover:bg-hover dark:hover:bg-elevated transition-colors"
           >
             {t('governance.dashboardBuilder.panelEditor.discard')}
           </button>
@@ -184,7 +184,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
         <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
           {tableView ? (
             <div className="w-full h-full flex items-center justify-center">
-              <p className="text-xs text-gray-400 italic font-mono">
+              <p className="text-xs text-faded italic font-mono">
                 {/* Raw data placeholder when table view is active */}
                 {'[ raw data table — connect a data source to populate ]'}
               </p>
@@ -198,7 +198,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 italic">
+            <p className="text-sm text-faded italic">
               {/* No NQL query placeholder */}
               {'— configure a query to see the preview —'}
             </p>
@@ -242,7 +242,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
               <div className="h-full flex flex-col">
                 {/* Query tab header */}
                 <div className="flex items-center gap-2 px-3 py-1.5 border-b border-edge shrink-0">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+                  <span className="text-[10px] text-faded uppercase tracking-wider">
                     {t('governance.dashboardBuilder.queryBuilder.service')}
                   </span>
                 </div>
@@ -267,7 +267,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
 
             {activeTab === 'alerts' && (
               <div className="flex items-center justify-center h-full p-8">
-                <p className="text-sm text-gray-400 italic">
+                <p className="text-sm text-faded italic">
                   {t('governance.dashboardBuilder.panelEditor.tabs.alerts')} — coming in v2
                 </p>
               </div>

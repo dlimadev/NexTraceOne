@@ -40,14 +40,14 @@ function AnnotationsTooltip({ active, payload }: { active?: boolean; payload?: {
   if (!data) return null;
 
   return (
-    <div className="rounded border border-gray-700 bg-gray-900 px-2 py-1.5 shadow-xl">
+    <div className="rounded border border-gray-700 bg-canvas px-2 py-1.5 shadow-xl">
       <p className="text-[10px] font-semibold" style={{ color: SEVERITY_COLORS[data.severity] }}>
         {data.label}
       </p>
-      <p className="text-[9px] text-gray-400">
+      <p className="text-[9px] text-faded">
         {new Date(data.timestamp).toLocaleString()}
       </p>
-      <p className="text-[9px] text-gray-500 capitalize">{data.type}</p>
+      <p className="text-[9px] text-muted capitalize">{data.type}</p>
     </div>
   );
 }

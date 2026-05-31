@@ -136,9 +136,9 @@ export function KnowledgeGraphPage() {
                 <CardBody className="p-3">
                   <div className="flex items-center gap-2 text-sm">
                     <span className="font-medium text-body">{edge.sourceId}</span>
-                    <Layers size={14} className="text-gray-400" />
+                    <Layers size={14} className="text-faded" />
                     <Badge variant="secondary" className="text-xs">{edge.relationshipType}</Badge>
-                    <Layers size={14} className="text-gray-400" />
+                    <Layers size={14} className="text-faded" />
                     <span className="font-medium text-body">{edge.targetId}</span>
                   </div>
                 </CardBody>

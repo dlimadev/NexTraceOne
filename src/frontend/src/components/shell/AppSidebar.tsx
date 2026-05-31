@@ -285,7 +285,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                     }}
                     title={sectionLabels[section] ? t(sectionLabels[section]) : section}
                     className={cn(
-                      'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-xl mb-1',
+                      'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-md mb-1',
                       'transition-all duration-200',
                       isActive
                         ? 'bg-[rgba(27,127,232,.25)] text-[#3D96F2] shadow-[0_0_12px_rgba(27,127,232,.18),inset_0_0_0_1px_rgba(27,127,232,.4)]'
@@ -313,7 +313,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           <div className="px-3 py-2 border-t border-edge flex justify-center">
             <button
               onClick={onToggleCollapse}
-              className="flex items-center justify-center w-[48px] h-[40px] rounded-xl text-faded hover:text-body hover:bg-hover transition-all duration-200"
+              className="flex items-center justify-center w-[48px] h-[40px] rounded-md text-faded hover:text-body hover:bg-hover transition-all duration-200"
               title={t('common.expand')}
               aria-label={t('common.expand')}
             >

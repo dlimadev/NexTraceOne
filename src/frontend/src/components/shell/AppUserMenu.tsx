@@ -24,14 +24,14 @@ export function AppUserMenu() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-hover transition-all duration-[var(--nto-motion-base)]"
+        className="flex items-center gap-2.5 p-1.5 rounded-md hover:bg-hover transition-all duration-[var(--nto-motion-base)]"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('shell.userMenu')}
         data-testid="user-menu-trigger"
       >
         <div
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+          className="w-8 h-8 rounded-md flex items-center justify-center text-white text-sm font-bold"
           style={{ background: 'var(--nto-gradient-logo)' }}
         >
           {initial}

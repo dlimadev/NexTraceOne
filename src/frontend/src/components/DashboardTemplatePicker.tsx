@@ -87,19 +87,19 @@ export function DashboardTemplatePicker({ open, onClose, onSelect }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl p-6">
+      <div className="bg-white dark:bg-canvas rounded-lg shadow-xl w-full max-w-2xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Layout className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-heading dark:text-white">
               {t('dashboardTemplates.modal.title')}
             </h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <button onClick={onClose} className="text-faded hover:text-muted dark:hover:text-faded">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+        <p className="text-sm text-muted dark:text-faded mb-5">
           {t('dashboardTemplates.modal.subtitle')}
         </p>
         <div className="grid grid-cols-1 gap-3">
@@ -109,13 +109,13 @@ export function DashboardTemplatePicker({ open, onClose, onSelect }: Props) {
               onClick={() => { onSelect(tpl); onClose(); }}
               className="text-left border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
             >
-              <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
+              <div className="font-medium text-heading dark:text-white text-sm mb-1">
                 {t(tpl.titleKey)}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t(tpl.descKey)}</p>
+              <p className="text-xs text-muted dark:text-faded mb-2">{t(tpl.descKey)}</p>
               <div className="flex flex-wrap gap-1">
                 {tpl.widgets.map((w) => (
-                  <span key={w} className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded">
+                  <span key={w} className="text-xs bg-hover dark:bg-elevated text-muted dark:text-faded px-2 py-0.5 rounded">
                     {w}
                   </span>
                 ))}

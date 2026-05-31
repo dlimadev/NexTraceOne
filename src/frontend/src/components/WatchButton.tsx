@@ -86,7 +86,7 @@ export function WatchButton({ entityType, entityId, size = 'md' }: Props) {
         className={`inline-flex items-center gap-1.5 border rounded-md transition-colors font-medium ${sizeClass} ${
           isWatching
             ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-600 dark:bg-blue-900/20 dark:text-blue-300'
-            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300 hover:text-blue-600'
+            : 'border-gray-200 dark:border-gray-700 text-muted dark:text-faded hover:border-blue-300 hover:text-blue-600'
         }`}
         aria-label={isWatching ? t('watch.unwatch') : t('watch.watch')}
       >
@@ -95,7 +95,7 @@ export function WatchButton({ entityType, entityId, size = 'md' }: Props) {
       </button>
 
       {showMenu && !isWatching && (
-        <div className="absolute top-full left-0 mt-1 z-20 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[180px]">
+        <div className="absolute top-full left-0 mt-1 z-20 bg-white dark:bg-canvas border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[180px]">
           {(['all', 'critical', 'none'] as NotifyLevel[]).map((level) => (
             <button
               key={level}
@@ -103,14 +103,14 @@ export function WatchButton({ entityType, entityId, size = 'md' }: Props) {
                 watch.mutate(level);
                 setShowMenu(false);
               }}
-              className="w-full text-left text-sm px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+              className="w-full text-left text-sm px-4 py-2 hover:bg-hover dark:hover:bg-elevated text-body dark:text-faded"
             >
               {t(`watch.level.${level}`)}
             </button>
           ))}
           <button
             onClick={() => setShowMenu(false)}
-            className="w-full text-left text-xs px-4 py-1.5 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="w-full text-left text-xs px-4 py-1.5 text-faded hover:bg-hover dark:hover:bg-elevated"
           >
             {t('common.cancel')}
           </button>

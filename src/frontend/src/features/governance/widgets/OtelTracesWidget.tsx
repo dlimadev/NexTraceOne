@@ -269,7 +269,7 @@ export function OtelTracesWidget({
               {(data?.traces ?? []).map((trace) => (
                 <tr
                   key={trace.traceId}
-                  className="border-t border-edge hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  className="border-t border-edge hover:bg-hover dark:hover:bg-elevated/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedTraceId(trace.traceId)}
                   aria-label={`${t('obs.traces.openTrace', 'Open trace')} ${trace.traceId}`}
                 >

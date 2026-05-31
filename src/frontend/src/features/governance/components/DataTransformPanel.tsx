@@ -138,7 +138,7 @@ function TransformConfig({ transform, onChange }: { transform: DataTransform; on
     case 'groupBy':
       return <GroupByTransformConfig config={transform.config} onChange={handleConfigChange} />;
     default:
-      return <p className="text-xs text-gray-400 mt-2">Configure in query settings</p>;
+      return <p className="text-xs text-faded mt-2">Configure in query settings</p>;
   }
 }
 
@@ -205,7 +205,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
                 {def.icon}
                 {def.label}
               </span>
-              <span className="text-[9px] text-gray-400 leading-tight">{def.description}</span>
+              <span className="text-[9px] text-faded leading-tight">{def.description}</span>
             </button>
           ))}
         </div>
@@ -220,7 +220,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
               className={`rounded border ${transform.enabled ? 'border-edge' : 'border-edge opacity-50'} bg-card`}
             >
               <div className="flex items-center gap-1 px-2 py-1">
-                <GripVertical size={10} className="text-gray-300 cursor-grab" />
+                <GripVertical size={10} className="text-faded cursor-grab" />
                 <input
                   type="checkbox"
                   checked={transform.enabled}
@@ -236,7 +236,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
                     type="button"
                     onClick={() => moveTransform(index, -1)}
                     disabled={index === 0}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-[10px]"
+                    className="text-faded hover:text-muted disabled:opacity-30 text-[10px]"
                   >
                     ↑
                   </button>
@@ -244,14 +244,14 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
                     type="button"
                     onClick={() => moveTransform(index, 1)}
                     disabled={index === transforms.length - 1}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-[10px]"
+                    className="text-faded hover:text-muted disabled:opacity-30 text-[10px]"
                   >
                     ↓
                   </button>
                   <button
                     type="button"
                     onClick={() => removeTransform(transform.id)}
-                    className="text-gray-400 hover:text-red-400 p-0.5"
+                    className="text-faded hover:text-red-400 p-0.5"
                   >
                     <X size={10} />
                   </button>
@@ -270,7 +270,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
       </div>
 
       {transforms.length === 0 && (
-        <p className="text-xs text-gray-400 italic">
+        <p className="text-xs text-faded italic">
           {t('transforms.none', 'No transformations. Click Add to create one.')}
         </p>
       )}

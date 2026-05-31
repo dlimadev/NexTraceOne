@@ -108,14 +108,14 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
       >
         <span className="font-medium text-accent">${variable.key}</span>
         <span className="truncate max-w-[100px]">{displayLabel}</span>
-        <ChevronDown size={10} className={`shrink-0 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={10} className={`shrink-0 text-faded transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
         <div className="absolute top-full left-0 z-50 mt-1 w-56 rounded-lg border border-edge bg-card shadow-xl">
           <div className="p-2 border-b border-edge">
             <div className="flex items-center gap-1 rounded border border-edge bg-elevated px-1.5 py-1">
-              <Search size={10} className="text-gray-400 shrink-0" />
+              <Search size={10} className="text-faded shrink-0" />
               <input
                 type="text"
                 value={search}
@@ -131,7 +131,7 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
               <button
                 type="button"
                 onClick={() => onChange([])}
-                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-muted hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-muted hover:bg-hover dark:hover:bg-elevated rounded"
               >
                 <span className={`w-3.5 h-3.5 rounded border ${selected.length === 0 ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center`}>
                   {selected.length === 0 && <Check size={10} className="text-white" />}
@@ -144,7 +144,7 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
                 key={val}
                 type="button"
                 onClick={() => toggleValue(val)}
-                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-body hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-body hover:bg-hover dark:hover:bg-elevated rounded"
               >
                 {variable.allowMultiple ? (
                   <span className={`w-3.5 h-3.5 rounded border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center shrink-0`}>
@@ -159,7 +159,7 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
               </button>
             ))}
             {filtered.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-2">
+              <p className="text-xs text-faded text-center py-2">
                 {t('common.noResults', 'No results')}
               </p>
             )}
@@ -189,7 +189,7 @@ export function DashboardVariablesPanel({
     return (
       <div className="mb-4 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 flex items-center gap-4">
         <SlidersHorizontal size={14} className="text-accent animate-pulse" />
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-muted">
           {t('governance.dashboardView.loadingVariables', 'Loading variables...')}
         </span>
       </div>
@@ -228,7 +228,7 @@ export function DashboardVariablesPanel({
         </Button>
       )}
 
-      <span className="text-[10px] text-gray-400 ml-auto">
+      <span className="text-[10px] text-faded ml-auto">
         {t('governance.dashboardView.varsHint', 'Variable values override per-widget filters')}
       </span>
     </div>

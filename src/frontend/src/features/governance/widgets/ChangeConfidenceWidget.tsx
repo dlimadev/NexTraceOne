@@ -61,7 +61,7 @@ export function ChangeConfidenceWidget({ config, environmentId, timeRange, title
         {data.items.slice(0, 5).map((item) => (
           <div key={item.changeId} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
             <span className="text-xs text-body truncate flex-1 mr-2">{item.serviceName}</span>
-            <span className={`text-xs font-semibold tabular-nums ${RISK_COLOR[item.riskLevel] ?? 'text-gray-400'}`}>
+            <span className={`text-xs font-semibold tabular-nums ${RISK_COLOR[item.riskLevel] ?? 'text-faded'}`}>
               {item.confidenceScore}%
             </span>
           </div>

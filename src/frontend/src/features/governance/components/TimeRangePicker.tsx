@@ -251,7 +251,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
         <span className="font-medium">{label}</span>
         <ChevronDown
           size={12}
-          className={`shrink-0 transition-transform text-gray-400 ${isOpen ? 'rotate-180' : ''}`}
+          className={`shrink-0 transition-transform text-faded ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 

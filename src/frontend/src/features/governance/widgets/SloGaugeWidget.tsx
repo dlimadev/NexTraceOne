@@ -118,9 +118,9 @@ export function SloGaugeWidget({ config, timeRange, title }: WidgetProps) {
           {data.compliancePercent.toFixed(1)}%
         </span>
         <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
-        <span className="text-[10px] text-gray-400 truncate max-w-full">{data.sloName}</span>
+        <span className="text-[10px] text-faded truncate max-w-full">{data.sloName}</span>
       </div>
-      <span className="text-[10px] text-gray-400">
+      <span className="text-[10px] text-faded">
         {t('governance.sloStatus.target', 'Target')}: {data.target}%
       </span>
     </div>

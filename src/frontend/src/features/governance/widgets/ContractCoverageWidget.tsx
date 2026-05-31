@@ -106,7 +106,7 @@ export function ContractCoverageWidget({ config, title }: WidgetProps) {
         />
       </div>
 
-      <p className="text-[10px] text-gray-400 text-center">
+      <p className="text-[10px] text-faded text-center">
         {data.coveredServices} / {data.totalServices}{' '}
         {t('governance.customDashboards.contractCoverage.servicesWithContracts', 'services with contracts')}
       </p>

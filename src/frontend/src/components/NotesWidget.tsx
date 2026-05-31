@@ -69,17 +69,17 @@ export function NotesWidget({ userId = 'current' }: Props) {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 h-full flex flex-col">
+    <div className="bg-white dark:bg-canvas border border-gray-200 dark:border-gray-700 rounded-lg p-4 h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <FileText className="w-4 h-4 text-muted" />
+          <span className="text-sm font-medium text-body dark:text-faded">
             {t('notesWidget.title')}
           </span>
         </div>
         <button
           onClick={() => setIsEditing((e) => !e)}
-          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="text-faded hover:text-muted dark:hover:text-faded transition-colors"
           aria-label={isEditing ? t('notesWidget.preview') : t('notesWidget.edit')}
         >
           {isEditing ? <Eye className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
@@ -91,22 +91,22 @@ export function NotesWidget({ userId = 'current' }: Props) {
           <textarea
             value={content}
             onChange={(e) => handleChange(e.target.value)}
-            className="w-full h-full min-h-[160px] text-sm text-gray-700 dark:text-gray-300 bg-transparent border-none resize-none focus:outline-none placeholder-gray-400"
+            className="w-full h-full min-h-[160px] text-sm text-body dark:text-faded bg-transparent border-none resize-none focus:outline-none placeholder-gray-400"
             placeholder={t('notesWidget.placeholder')}
           />
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+          <div className="prose prose-sm dark:prose-invert max-w-none text-muted dark:text-faded">
             {content ? (
               <pre className="whitespace-pre-wrap text-sm font-sans">{content}</pre>
             ) : (
-              <p className="text-gray-400 text-sm italic">{t('notesWidget.empty')}</p>
+              <p className="text-faded text-sm italic">{t('notesWidget.empty')}</p>
             )}
           </div>
         )}
       </div>
 
       {isEditing && (
-        <div className="mt-2 text-xs text-gray-400 text-right">
+        <div className="mt-2 text-xs text-faded text-right">
           {content.length}/{MAX_CHARS}
         </div>
       )}

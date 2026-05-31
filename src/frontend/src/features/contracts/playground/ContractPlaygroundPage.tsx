@@ -88,7 +88,7 @@ export function ContractPlaygroundPage() {
     PATCH: 'text-yellow-400',
     DELETE: 'text-red-400',
     HEAD: 'text-purple-400',
-    OPTIONS: 'text-gray-400',
+    OPTIONS: 'text-faded',
   };
 
   return (

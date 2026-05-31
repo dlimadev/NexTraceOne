@@ -53,14 +53,14 @@ export function IncidentSummaryWidget({ config, timeRange, title, environmentId 
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center mt-4">
+          <p className="text-xs text-faded text-center mt-4">
             {t('governance.dashboardView.noIncidents', 'No open incidents')}
           </p>
         ) : (
           data.items.slice(0, 5).map((inc) => (
             <div key={inc.id} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
               <span className="text-xs text-body truncate flex-1 mr-2">{inc.title}</span>
-              <span className={`text-xs font-semibold ${SEVERITY_COLOR[inc.severity] ?? 'text-gray-400'}`}>
+              <span className={`text-xs font-semibold ${SEVERITY_COLOR[inc.severity] ?? 'text-faded'}`}>
                 {inc.severity}
               </span>
             </div>

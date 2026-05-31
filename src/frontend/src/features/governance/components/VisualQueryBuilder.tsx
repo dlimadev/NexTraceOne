@@ -123,7 +123,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 className={`px-2.5 py-1 font-semibold transition-colors ${
                   row.mode === 'visual'
                     ? 'bg-accent text-white'
-                    : 'bg-card text-muted hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-card text-muted hover:bg-hover dark:hover:bg-elevated'
                 }`}
               >
                 {t('governance.dashboardBuilder.queryBuilder.visual', 'Visual')}
@@ -134,7 +134,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 className={`px-2.5 py-1 font-mono font-semibold transition-colors ${
                   row.mode === 'nql'
                     ? 'bg-accent text-white'
-                    : 'bg-card text-muted hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-card text-muted hover:bg-hover dark:hover:bg-elevated'
                 }`}
               >
                 {t('governance.dashboardBuilder.queryBuilder.nql', 'NQL')}
@@ -158,7 +158,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   <button
                     type="button"
                     onClick={() => { duplicateRow(row.queryId); setOpenMenuId(null); }}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-hover dark:hover:bg-elevated"
                   >
                     <Copy size={11} />
                     {t('governance.dashboardBuilder.queryBuilder.duplicate', 'Duplicate')}
@@ -166,7 +166,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   <button
                     type="button"
                     onClick={() => { void copyNql(row); setOpenMenuId(null); }}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-hover dark:hover:bg-elevated"
                   >
                     <Copy size={11} />
                     {t('governance.dashboardBuilder.queryBuilder.copyNql', 'Copy NQL')}
@@ -248,7 +248,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                     onClick={() => updateRow(row.queryId, {
                       filters: [...row.filters, { key: '', op: '=', value: '' }],
                     })}
-                    className="text-[10px] text-gray-400 hover:text-accent"
+                    className="text-[10px] text-faded hover:text-accent"
                   >
                     {t('governance.dashboardBuilder.queryBuilder.addFilter', '+ Add')}
                   </button>

@@ -333,7 +333,7 @@ function PaletteCard({ type, label, meta, onAdd, onDragStart }: PaletteCardProps
       <span className="text-[10px] font-medium text-body text-center leading-tight line-clamp-2">
         {label}
       </span>
-      <span className="text-[9px] text-gray-400 tabular-nums">
+      <span className="text-[9px] text-faded tabular-nums">
         {meta.defaultWidth}×{meta.defaultHeight}
       </span>
     </div>
@@ -371,7 +371,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-muted transition-colors"
+          className="p-1.5 rounded hover:bg-hover dark:hover:bg-elevated text-muted transition-colors"
           aria-label={t('common.close', 'Close')}
         >
           <X size={16} />
@@ -476,7 +476,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
               placeholder={t('governance.dashboardBuilder.textContentPlaceholder', 'Supports **bold**, *italic*, # headings')}
               className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading font-mono focus:outline-none focus:border-accent resize-y"
             />
-            <p className="mt-1 text-[9px] text-gray-400">{slot.content.length}/2000</p>
+            <p className="mt-1 text-[9px] text-faded">{slot.content.length}/2000</p>
           </div>
         )}
 
@@ -698,14 +698,14 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                   <button
                     type="button"
                     onClick={() => updateThresholds(thresholds.filter((_, j) => j !== i))}
-                    className="text-gray-400 hover:text-red-400 text-xs ml-auto"
+                    className="text-faded hover:text-red-400 text-xs ml-auto"
                   >
                     ✕
                   </button>
                 </div>
               ))}
               {thresholds.length === 0 && (
-                <p className="text-xs text-gray-400 italic">No thresholds configured</p>
+                <p className="text-xs text-faded italic">No thresholds configured</p>
               )}
             </div>
           );
@@ -1466,7 +1466,7 @@ export function DashboardBuilderPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden">
+    <div className="flex flex-col h-screen bg-hover dark:bg-canvas overflow-hidden">
 
       {/* ── Toolbar ────────────────────────────────────────────────────────── */}
       <header className="shrink-0 flex items-center gap-3 px-4 py-2 bg-card border-b border-edge shadow-sm z-30">
@@ -1606,7 +1606,7 @@ export function DashboardBuilderPage() {
               <div className="relative">
                 <Search
                   size={11}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 text-faded pointer-events-none"
                 />
                 <input
                   type="text"
@@ -1639,7 +1639,7 @@ export function DashboardBuilderPage() {
             {/* Widget cards */}
             <div className="flex-1 overflow-y-auto px-3 pb-3">
               {paletteWidgets.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center py-6">
+                <p className="text-xs text-faded text-center py-6">
                   {t('governance.dashboardBuilder.noWidgetsFound', 'No widgets match the filter')}
                 </p>
               ) : (

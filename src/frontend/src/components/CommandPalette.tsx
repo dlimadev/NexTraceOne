@@ -334,7 +334,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
       {/* Palette */}
       <div
-        className="relative w-full max-w-lg bg-panel border border-edge rounded-xl shadow-xl overflow-hidden animate-slide-up"
+        className="relative w-full max-w-lg bg-panel border border-edge rounded-md shadow-xl overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search input */}

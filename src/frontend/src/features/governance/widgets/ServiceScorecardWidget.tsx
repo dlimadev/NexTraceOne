@@ -48,7 +48,7 @@ export function ServiceScorecardWidget({ config, timeRange, title }: WidgetProps
           <div key={s.serviceName} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
             <span className="text-xs text-body truncate">{s.serviceName}</span>
             <span className="text-xs font-semibold tabular-nums text-heading">
-              {s.finalScore} <span className="font-normal text-gray-400">/ 100</span>
+              {s.finalScore} <span className="font-normal text-faded">/ 100</span>
             </span>
           </div>
         ))}

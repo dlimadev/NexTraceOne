@@ -71,7 +71,7 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
             : 'border-edge'
         }`}
       >
-        <Search size={14} className="text-gray-400 shrink-0" />
+        <Search size={14} className="text-faded shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -81,13 +81,13 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
           placeholder={t('dashboard.queryBarPlaceholder', 'Search logs, traces, metrics... (e.g., level:error service:auth)')}
-          className="flex-1 bg-transparent text-xs text-heading placeholder:text-gray-400 focus:outline-none"
+          className="flex-1 bg-transparent text-xs text-heading placeholder:text-faded focus:outline-none"
         />
         {value && (
           <button
             type="button"
             onClick={() => { onChange(''); onSubmit(''); }}
-            className="p-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
+            className="p-0.5 rounded hover:bg-hover dark:hover:bg-elevated text-faded"
           >
             <X size={12} />
           </button>
@@ -114,11 +114,11 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
               key={s.query}
               type="button"
               onClick={() => handleSuggestionClick(s.query)}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-body hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated transition-colors"
             >
-              <Clock size={10} className="text-gray-400 shrink-0" />
+              <Clock size={10} className="text-faded shrink-0" />
               <span className="font-medium">{s.label}</span>
-              <span className="text-gray-400 font-mono ml-auto">{s.query}</span>
+              <span className="text-faded font-mono ml-auto">{s.query}</span>
             </button>
           ))}
         </div>

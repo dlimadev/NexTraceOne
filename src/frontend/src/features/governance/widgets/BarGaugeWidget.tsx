@@ -92,19 +92,19 @@ function GaugeRow({ gauge, unit, thresholds, onClick }: GaugeRowProps): React.Re
 
   return (
     <div
-      className="flex items-center gap-2 cursor-pointer hover:bg-gray-800/40 rounded px-1 py-0.5"
+      className="flex items-center gap-2 cursor-pointer hover:bg-elevated/40 rounded px-1 py-0.5"
       onClick={onClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
     >
       {/* Label à esquerda em font-mono — estilo Grafana */}
-      <span className="font-mono text-[10px] text-gray-300 w-36 shrink-0 truncate" title={gauge.label}>
+      <span className="font-mono text-[10px] text-faded w-36 shrink-0 truncate" title={gauge.label}>
         {gauge.label}
       </span>
 
       {/* Barra de progresso com marcadores de threshold */}
-      <div className="flex-1 relative bg-gray-700 rounded-sm overflow-hidden" style={{ height: 8 }}>
+      <div className="flex-1 relative bg-elevated rounded-sm overflow-hidden" style={{ height: 8 }}>
         <div
           className="h-full rounded-sm transition-all duration-300"
           style={{ width: `${fillPct}%`, backgroundColor: barColor }}
@@ -190,11 +190,11 @@ export function BarGaugeWidget({
   const effectiveUnit = unit || (gauges[0]?.unit ?? '');
 
   return (
-    <div className="flex flex-col h-full gap-2 p-1 bg-gray-900/50 rounded">
+    <div className="flex flex-col h-full gap-2 p-1 bg-canvas/50 rounded">
       {/* Título */}
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <Gauge size={13} className="text-blue-500 shrink-0" />
-        <span className="text-xs font-semibold text-gray-100 truncate">{displayTitle}</span>
+        <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
 
       {/* Banner de dados simulados */}

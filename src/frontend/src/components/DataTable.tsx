@@ -171,7 +171,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn('bg-card rounded-2xl border border-edge shadow-surface overflow-hidden', className)}>
+    <div className={cn('bg-card rounded-md border border-edge shadow-surface overflow-hidden', className)}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm" role="grid" aria-labelledby={`${tableId}-caption`}>
           <thead className={cn(stickyHeader && 'sticky top-0 z-10')}>

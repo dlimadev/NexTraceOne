@@ -150,7 +150,7 @@ export function OtelLogsWidget({
               {(data?.entries ?? []).map((entry, idx) => (
                 <tr
                   key={`${entry.timestamp}-${idx}`}
-                  className="border-t border-edge hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  className="border-t border-edge hover:bg-hover dark:hover:bg-elevated/50 cursor-pointer transition-colors"
                   onClick={() => {
                     if (entry.serviceName && onCrossFilter) {
                       onCrossFilter({ serviceId: entry.serviceName });
@@ -158,7 +158,7 @@ export function OtelLogsWidget({
                   }}
                   aria-label={`${entry.severity}: ${entry.message}`}
                 >
-                  <td className="py-0.5 pr-1.5 text-gray-400 whitespace-nowrap">
+                  <td className="py-0.5 pr-1.5 text-faded whitespace-nowrap">
                     {new Date(entry.timestamp).toLocaleTimeString(undefined, {
                       hour: '2-digit',
                       minute: '2-digit',

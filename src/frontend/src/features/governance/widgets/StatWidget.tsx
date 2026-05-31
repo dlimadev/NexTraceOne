@@ -127,7 +127,7 @@ export function StatWidget({ config, timeRange, title }: WidgetProps) {
   if (isError || !data) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-1 p-2">
-        <span className="text-xs text-gray-400 text-center">
+        <span className="text-xs text-faded text-center">
           {displayTitle} — {t('governance.dashboardView.widgetError', 'Could not load data')}
         </span>
       </div>
@@ -149,14 +149,14 @@ export function StatWidget({ config, timeRange, title }: WidgetProps) {
           {data.value.toLocaleString()}
         </span>
         {data.unit && (
-          <span className="text-xs text-gray-400 mb-1">{data.unit}</span>
+          <span className="text-xs text-faded mb-1">{data.unit}</span>
         )}
       </div>
       <TrendIcon
         size={14}
         className={
           data.trend === 'stable'
-            ? 'text-gray-400'
+            ? 'text-faded'
             : data.healthScore >= 0.8
             ? 'text-emerald-500'
             : 'text-amber-500'

@@ -127,7 +127,7 @@ export function AiComposeDashboardModal({
               {t('aiCompose.promptLabel')}
             </label>
             <textarea
-              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-heading placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-heading placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent"
               rows={4}
               placeholder={t('aiCompose.promptPlaceholder')}
               value={prompt}
@@ -166,7 +166,7 @@ export function AiComposeDashboardModal({
 
             {/* Proposed title */}
             <div>
-              <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-xs font-medium text-muted uppercase tracking-wider mb-1">
                 {t('aiCompose.proposalTitle')}
               </div>
               <div className="text-base font-semibold text-heading flex items-center gap-2">
@@ -178,7 +178,7 @@ export function AiComposeDashboardModal({
             {/* Variables */}
             {proposal.proposedVariables.length > 0 && (
               <div>
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <div className="text-xs font-medium text-muted uppercase tracking-wider mb-2">
                   {t('aiCompose.variablesSection')}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -194,7 +194,7 @@ export function AiComposeDashboardModal({
 
             {/* Widgets */}
             <div>
-              <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <div className="text-xs font-medium text-muted uppercase tracking-wider mb-2">
                 {t('aiCompose.widgetsSection', { count: activeWidgets.length })}
               </div>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -259,7 +259,7 @@ function WidgetProposalRow({
       onClick={onToggle}
     >
       {removed ? (
-        <XCircle className="h-4 w-4 text-gray-400 shrink-0" />
+        <XCircle className="h-4 w-4 text-faded shrink-0" />
       ) : (
         <CheckCircle className="h-4 w-4 text-indigo-500 shrink-0" />
       )}

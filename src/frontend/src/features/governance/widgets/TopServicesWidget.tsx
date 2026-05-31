@@ -63,13 +63,13 @@ export function TopServicesWidget({ config, timeRange, title }: WidgetProps) {
         <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
-        <span className="ml-auto text-[10px] text-gray-400 shrink-0">
+        <span className="ml-auto text-[10px] text-faded shrink-0">
           {t('governance.customDashboards.topServices.header', 'incidents')}
         </span>
       </div>
 
       {data.items.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-gray-400">
+        <div className="flex-1 flex items-center justify-center text-xs text-faded">
           {t('governance.customDashboards.topServices.noData', 'No service data available')}
         </div>
       ) : (
@@ -81,7 +81,7 @@ export function TopServicesWidget({ config, timeRange, title }: WidgetProps) {
                 key={svc.serviceId}
                 className="flex items-center gap-2 py-1 border-b border-edge last:border-0"
               >
-                <span className="text-[10px] font-mono text-gray-400 w-4 shrink-0 text-right">
+                <span className="text-[10px] font-mono text-faded w-4 shrink-0 text-right">
                   {idx + 1}
                 </span>
                 <span className="text-xs text-body truncate flex-1">

@@ -93,7 +93,7 @@ function ServiceFailurePredictionForm() {
   });
 
   const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
   const labelClass = 'mb-1 block text-xs font-medium text-body';
 
   return (
@@ -255,7 +255,7 @@ function ServiceFailurePredictionForm() {
               <p className="text-sm text-body">{result.recommendedAction}</p>
             </div>
 
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-faded">
               {t('predictiveIntelligence.computedAt')}: {new Date(result.computedAt).toLocaleString()}
             </p>
           </CardBody>
@@ -301,9 +301,9 @@ function ChangeRiskAssessmentForm() {
   });
 
   const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
   const labelClass = 'mb-1 block text-xs font-medium text-body';
-  const checkboxClass = 'mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-400';
+  const checkboxClass = 'mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-accent';
 
   return (
     <div className="space-y-4">
@@ -461,7 +461,7 @@ function ChangeRiskAssessmentForm() {
               </div>
             )}
 
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-faded">
               {t('predictiveIntelligence.assessedAt')}: {new Date(result.assessedAt).toLocaleString()}
             </p>
           </CardBody>

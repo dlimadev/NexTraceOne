@@ -26,9 +26,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
   institutional:
-    'blue-gradient text-white shadow-md hover:brightness-110 hover:shadow-glow-blue disabled:opacity-40',
+    'blue-gradient text-white shadow-md hover:brightness-110 disabled:opacity-40',
   primary:
-    'cta-gradient text-on-accent shadow-sm hover:brightness-110 hover:shadow-glow-sm disabled:opacity-40',
+    'bg-accent text-on-accent shadow-sm hover:bg-accent-hover disabled:opacity-40',
   secondary:
     'bg-elevated text-body border border-edge hover:border-edge-strong hover:bg-hover disabled:opacity-40',
   outline:
@@ -42,10 +42,10 @@ const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
-  xs: 'h-7 px-2.5 text-xs gap-1',
-  sm: 'h-9 px-4 text-sm gap-1.5',
-  md: 'h-11 px-5 text-sm gap-2',
-  lg: 'h-14 px-7 text-base font-bold gap-2.5',
+  xs: 'h-6 px-2 text-xs gap-1',
+  sm: 'h-8 px-3 text-xs gap-1.5',
+  md: 'h-9 px-4 text-sm gap-2',
+  lg: 'h-11 px-6 text-sm font-semibold gap-2',
 };
 
 export function Button({
@@ -62,7 +62,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-semibold',
+        'inline-flex items-center justify-center rounded-sm font-medium',
         'transition-all duration-[var(--nto-motion-base)]',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
         'disabled:cursor-not-allowed select-none',

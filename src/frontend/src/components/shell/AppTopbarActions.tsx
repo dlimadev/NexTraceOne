@@ -83,7 +83,7 @@ export function AppTopbarActions() {
           <>
             <div className="fixed inset-0 z-[var(--z-dropdown)]" onClick={() => setLangOpen(false)} aria-hidden="true" />
             <div
-              className="absolute right-0 top-full mt-2 z-[calc(var(--z-dropdown)+1)] bg-elevated border border-edge rounded-xl shadow-floating py-2 min-w-[220px] animate-fade-in"
+              className="absolute right-0 top-full mt-2 z-[calc(var(--z-dropdown)+1)] bg-elevated border border-edge rounded-md shadow-floating py-2 min-w-[220px] animate-fade-in"
               role="menu"
             >
               <div className="px-3 pb-2 mb-1 border-b border-edge">

@@ -264,7 +264,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={onInspect}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated cursor-pointer"
       >
         <BarChart2 size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.inspect', 'Inspect')}
@@ -273,7 +273,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleDownloadJson}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated cursor-pointer"
       >
         <Download size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.downloadCsv', 'Download CSV')}
@@ -282,7 +282,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleCopyLink}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated cursor-pointer"
       >
         <LinkIcon size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.copyLink', 'Copy link')}
@@ -291,7 +291,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleCreateAlert}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated cursor-pointer"
       >
         <Bell size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.createAlert', 'Create alert')}
@@ -300,7 +300,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleEditWidget}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-hover dark:hover:bg-elevated cursor-pointer"
       >
         <Settings size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.editWidget', 'Edit widget')}
@@ -367,7 +367,7 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
             ))}
           </dl>
           <div className="mt-4 rounded bg-elevated p-2">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-[10px] font-semibold text-faded uppercase tracking-wider mb-1">
               {t('governance.dashboardView.inspectRawJson', 'Raw JSON')}
             </p>
             <pre className="text-[10px] text-body overflow-x-auto whitespace-pre-wrap">
@@ -512,7 +512,7 @@ function DashboardViewInner() {
   // ── Kiosk/NOC mode: full-screen widget grid with minimal chrome ────────────
   if (isKiosk) {
     return (
-      <div className="min-h-screen bg-gray-950 p-4">
+      <div className="min-h-screen bg-canvas p-4">
         {/* Kiosk toolbar — only time range + exit */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-white flex items-center gap-2">
@@ -523,7 +523,7 @@ function DashboardViewInner() {
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="text-xs rounded border border-gray-700 bg-gray-900 text-gray-300 px-2 py-1 focus:outline-none"
+              className="text-xs rounded border border-gray-700 bg-canvas text-faded px-2 py-1 focus:outline-none"
               aria-label={t('governance.dashboardView.timeRangeLabel', 'Time range')}
             >
               {TIME_RANGE_OPTIONS.map((opt) => (
@@ -553,7 +553,7 @@ function DashboardViewInner() {
         </div>
 
         {data.widgets.length === 0 ? (
-          <div className="flex items-center justify-center h-48 text-sm text-gray-500">
+          <div className="flex items-center justify-center h-48 text-sm text-muted">
             {t('governance.dashboardView.noWidgets', 'No widgets configured. Click Edit to add widgets.')}
           </div>
         ) : (
@@ -567,7 +567,7 @@ function DashboardViewInner() {
                 <div
                   key={slot.widgetId}
                   style={style}
-                  className="rounded-lg border border-gray-700 bg-gray-900 shadow overflow-hidden"
+                  className="rounded-lg border border-gray-700 bg-canvas shadow overflow-hidden"
                 >
                   {WidgetComponent ? (
                     <WidgetComponent
@@ -669,10 +669,10 @@ function DashboardViewInner() {
                   ? isLive
                     ? 'border-green-600 bg-green-950 text-green-300'
                     : 'border-yellow-600 bg-yellow-950 text-yellow-300 animate-pulse'
-                  : 'border-edge bg-card text-gray-500 hover:text-accent'
+                  : 'border-edge bg-card text-muted hover:text-accent'
               }`}
             >
-              <span className={`inline-block h-2 w-2 rounded-full ${isLiveEnabled && isLive ? 'bg-green-400' : isLiveEnabled ? 'bg-yellow-400' : 'bg-gray-500'}`} />
+              <span className={`inline-block h-2 w-2 rounded-full ${isLiveEnabled && isLive ? 'bg-green-400' : isLiveEnabled ? 'bg-yellow-400' : 'bg-elevated'}`} />
               <span>{t('dashboardLive.liveToggle', 'Live')}</span>
             </button>
 
@@ -785,7 +785,7 @@ function DashboardViewInner() {
 
       {/* Widget grid */}
       {data.widgets.length === 0 ? (
-        <div className="flex items-center justify-center h-48 text-sm text-gray-400">
+        <div className="flex items-center justify-center h-48 text-sm text-faded">
           {t('governance.dashboardView.noWidgets', 'No widgets configured. Click Edit to add widgets.')}
         </div>
       ) : (
@@ -865,7 +865,7 @@ function DashboardViewInner() {
                       <button
                         type="button"
                         onClick={() => navigate(drillDest.path)}
-                        className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent text-xs"
+                        className="p-1 rounded bg-white/80 dark:bg-canvas/80 text-faded hover:text-accent text-xs"
                         title={t(drillDest.labelKey, drillDest.label)}
                         aria-label={t(drillDest.labelKey, drillDest.label)}
                       >
@@ -875,7 +875,7 @@ function DashboardViewInner() {
                     <button
                       type="button"
                       onClick={() => setExpandedWidgetId(slot.widgetId)}
-                      className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
+                      className="p-1 rounded bg-white/80 dark:bg-canvas/80 text-faded hover:text-accent"
                       aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
                     >
                       <Maximize2 size={12} />
@@ -888,7 +888,7 @@ function DashboardViewInner() {
                           e.stopPropagation();
                           setWidgetMenuOpenId(isMenuOpen ? null : slot.widgetId);
                         }}
-                        className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
+                        className="p-1 rounded bg-white/80 dark:bg-canvas/80 text-faded hover:text-accent"
                         aria-label={t('governance.dashboardView.widgetActions', 'Widget actions')}
                         aria-haspopup="menu"
                         aria-expanded={isMenuOpen}
@@ -971,7 +971,7 @@ function DashboardViewInner() {
         );
       })()}
 
-      <p className="mt-4 text-xs text-gray-400 text-right">
+      <p className="mt-4 text-xs text-faded text-right">
         {t('governance.dashboardView.generatedAt', 'Generated at')}{' '}
         {new Date(data.generatedAt).toLocaleTimeString()}
       </p>

@@ -151,7 +151,7 @@ export function NqlEditor({
           placeholder={t('nqlEditor.placeholder')}
           rows={4}
           spellCheck={false}
-          className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 font-mono text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+          className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 font-mono text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent resize-y"
           aria-label={t('nqlEditor.title')}
         />
         {/* Keyword autocomplete hint */}

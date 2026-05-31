@@ -102,14 +102,14 @@ export function ContractMigrationPage() {
                 </button>
                 {isExpanded && (
                   <div className="mt-2 relative">
-                    <pre className="overflow-x-auto rounded bg-gray-950 p-3 text-xs text-green-300 whitespace-pre-wrap">
+                    <pre className="overflow-x-auto rounded bg-canvas p-3 text-xs text-green-300 whitespace-pre-wrap">
                       {suggestion.codeHint}
                     </pre>
                     <button
                       type="button"
                       title={t('contracts.migrationCopyHint')}
                       onClick={() => copyHint(suggestion.codeHint!)}
-                      className="absolute top-2 right-2 rounded bg-gray-700 p-1 text-gray-300 hover:bg-gray-600 hover:text-white"
+                      className="absolute top-2 right-2 rounded bg-elevated p-1 text-faded hover:bg-elevated hover:text-white"
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>

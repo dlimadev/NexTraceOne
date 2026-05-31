@@ -193,7 +193,7 @@ export function NotebookEditorPage() {
           <Badge variant="yellow" size="sm">{t('common.unsaved', 'Unsaved')}</Badge>
         )}
         {savedAt && !dirty && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-faded">
             {t('notebook.savedAt', { time: savedAt.toLocaleTimeString() })}
           </span>
         )}
@@ -223,7 +223,7 @@ export function NotebookEditorPage() {
           <Card key={cell.localId} className="overflow-hidden">
             {/* Cell header */}
             <div className="flex items-center gap-2 px-3 py-2 bg-elevated border-b border-edge">
-              <span className="text-gray-500">{CELL_ICONS[cell.cellType]}</span>
+              <span className="text-muted">{CELL_ICONS[cell.cellType]}</span>
               <span className="text-xs font-medium text-muted flex-1">
                 {t(`notebook.cellType${cell.cellType}`)}
               </span>
@@ -231,25 +231,25 @@ export function NotebookEditorPage() {
                 <button
                   onClick={() => moveCell(cell.localId, 'up')}
                   disabled={idx === 0}
-                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30"
+                  className="p-1 rounded hover:bg-card dark:hover:bg-elevated disabled:opacity-30"
                 >
                   <ChevronUp className="h-3 w-3" />
                 </button>
                 <button
                   onClick={() => moveCell(cell.localId, 'down')}
                   disabled={idx === cells.length - 1}
-                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30"
+                  className="p-1 rounded hover:bg-card dark:hover:bg-elevated disabled:opacity-30"
                 >
                   <ChevronDown className="h-3 w-3" />
                 </button>
                 {cell.cellType === 'Query' && (
-                  <button className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-indigo-500">
+                  <button className="p-1 rounded hover:bg-card dark:hover:bg-elevated text-indigo-500">
                     <Play className="h-3 w-3" />
                   </button>
                 )}
                 <button
                   onClick={() => toggleCollapse(cell.localId)}
-                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="p-1 rounded hover:bg-card dark:hover:bg-elevated"
                 >
                   {cell.isCollapsed
                     ? <ChevronDown className="h-3 w-3" />
@@ -287,7 +287,7 @@ export function NotebookEditorPage() {
 
       {/* Add cell bar */}
       <div className="flex items-center gap-2 pt-2">
-        <span className="text-xs text-gray-400 mr-1">{t('notebook.addCell')}</span>
+        <span className="text-xs text-faded mr-1">{t('notebook.addCell')}</span>
         {(['Markdown', 'Query', 'Widget', 'Action', 'Ai'] as const).map((type) => (
           <button
             key={type}

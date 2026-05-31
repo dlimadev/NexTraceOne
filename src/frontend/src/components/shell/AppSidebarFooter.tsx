@@ -105,7 +105,7 @@ export function AppSidebarFooter({
             aria-hidden="true"
           />
           <div
-            className="absolute bottom-full left-2 right-2 mb-1 rounded-xl overflow-hidden z-[var(--z-dropdown)]"
+            className="absolute bottom-full left-2 right-2 mb-1 rounded-md overflow-hidden z-[var(--z-dropdown)]"
             style={{
               background: '#0F1E38',
               border: '1px solid rgba(129,170,214,.14)',

@@ -95,7 +95,7 @@ export function BlastRadiusWidget({ config, environmentId, title }: WidgetProps)
 
       {/* Confidence score */}
       <div className="flex items-center justify-between">
-        <span className="text-[10px] text-gray-400">
+        <span className="text-[10px] text-faded">
           {t('governance.customDashboards.blastRadius.confidence', 'Confidence')}
         </span>
         <span className="text-[10px] font-semibold tabular-nums text-muted">

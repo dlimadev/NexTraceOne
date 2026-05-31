@@ -232,7 +232,7 @@ export function NqlMonacoEditor({
           )}
         </div>
 
-        <span className="text-[9px] text-gray-400">
+        <span className="text-[9px] text-faded">
           {t('nqlEditor.hint', 'Ctrl+Space for suggestions')}
         </span>
       </div>

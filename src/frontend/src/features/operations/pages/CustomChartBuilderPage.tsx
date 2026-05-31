@@ -176,7 +176,7 @@ export function CustomChartBuilderPage() {
       <PageSection>
         {!data?.items.length ? (
           <EmptyState
-            icon={<BarChart2 className="w-8 h-8 text-gray-400" />}
+            icon={<BarChart2 className="w-8 h-8 text-faded" />}
             title={t('customCharts.empty.title')}
             description={t('customCharts.empty.description')}
             action={
@@ -312,7 +312,7 @@ export function CustomChartBuilderPage() {
                   {t('customCharts.builder.preview')}
                 </p>
                 <div className="border border-dashed border-edge rounded-lg p-8 flex items-center justify-center">
-                  <div className="text-center text-gray-400">
+                  <div className="text-center text-faded">
                     <BarChart2 className="w-10 h-10 mx-auto mb-2" />
                     <p className="text-sm">{builder.source} / {builder.chartType} / {builder.timeRange}</p>
                   </div>

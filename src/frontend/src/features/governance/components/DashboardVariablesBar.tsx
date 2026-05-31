@@ -137,7 +137,7 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="text-xs px-3 py-1.5 rounded border border-edge text-muted hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="text-xs px-3 py-1.5 rounded border border-edge text-muted hover:bg-hover dark:hover:bg-elevated"
           >
             {t('governance.dashboardBuilder.variablesBar.modal.cancel')}
           </button>

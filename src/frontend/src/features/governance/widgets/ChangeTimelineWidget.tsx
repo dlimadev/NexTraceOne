@@ -32,7 +32,7 @@ const STATUS_ICON: Record<string, React.ReactNode> = {
 };
 
 function defaultIcon() {
-  return <GitCommit size={12} className="text-gray-400 shrink-0" />;
+  return <GitCommit size={12} className="text-faded shrink-0" />;
 }
 
 /** Formats a timestamp as a human-readable relative time string (e.g. "5m ago") */
@@ -86,11 +86,11 @@ export function ChangeTimelineWidget({ config, timeRange, title }: WidgetProps) 
       <div className="flex items-center gap-2 mb-1">
         <GitCommit size={14} className="text-accent shrink-0" />
         <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
-        <span className="ml-auto text-xs text-gray-400">{data.totalCount} total</span>
+        <span className="ml-auto text-xs text-faded">{data.totalCount} total</span>
       </div>
 
       {items.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-gray-400">
+        <div className="flex-1 flex items-center justify-center text-xs text-faded">
           {t('governance.dashboardView.noChanges', 'No recent changes')}
         </div>
       ) : (
@@ -105,11 +105,11 @@ export function ChangeTimelineWidget({ config, timeRange, title }: WidgetProps) 
                 <span className="text-xs font-medium text-heading truncate leading-tight">
                   {ev.title}
                 </span>
-                <span className="text-[10px] text-gray-400 truncate leading-tight">
+                <span className="text-[10px] text-faded truncate leading-tight">
                   {ev.serviceName} · {ev.environment}
                 </span>
               </div>
-              <span className="text-[10px] text-gray-400 shrink-0 tabular-nums whitespace-nowrap">
+              <span className="text-[10px] text-faded shrink-0 tabular-nums whitespace-nowrap">
                 {formatRelativeTime(ev.occurredAt)}
               </span>
             </div>

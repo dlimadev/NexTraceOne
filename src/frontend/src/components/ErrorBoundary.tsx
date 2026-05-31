@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-critical/15 mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-md bg-critical/15 mb-4">
               <span className="text-critical font-bold text-xl">!</span>
             </div>
             <h1 className="text-xl font-semibold text-heading mb-2">

@@ -130,7 +130,7 @@ const WIDGET_KEY_MAP: Record<string, string> = {
 };
 
 const LIFECYCLE_COLORS: Record<string, string> = {
-  Draft:      'text-gray-500 bg-elevated',
+  Draft:      'text-muted bg-elevated',
   Published:  'text-green-700 bg-green-100 dark:bg-green-900/30',
   Deprecated: 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30',
   Archived:   'text-red-700 bg-red-100 dark:bg-red-900/30',
@@ -201,7 +201,7 @@ const useDeleteDashboard = () => {
 function SharingIcon({ isShared, isSystem }: { isShared: boolean; isSystem: boolean }) {
   if (isSystem) return <Globe size={11} className="text-blue-500" aria-label="System dashboard" />;
   if (isShared) return <Users size={11} className="text-green-500" aria-label="Shared" />;
-  return <Lock size={11} className="text-gray-400" aria-label="Private" />;
+  return <Lock size={11} className="text-faded" aria-label="Private" />;
 }
 
 function DashboardCard({
@@ -278,7 +278,7 @@ function DashboardCard({
         )}
 
         {/* Created at */}
-        <p className="text-[10px] text-gray-400 flex items-center gap-1">
+        <p className="text-[10px] text-faded flex items-center gap-1">
           <Clock size={9} />
           {new Date(dashboard.createdAt).toLocaleDateString()}
         </p>
@@ -525,7 +525,7 @@ export function CustomDashboardsPage() {
               <h3 className="text-lg font-semibold text-white mb-1">
                 {t('governance.customDashboards.builderCtaTitle', 'Visual Dashboard Builder')}
               </h3>
-              <p className="text-sm text-gray-400 max-w-md">
+              <p className="text-sm text-faded max-w-md">
                 {t('governance.customDashboards.builderCtaDesc', 'Drag and drop widgets, resize panels, and configure your layout interactively — just like Grafana.')}
               </p>
             </div>
@@ -551,7 +551,7 @@ export function CustomDashboardsPage() {
           {/* Search */}
           <div className="flex gap-2 flex-wrap items-center">
             <div className="relative flex-1 min-w-48">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded" />
               <input
                 type="search"
                 value={searchQuery}

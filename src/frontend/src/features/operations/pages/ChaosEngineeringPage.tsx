@@ -107,7 +107,7 @@ function ExperimentResultCard({ result }: { result: CreateChaosExperimentRespons
             <span className="text-sm font-medium text-heading">{result.serviceName}</span>
             <span className="text-xs text-muted">— {result.experimentType}</span>
           </div>
-          <span className="text-xs text-gray-400">{result.estimatedDurationSeconds}s / {result.targetPercentage}%</span>
+          <span className="text-xs text-faded">{result.estimatedDurationSeconds}s / {result.targetPercentage}%</span>
         </div>
       </CardHeader>
       <CardBody className="space-y-3">
@@ -165,7 +165,7 @@ function ExperimentSummaryCard({ experiment }: { experiment: ChaosExperimentSumm
               {t(`chaosEngineering.${experiment.status.toLowerCase()}` as never, { defaultValue: experiment.status })}
             </Badge>
           </div>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-faded">
             {new Date(experiment.createdAt).toLocaleString()}
           </span>
         </div>
@@ -197,7 +197,7 @@ export function ChaosEngineeringPage() {
   };
 
   const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
+    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
   const labelClass = 'mb-1 block text-xs font-medium text-body';
 
   return (

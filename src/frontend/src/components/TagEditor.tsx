@@ -39,7 +39,7 @@ const TAG_KEY_COLORS: Record<string, string> = {
 
 function getTagColor(key: string) {
   return TAG_KEY_COLORS[key.toLowerCase()] ??
-    'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    'bg-hover text-body dark:bg-elevated dark:text-faded';
 }
 
 /** Componente reutilizável para editar tags de uma entidade. */
@@ -84,7 +84,7 @@ export function TagEditor({ entityType, entityId, readOnly = false }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <Tag className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+      <Tag className="w-3.5 h-3.5 text-faded shrink-0" />
       {tags.map((tag) => (
         <span
           key={tag.tagId}
@@ -112,12 +112,12 @@ export function TagEditor({ entityType, entityId, readOnly = false }: Props) {
             onKeyDown={handleKeyDown}
             onBlur={() => { if (!inputValue) { setShowInput(false); } }}
             placeholder={t('tags.placeholder')}
-            className="text-xs border border-gray-200 dark:border-gray-600 rounded-full px-2 py-0.5 bg-transparent text-gray-700 dark:text-gray-300 w-36 focus:outline-none focus:ring-1 focus:ring-blue-400"
+            className="text-xs border border-gray-200 dark:border-gray-600 rounded-full px-2 py-0.5 bg-transparent text-body dark:text-faded w-36 focus:outline-none focus:ring-1 focus:ring-accent"
           />
         ) : (
           <button
             onClick={() => setShowInput(true)}
-            className="inline-flex items-center gap-0.5 text-xs text-gray-400 hover:text-blue-500 transition-colors"
+            className="inline-flex items-center gap-0.5 text-xs text-faded hover:text-blue-500 transition-colors"
             aria-label={t('tags.add')}
           >
             <Plus className="w-3 h-3" />

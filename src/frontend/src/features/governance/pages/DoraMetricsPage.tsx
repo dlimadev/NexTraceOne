@@ -99,7 +99,7 @@ const RATING_COLOR: Record<string, string> = {
 const TrendIcon = ({ trend }: { trend: string }) => {
   if (trend === 'Improving') return <TrendingUp size={14} className="text-green-500" />;
   if (trend === 'Degrading') return <TrendingDown size={14} className="text-red-500" />;
-  return <Minus size={14} className="text-gray-400" />;
+  return <Minus size={14} className="text-faded" />;
 };
 
 export function DoraMetricsPage() {
@@ -190,7 +190,7 @@ export function DoraMetricsPage() {
               </CardHeader>
               <CardBody className="pt-2">
                 <p className={`text-3xl font-bold ${RATING_COLOR[metric.rating] ?? 'text-heading'}`}>
-                  {metric.value} <span className="text-sm font-normal text-gray-400">{metric.unit}</span>
+                  {metric.value} <span className="text-sm font-normal text-faded">{metric.unit}</span>
                 </p>
                 <p className="mt-1 text-xs text-muted">{metric.description}</p>
               </CardBody>
@@ -260,16 +260,16 @@ export function DoraMetricsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-edge">
-                    <th className="py-2 px-3 text-left text-xs text-gray-500">{t('governance.dora.period')}</th>
-                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.deployFreq')}</th>
-                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.leadTime')}</th>
-                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.cfr')}</th>
-                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.mttr')}</th>
+                    <th className="py-2 px-3 text-left text-xs text-muted">{t('governance.dora.period')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-muted">{t('governance.dora.deployFreq')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-muted">{t('governance.dora.leadTime')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-muted">{t('governance.dora.cfr')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-muted">{t('governance.dora.mttr')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {trendData.dataPoints.map((point, idx) => (
-                    <tr key={idx} className="border-b border-edge hover:bg-gray-50 dark:hover:bg-gray-900/20">
+                    <tr key={idx} className="border-b border-edge hover:bg-hover dark:hover:bg-canvas/20">
                       <td className="py-2 px-3 text-body">
                         {new Date(point.periodStart).toLocaleDateString()}
                       </td>

@@ -86,7 +86,7 @@ export function TextMarkdownWidget({ config, title }: WidgetProps) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-2 p-3">
         <FileText size={18} className="text-faded" />
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-faded">
           {t('governance.dashboardView.noContent', 'No content configured. Edit this widget to add a note.')}
         </span>
       </div>

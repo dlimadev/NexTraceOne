@@ -35,7 +35,7 @@ export function WorkspaceSwitcher() {
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          'flex items-center gap-2 px-3 py-2 rounded-xl text-sm',
+          'flex items-center gap-2 px-3 py-2 rounded-md text-sm',
           'border border-edge hover:border-edge-strong',
           'transition-all duration-[var(--nto-motion-base)]',
           'text-body hover:text-heading',
@@ -73,7 +73,7 @@ export function WorkspaceSwitcher() {
         <>
           <div className="fixed inset-0 z-[var(--z-dropdown)]" onClick={() => setOpen(false)} aria-hidden="true" />
           <div
-            className="absolute right-0 top-full mt-2 z-[calc(var(--z-dropdown)+1)] bg-elevated border border-edge rounded-xl shadow-floating py-2 min-w-[280px] animate-fade-in"
+            className="absolute right-0 top-full mt-2 z-[calc(var(--z-dropdown)+1)] bg-elevated border border-edge rounded-md shadow-floating py-2 min-w-[280px] animate-fade-in"
             role="listbox"
             aria-label={t('shell.workspaceSwitcher')}
           >
