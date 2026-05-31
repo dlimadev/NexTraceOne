@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { GitBranch, ArrowLeft, CheckCircle, XCircle, Settings } from 'lucide-react';
+import { Waypoints, ArrowLeft, CheckCircle2, XCircle, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
@@ -47,9 +47,9 @@ interface TraceDetailResponse {
 // ── Duration colour ────────────────────────────────────────────────────────
 
 function durationColour(ms: number): string {
-  if (ms > 1000) return 'text-red-600 dark:text-red-400';
-  if (ms > 200)  return 'text-yellow-600 dark:text-yellow-400';
-  return 'text-emerald-600 dark:text-emerald-400';
+  if (ms > 1000) return 'text-danger';
+  if (ms > 200)  return 'text-warning';
+  return 'text-success';
 }
 
 // ── Trace Detail sub-view ──────────────────────────────────────────────────
@@ -77,7 +77,7 @@ function TraceDetail({
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-1 text-[10px] text-blue-500 hover:text-blue-400 transition-colors shrink-0"
+        className="flex items-center gap-1 text-[10px] text-accent hover:text-accent-hover transition-colors shrink-0"
         aria-label={t('obs.traces.backToList', 'Back to traces')}
       >
         <ArrowLeft size={11} />
@@ -95,13 +95,13 @@ function TraceDetail({
         </div>
       ) : isError ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <span className="text-xs text-red-500 dark:text-red-400 text-center">
+          <span className="text-xs text-danger text-center">
             {t('governance.dashboardView.widgetError', 'Could not load data')}
           </span>
           <button
             type="button"
             onClick={() => refetch()}
-            className="text-xs text-blue-500 underline hover:no-underline"
+            className="text-xs text-accent underline hover:no-underline"
           >
             {t('common.retry', 'Retry')}
           </button>
@@ -132,7 +132,7 @@ function TraceDetail({
                     {span.hasError && (
                       <XCircle
                         size={9}
-                        className="inline-block mr-0.5 text-red-500 shrink-0"
+                        className="inline-block mr-0.5 text-danger shrink-0"
                         aria-label={t('obs.traces.errorSpan', 'Error')}
                       />
                     )}
@@ -204,7 +204,7 @@ export function OtelTracesWidget({
     <div className="h-full flex flex-col gap-1 p-2">
       {/* Header */}
       <div className="flex items-center gap-1.5 shrink-0">
-        <GitBranch size={13} className="text-purple-500 shrink-0" />
+        <Waypoints size={13} className="text-accent shrink-0" />
         <span className="text-xs font-semibold text-heading truncate">
           {displayTitle}
         </span>
@@ -219,13 +219,13 @@ export function OtelTracesWidget({
         </div>
       ) : isError ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <span className="text-xs text-red-500 dark:text-red-400 text-center">
+          <span className="text-xs text-danger text-center">
             {t('governance.dashboardView.widgetError', 'Could not load data')}
           </span>
           <button
             type="button"
             onClick={() => refetch()}
-            className="text-xs text-blue-500 underline hover:no-underline"
+            className="text-xs text-accent underline hover:no-underline"
           >
             {t('common.retry', 'Retry')}
           </button>
@@ -289,13 +289,13 @@ export function OtelTracesWidget({
                     {trace.hasErrors ? (
                       <XCircle
                         size={10}
-                        className="inline-block text-red-500"
+                        className="inline-block text-danger"
                         aria-label={t('obs.traces.hasErrors', 'Has errors')}
                       />
                     ) : (
-                      <CheckCircle
+                      <CheckCircle2
                         size={10}
-                        className="inline-block text-emerald-500"
+                        className="inline-block text-success"
                         aria-label={t('obs.traces.ok', 'OK')}
                       />
                     )}

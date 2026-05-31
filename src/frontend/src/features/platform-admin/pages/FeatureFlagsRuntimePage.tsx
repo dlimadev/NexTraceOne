@@ -7,7 +7,7 @@ import {
   RefreshCw,
   XCircle,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   Search,
   Layers,
 } from 'lucide-react';
@@ -162,7 +162,7 @@ export function FeatureFlagsRuntimePage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       {flag.defaultEnabled ? (
-                        <CheckCircle size={16} className="text-success mx-auto" />
+                        <CheckCircle2 size={16} className="text-success mx-auto" />
                       ) : (
                         <XCircle size={16} className="text-faded mx-auto" />
                       )}

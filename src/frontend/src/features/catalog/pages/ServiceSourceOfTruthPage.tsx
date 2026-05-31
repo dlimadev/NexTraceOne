@@ -8,7 +8,7 @@ import {
   FileText,
   BookOpen,
   ExternalLink,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Layers,
 } from 'lucide-react';
@@ -379,7 +379,7 @@ export function ServiceSourceOfTruthPage() {
                   return (
                     <li key={String(key)} className="flex items-center gap-2 text-sm">
                       {met ? (
-                        <CheckCircle size={14} className="text-success shrink-0" />
+                        <CheckCircle2 size={14} className="text-success shrink-0" />
                       ) : (
                         <XCircle size={14} className="text-critical shrink-0" />
                       )}

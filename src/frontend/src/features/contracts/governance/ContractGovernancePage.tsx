@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  BarChart3, RefreshCw, CheckCircle, Clock, ShieldCheck, FileWarning,
+  BarChart3, RefreshCw, CheckCircle2, Clock, ShieldCheck, FileWarning,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
@@ -49,7 +49,7 @@ export function ContractGovernancePage() {
 
   const views: { id: GovernanceView; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'contracts.governance.views.overview', icon: <BarChart3 size={13} /> },
-    { id: 'approvals', labelKey: 'contracts.governance.views.approvals', icon: <CheckCircle size={13} /> },
+    { id: 'approvals', labelKey: 'contracts.governance.views.approvals', icon: <CheckCircle2 size={13} /> },
     { id: 'compliance', labelKey: 'contracts.governance.views.compliance', icon: <ShieldCheck size={13} /> },
     { id: 'gaps', labelKey: 'contracts.governance.views.gaps', icon: <FileWarning size={13} /> },
     { id: 'audit', labelKey: 'contracts.governance.views.audit', icon: <Clock size={13} /> },

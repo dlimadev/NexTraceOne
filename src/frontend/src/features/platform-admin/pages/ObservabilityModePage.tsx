@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Activity, CheckCircle, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Activity, CheckCircle2, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -99,7 +99,7 @@ export function ObservabilityModePage() {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-heading">{t(`mode.${mode}`)}</span>
-                        {isActive && <CheckCircle size={16} className="text-accent" />}
+                        {isActive && <CheckCircle2 size={16} className="text-accent" />}
                       </div>
                       <p className="text-xs text-muted">{t(`modeDesc.${mode}`)}</p>
                       <p className="text-xs text-faded mt-1">{t(`modeRam.${mode}`)}</p>
@@ -130,7 +130,7 @@ export function ObservabilityModePage() {
 
             {mutation.isSuccess && (
               <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg p-3">
-                <CheckCircle size={16} />
+                <CheckCircle2 size={16} />
                 {t('saveSuccess')}
               </div>
             )}

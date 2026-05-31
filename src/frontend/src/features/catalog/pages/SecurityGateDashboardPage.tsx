@@ -9,7 +9,7 @@ import {
   Search,
   Filter,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Eye,
   Loader2,
@@ -471,7 +471,7 @@ export function SecurityGateDashboardPage() {
                           {s.overallRisk}
                         </span>
                         {s.passedGate ? (
-                          <CheckCircle className="h-4 w-4 text-success" />
+                          <CheckCircle2 className="h-4 w-4 text-success" />
                         ) : (
                           <XCircle className="h-4 w-4 text-critical" />
                         )}

@@ -12,7 +12,7 @@ import {
   BookOpen,
   Code2,
   Package,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
 } from 'lucide-react';
 import {
@@ -107,7 +107,7 @@ function TemplateCard({
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           {template.isActive ? (
-            <CheckCircle className="h-4 w-4 text-success" />
+            <CheckCircle2 className="h-4 w-4 text-success" />
           ) : (
             <XCircle className="h-4 w-4 text-muted" />
           )}

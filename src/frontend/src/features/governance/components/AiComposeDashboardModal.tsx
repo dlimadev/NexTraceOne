@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bot, Sparkles, CheckCircle, XCircle, LayoutDashboard, AlertTriangle } from 'lucide-react';
+import { Bot, Sparkles, CheckCircle2, XCircle, LayoutDashboard, AlertTriangle } from 'lucide-react';
 import { notebooksApi, type AiDashboardProposal, type ProposedWidgetDto } from '../api/notebooks';
 import { Modal } from '../../../components/Modal';
 import { Button } from '../../../components/Button';
@@ -228,7 +228,7 @@ export function AiComposeDashboardModal({
                   disabled={acceptMutation.isPending || activeWidgets.length === 0}
                   className="flex items-center gap-2"
                 >
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircle2 className="h-4 w-4" />
                   {acceptMutation.isPending ? t('common.creating', 'Creating…') : t('aiCompose.accept')}
                 </Button>
               </div>
@@ -261,7 +261,7 @@ function WidgetProposalRow({
       {removed ? (
         <XCircle className="h-4 w-4 text-faded shrink-0" />
       ) : (
-        <CheckCircle className="h-4 w-4 text-indigo-500 shrink-0" />
+        <CheckCircle2 className="h-4 w-4 text-indigo-500 shrink-0" />
       )}
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-heading truncate">

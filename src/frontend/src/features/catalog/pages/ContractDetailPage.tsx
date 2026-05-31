@@ -6,7 +6,7 @@ import {
   Shield,
   Lock,
   Unlock,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Bot,
   Clock,
@@ -216,7 +216,7 @@ export function ContractDetailPage() {
                   <dd className="flex items-center gap-1.5 text-sm">
                     {detail.signedBy ? (
                       <>
-                        <CheckCircle size={14} className="text-success" />
+                        <CheckCircle2 size={14} className="text-success" />
                         <span className="text-success">{t('contractGov.badges.signed')}</span>
                       </>
                     ) : (
@@ -348,7 +348,7 @@ export function ContractDetailPage() {
             <CardBody>
               {!violations || violations.length === 0 ? (
                 <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle size={14} className="text-success" />
+                  <CheckCircle2 size={14} className="text-success" />
                   <span className="text-success">{t('contractGov.detail.noViolations')}</span>
                 </div>
               ) : (

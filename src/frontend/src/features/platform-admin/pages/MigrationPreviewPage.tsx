@@ -8,7 +8,7 @@ import {
   ChevronDown,
   ChevronRight,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   Shield,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
@@ -150,7 +150,7 @@ export function MigrationPreviewPage() {
             {/* Migrations list */}
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 text-faded gap-2">
-                <CheckCircle size={32} className="text-success" />
+                <CheckCircle2 size={32} className="text-success" />
                 <p className="text-sm">{t('noPending')}</p>
               </div>
             ) : (

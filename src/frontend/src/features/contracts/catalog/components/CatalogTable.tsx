@@ -19,7 +19,7 @@ import {
   Plus,
   Eye,
   Send,
-  CheckCircle,
+  CheckCircle2,
   Upload,
   AlertTriangle,
   Archive,
@@ -337,7 +337,7 @@ function RowActionMenu({ item }: { item: CatalogItem }) {
     },
     {
       key: 'approve',
-      icon: <CheckCircle size={13} />,
+      icon: <CheckCircle2 size={13} />,
       labelKey: 'contracts.catalog.actions.approve',
       onClick: () => navigate(`/contracts/${item.versionId}`),
     },

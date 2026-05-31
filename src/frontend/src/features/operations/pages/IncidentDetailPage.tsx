@@ -5,7 +5,7 @@ import { useParams, NavLink } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, ArrowLeft, ShieldAlert, AlertCircle, Eye,
-  CheckCircle, XCircle, Clock, Search, Wrench,
+  CheckCircle2, XCircle, Clock, Search, Wrench,
   GitBranch, FileText, BookOpen, Shield, Activity,
   ExternalLink,
 } from 'lucide-react';
@@ -36,7 +36,7 @@ const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger
     case 'Investigating': return { variant: 'warning', icon: <Search size={14} /> };
     case 'Mitigating': return { variant: 'warning', icon: <Wrench size={14} /> };
     case 'Monitoring': return { variant: 'info', icon: <Eye size={14} /> };
-    case 'Resolved': return { variant: 'success', icon: <CheckCircle size={14} /> };
+    case 'Resolved': return { variant: 'success', icon: <CheckCircle2 size={14} /> };
     case 'Closed': return { variant: 'default', icon: <XCircle size={14} /> };
     default: return { variant: 'default', icon: <Clock size={14} /> };
   }
@@ -489,7 +489,7 @@ export function IncidentDetailPage() {
                       {mitigation.actions.map((action, idx) => (
                         <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated">
                           {action.completed
-                            ? <CheckCircle size={14} className="text-success shrink-0" aria-hidden="true" />
+                            ? <CheckCircle2 size={14} className="text-success shrink-0" aria-hidden="true" />
                             : <Clock size={14} className="text-warning shrink-0" aria-hidden="true" />
                           }
                           <span className="text-sm text-body flex-1">{action.description}</span>

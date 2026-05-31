@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardCheck, RefreshCw, XCircle, CheckCircle, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { ClipboardCheck, RefreshCw, XCircle, CheckCircle2, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -105,7 +105,7 @@ function PackCard({
         <div className="flex items-center gap-6">
           <div className="hidden md:flex gap-6 text-sm text-muted">
             <span className="flex items-center gap-1">
-              <CheckCircle size={14} className="text-success" />
+              <CheckCircle2 size={14} className="text-success" />
               {t('passing', { count: pack.passingControls })}
             </span>
             <span className="flex items-center gap-1">
@@ -151,7 +151,7 @@ function ControlRow({
   t: (key: string) => string;
 }) {
   const statusIcon = {
-    Pass: <CheckCircle size={16} className="text-success shrink-0" />,
+    Pass: <CheckCircle2 size={16} className="text-success shrink-0" />,
     Fail: <XCircle size={16} className="text-critical shrink-0" />,
     Warning: <AlertTriangle size={16} className="text-warning shrink-0" />,
     NotApplicable: <span className="w-4 h-4 rounded-full border border-edge inline-block shrink-0" />,

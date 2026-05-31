@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, X, CheckCircle } from 'lucide-react';
+import { Search, X, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { contractsApi } from '../../../api/contracts';
 
@@ -96,7 +96,7 @@ export function CanonicalEntityPicker({ onSelect, onClose }: CanonicalEntityPick
                     onClick={() => handleSelect(entity.name)}
                     className="ml-3 flex-shrink-0 flex items-center gap-1 text-[10px] font-medium text-accent hover:text-accent/80 transition-colors"
                   >
-                    <CheckCircle size={12} />
+                    <CheckCircle2 size={12} />
                     {t('contracts.builder.canonical.picker.select', 'Select')}
                   </button>
                 </li>

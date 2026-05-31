@@ -6,7 +6,7 @@ import {
   Building2,
   ChevronRight,
   ChevronLeft,
-  CheckCircle,
+  CheckCircle2,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
@@ -65,7 +65,7 @@ function StepIndicator({ current, total }: { current: Step; total: number }) {
                 : 'bg-elevated text-faded'
             }`}
           >
-            {step < current ? <CheckCircle size={14} /> : step}
+            {step < current ? <CheckCircle2 size={14} /> : step}
           </div>
           {step < total && <div className={`h-0.5 w-8 ${step < current ? 'bg-success/60' : 'bg-edge'}`} />}
         </div>
@@ -226,7 +226,7 @@ export function TenantProvisioningPage() {
                         <ul className="space-y-1">
                           {desc.features.map((f) => (
                             <li key={f} className="text-xs text-muted flex items-center gap-1.5">
-                              <CheckCircle size={10} className="text-success shrink-0" />
+                              <CheckCircle2 size={10} className="text-success shrink-0" />
                               {f}
                             </li>
                           ))}
@@ -293,7 +293,7 @@ export function TenantProvisioningPage() {
             {/* Step 3: Success */}
             {step === 3 && result && (
               <div className="text-center py-6 space-y-4">
-                <CheckCircle size={48} className="mx-auto text-success" />
+                <CheckCircle2 size={48} className="mx-auto text-success" />
                 <h2 className="text-lg font-semibold text-heading">{t('step3.title')}</h2>
                 <div className="bg-elevated rounded-md p-4 text-left text-sm space-y-2">
                   <div>

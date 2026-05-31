@@ -1,6 +1,6 @@
-﻿import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
-  ShieldCheck, CheckCircle, AlertTriangle, XCircle, Eye, Lock, RefreshCw,
+  ShieldCheck, CheckCircle2, AlertTriangle, XCircle, Eye, Lock, RefreshCw,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -66,7 +66,7 @@ export function ParameterComplianceDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             <Card>
               <CardBody className="text-center">
-                <CheckCircle size={20} className={`mx-auto mb-2 ${getComplianceColor(summary.i18nCoveragePercent)}`} />
+                <CheckCircle2 size={20} className={`mx-auto mb-2 ${getComplianceColor(summary.i18nCoveragePercent)}`} />
                 <div className={`text-2xl font-bold ${getComplianceColor(summary.i18nCoveragePercent)}`}>
                   {summary.i18nCoveragePercent}%
                 </div>

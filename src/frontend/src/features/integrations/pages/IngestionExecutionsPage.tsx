@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Activity, Search, CheckCircle, AlertTriangle, XCircle, RefreshCw, Play,
+  Activity, Search, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Play,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -24,7 +24,7 @@ const resultBadge = (r: string): 'success' | 'warning' | 'danger' => {
 
 const resultIcon = (r: string) => {
   switch (r) {
-    case 'Success': return <CheckCircle size={14} className="text-success" />;
+    case 'Success': return <CheckCircle2 size={14} className="text-success" />;
     case 'PartialSuccess': return <AlertTriangle size={14} className="text-warning" />;
     default: return <XCircle size={14} className="text-critical" />;
   }
@@ -101,14 +101,14 @@ export function IngestionExecutionsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('integrations.executionsTitle')} value={response?.totalCount ?? executions.length} icon={<Activity size={20} />} color="text-accent" />
-        <StatCard title={t('integrations.success')} value={successCount} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('integrations.success')} value={successCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('integrations.partialSuccess')} value={partialCount} icon={<AlertTriangle size={20} />} color="text-warning" />
         <StatCard title={t('integrations.failed')} value={failedCount} icon={<XCircle size={20} />} color="text-critical" />
       </div>
 
       {reprocessMutation.isSuccess && (
         <div className="mb-4 px-4 py-2 rounded-md bg-success/15 text-success text-sm flex items-center gap-2">
-          <CheckCircle size={14} /> {t('integrations.reprocessQueued')}
+          <CheckCircle2 size={14} /> {t('integrations.reprocessQueued')}
         </div>
       )}
 

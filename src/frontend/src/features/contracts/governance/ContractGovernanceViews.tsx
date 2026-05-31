@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert, ShieldCheck, AlertTriangle, UserX,
-  FileWarning, BarChart3, ArrowRight, CheckCircle,
+  FileWarning, BarChart3, ArrowRight, CheckCircle2,
   XCircle, Clock, Lock, Eye, FileText, Users, BookOpen,
   MessageSquare, Shield,
 } from 'lucide-react';
@@ -38,7 +38,7 @@ export const OverviewView = memo(function OverviewView({
           <KpiCard label={t('contracts.governance.totalContracts', 'Total')} value={summary.distinctContracts ?? 0} icon={<BarChart3 size={16} />} color="text-accent" />
           <KpiCard label={t('contracts.governance.draftCount', 'Draft')} value={summary.draftCount ?? 0} icon={<FileText size={14} />} color="text-muted" />
           <KpiCard label={t('contracts.governance.inReviewCount', 'In Review')} value={summary.inReviewCount ?? 0} icon={<Eye size={14} />} color="text-cyan" />
-          <KpiCard label={t('contracts.governance.approvedCount', 'Approved')} value={summary.approvedCount} icon={<CheckCircle size={14} />} color="text-mint" />
+          <KpiCard label={t('contracts.governance.approvedCount', 'Approved')} value={summary.approvedCount} icon={<CheckCircle2 size={14} />} color="text-mint" />
           <KpiCard label={t('contracts.governance.issuesCount', 'Issues')} value={policyResults.totalViolations} icon={<AlertTriangle size={14} />} color="text-danger" />
         </div>
       )}
@@ -146,7 +146,7 @@ export const ApprovalsView = memo(function ApprovalsView({ contracts }: { contra
   const workflowSteps = [
     { state: 'Draft', labelKey: 'contracts.governance.workflow.draft', icon: <FileText size={14} /> },
     { state: 'InReview', labelKey: 'contracts.governance.workflow.inReview', icon: <Eye size={14} /> },
-    { state: 'Approved', labelKey: 'contracts.governance.workflow.approved', icon: <CheckCircle size={14} /> },
+    { state: 'Approved', labelKey: 'contracts.governance.workflow.approved', icon: <CheckCircle2 size={14} /> },
     { state: 'Locked', labelKey: 'contracts.governance.workflow.locked', icon: <Lock size={14} /> },
     { state: 'Deprecated', labelKey: 'contracts.governance.workflow.deprecated', icon: <AlertTriangle size={14} /> },
     { state: 'Sunset', labelKey: 'contracts.governance.workflow.sunset', icon: <Clock size={14} /> },
@@ -271,7 +271,7 @@ export const ComplianceView = memo(function ComplianceView({ policyResults }: { 
   ];
 
   const resultColors = {
-    pass: { bg: 'bg-mint/10', text: 'text-mint', icon: <CheckCircle size={12} /> },
+    pass: { bg: 'bg-mint/10', text: 'text-mint', icon: <CheckCircle2 size={12} /> },
     warning: { bg: 'bg-warning/10', text: 'text-warning', icon: <AlertTriangle size={12} /> },
     violation: { bg: 'bg-danger/10', text: 'text-danger', icon: <XCircle size={12} /> },
     blocked: { bg: 'bg-danger/15', text: 'text-danger', icon: <ShieldAlert size={12} /> },
@@ -380,7 +380,7 @@ export const GapsView = memo(function GapsView({ insights }: { insights: Governa
               'w-12 h-12 rounded-lg flex items-center justify-center',
               totalGaps === 0 ? 'bg-mint/10 border border-mint/25' : 'bg-warning/10 border border-warning/25',
             )}>
-              {totalGaps === 0 ? <CheckCircle size={20} className="text-mint" /> : <AlertTriangle size={20} className="text-warning" />}
+              {totalGaps === 0 ? <CheckCircle2 size={20} className="text-mint" /> : <AlertTriangle size={20} className="text-warning" />}
             </div>
             <div>
               <p className="text-sm font-bold text-heading">
@@ -436,7 +436,7 @@ export const AuditView = memo(function AuditView({ contracts }: { contracts: Con
               {auditEntries.map((entry, i) => (
                 <div key={i} className="flex items-start gap-3 px-4 py-3">
                   <div className="flex-shrink-0 mt-0.5">
-                    {entry.type === 'approval' && <CheckCircle size={12} className="text-mint" />}
+                    {entry.type === 'approval' && <CheckCircle2 size={12} className="text-mint" />}
                     {entry.type === 'lifecycle' && <ArrowRight size={12} className="text-cyan" />}
                     {entry.type === 'publication' && <ShieldCheck size={12} className="text-accent" />}
                     {entry.type === 'deprecation' && <AlertTriangle size={12} className="text-warning" />}

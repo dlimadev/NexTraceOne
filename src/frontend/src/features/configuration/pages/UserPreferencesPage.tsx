@@ -1,8 +1,8 @@
-﻿import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Settings, Sidebar, LayoutDashboard, Save, CheckCircle, XCircle,
+  Settings, Sidebar, LayoutDashboard, Save, CheckCircle2, XCircle,
   Sun, Moon, Globe, Bell, BellOff, Eye, Accessibility, Monitor,
   Table, Clock, Type, List, Rss, Bot,
 } from 'lucide-react';
@@ -895,7 +895,7 @@ export function UserPreferencesPage() {
         </button>
         {saveStatus === 'saved' && (
           <span className="flex items-center gap-1 text-success text-sm">
-            <CheckCircle size={14} /> {t('userPreferences.saved')}
+            <CheckCircle2 size={14} /> {t('userPreferences.saved')}
           </span>
         )}
         {saveStatus === 'error' && (

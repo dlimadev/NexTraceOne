@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   GitCommit, ArrowUpCircle, Lock, FileSignature,
-  AlertTriangle, CheckCircle, XCircle, Clock, RefreshCw,
+  AlertTriangle, CheckCircle2, XCircle, Clock, RefreshCw,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
@@ -253,7 +253,7 @@ function buildTimeline(
 function stateIcon(state: string): React.ReactNode {
   switch (state) {
     case 'Approved':
-      return <CheckCircle size={11} />;
+      return <CheckCircle2 size={11} />;
     case 'InReview':
       return <ArrowUpCircle size={11} />;
     case 'Deprecated':

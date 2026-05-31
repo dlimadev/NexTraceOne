@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Server, Activity, CheckCircle, AlertTriangle,
+  Server, Activity, CheckCircle2, AlertTriangle,
   Inbox, Bell, Cpu, Database, Cog, BrainCircuit,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -131,7 +131,7 @@ export function PlatformOperationsPage() {
           <StatCard
             title={t('platformOps.healthyCount')}
             value={healthQuery.isLoading ? '…' : `${healthyCount}/${subsystems.length}`}
-            icon={<CheckCircle size={20} />}
+            icon={<CheckCircle2 size={20} />}
             color="text-success"
           />
           <StatCard

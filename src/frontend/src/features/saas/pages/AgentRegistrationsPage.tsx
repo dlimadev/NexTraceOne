@@ -8,7 +8,7 @@ import {
   Cpu,
   MemoryStick,
   Clock,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   AlertCircle,
 } from 'lucide-react';
@@ -20,7 +20,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 
 const STATUS_ICON: Record<AgentStatus, React.ReactNode> = {
-  Active: <CheckCircle size={14} className="text-success" />,
+  Active: <CheckCircle2 size={14} className="text-success" />,
   Inactive: <XCircle size={14} className="text-faded" />,
   Decommissioned: <AlertCircle size={14} className="text-critical/60" />,
 };

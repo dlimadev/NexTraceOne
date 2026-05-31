@@ -7,7 +7,7 @@ import {
   ToggleLeft,
   ToggleRight,
   Users,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Clock,
 } from 'lucide-react';
@@ -203,7 +203,7 @@ export function DashboardReportsPage() {
                               {report.failureCount > 0 ? (
                                 <XCircle size={11} className="text-critical" />
                               ) : (
-                                <CheckCircle size={11} className="text-success" />
+                                <CheckCircle2 size={11} className="text-success" />
                               )}
                               {t('governance.dashboardReports.lastRun', 'Last run')}:{' '}
                               {formatDate(report.lastRunAt)}

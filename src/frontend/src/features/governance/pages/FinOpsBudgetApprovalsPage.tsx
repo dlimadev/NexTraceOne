@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClipboardCheck, Clock, CheckCircle, XCircle, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
+import { ClipboardCheck, Clock, CheckCircle2, XCircle, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -157,7 +157,7 @@ export function FinOpsBudgetApprovalsPage() {
                         disabled={resolveMutation.isPending}
                         className="btn btn-primary btn-sm flex items-center gap-1"
                       >
-                        <CheckCircle size={14} />
+                        <CheckCircle2 size={14} />
                         {t('finops.approvals.approve')}
                       </button>
                       <button
@@ -175,7 +175,7 @@ export function FinOpsBudgetApprovalsPage() {
                 {item.status !== 'Pending' && item.resolvedBy && (
                   <div className="border-t border-border pt-4 flex items-start gap-3">
                     {item.status === 'Approved'
-                      ? <CheckCircle size={14} className="text-success mt-0.5" />
+                      ? <CheckCircle2 size={14} className="text-success mt-0.5" />
                       : <XCircle size={14} className="text-critical mt-0.5" />}
                     <div>
                       <p className="text-xs text-muted">

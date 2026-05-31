@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   Users, Server, FileText, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Building2, Calendar, ArrowLeft,
+  CheckCircle2, Building2, Calendar, ArrowLeft,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -352,7 +352,7 @@ function GovernanceTab({ gov, t, formatPct }: { gov: GovernanceSummary | null; t
           <div className="divide-y divide-edge">
             {gov.dimensions.map(dim => (
               <div key={dim.dimension} className="px-4 py-3 flex items-center gap-3">
-                <CheckCircle size={14} className={dim.score >= 85 ? 'text-success' : dim.score >= 70 ? 'text-warning' : 'text-critical'} />
+                <CheckCircle2 size={14} className={dim.score >= 85 ? 'text-success' : dim.score >= 70 ? 'text-warning' : 'text-critical'} />
                 <span className="text-sm font-medium text-heading flex-1 truncate">{dim.dimension}</span>
                 <Badge variant={maturityBadgeVariant(dim.level)}>
                   {t(`organization.teams.maturityLevel.${dim.level}`)}

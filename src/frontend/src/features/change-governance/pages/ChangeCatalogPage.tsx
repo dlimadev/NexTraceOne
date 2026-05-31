@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Activity,
-  CheckCircle,
+  CheckCircle2,
   AlertTriangle,
   XCircle,
   AlertOctagon,
@@ -171,7 +171,7 @@ export function ChangeCatalogPage() {
   /** Configuração dos cards de resumo. */
   const summaryCards = [
     { key: 'totalChanges', value: summary?.totalChanges, icon: Activity, color: 'text-accent' },
-    { key: 'validatedChanges', value: summary?.validatedChanges, icon: CheckCircle, color: 'text-success' },
+    { key: 'validatedChanges', value: summary?.validatedChanges, icon: CheckCircle2, color: 'text-success' },
     { key: 'changesNeedingAttention', value: summary?.changesNeedingAttention, icon: AlertTriangle, color: 'text-warning' },
     { key: 'suspectedRegressions', value: summary?.suspectedRegressions, icon: XCircle, color: 'text-critical' },
     { key: 'correlatedWithIncidents', value: summary?.changesCorrelatedWithIncidents, icon: AlertOctagon, color: 'text-critical' },

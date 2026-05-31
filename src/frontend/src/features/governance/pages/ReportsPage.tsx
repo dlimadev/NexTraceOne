@@ -4,7 +4,7 @@ import {
   Award, FileText, AlertTriangle,
   ShieldCheck, TrendingUp, TrendingDown, Minus,
   Activity, ClipboardCheck, Download, Package,
-  CheckCircle, XCircle, Clock,
+  CheckCircle2, XCircle, Clock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -95,8 +95,8 @@ export function ReportsPage() {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <StatCard title={t('governance.reports.totalPacks')} value={data.totalPacks} icon={<Package size={20} />} color="text-accent" />
-          <StatCard title={t('governance.reports.publishedPacks')} value={`${packPublishedPct}%`} icon={<CheckCircle size={20} />} color="text-success" />
-          <StatCard title={t('governance.reports.completedRollouts')} value={`${rolloutCompletionPct}%`} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('governance.reports.publishedPacks')} value={`${packPublishedPct}%`} icon={<CheckCircle2 size={20} />} color="text-success" />
+          <StatCard title={t('governance.reports.completedRollouts')} value={`${rolloutCompletionPct}%`} icon={<CheckCircle2 size={20} />} color="text-success" />
           <StatCard title={t('governance.reports.pendingRollouts')} value={data.pendingRollouts} icon={<Clock size={20} />} color="text-warning" />
           <StatCard title={t('governance.reports.failedRollouts')} value={data.failedRollouts} icon={<XCircle size={20} />} color="text-critical" />
           <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={20} />} color="text-success" />
@@ -205,7 +205,7 @@ export function ReportsPage() {
             {(persona === 'Architect' || persona === 'PlatformAdmin') && (
               <div className="py-3">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <StatCard title={t('governance.reports.publishedPacks')} value={data.publishedPacks} icon={<CheckCircle size={18} />} color="text-success" />
+                  <StatCard title={t('governance.reports.publishedPacks')} value={data.publishedPacks} icon={<CheckCircle2 size={18} />} color="text-success" />
                   <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-success" />
                   <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-warning" />
                 </div>

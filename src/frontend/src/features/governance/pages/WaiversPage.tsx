@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  FileCheck, Search, Clock, CheckCircle, XCircle, Shield,
+  FileCheck, Search, Clock, CheckCircle2, XCircle, Shield,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -98,7 +98,7 @@ export function WaiversPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('governancePacks.waivers.totalWaivers')} value={totalWaivers} icon={<FileCheck size={20} />} color="text-accent" />
         <StatCard title={t('governancePacks.waivers.pendingApproval')} value={pendingCount} icon={<Clock size={20} />} color="text-warning" />
-        <StatCard title={t('governancePacks.waivers.approved')} value={approvedCount} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('governancePacks.waivers.approved')} value={approvedCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('governancePacks.waivers.expired')} value={expiredCount} icon={<XCircle size={20} />} color="text-muted" />
       </div>
 
@@ -173,7 +173,7 @@ export function WaiversPage() {
                         {waiver.status === 'Pending' && (
                           <div className="flex items-center gap-2 mt-3">
                             <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-success/15 text-success hover:bg-success/25 transition-colors">
-                              <CheckCircle size={12} />
+                              <CheckCircle2 size={12} />
                               {t('governancePacks.waivers.approve')}
                             </button>
                             <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-critical/15 text-critical hover:bg-critical/25 transition-colors">

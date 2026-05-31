@@ -9,7 +9,7 @@ import {
   Box,
   Download,
   Copy,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Loader2,
   ArrowRight,
@@ -132,7 +132,7 @@ function ArtifactCard({
             onClick={handleCopy}
             className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs text-muted hover:bg-elevated hover:text-body transition-colors"
           >
-            {copied ? <CheckCircle className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? t('copied') : t('copy')}
           </button>
           <button
@@ -292,7 +292,7 @@ export function ContractPipelinePage() {
                   }`}
                 >
                   {item.value
-                    ? <CheckCircle className="h-3.5 w-3.5 text-success shrink-0" />
+                    ? <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
                     : <XCircle className="h-3.5 w-3.5 text-muted shrink-0" />}
                   {item.icon}
                   {item.label}
@@ -339,7 +339,7 @@ export function ContractPipelinePage() {
         <div className="flex flex-col gap-4">
           {/* Summary bar */}
           <div className="flex items-center gap-4 rounded-lg border border-success/30 bg-success/10 px-4 py-3">
-            <CheckCircle className="h-5 w-5 text-success shrink-0" />
+            <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-medium text-success">
                 {t('pipelineSuccess', { count: mutation.data.totalArtifacts })}

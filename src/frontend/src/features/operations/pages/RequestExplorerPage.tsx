@@ -101,12 +101,14 @@ interface CollapsibleFacetProps {
 function CollapsibleFacet({ title, children, defaultOpen = true }: CollapsibleFacetProps) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-slate-200 dark:border-slate-700 pb-3 mb-2">
+    <div className="border-b border-divider pb-3 mb-2 last:border-b-0 last:pb-0 last:mb-0">
       <button
-        className="flex items-center w-full gap-1 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+        className="flex items-center w-full gap-1 py-1 text-xs font-semibold text-muted hover:text-body transition-colors"
         onClick={() => setOpen(o => !o)}
       >
-        {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        {open
+          ? <ChevronDown size={13} className="flex-shrink-0" />
+          : <ChevronRight size={13} className="flex-shrink-0" />}
         {title}
       </button>
       {open && <div className="mt-2 pl-1">{children}</div>}
@@ -114,7 +116,7 @@ function CollapsibleFacet({ title, children, defaultOpen = true }: CollapsibleFa
   );
 }
 
-// ── Histogram chart (pure CSS bars, no ECharts dep needed for test compat) ────
+// ── Histogram chart ───────────────────────────────────────────────────────────
 
 interface HistogramProps {
   buckets: Array<{ durationLabel: string; successCount: number; failureCount: number }>;
@@ -128,7 +130,7 @@ function HistogramChart({ buckets }: HistogramProps) {
   if (!buckets.length) return null;
   return (
     <div
-      className="flex items-end gap-0.5 h-40 w-full px-2"
+      className="flex items-end gap-0.5 h-36 w-full px-2"
       role="img"
       aria-label="request duration histogram"
     >
@@ -142,14 +144,13 @@ function HistogramChart({ buckets }: HistogramProps) {
             className="flex flex-col flex-1 items-stretch justify-end"
             title={`${b.durationLabel}: ${total} (${b.failureCount} failed)`}
           >
-            <div className="flex flex-col" style={{ height: `${heightPct}%` }}>
+            <div className="flex flex-col rounded-t-sm overflow-hidden" style={{ height: `${heightPct}%` }}>
               {b.failureCount > 0 && (
                 <div
-                  className="bg-red-400 dark:bg-red-500"
-                  style={{ height: `${failurePct}%`, minHeight: 2 }}
+                  style={{ height: `${failurePct}%`, minHeight: 2, background: 'var(--t-danger)' }}
                 />
               )}
-              <div className="bg-teal-500 dark:bg-teal-400 flex-1" />
+              <div className="flex-1" style={{ background: 'var(--t-data-2)' }} />
             </div>
           </div>
         );
@@ -289,6 +290,10 @@ export function RequestExplorerPage() {
 
   const SPAN_KINDS: SpanKindFilter[] = ['client', 'server', 'consumer', 'producer', 'internal', 'link'];
 
+  // ── Shared input / control classes ────────────────────────────────────────
+
+  const inputCls = 'px-2 py-1.5 text-xs rounded-sm border border-edge bg-elevated text-body placeholder-faded focus:outline-none focus:ring-1 focus:ring-accent';
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -303,15 +308,15 @@ export function RequestExplorerPage() {
           {/* ── Toolbar: view toggle + time range + refresh ── */}
           <div className="flex items-center gap-3 flex-wrap">
             {/* View toggle */}
-            <div className="flex rounded-md border border-slate-300 dark:border-slate-600 overflow-hidden text-sm">
+            <div className="flex rounded-sm border border-edge overflow-hidden text-sm">
               {(['requests', 'spans'] as RequestViewMode[]).map(mode => (
                 <button
                   key={mode}
                   onClick={() => { setViewMode(mode); setPage(1); }}
-                  className={`px-4 py-1.5 font-medium capitalize transition-colors ${
+                  className={`px-4 py-1.5 text-xs font-medium capitalize transition-colors ${
                     viewMode === mode
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                      ? 'bg-accent text-on-accent'
+                      : 'bg-elevated text-muted hover:bg-hover hover:text-body'
                   }`}
                 >
                   {mode === 'requests' ? t('requestExplorer.viewRequests') : t('requestExplorer.viewSpans')}
@@ -323,20 +328,20 @@ export function RequestExplorerPage() {
             <div className="relative">
               <button
                 onClick={() => setTimeRangeOpen(o => !o)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-sm border border-edge bg-elevated text-xs text-body hover:bg-hover transition-colors"
               >
-                <Clock size={14} />
+                <Clock size={13} className="text-muted flex-shrink-0" />
                 {currentTimeRangeLabel}
-                <ChevronDown size={14} />
+                <ChevronDown size={13} className="text-muted flex-shrink-0" />
               </button>
               {timeRangeOpen && (
-                <div className="absolute left-0 top-full mt-1 z-20 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg min-w-[160px]">
+                <div className="absolute left-0 top-full mt-1 z-20 bg-card border border-edge rounded-sm shadow-lg min-w-[160px]">
                   {TIME_RANGE_OPTIONS.map(opt => (
                     <button
                       key={opt.value}
                       onClick={() => { setTimeRange(opt.value); setTimeRangeOpen(false); setPage(1); }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 ${
-                        timeRange === opt.value ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-slate-700 dark:text-slate-300'
+                      className={`block w-full text-left px-4 py-2 text-xs hover:bg-hover transition-colors ${
+                        timeRange === opt.value ? 'text-accent font-medium' : 'text-body'
                       }`}
                     >
                       {t(opt.labelKey)}
@@ -347,23 +352,23 @@ export function RequestExplorerPage() {
             </div>
 
             <Button variant="ghost" size="sm" onClick={() => setRefreshKey(k => k + 1)} title={t('requestExplorer.refresh')}>
-              <RefreshCw size={14} />
+              <RefreshCw size={13} />
             </Button>
           </div>
 
           {/* ── Active filter chips ── */}
           {activeChips.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
-              <Filter size={14} className="text-slate-400 flex-shrink-0" />
+              <Filter size={13} className="text-muted flex-shrink-0" />
               {activeChips.map(chip => (
                 <span
                   key={chip.key}
-                  className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded text-xs font-medium"
+                  className="flex items-center gap-1 px-2 py-0.5 bg-accent-muted text-accent rounded-sm text-xs font-medium"
                 >
                   {chip.label}
                   <button
                     onClick={chip.onRemove}
-                    className="ml-0.5 hover:text-blue-900 dark:hover:text-blue-100"
+                    className="ml-0.5 hover:text-accent-hover transition-colors"
                     aria-label={t('requestExplorer.removeFilter')}
                   >
                     <X size={10} />
@@ -380,7 +385,7 @@ export function RequestExplorerPage() {
                   setDurationMin('');
                   setDurationMax('');
                 }}
-                className="text-xs text-slate-500 hover:text-red-500 ml-1"
+                className="text-xs text-muted hover:text-danger transition-colors ml-1"
               >
                 {t('requestExplorer.clearAll')}
               </button>
@@ -390,28 +395,27 @@ export function RequestExplorerPage() {
           {/* ── Main layout: facets + content ── */}
           <div className="flex gap-4 items-start">
             {/* ── Facet sidebar ── */}
-            <aside className="w-64 flex-shrink-0">
+            <aside className="w-60 flex-shrink-0">
               <Card>
-                <CardBody>
-                  <div className="mb-3">
-                    <div className="relative">
-                      <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        className="w-full pl-8 pr-3 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 placeholder-slate-400"
-                        placeholder={t('requestExplorer.searchFacets')}
-                        readOnly
-                      />
-                    </div>
+                <CardBody className="p-3">
+                  {/* Facet search (decorativo) */}
+                  <div className="relative mb-3">
+                    <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faded pointer-events-none" />
+                    <input
+                      className={`w-full pl-8 pr-3 ${inputCls}`}
+                      placeholder={t('requestExplorer.searchFacets')}
+                      readOnly
+                    />
                   </div>
 
                   {/* Core / Duration */}
                   <CollapsibleFacet title={t('requestExplorer.facets.core')}>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('requestExplorer.facets.duration')}</div>
+                    <div className="text-xs text-faded mb-1">{t('requestExplorer.facets.duration')}</div>
                     <div className="flex gap-2">
                       <div>
-                        <div className="text-xs text-slate-400 mb-0.5">{t('requestExplorer.facets.min')}</div>
+                        <div className="text-xs text-faded mb-0.5">{t('requestExplorer.facets.min')}</div>
                         <input
-                          className="w-20 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                          className={`w-20 ${inputCls}`}
                           placeholder="0ns"
                           value={durationMin}
                           onChange={e => { setDurationMin(e.target.value); setPage(1); }}
@@ -419,9 +423,9 @@ export function RequestExplorerPage() {
                         />
                       </div>
                       <div>
-                        <div className="text-xs text-slate-400 mb-0.5">{t('requestExplorer.facets.max')}</div>
+                        <div className="text-xs text-faded mb-0.5">{t('requestExplorer.facets.max')}</div>
                         <input
-                          className="w-20 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                          className={`w-20 ${inputCls}`}
                           placeholder="1000s"
                           value={durationMax}
                           onChange={e => { setDurationMax(e.target.value); setPage(1); }}
@@ -434,50 +438,50 @@ export function RequestExplorerPage() {
                   {/* Service */}
                   <CollapsibleFacet title={t('requestExplorer.facets.service')}>
                     {(facets?.services ?? []).map(svc => (
-                      <label key={svc} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 py-0.5 cursor-pointer hover:text-blue-600">
+                      <label key={svc} className="flex items-center gap-2 text-xs text-body py-0.5 cursor-pointer hover:text-accent transition-colors">
                         <input
                           type="checkbox"
                           checked={selectedServices.includes(svc)}
                           onChange={() => toggleListItem(selectedServices, setSelectedServices, svc)}
-                          className="rounded border-slate-300"
+                          className="rounded-sm border-edge accent-accent"
                         />
                         {svc}
                       </label>
                     ))}
                     {!facets?.services?.length && (
-                      <p className="text-xs text-slate-400">{t('requestExplorer.noFacets')}</p>
+                      <p className="text-xs text-faded">{t('requestExplorer.noFacets')}</p>
                     )}
                   </CollapsibleFacet>
 
                   {/* Endpoint */}
                   <CollapsibleFacet title={t('requestExplorer.facets.endpoint')}>
                     {(facets?.endpoints ?? []).slice(0, 8).map(ep => (
-                      <label key={ep} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 py-0.5 cursor-pointer hover:text-blue-600 break-all">
+                      <label key={ep} className="flex items-center gap-2 text-xs text-body py-0.5 cursor-pointer hover:text-accent transition-colors break-all">
                         <input
                           type="checkbox"
                           checked={selectedEndpoints.includes(ep)}
                           onChange={() => toggleListItem(selectedEndpoints, setSelectedEndpoints, ep)}
-                          className="rounded border-slate-300 flex-shrink-0"
+                          className="rounded-sm border-edge accent-accent flex-shrink-0"
                         />
                         {ep}
                       </label>
                     ))}
                     {!facets?.endpoints?.length && (
-                      <p className="text-xs text-slate-400">{t('requestExplorer.noFacets')}</p>
+                      <p className="text-xs text-faded">{t('requestExplorer.noFacets')}</p>
                     )}
                   </CollapsibleFacet>
 
                   {/* Request Status */}
                   <CollapsibleFacet title={t('requestExplorer.facets.requestStatus')}>
                     {(['Success', 'Failure'] as RequestStatus[]).map(s => (
-                      <label key={s} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 py-0.5 cursor-pointer hover:text-blue-600">
+                      <label key={s} className="flex items-center gap-2 text-xs py-0.5 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={requestStatus === s}
                           onChange={() => setRequestStatus(prev => (prev === s ? '' : s))}
-                          className="rounded border-slate-300"
+                          className="rounded-sm border-edge accent-accent"
                         />
-                        <span className={s === 'Success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                        <span className={s === 'Success' ? 'text-success' : 'text-danger'}>
                           {t(`requestExplorer.status.${s.toLowerCase()}`)}
                         </span>
                       </label>
@@ -487,12 +491,12 @@ export function RequestExplorerPage() {
                   {/* Span Status */}
                   <CollapsibleFacet title={t('requestExplorer.facets.spanStatus')}>
                     {(['Ok', 'Error'] as SpanStatusFilter[]).map(s => (
-                      <label key={s} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 py-0.5 cursor-pointer hover:text-blue-600">
+                      <label key={s} className="flex items-center gap-2 text-xs text-body py-0.5 cursor-pointer hover:text-accent transition-colors">
                         <input
                           type="checkbox"
                           checked={spanStatus === s}
                           onChange={() => setSpanStatus(prev => (prev === s ? '' : s))}
-                          className="rounded border-slate-300"
+                          className="rounded-sm border-edge accent-accent"
                         />
                         {s}
                       </label>
@@ -502,12 +506,12 @@ export function RequestExplorerPage() {
                   {/* Span Kind */}
                   <CollapsibleFacet title={t('requestExplorer.facets.spanKind')}>
                     {SPAN_KINDS.map(k => (
-                      <label key={k} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 py-0.5 cursor-pointer hover:text-blue-600">
+                      <label key={k} className="flex items-center gap-2 text-xs text-body py-0.5 cursor-pointer hover:text-accent transition-colors capitalize">
                         <input
                           type="checkbox"
                           checked={selectedSpanKinds.includes(k)}
                           onChange={() => toggleListItem(selectedSpanKinds, setSelectedSpanKinds, k)}
-                          className="rounded border-slate-300"
+                          className="rounded-sm border-edge accent-accent"
                         />
                         {k}
                       </label>
@@ -516,20 +520,20 @@ export function RequestExplorerPage() {
 
                   {/* HTTP */}
                   <CollapsibleFacet title="HTTP" defaultOpen={false}>
-                    <p className="text-xs text-slate-400">{t('requestExplorer.facets.httpNote')}</p>
+                    <p className="text-xs text-faded">{t('requestExplorer.facets.httpNote')}</p>
                   </CollapsibleFacet>
                 </CardBody>
               </Card>
             </aside>
 
             {/* ── Content: chart + table ── */}
-            <div className="flex-1 min-w-0 flex flex-col gap-4">
+            <div className="flex-1 min-w-0 flex flex-col gap-3">
               {/* Chart card */}
               <Card>
-                <CardBody>
+                <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      <h3 className="text-sm font-semibold text-foreground">
                         {viewMode === 'requests' ? t('requestExplorer.viewRequests') : t('requestExplorer.viewSpans')}
                       </h3>
                       {result && (
@@ -539,15 +543,15 @@ export function RequestExplorerPage() {
                       )}
                     </div>
                     {/* Chart mode toggle */}
-                    <div className="flex rounded border border-slate-300 dark:border-slate-600 overflow-hidden text-xs">
+                    <div className="flex rounded-sm border border-edge overflow-hidden text-xs">
                       {(['timeseries', 'histogram'] as ChartMode[]).map(mode => (
                         <button
                           key={mode}
                           onClick={() => setChartMode(mode)}
                           className={`px-3 py-1 font-medium capitalize transition-colors ${
                             chartMode === mode
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                              ? 'bg-accent text-on-accent'
+                              : 'bg-elevated text-muted hover:bg-hover hover:text-body'
                           }`}
                         >
                           {t(`requestExplorer.chart.${mode}`)}
@@ -556,22 +560,21 @@ export function RequestExplorerPage() {
                     </div>
                   </div>
 
-                  {/* Histogram / legend */}
                   {result && result.histogram.length > 0 ? (
                     <>
-                      <div className="flex items-center gap-4 mb-2 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <span className="inline-block w-3 h-3 rounded-sm bg-red-400 dark:bg-red-500" />
+                      <div className="flex items-center gap-4 mb-2 text-xs text-muted">
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: 'var(--t-danger)' }} />
                           {t('requestExplorer.chart.failedRequests')}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <span className="inline-block w-3 h-3 rounded-sm bg-teal-500 dark:bg-teal-400" />
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: 'var(--t-data-2)' }} />
                           {t('requestExplorer.chart.successfulRequests')}
                         </span>
                       </div>
                       <HistogramChart buckets={result.histogram} />
                       {/* x-axis labels */}
-                      <div className="flex justify-between px-2 mt-1 text-xs text-slate-400">
+                      <div className="flex justify-between px-2 mt-1 text-[10px] text-faded">
                         {result.histogram
                           .filter((_, i) => i % Math.max(1, Math.floor(result.histogram.length / 6)) === 0)
                           .map((b, i) => <span key={i}>{b.durationLabel}</span>)}
@@ -579,7 +582,7 @@ export function RequestExplorerPage() {
                       </div>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-32 text-sm text-slate-400">
+                    <div className="flex items-center justify-center h-28 text-sm text-muted">
                       {t('requestExplorer.noRecords')}
                     </div>
                   )}
@@ -588,11 +591,11 @@ export function RequestExplorerPage() {
 
               {/* Table card */}
               <Card>
-                <CardBody>
+                <CardBody className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-700">
+                        <tr className="border-b border-border bg-muted/20">
                           {[
                             { key: 'startTime', label: t('requestExplorer.table.startTime') },
                             { key: 'endpoint', label: t('requestExplorer.table.endpoint') },
@@ -606,12 +609,12 @@ export function RequestExplorerPage() {
                           ].map(col => (
                             <th
                               key={col.key}
-                              className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap cursor-pointer hover:text-slate-700 dark:hover:text-slate-200"
+                              className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap cursor-pointer hover:text-foreground transition-colors"
                               onClick={() => handleSort(col.key)}
                             >
                               <div className="flex items-center gap-1">
                                 {col.label}
-                                <ArrowUpDown size={12} className={sortBy === col.key ? 'text-blue-500' : 'opacity-40'} />
+                                <ArrowUpDown size={11} className={sortBy === col.key ? 'text-accent' : 'opacity-30'} />
                               </div>
                             </th>
                           ))}
@@ -623,7 +626,7 @@ export function RequestExplorerPage() {
                         ))}
                         {(!result?.items?.length) && (
                           <tr>
-                            <td colSpan={9} className="px-3 py-8 text-center text-sm text-slate-400">
+                            <td colSpan={9} className="px-3 py-8 text-center text-sm text-muted-foreground">
                               {t('requestExplorer.noRecords')}
                             </td>
                           </tr>
@@ -634,7 +637,7 @@ export function RequestExplorerPage() {
 
                   {/* Pagination */}
                   {result && result.total > PAGE_SIZE && (
-                    <div className="flex items-center justify-between mt-4 text-sm text-slate-500">
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
                       <span>
                         {t('requestExplorer.pagination.showing', {
                           from: (page - 1) * PAGE_SIZE + 1,
@@ -676,18 +679,26 @@ export function RequestExplorerPage() {
 
 function RequestRow({ row, t }: { row: RequestSpan; t: (k: string) => string }) {
   const isFailure = row.requestStatus === 'Failure';
+
+  function httpCodeClass(code: number): string {
+    if (code >= 500) return 'text-danger font-medium';
+    if (code >= 400) return 'text-warning font-medium';
+    if (code >= 200) return 'text-success';
+    return 'text-muted-foreground';
+  }
+
   return (
-    <tr className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isFailure ? 'border-l-2 border-l-red-500' : ''}`}>
-      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap font-mono">
+    <tr className={`border-b border-border/50 hover:bg-muted/20 transition-colors ${isFailure ? 'border-l-2 border-l-danger' : ''}`}>
+      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap font-mono">
         {fmtDateTime(row.startTime)}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-700 dark:text-slate-300 max-w-[180px] truncate" title={row.endpoint}>
+      <td className="px-3 py-2 text-xs text-foreground max-w-[180px] truncate" title={row.endpoint}>
         {row.endpoint}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-700 dark:text-slate-300 whitespace-nowrap">
+      <td className="px-3 py-2 text-xs text-foreground whitespace-nowrap">
         {row.service}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-700 dark:text-slate-300 whitespace-nowrap">
+      <td className="px-3 py-2 text-xs text-foreground whitespace-nowrap tabular-nums">
         {fmtDuration(row.durationMs)}
       </td>
       <td className="px-3 py-2">
@@ -697,22 +708,18 @@ function RequestRow({ row, t }: { row: RequestSpan; t: (k: string) => string }) 
       </td>
       <td className="px-3 py-2 text-xs whitespace-nowrap">
         {row.httpCode != null ? (
-          <span className={
-            row.httpCode >= 500 ? 'text-red-600 dark:text-red-400 font-medium' :
-            row.httpCode >= 400 ? 'text-orange-600 dark:text-orange-400 font-medium' :
-            'text-slate-600 dark:text-slate-300'
-          }>
+          <span className={`font-mono ${httpCodeClass(row.httpCode)}`}>
             {row.httpCode}
           </span>
         ) : '—'}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap max-w-[120px] truncate" title={row.processGroup}>
+      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap max-w-[120px] truncate" title={row.processGroup}>
         {row.processGroup ?? '—'}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">
+      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
         {row.k8sWorkload ?? '—'}
       </td>
-      <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">
+      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
         {row.k8sNamespace ?? '—'}
       </td>
     </tr>

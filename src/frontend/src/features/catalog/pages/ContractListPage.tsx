@@ -6,7 +6,7 @@ import {
   FileText,
   Shield,
   Lock,
-  CheckCircle,
+  CheckCircle2,
   ChevronRight,
   Layers,
   Clock,
@@ -145,7 +145,7 @@ export function ContractListPage() {
             accent="text-info"
           />
           <SummaryCard
-            icon={<CheckCircle size={18} />}
+            icon={<CheckCircle2 size={18} />}
             label={t('contractGov.summary.approved')}
             value={summary.approvedCount}
             accent="text-success"
@@ -306,7 +306,7 @@ export function ContractListPage() {
                       <td className="px-4 py-3">
                         {c.isSigned ? (
                           <span className="inline-flex items-center gap-1 text-xs text-success">
-                            <CheckCircle size={12} />
+                            <CheckCircle2 size={12} />
                             {t('contractGov.badges.signed')}
                           </span>
                         ) : (

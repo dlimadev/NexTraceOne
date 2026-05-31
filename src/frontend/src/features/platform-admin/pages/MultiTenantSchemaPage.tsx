@@ -5,7 +5,7 @@ import {
   Database,
   RefreshCw,
   XCircle,
-  CheckCircle,
+  CheckCircle2,
   Plus,
   Server,
   AlertTriangle,
@@ -116,7 +116,7 @@ export function MultiTenantSchemaPage() {
           </div>
           {provisionMutation.isSuccess && (
             <div className="mt-3 flex items-center gap-2 text-success text-sm">
-              <CheckCircle size={14} />
+              <CheckCircle2 size={14} />
               {t('provisionSuccess')}
             </div>
           )}
@@ -176,7 +176,7 @@ function SchemaRow({ schema }: { schema: TenantSchemaEntry }) {
     <tr className="hover:bg-elevated">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          <CheckCircle size={14} className="text-success shrink-0" />
+          <CheckCircle2 size={14} className="text-success shrink-0" />
           <span className="font-medium text-heading">{schema.tenantSlug}</span>
         </div>
       </td>

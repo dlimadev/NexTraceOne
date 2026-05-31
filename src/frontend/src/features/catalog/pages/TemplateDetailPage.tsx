@@ -13,7 +13,7 @@ import {
   GitBranch,
   Power,
   PowerOff,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Clock,
   BarChart2,
@@ -178,7 +178,7 @@ export function TemplateDetailPage() {
           <div className="flex shrink-0 items-center gap-2">
             {template.isActive ? (
               <span className="flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
-                <CheckCircle className="h-3.5 w-3.5" />
+                <CheckCircle2 className="h-3.5 w-3.5" />
                 {t('templates.detail.active')}
               </span>
             ) : (
@@ -268,7 +268,7 @@ export function TemplateDetailPage() {
                 <span className="text-xs text-muted">{t('templates.detail.timesUsed')}</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-muted">
-                <CheckCircle className="h-3.5 w-3.5 text-success" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-success" />
                 {template.hasBaseContract ? t('templates.detail.hasContract') : t('templates.detail.noContract')}
               </div>
               <div className="flex items-center gap-2 text-xs text-muted">

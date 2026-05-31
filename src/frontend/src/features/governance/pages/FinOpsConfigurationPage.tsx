@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings, DollarSign, Shield, CheckCircle, AlertTriangle, Plus, X, Activity, Trash2, BookOpen, Eye } from 'lucide-react';
+import { Settings, DollarSign, Shield, CheckCircle2, AlertTriangle, Plus, X, Activity, Trash2, BookOpen, Eye } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -195,7 +195,7 @@ export function FinOpsConfigurationPage() {
         <Card className="md:col-span-2">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-accent" />
+              <CheckCircle2 size={16} className="text-accent" />
               <span className="font-semibold text-sm">{t('finops.config.approvers.title')}</span>
               <Badge variant="default" size="sm">{data.approvers.length}</Badge>
             </div>

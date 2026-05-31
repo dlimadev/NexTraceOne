@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, Circle, AlertTriangle, ArrowRight, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Circle, AlertTriangle, ArrowRight, ChevronRight } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { LifecycleBadge } from '../../shared/components/LifecycleBadge';
@@ -100,7 +100,7 @@ export function ApprovalsSection({ contract, onTransition, className = '' }: App
                       )}
                     >
                       {item.state === 'Approved' ? (
-                        <CheckCircle size={16} className="text-mint flex-shrink-0" />
+                        <CheckCircle2 size={16} className="text-mint flex-shrink-0" />
                       ) : (
                         <Circle size={16} className="text-muted/40 flex-shrink-0" />
                       )}

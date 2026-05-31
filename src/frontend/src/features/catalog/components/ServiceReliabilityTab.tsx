@@ -8,7 +8,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Shield, ExternalLink, Activity, CheckCircle } from 'lucide-react';
+import { Shield, ExternalLink, Activity, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Link } from 'react-router-dom';
@@ -20,7 +20,7 @@ interface Props {
 
 function sloActiveBadge(isActive: boolean) {
   return isActive
-    ? <Badge variant="success" size="sm"><CheckCircle size={10} className="inline mr-1" />Active</Badge>
+    ? <Badge variant="success" size="sm"><CheckCircle2 size={10} className="inline mr-1" />Active</Badge>
     : <Badge variant="default" size="sm">Inactive</Badge>;
 }
 

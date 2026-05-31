@@ -6,7 +6,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor, { type OnMount } from '@monaco-editor/react';
-import { Play, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Play, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -218,13 +218,13 @@ export function NqlMonacoEditor({
             disabled={isValidating || !value.trim()}
             className="flex items-center gap-1 rounded border border-edge bg-card px-2 py-1 text-[10px] text-muted hover:text-accent disabled:opacity-40 transition-colors"
           >
-            {isValidating ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle size={10} />}
+            {isValidating ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle2 size={10} />}
             {t('nqlEditor.validate', 'Validate')}
           </button>
 
           {validation && (
             <span className={`flex items-center gap-1 text-[10px] ${validation.valid ? 'text-green-500' : 'text-red-500'}`}>
-              {validation.valid ? <CheckCircle size={10} /> : <AlertCircle size={10} />}
+              {validation.valid ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
               {validation.valid
                 ? t('nqlEditor.valid', 'Valid')
                 : validation.errors?.[0] ?? t('nqlEditor.invalid', 'Invalid')}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  X, Shield, CheckCircle, XCircle, ArrowRight, AlertOctagon, Search,
+  X, Shield, CheckCircle2, XCircle, ArrowRight, AlertOctagon, Search,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -244,7 +244,7 @@ export function ContractVersionDetailPanel({
                   </Button>
                   {verifyStatus && verifyStatus.id === detail.id && (
                     <span className={`inline-flex items-center gap-1 text-xs ${verifyStatus.valid ? 'text-success' : 'text-critical'}`}>
-                      {verifyStatus.valid ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                      {verifyStatus.valid ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
                       {verifyStatus.valid ? t('contracts.verifyResult.valid') : t('contracts.verifyResult.invalid')}
                     </span>
                   )}
@@ -280,7 +280,7 @@ export function ContractVersionDetailPanel({
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
                     {integrityResult.result.isValid
-                      ? <CheckCircle size={14} />
+                      ? <CheckCircle2 size={14} />
                       : <XCircle size={14} />}
                     <span className="font-medium">
                       {integrityResult.result.isValid

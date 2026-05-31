@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Award,
   Cpu,
-  CheckCircle,
+  CheckCircle2,
   RefreshCw,
   TrendingUp,
   Calendar,
@@ -163,7 +163,7 @@ export function LicensingPage() {
                       key={cap}
                       className="flex items-center gap-2 text-sm text-body bg-elevated rounded-lg px-3 py-2"
                     >
-                      <CheckCircle size={13} className="text-success shrink-0" />
+                      <CheckCircle2 size={13} className="text-success shrink-0" />
                       <span className="truncate">{cap}</span>
                     </div>
                   ))}

@@ -10,7 +10,7 @@ import {
   Minus,
   Target,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -102,7 +102,7 @@ export function GreenOpsPage() {
               </div>
             ) : (
               <div className="flex items-start gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
-                <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
                 <p className="text-sm text-success">{t('belowTargetMsg')}</p>
               </div>
             )}

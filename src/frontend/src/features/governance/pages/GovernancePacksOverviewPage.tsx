@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
-  Activity, Settings, CheckCircle, Archive,
+  Activity, Settings, CheckCircle2, Archive,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -125,7 +125,7 @@ export function GovernancePacksOverviewPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('governancePacks.totalPacks')} value={totalPacks} icon={<Package size={20} />} color="text-accent" />
-        <StatCard title={t('governancePacks.published')} value={publishedCount} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('governancePacks.published')} value={publishedCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('governancePacks.draft')} value={draftCount} icon={<FileText size={20} />} color="text-warning" />
         <StatCard title={t('governancePacks.deprecated')} value={deprecatedCount} icon={<Archive size={20} />} color="text-muted" />
       </div>

@@ -10,7 +10,7 @@ import {
   Clock,
   Shield,
   Lightbulb,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   AlertTriangle,
   HelpCircle,
@@ -90,7 +90,7 @@ function factorStatusVariant(status: string): 'default' | 'success' | 'warning' 
 function FactorStatusIcon({ status }: { status: string }) {
   switch (status) {
     case 'Pass':
-      return <CheckCircle size={14} className="text-success" />;
+      return <CheckCircle2 size={14} className="text-success" />;
     case 'Warning':
       return <AlertTriangle size={14} className="text-warning" />;
     case 'Fail':
@@ -524,7 +524,7 @@ export function ChangeDetailPage() {
                     : 'bg-elevated border border-edge text-body hover:text-heading hover:border-success'
                 }`}
               >
-                <CheckCircle size={14} />
+                <CheckCircle2 size={14} />
                 {t('changeConfidence.detail.approve')}
               </button>
               <button
@@ -607,7 +607,7 @@ export function ChangeDetailPage() {
             {/* Success/Error feedback */}
             {decisionSuccess && (
               <div className="flex items-center gap-2 p-3 rounded-md bg-success/10 border border-success/30">
-                <CheckCircle size={14} className="text-success" />
+                <CheckCircle2 size={14} className="text-success" />
                 <p className="text-sm text-success">{t('changeConfidence.detail.decisionSuccess')}</p>
               </div>
             )}
@@ -641,7 +641,7 @@ export function ChangeDetailPage() {
                 <div key={decision.eventId} className="flex items-start gap-3 border-l-2 border-accent pl-4 py-2">
                   <div className="shrink-0">
                     {decision.eventType.includes('approved') ? (
-                      <CheckCircle size={16} className="text-success" />
+                      <CheckCircle2 size={16} className="text-success" />
                     ) : decision.eventType.includes('rejected') ? (
                       <XCircle size={16} className="text-critical" />
                     ) : decision.eventType.includes('conditionally') ? (

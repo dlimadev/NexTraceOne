@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
-  Scale, Search, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle,
+  Scale, Search, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -90,7 +90,7 @@ export function CompliancePage() {
             <p className={`text-4xl font-bold ${scoreColor}`}>{d.overallScore}%</p>
           </div>
           <StatCard title={t('governance.compliance.totalAssessed')} value={d.totalPacksAssessed} icon={<Scale size={20} />} color="text-accent" />
-          <StatCard title={t('governance.compliance.compliant')} value={d.compliantCount} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('governance.compliance.compliant')} value={d.compliantCount} icon={<CheckCircle2 size={20} />} color="text-success" />
           <StatCard title={t('governance.compliance.partiallyCompliant')} value={d.partiallyCompliantCount} icon={<AlertCircle size={20} />} color="text-warning" />
           <StatCard title={t('governance.compliance.nonCompliant')} value={d.nonCompliantCount} icon={<ShieldAlert size={20} />} color="text-critical" />
         </ContentGrid>

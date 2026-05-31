@@ -6,7 +6,7 @@ import {
   RefreshCw,
   XCircle,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   Loader2,
   Upload,
   Eye,
@@ -173,7 +173,7 @@ export function MtlsManagerPage() {
                   }`}
                 >
                   {data.policy.rootCaCertPresent ? (
-                    <CheckCircle size={16} />
+                    <CheckCircle2 size={16} />
                   ) : (
                     <AlertTriangle size={16} />
                   )}
@@ -196,7 +196,7 @@ export function MtlsManagerPage() {
               <h2 className="text-lg font-medium text-heading mb-3">{t('inventoryTitle')}</h2>
               {data.certificates.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-40 text-faded gap-2">
-                  <CheckCircle size={32} className="text-success" />
+                  <CheckCircle2 size={32} className="text-success" />
                   <p className="text-sm">{t('noCerts')}</p>
                 </div>
               ) : (

@@ -5,7 +5,7 @@ import {
   AlertTriangle,
   Info,
   AlertOctagon,
-  CheckCircle,
+  CheckCircle2,
   Clock,
   Filter,
   Tag,
@@ -122,7 +122,7 @@ export function OperationalNotesPage() {
                 : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
             }`}
           >
-            <CheckCircle size={12} />
+            <CheckCircle2 size={12} />
             {t('operationalNotes.filterResolved')}
           </button>
         </div>
@@ -150,7 +150,7 @@ export function OperationalNotesPage() {
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-sm text-content-primary truncate">{note.title}</p>
                           {note.isResolved && (
-                            <CheckCircle size={13} className="text-success shrink-0" />
+                            <CheckCircle2 size={13} className="text-success shrink-0" />
                           )}
                         </div>
                         <p className="text-xs text-content-secondary mt-0.5 line-clamp-2">{note.content}</p>

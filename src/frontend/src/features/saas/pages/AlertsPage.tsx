@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
   RefreshCw,
-  CheckCircle,
+  CheckCircle2,
   VolumeX,
   AlertTriangle,
   Clock,
@@ -25,7 +25,7 @@ const STATUS_STYLE: Record<AlertFiringStatus, { bg: string; text: string; icon: 
   Resolved: {
     bg: 'bg-success/10',
     text: 'text-success',
-    icon: <CheckCircle size={13} className="text-success" />,
+    icon: <CheckCircle2 size={13} className="text-success" />,
   },
   Silenced: {
     bg: 'bg-elevated',

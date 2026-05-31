@@ -6,7 +6,7 @@ import {
   AlertTriangle,
   Info,
   AlertOctagon,
-  CheckCircle,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Tag,
@@ -57,7 +57,7 @@ function TimelineEntryCard({ entry }: { entry: ServiceTimelineEntryDto }) {
           <div className="flex items-center gap-2 shrink-0">
             {entry.isResolved && (
               <Badge variant="success">
-                <CheckCircle size={12} className="mr-1" />
+                <CheckCircle2 size={12} className="mr-1" />
                 {t('knowledge.serviceTimeline.resolved')}
               </Badge>
             )}

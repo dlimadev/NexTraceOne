@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   TrendingUp, ShieldAlert, AlertTriangle, BarChart3, Activity,
-  CheckCircle, RefreshCw, Clock, Target, AlertCircle,
+  CheckCircle2, RefreshCw, Clock, Target, AlertCircle,
   Zap,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -287,7 +287,7 @@ export function ExecutiveOverviewPage() {
                 <StatCard
                   title={t('governance.executive.safeChanges')}
                   value={d.changeSafetySummary.safeChanges}
-                  icon={<CheckCircle size={20} />}
+                  icon={<CheckCircle2 size={20} />}
                   color="text-success"
                 />
                 <StatCard
@@ -331,7 +331,7 @@ export function ExecutiveOverviewPage() {
                 <StatCard
                   title={t('governance.executive.resolvedLast30Days')}
                   value={d.incidentTrendSummary.resolvedLast30Days}
-                  icon={<CheckCircle size={20} />}
+                  icon={<CheckCircle2 size={20} />}
                   color="text-success"
                 />
                 <StatCard

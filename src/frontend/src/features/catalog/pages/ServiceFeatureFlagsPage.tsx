@@ -9,7 +9,7 @@ import {
   ToggleRight,
   Server,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Filter,
 } from 'lucide-react';
@@ -123,7 +123,7 @@ export function ServiceFeatureFlagsPage() {
           </div>
           <div className="bg-card border border-edge rounded-lg p-4">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-success" />
+              <CheckCircle2 size={16} className="text-success" />
               <p className="text-xs font-medium text-muted uppercase tracking-wide">
                 {t('featureFlags.enabled', 'Habilitadas')}
               </p>

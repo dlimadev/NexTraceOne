@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Gauge, CheckCircle, AlertTriangle, XCircle, Clock, Activity, Shield, RefreshCw,
+  Gauge, CheckCircle2, AlertTriangle, XCircle, Clock, Activity, Shield, RefreshCw,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -74,7 +74,7 @@ const overallHealthColor = (h: string) => {
 
 const overallHealthIcon = (h: string) => {
   switch (h) {
-    case 'Healthy': return <CheckCircle size={20} className="text-success" />;
+    case 'Healthy': return <CheckCircle2 size={20} className="text-success" />;
     case 'Degraded': return <AlertTriangle size={20} className="text-warning" />;
     case 'Critical': return <XCircle size={20} className="text-critical" />;
     default: return <Activity size={20} className="text-muted" />;
@@ -164,7 +164,7 @@ export function IngestionFreshnessPage() {
           icon={overallHealthIcon(overallHealth)}
           color={overallHealthColor(overallHealth)}
         />
-        <StatCard title={t('integrations.fresh')} value={freshCount} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('integrations.fresh')} value={freshCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('integrations.staleFeeds')} value={staleCount} icon={<AlertTriangle size={20} />} color="text-critical" />
         <StatCard title={t('integrations.sourceCount')} value={totalSources} icon={<Activity size={20} />} color="text-accent" />
       </div>
@@ -228,7 +228,7 @@ export function IngestionFreshnessPage() {
                 }`}
               >
                 <span className="text-sm font-medium text-heading flex items-center gap-2">
-                  {dm.freshnessStatus === 'Fresh' && <CheckCircle size={14} className="text-success" />}
+                  {dm.freshnessStatus === 'Fresh' && <CheckCircle2 size={14} className="text-success" />}
                   {dm.freshnessStatus === 'Acceptable' && <Clock size={14} className="text-info" />}
                   {dm.freshnessStatus === 'Stale' && <AlertTriangle size={14} className="text-warning" />}
                   {dm.freshnessStatus === 'Failed' && <XCircle size={14} className="text-critical" />}

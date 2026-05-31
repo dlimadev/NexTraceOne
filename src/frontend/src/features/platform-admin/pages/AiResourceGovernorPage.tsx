@@ -6,7 +6,7 @@ import {
   RefreshCw,
   XCircle,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   Activity,
   Zap,
   Clock,
@@ -127,7 +127,7 @@ export function AiResourceGovernorPage() {
 
             {cbState === 'Closed' && (
               <div className="flex items-start gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
-                <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
                 <p className="text-sm text-success">{t('cbClosedMsg')}</p>
               </div>
             )}

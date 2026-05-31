@@ -8,7 +8,7 @@ import {
   Zap,
   FileCode,
   Download,
-  CheckCircle,
+  CheckCircle2,
   AlertCircle,
   Loader2,
   ChevronRight,
@@ -43,7 +43,7 @@ function StepDot({ step, current }: { step: string; current: Step }) {
           : 'bg-elevated text-muted'
       }`}
     >
-      {done ? <CheckCircle className="h-4 w-4" /> : stepIdx + 1}
+      {done ? <CheckCircle2 className="h-4 w-4" /> : stepIdx + 1}
     </div>
   );
 }
@@ -475,7 +475,7 @@ export function AiScaffoldWizardPage() {
             {result.isFallback ? (
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
             ) : (
-              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
             )}
             <div className="flex flex-col gap-0.5">
               <p className={`text-sm font-medium ${result.isFallback ? 'text-warning' : 'text-success'}`}>

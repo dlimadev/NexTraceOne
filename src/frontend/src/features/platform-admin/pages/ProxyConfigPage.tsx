@@ -5,7 +5,7 @@ import {
   Globe,
   RefreshCw,
   XCircle,
-  CheckCircle,
+  CheckCircle2,
   AlertTriangle,
   ShieldAlert,
   TestTube,
@@ -127,7 +127,7 @@ export function ProxyConfigPage() {
               </div>
             ) : data.status === 'TestPassed' ? (
               <div className="flex items-start gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
-                <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
                 <p className="text-sm text-success">{t('testPassedBanner')}</p>
               </div>
             ) : !isConfigured ? (
@@ -146,7 +146,7 @@ export function ProxyConfigPage() {
                     : 'bg-critical/10 border border-critical/20 text-critical'
                 }`}
               >
-                {testResult.success ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                {testResult.success ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                 {testResult.message}
               </div>
             )}

@@ -16,7 +16,7 @@ import {
   Webhook,
   Database,
   Layers,
-  CheckCircle,
+  CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -204,7 +204,7 @@ export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {iface.requiresContract ? (
-                          <CheckCircle size={14} className="text-mint mx-auto" aria-label={t('serviceInterfaces.requiresContract')} />
+                          <CheckCircle2 size={14} className="text-mint mx-auto" aria-label={t('serviceInterfaces.requiresContract')} />
                         ) : (
                           <AlertTriangle size={14} className="text-muted mx-auto" aria-label={t('serviceInterfaces.requiresContract')} />
                         )}

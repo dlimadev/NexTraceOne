@@ -6,7 +6,7 @@ import {
   RefreshCw,
   XCircle,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   Loader2,
   Download,
 } from 'lucide-react';
@@ -264,7 +264,7 @@ export function SamlSsoPage() {
                 disabled={isTesting}
                 className="flex items-center gap-2 px-4 py-2 text-sm border border-edge rounded-lg hover:bg-elevated disabled:opacity-50 text-muted"
               >
-                {isTesting ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                {isTesting ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
                 {t('btnTestConnection')}
               </button>
               {testResult && (
@@ -275,7 +275,7 @@ export function SamlSsoPage() {
                       : 'bg-critical/10 text-critical border border-critical/20'
                   }`}
                 >
-                  {testResult.success ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                  {testResult.success ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                   {testResult.message}
                 </div>
               )}
@@ -293,7 +293,7 @@ export function SamlSsoPage() {
               </button>
               {updateMutation.isSuccess && (
                 <span className="text-sm text-success flex items-center gap-1">
-                  <CheckCircle size={14} />
+                  <CheckCircle2 size={14} />
                   {t('saveSuccess')}
                 </span>
               )}

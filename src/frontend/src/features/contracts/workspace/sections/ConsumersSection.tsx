@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, ArrowUpRight, ArrowDownLeft, ExternalLink, Clock, Tag, Bell, CheckCircle, XCircle } from 'lucide-react';
+import { Users, ArrowUpRight, ArrowDownLeft, ExternalLink, Clock, Tag, Bell, CheckCircle2, XCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
 import { useContractSubscribers } from '../../hooks';
@@ -225,7 +225,7 @@ function SubscriberRow({ subscriber }: { subscriber: ContractSubscriber }) {
       </div>
 
       {subscriber.isActive ? (
-        <CheckCircle size={12} className="text-mint flex-shrink-0" />
+        <CheckCircle2 size={12} className="text-mint flex-shrink-0" />
       ) : (
         <XCircle size={12} className="text-critical flex-shrink-0" />
       )}

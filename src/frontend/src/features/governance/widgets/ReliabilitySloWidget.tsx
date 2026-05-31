@@ -4,7 +4,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { WidgetSkeleton, WidgetError } from './DoraMetricsWidget';
 import client from '../../../api/client';
 import type { WidgetProps } from './WidgetRegistry';
@@ -43,7 +43,7 @@ export function ReliabilitySloWidget({ config, environmentId, timeRange, title }
   return (
     <div className="h-full flex flex-col gap-2 p-1">
       <div className="flex items-center gap-2">
-        <CheckCircle size={14} className="text-green-500 shrink-0" />
+        <CheckCircle2 size={14} className="text-green-500 shrink-0" />
         <span className="text-xs font-semibold text-heading truncate">{displayTitle}</span>
       </div>
       <div className="flex-1 overflow-auto">

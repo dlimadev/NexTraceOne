@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowUpCircle, CheckCircle, XCircle, Plus, ChevronDown, ChevronUp, ShieldAlert, AlertTriangle, Ban, ClipboardList } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle2, XCircle, Plus, ChevronDown, ChevronUp, ShieldAlert, AlertTriangle, Ban, ClipboardList } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -78,7 +78,7 @@ function GateEvaluationBreakdown({
           className="p-3 rounded-md border border-edge bg-elevated flex items-start gap-3"
         >
           {ev.passed ? (
-            <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
+            <CheckCircle2 size={14} className="text-success mt-0.5 shrink-0" />
           ) : (
             <XCircle size={14} className="text-critical mt-0.5 shrink-0" />
           )}
@@ -458,7 +458,7 @@ export function PromotionPage() {
                         {req.gateResults.map((gate) => (
                           <li key={gate.gateName} className="flex items-center gap-2">
                             {gate.passed ? (
-                              <CheckCircle size={12} className="text-success shrink-0" />
+                              <CheckCircle2 size={12} className="text-success shrink-0" />
                             ) : (
                               <XCircle size={12} className="text-critical shrink-0" />
                             )}

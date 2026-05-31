@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
-  Eye, ShieldCheck, AlertTriangle, CheckCircle, XCircle, Users, Activity,
+  Eye, ShieldCheck, AlertTriangle, CheckCircle2, XCircle, Users, Activity,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -189,7 +189,7 @@ function FourEyesResultCard({ result }: { result: FourEyesResult }) {
   return (
     <div className="mt-4 p-3 rounded bg-surface-secondary">
       <div className="flex items-center gap-2 mb-2">
-        {result.isCompliant ? <CheckCircle size={16} className="text-success" /> : <XCircle size={16} className="text-critical" />}
+        {result.isCompliant ? <CheckCircle2 size={16} className="text-success" /> : <XCircle size={16} className="text-critical" />}
         <Badge variant={result.isCompliant ? 'success' : 'critical'}>{result.isCompliant ? 'Compliant' : 'Not Compliant'}</Badge>
       </div>
       <p className="text-sm">{result.reason}</p>
@@ -235,7 +235,7 @@ function CabResultCard({ result }: { result: CabResult }) {
   return (
     <div className="mt-4 p-3 rounded bg-surface-secondary">
       <div className="flex items-center gap-2 mb-2">
-        {result.cabRequired ? <AlertTriangle size={16} className="text-warning" /> : <CheckCircle size={16} className="text-success" />}
+        {result.cabRequired ? <AlertTriangle size={16} className="text-warning" /> : <CheckCircle2 size={16} className="text-success" />}
         <Badge variant={result.cabRequired ? 'warning' : 'success'}>{result.cabRequired ? 'CAB Required' : 'No CAB'}</Badge>
       </div>
       <p className="text-sm">{result.reason}</p>
@@ -273,7 +273,7 @@ function ErrorBudgetResultCard({ result }: { result: ErrorBudgetResult }) {
   return (
     <div className="mt-4 p-3 rounded bg-surface-secondary">
       <div className="flex items-center gap-2 mb-2">
-        {result.isBlocked ? <XCircle size={16} className="text-critical" /> : <CheckCircle size={16} className="text-success" />}
+        {result.isBlocked ? <XCircle size={16} className="text-critical" /> : <CheckCircle2 size={16} className="text-success" />}
         <Badge variant={result.isBlocked ? 'critical' : 'success'}>{result.isBlocked ? 'Blocked' : 'Allowed'}</Badge>
       </div>
       <p className="text-sm">{result.reason}</p>

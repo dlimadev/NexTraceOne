@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Sliders, RefreshCw, XCircle, CheckCircle, AlertTriangle, TrendingDown } from 'lucide-react';
+import { Sliders, RefreshCw, XCircle, CheckCircle2, AlertTriangle, TrendingDown } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -71,7 +71,7 @@ export function RightsizingPage() {
             {/* Recommendations table */}
             {data.recommendations.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 text-faded gap-2">
-                <CheckCircle size={32} className="text-success" />
+                <CheckCircle2 size={32} className="text-success" />
                 <p className="text-sm">{t('noRecs')}</p>
               </div>
             ) : (

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   RotateCcw,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   AlertTriangle,
   ChevronRight,
@@ -220,7 +220,7 @@ function StepIndicator({
                   : 'bg-elevated text-muted'
               }`}
             >
-              {isDone ? <CheckCircle size={14} /> : stepNum}
+              {isDone ? <CheckCircle2 size={14} /> : stepNum}
             </div>
             <span
               className={`text-xs hidden sm:block ${
@@ -505,7 +505,7 @@ function Step4Executing({
         </>
       ) : (
         <>
-          <CheckCircle size={48} className="text-success" />
+          <CheckCircle2 size={48} className="text-success" />
           <p className="text-body font-medium">{t('executionDone')}</p>
         </>
       )}
@@ -535,7 +535,7 @@ function Step5Verify({
         }`}
       >
         {isSuccess ? (
-          <CheckCircle size={20} className="text-success mt-0.5" />
+          <CheckCircle2 size={20} className="text-success mt-0.5" />
         ) : (
           <XCircle size={20} className="text-critical mt-0.5" />
         )}

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, Search,
-  AlertTriangle, XCircle, CheckCircle,
+  AlertTriangle, XCircle, CheckCircle2,
   Activity, Zap, ArrowRight, Target, PieChart, TrendingUp,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -83,7 +83,7 @@ export function FinOpsPage() {
         <StatCard
           title={t('governance.finops.overallEfficiency')}
           value={t(`governance.finops.efficiency.${d.overallEfficiency}`)}
-          icon={efficiencyIcon(d.overallEfficiency) ?? <CheckCircle size={20} />}
+          icon={efficiencyIcon(d.overallEfficiency) ?? <CheckCircle2 size={20} />}
           color="text-warning"
         />
         <StatCard

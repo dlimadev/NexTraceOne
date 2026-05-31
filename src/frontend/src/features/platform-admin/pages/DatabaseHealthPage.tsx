@@ -6,7 +6,7 @@ import {
   Users,
   HardDrive,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Activity,
   RefreshCw,
@@ -192,7 +192,7 @@ export function DatabaseHealthPage() {
             {/* No issues state */}
             {data.bloatSignals.length === 0 && data.slowQueries.length === 0 && (
               <div className="flex items-center gap-3 p-4 bg-success/10 border border-success/20 rounded-lg text-success text-sm">
-                <CheckCircle size={18} />
+                <CheckCircle2 size={18} />
                 {t('healthy')}
               </div>
             )}

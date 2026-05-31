@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Lock, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { PageContainer } from '../../../components/shell/PageContainer';
 import { PageHeader } from '../../../components/PageHeader';
 import { ErrorState } from '../../../components/ErrorState';
@@ -120,7 +120,7 @@ export function NotificationPreferencesPage() {
       {/* Feedback */}
       {feedback?.type === 'success' && (
         <div className="mt-4">
-          <InlineMessage severity="success" icon={<CheckCircle className="h-4 w-4" />}>
+          <InlineMessage severity="success" icon={<CheckCircle2 className="h-4 w-4" />}>
             {t('notifications.preferences.saved')}
           </InlineMessage>
         </div>

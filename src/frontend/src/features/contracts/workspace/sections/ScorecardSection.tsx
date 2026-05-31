@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart2, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
+import { BarChart2, CheckCircle2, XCircle, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
@@ -41,7 +41,7 @@ function scoreBgLight(score: number): string {
 
 /** Ícone de status por threshold. */
 function ScoreIcon({ score }: { score: number }) {
-  if (score >= 0.8) return <CheckCircle size={14} className="text-mint flex-shrink-0" />;
+  if (score >= 0.8) return <CheckCircle2 size={14} className="text-mint flex-shrink-0" />;
   if (score >= 0.6) return <Info size={14} className="text-cyan flex-shrink-0" />;
   if (score >= 0.4) return <AlertTriangle size={14} className="text-warning flex-shrink-0" />;
   return <XCircle size={14} className="text-danger flex-shrink-0" />;

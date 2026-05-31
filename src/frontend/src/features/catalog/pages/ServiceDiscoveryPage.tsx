@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search,
   Radar,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   ArrowRight,
   RefreshCw,
@@ -110,10 +110,10 @@ export default function ServiceDiscoveryPage() {
     Ignored: 'bg-muted/10 text-muted border-muted/20',
   };
 
-  const statusIcons: Record<DiscoveryStatus, typeof CheckCircle> = {
+  const statusIcons: Record<DiscoveryStatus, typeof CheckCircle2> = {
     Pending: Clock,
     Matched: ArrowRight,
-    Registered: CheckCircle,
+    Registered: CheckCircle2,
     Ignored: XCircle,
   };
 

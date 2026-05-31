@@ -4,7 +4,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  CheckCircle,
+  CheckCircle2,
   Clock,
   Users,
   Target,
@@ -106,7 +106,7 @@ export function ValueTrackingPage() {
         <StatCard
           title={t('analytics.timeToCoreValue')}
           value={formatTime(data.avgTimeToCoreValueMinutes)}
-          icon={<CheckCircle size={20} />}
+          icon={<CheckCircle2 size={20} />}
           color="text-success"
           trend={{ direction: 'down', label: t('analytics.trendImproving') }}
         />
@@ -141,7 +141,7 @@ export function ValueTrackingPage() {
                 <div key={m.milestoneType} className="flex flex-col md:flex-row md:items-center gap-3">
                   {/* Milestone name & trend */}
                   <div className="md:w-72 flex items-center gap-2">
-                    <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-success' : 'text-faded'} />
+                    <CheckCircle2 size={16} className={m.completionRate >= 50 ? 'text-success' : 'text-faded'} />
                     <span className="text-sm text-heading">{t(`analytics.milestone.${m.milestoneType}`, { defaultValue: m.milestoneName })}</span>
                     {trendIcon(m.trend)}
                   </div>

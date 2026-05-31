@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { CheckCircle, XCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
@@ -11,7 +11,7 @@ const SEVERITY_CONFIG: Record<string, { color: string; bg: string; Icon: React.C
   Critical: { color: 'text-critical', bg: 'bg-critical/15', Icon: XCircle },
   Error: { color: 'text-critical', bg: 'bg-critical/15', Icon: XCircle },
   Warning: { color: 'text-warning', bg: 'bg-warning/15', Icon: AlertTriangle },
-  Info: { color: 'text-info', bg: 'bg-info/15', Icon: CheckCircle },
+  Info: { color: 'text-info', bg: 'bg-info/15', Icon: CheckCircle2 },
 };
 
 interface ComplianceSectionProps {
@@ -131,7 +131,7 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
             <EmptyState
               title={t('contracts.noViolations', 'No violations')}
               description={t('contracts.noViolationsFound', 'No rule violations found for this version')}
-              icon={<CheckCircle size={18} className="text-success" />}
+              icon={<CheckCircle2 size={18} className="text-success" />}
               size="compact"
             />
           )}

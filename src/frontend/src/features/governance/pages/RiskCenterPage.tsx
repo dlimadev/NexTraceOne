@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert, Search, AlertTriangle, AlertCircle,
-  Shield, CheckCircle,
+  Shield, CheckCircle2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -37,7 +37,7 @@ const riskIcon = (level: RiskLevel) => {
     case 'Critical': return <ShieldAlert size={14} className="text-critical" />;
     case 'High': return <AlertTriangle size={14} className="text-warning" />;
     case 'Medium': return <AlertCircle size={14} className="text-warning" />;
-    case 'Low': return <CheckCircle size={14} className="text-success" />;
+    case 'Low': return <CheckCircle2 size={14} className="text-success" />;
     default: return <Shield size={14} className="text-muted" />;
   }
 };
@@ -92,7 +92,7 @@ export function RiskCenterPage() {
           <StatCard title={t('governance.risk.critical')} value={d.criticalCount} icon={<ShieldAlert size={20} />} color="text-critical" />
           <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-warning" />
           <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-warning" />
-          <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         </ContentGrid>
       </PageSection>
 

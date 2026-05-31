@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Zap, ShieldAlert, Settings, CheckCircle, AlertTriangle,
+  Zap, ShieldAlert, Settings, CheckCircle2, AlertTriangle,
   Clock, Activity, Scale, Server, RotateCcw, RefreshCw,
   Trash2,
 } from 'lucide-react';
@@ -79,7 +79,7 @@ export function AutomationAdminPage() {
       <StatsGrid columns={4}>
         <StatCard title={t('automation.admin.stats.totalActions')} value={totalActions} icon={<Zap size={20} />} color="text-accent" />
         <StatCard title={t('automation.admin.stats.approvalRequired', 'Approval Required')} value={approvalRequired} icon={<ShieldAlert size={20} />} color="text-warning" />
-        <StatCard title={t('automation.admin.stats.withValidation', 'With Post-Validation')} value={actions.filter(a => a.hasPostValidation).length} icon={<CheckCircle size={20} />} color="text-info" />
+        <StatCard title={t('automation.admin.stats.withValidation', 'With Post-Validation')} value={actions.filter(a => a.hasPostValidation).length} icon={<CheckCircle2 size={20} />} color="text-info" />
         <StatCard title={t('automation.admin.stats.auditEntries', 'Audit Entries')} value={recentAuditCount} icon={<Activity size={20} />} color="text-critical" />
       </StatsGrid>
 

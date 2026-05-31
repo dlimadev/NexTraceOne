@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Shield, Settings, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Shield, Settings, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -193,7 +193,7 @@ export function SessionSecurityPage() {
 
             {mutation.isSuccess && (
               <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg p-3">
-                <CheckCircle size={16} />
+                <CheckCircle2 size={16} />
                 {t('saveSuccess')}
               </div>
             )}

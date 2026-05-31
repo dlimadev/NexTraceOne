@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Webhook, Plus, Shield, ShieldOff, CheckCircle, XCircle, Tag, Clock,
+  Webhook, Plus, Shield, ShieldOff, CheckCircle2, XCircle, Tag, Clock,
 } from 'lucide-react';
 import { EmptyState } from '../../../components/EmptyState';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -308,7 +308,7 @@ export function WebhookSubscriptionsPage() {
       {formSuccess && (
         <PageSection>
           <div className="flex items-center gap-2 text-success text-sm">
-            <CheckCircle size={16} />
+            <CheckCircle2 size={16} />
             {t('webhookSubscriptions.createSuccess')}
           </div>
         </PageSection>
@@ -332,7 +332,7 @@ export function WebhookSubscriptionsPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-semibold text-primary truncate">{sub.name}</span>
                         {sub.isActive
-                          ? <Badge variant="success"><CheckCircle size={10} className="inline mr-0.5" />{t('integrations.active')}</Badge>
+                          ? <Badge variant="success"><CheckCircle2 size={10} className="inline mr-0.5" />{t('integrations.active')}</Badge>
                           : <Badge variant="default"><XCircle size={10} className="inline mr-0.5" />{t('integrations.disabled')}</Badge>
                         }
                         {sub.hasSecret

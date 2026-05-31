@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FlaskConical, Play, Trash2, CheckCircle, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { FlaskConical, Play, Trash2, CheckCircle2, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -75,7 +75,7 @@ export function DemoSeedPage() {
               </div>
             ) : (
               <div className="flex items-start gap-3 p-4 bg-elevated border border-edge rounded-lg">
-                <CheckCircle size={18} className="text-muted mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="text-muted mt-0.5 shrink-0" />
                 <p className="text-sm text-muted">{t('notSeededMsg')}</p>
               </div>
             )}
@@ -95,11 +95,11 @@ export function DemoSeedPage() {
               <section className="border border-edge rounded-lg p-5">
                 <h2 className="text-base font-medium text-heading mb-3">{t('includedTitle')}</h2>
                 <ul className="space-y-2 text-sm text-muted">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-accent" />{t('inc1')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-accent" />{t('inc2')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-accent" />{t('inc3')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-accent" />{t('inc4')}</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-accent" />{t('inc5')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-accent" />{t('inc1')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-accent" />{t('inc2')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-accent" />{t('inc3')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-accent" />{t('inc4')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-accent" />{t('inc5')}</li>
                 </ul>
               </section>
             )}
@@ -151,13 +151,13 @@ export function DemoSeedPage() {
             {/* Mutation feedback */}
             {seedMutation.isSuccess && (
               <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg p-3">
-                <CheckCircle size={16} />
+                <CheckCircle2 size={16} />
                 {t('seedSuccess', { count: seedMutation.data.entitiesCreated, ms: seedMutation.data.durationMs })}
               </div>
             )}
             {clearMutation.isSuccess && (
               <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg p-3">
-                <CheckCircle size={16} />
+                <CheckCircle2 size={16} />
                 {t('clearSuccess', { count: clearMutation.data.entitiesRemoved })}
               </div>
             )}

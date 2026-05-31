@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, NavLink } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  ArrowLeft, Zap, CheckCircle, XCircle, Clock,
+  ArrowLeft, Zap, CheckCircle2, XCircle, Clock,
   AlertTriangle, Shield, FileText, User, Server,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -16,7 +16,7 @@ import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
-    case 'Completed': return { variant: 'success', icon: <CheckCircle size={14} /> };
+    case 'Completed': return { variant: 'success', icon: <CheckCircle2 size={14} /> };
     case 'Executing': return { variant: 'warning', icon: <Clock size={14} /> };
     case 'Failed': return { variant: 'danger', icon: <XCircle size={14} /> };
     case 'PendingApproval': return { variant: 'warning', icon: <Clock size={14} /> };
@@ -38,7 +38,7 @@ const riskBadge = (risk: string): 'success' | 'warning' | 'danger' | 'default' =
 
 const stepStatusIcon = (status: string) => {
   switch (status) {
-    case 'Completed': return <CheckCircle size={14} className="text-success" />;
+    case 'Completed': return <CheckCircle2 size={14} className="text-success" />;
     case 'InProgress': return <Clock size={14} className="text-warning" />;
     case 'Failed': return <XCircle size={14} className="text-critical" />;
     default: return <Clock size={14} className="text-muted" />;
@@ -187,7 +187,7 @@ export function AutomationWorkflowDetailPage() {
               {workflow.preconditions.map((pc, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
                   {pc.status === 'Met' ? (
-                    <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
+                    <CheckCircle2 size={14} className="text-success mt-0.5 shrink-0" />
                   ) : (
                     <AlertTriangle size={14} className="text-warning mt-0.5 shrink-0" />
                   )}
@@ -247,7 +247,7 @@ export function AutomationWorkflowDetailPage() {
         <Card className="mb-4">
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <CheckCircle size={16} className="text-accent" />
+              <CheckCircle2 size={16} className="text-accent" />
               {t('automation.detail.validation', 'Post-Execution Validation')}
             </h2>
           </CardHeader>

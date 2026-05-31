@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Activity, CheckCircle, AlertTriangle, XCircle,
+  Activity, CheckCircle2, AlertTriangle, XCircle,
   TrendingUp, TrendingDown, Minus, Shield, ArrowLeft,
   FileText, Link2, BookOpen, GitBranch,
 } from 'lucide-react';
@@ -17,7 +17,7 @@ import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
-    case 'Healthy': return { variant: 'success', icon: <CheckCircle size={14} /> };
+    case 'Healthy': return { variant: 'success', icon: <CheckCircle2 size={14} /> };
     case 'Degraded': return { variant: 'warning', icon: <AlertTriangle size={14} /> };
     case 'Unavailable': return { variant: 'danger', icon: <XCircle size={14} /> };
     case 'NeedsAttention': return { variant: 'default', icon: <Shield size={14} /> };
@@ -247,7 +247,7 @@ export function ServiceReliabilityDetailPage() {
               { key: 'incidents', value: data.coverage.hasIncidentLinkage },
             ].map(({ key, value }) => (
               <div key={key} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border ${value ? 'border-success/25 bg-success/5 text-success' : 'border-critical/25 bg-critical/15 text-critical'}`}>
-                {value ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                {value ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
                 {t(`reliability.coverage.${key}`)}
               </div>
             ))}

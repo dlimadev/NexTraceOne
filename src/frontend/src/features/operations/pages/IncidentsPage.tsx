@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, AlertCircle, ShieldAlert, Eye,
-  Search, CheckCircle, XCircle, Clock, Shield,
+  Search, CheckCircle2, XCircle, Clock, Shield,
   GitBranch, Wrench,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -40,7 +40,7 @@ const statusIcon = (status: string) => {
     case 'Investigating': return <Search size={14} className="text-warning" />;
     case 'Mitigating': return <Wrench size={14} className="text-warning" />;
     case 'Monitoring': return <Eye size={14} className="text-info" />;
-    case 'Resolved': return <CheckCircle size={14} className="text-success" />;
+    case 'Resolved': return <CheckCircle2 size={14} className="text-success" />;
     case 'Closed': return <XCircle size={14} className="text-muted" />;
     default: return <Clock size={14} className="text-muted" />;
   }

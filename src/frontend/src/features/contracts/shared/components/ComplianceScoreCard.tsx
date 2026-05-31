@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, AlertTriangle, XCircle, Minus } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle, Minus } from 'lucide-react';
 
 interface ComplianceScoreCardProps {
   score: number;
@@ -19,7 +19,7 @@ export function ComplianceScoreCard({ score, maxScore = 100, label, className = 
   const pct = Math.round((normalizedScore / normalizedMax) * 100);
 
   const variant = pct >= 80
-    ? { color: 'text-success', bg: 'bg-success/15', border: 'border-success/25', Icon: CheckCircle }
+    ? { color: 'text-success', bg: 'bg-success/15', border: 'border-success/25', Icon: CheckCircle2 }
     : pct >= 50
       ? { color: 'text-warning', bg: 'bg-warning/15', border: 'border-warning/25', Icon: AlertTriangle }
       : pct > 0

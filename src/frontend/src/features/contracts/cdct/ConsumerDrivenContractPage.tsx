@@ -16,7 +16,7 @@ import {
   Plus,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
+  Info,
   Users,
   FileCheck,
   RefreshCw,
@@ -229,7 +229,7 @@ export function ConsumerDrivenContractPage() {
           <p className="text-xs text-muted py-4 text-center">{t('common.loading', 'Loading...')}</p>
         ) : expectationList.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-muted">
-            <AlertTriangle size={20} className="mb-2 opacity-30" />
+            <Info size={20} className="mb-2 opacity-30" />
             <p className="text-xs">
               {t('contracts.cdct.noExpectations', 'No consumer expectations registered yet')}
             </p>

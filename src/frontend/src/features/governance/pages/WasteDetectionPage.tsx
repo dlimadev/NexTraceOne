@@ -6,7 +6,7 @@ import {
   TrendingDown,
   Trash2,
   XCircle,
-  CheckCircle,
+  CheckCircle2,
   Server,
   Clock,
 } from 'lucide-react';
@@ -80,7 +80,7 @@ export function WasteDetectionPage() {
           {/* Signals List */}
           {data.signals.length === 0 ? (
             <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
-              <CheckCircle size={18} />
+              <CheckCircle2 size={18} />
               {t('noWaste')}
             </div>
           ) : (

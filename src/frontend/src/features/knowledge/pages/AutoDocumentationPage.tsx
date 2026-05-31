@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { FileText, Search, CheckCircle, BookOpen, Link, Server, GitBranch } from 'lucide-react';
+import { FileText, Search, CheckCircle2, BookOpen, Link, Server, GitBranch } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -35,7 +35,7 @@ const SECTION_ICONS: Record<SectionKey, React.ReactNode> = {
   Ownership: <Server size={16} />,
   Contracts: <Link size={16} />,
   Dependencies: <GitBranch size={16} />,
-  SLOs: <CheckCircle size={16} />,
+  SLOs: <CheckCircle2 size={16} />,
   Runbooks: <BookOpen size={16} />,
   RecentChanges: <Search size={16} />,
 };

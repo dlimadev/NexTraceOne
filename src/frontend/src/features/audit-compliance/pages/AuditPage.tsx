@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, RefreshCw, Search, CheckCircle, XCircle } from 'lucide-react';
+import { Shield, RefreshCw, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -123,7 +123,7 @@ export function AuditPage() {
           }`}
         >
           {integrity.valid ? (
-            <CheckCircle size={16} className="text-success shrink-0" />
+            <CheckCircle2 size={16} className="text-success shrink-0" />
           ) : (
             <XCircle size={16} className="text-critical shrink-0" />
           )}

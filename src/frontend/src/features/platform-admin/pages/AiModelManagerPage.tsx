@@ -4,7 +4,7 @@ import {
   Cpu,
   HardDrive,
   MemoryStick,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   AlertTriangle,
   Zap,
@@ -173,7 +173,7 @@ function ModelRow({ model }: { model: ModelAdvice }) {
       </td>
       <td className="px-4 py-3 text-center">
         {compatible ? (
-          <CheckCircle size={16} className="text-success mx-auto" />
+          <CheckCircle2 size={16} className="text-success mx-auto" />
         ) : (
           <XCircle size={16} className="text-critical mx-auto" />
         )}

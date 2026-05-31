@@ -8,7 +8,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import {
-  CheckCircle, Circle, AlertTriangle, Shield,
+  CheckCircle2, Circle, AlertTriangle, Shield,
   Users, Activity, ChevronRight, ArrowRight,
 } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
@@ -104,7 +104,7 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
               {contract.approvalChecklist.map((item) => (
                 <div key={item.role} className="flex items-center gap-2 py-1">
                   {item.state === 'Approved' ? (
-                    <CheckCircle size={12} className="text-mint flex-shrink-0" />
+                    <CheckCircle2 size={12} className="text-mint flex-shrink-0" />
                   ) : (
                     <Circle size={12} className="text-muted/40 flex-shrink-0" />
                   )}
@@ -147,7 +147,7 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
             {contract.policyChecks.map((check) => (
               <div key={check.policyId} className="flex items-center gap-2 py-1">
                 {check.passed ? (
-                  <CheckCircle size={11} className="text-mint flex-shrink-0" />
+                  <CheckCircle2 size={11} className="text-mint flex-shrink-0" />
                 ) : (
                   <AlertTriangle size={11} className="text-warning flex-shrink-0" />
                 )}

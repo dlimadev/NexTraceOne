@@ -4,7 +4,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   ShieldOff,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Globe,
   AlertTriangle,
@@ -96,7 +96,7 @@ export function NetworkPolicyPage() {
                         <td className="px-4 py-3 font-mono text-xs text-faded">{call.envVar}</td>
                         <td className="px-4 py-3 text-center">
                           {call.configured ? (
-                            <CheckCircle size={15} className="text-success mx-auto" />
+                            <CheckCircle2 size={15} className="text-success mx-auto" />
                           ) : (
                             <XCircle size={15} className="text-faded mx-auto" />
                           )}

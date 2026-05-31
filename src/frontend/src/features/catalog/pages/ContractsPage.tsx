@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Plus, Lock, Shield, FileCheck, AlertTriangle,
-  X, Eye, GitCompare, Download, CheckCircle, XCircle,
+  Plus, Lock, Shield, FileCheck, Info,
+  X, Eye, GitCompare, Download, CheckCircle2, XCircle,
   FilePlus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -235,7 +235,7 @@ export function ContractsPage() {
             ? 'bg-success/15 text-success border border-success/30'
             : 'bg-critical/15 text-critical border border-critical/30'
         }`}>
-          {notification.type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+          {notification.type === 'success' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
           {notification.message}
         </div>
       )}
@@ -523,7 +523,7 @@ export function ContractsPage() {
             <PageErrorState />
           ) : !history?.length ? (
             <div className="px-6 py-12 text-center">
-              <AlertTriangle size={40} className="mx-auto mb-3 text-muted opacity-50" />
+              <Info size={40} className="mx-auto mb-3 text-muted opacity-50" />
               <p className="text-sm font-medium text-heading mb-1">{t('contracts.emptyState.title')}</p>
               <p className="text-xs text-muted">{t('contracts.emptyState.description')}</p>
             </div>

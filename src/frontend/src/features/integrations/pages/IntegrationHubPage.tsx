@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Cable, Search, CheckCircle, AlertTriangle, Clock,
+  Cable, Search, CheckCircle2, AlertTriangle, Clock,
   ArrowRight, Activity, Plug2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -105,7 +105,7 @@ export function IntegrationHubPage() {
       <PageSection>
         <StatsGrid columns={4}>
           <StatCard title={t('integrations.totalConnectors')} value={health?.totalConnectors ?? totalCount} icon={<Cable size={20} />} color="text-accent" />
-          <StatCard title={t('integrations.healthyConnectors')} value={health?.activeConnectors ?? 0} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('integrations.healthyConnectors')} value={health?.activeConnectors ?? 0} icon={<CheckCircle2 size={20} />} color="text-success" />
           <StatCard title={t('integrations.degradedFailed')} value={health?.failedExecutions24h ?? 0} icon={<AlertTriangle size={20} />} color="text-critical" />
           <StatCard title={t('integrations.staleFeeds')} value={connectors.filter((c: IntegrationConnectorDto) => c.healthScore < 50 && c.healthScore > 0).length} icon={<Clock size={20} />} color="text-warning" />
         </StatsGrid>

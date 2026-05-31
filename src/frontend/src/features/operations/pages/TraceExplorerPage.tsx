@@ -2,16 +2,16 @@
  * TraceExplorerPage — Explorador de traces distribuído unificado.
  *
  * Layout inspirado no Dynatrace Distributed Tracing Explorer:
- * - Vista de lista: tabela de traces com filtros e badges de tipo de serviço.
+ * - Vista de lista: tabela de traces com filtros, badges e mini barra de duração relativa.
  * - Vista de detalhe: split horizontal — waterfall (esquerda) + painel de span (direita).
- *   - Waterfall com régua de tempo (timeline ruler) e profundidade real (parent-child).
+ *   - Waterfall com árvore expand/collapse, régua de tempo e grade vertical.
  *   - Painel de detalhe com secções colapsáveis: Core, HTTP, Code, Networking, etc.
  *
  * @module operations/telemetry
  * @pillar Operational Reliability, Change Intelligence
  */
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -23,16 +23,9 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
-  Database,
-  FileCode,
-  Globe,
-  Layers,
-  MessageSquare,
   Search,
-  Server,
   X,
   XCircle,
-  Zap,
 } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -49,7 +42,76 @@ import {
 } from '../api/telemetry';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
-// ── Service Kind constants (mirror backend ServiceKindValues) ─────────────────
+// ── Service Kind brand icons (inline SVG, 12×12 viewBox) ─────────────────────
+
+const IconRest = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path d="M1.5 3.5h9M1.5 6h9M1.5 8.5H7" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+    <circle cx="9.5" cy="8.5" r="1.2" fill="currentColor"/>
+  </svg>
+);
+
+const IconSoap = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path d="M3.5 4L1.5 6l2 2M8.5 4l2 2-2 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M7 3.5l-2 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+  </svg>
+);
+
+const IconKafka = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <circle cx="6" cy="6" r="1.8" fill="currentColor"/>
+    <circle cx="2" cy="2.5" r="1.1" fill="currentColor" opacity=".65"/>
+    <circle cx="10" cy="2.5" r="1.1" fill="currentColor" opacity=".65"/>
+    <circle cx="2" cy="9.5" r="1.1" fill="currentColor" opacity=".65"/>
+    <circle cx="10" cy="9.5" r="1.1" fill="currentColor" opacity=".65"/>
+    <line x1="3.1" y1="3.4" x2="4.7" y2="5" stroke="currentColor" strokeWidth="1"/>
+    <line x1="8.9" y1="3.4" x2="7.3" y2="5" stroke="currentColor" strokeWidth="1"/>
+    <line x1="3.1" y1="8.6" x2="4.7" y2="7" stroke="currentColor" strokeWidth="1"/>
+    <line x1="8.9" y1="8.6" x2="7.3" y2="7" stroke="currentColor" strokeWidth="1"/>
+  </svg>
+);
+
+const IconBackground = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <circle cx="6" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.1"/>
+    <path d="M6 4V6.5l1.5 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconDb = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <ellipse cx="6" cy="3.5" rx="3.5" ry="1.3" stroke="currentColor" strokeWidth="1.1"/>
+    <path d="M2.5 3.5v5c0 .7 1.6 1.3 3.5 1.3s3.5-.6 3.5-1.3v-5" stroke="currentColor" strokeWidth="1.1"/>
+    <path d="M2.5 6c0 .7 1.6 1.3 3.5 1.3S9.5 6.7 9.5 6" stroke="currentColor" strokeWidth="1.1"/>
+  </svg>
+);
+
+const IconGrpc = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path d="M1 3.5h7.5m0 0L6.5 2M8.5 3.5L6.5 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M11 8.5H3.5m0 0L5.5 7M3.5 8.5l2 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconMessaging = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <rect x="1" y="2.5" width="8" height="5" rx="1" stroke="currentColor" strokeWidth="1.1"/>
+    <path d="M9.5 5l1.5 1-1.5 1" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M3 5h4M3 7h2" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+  </svg>
+);
+
+const IconServiceUnknown = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <rect x="1.5" y="2" width="9" height="3" rx=".8" stroke="currentColor" strokeWidth="1.1"/>
+    <rect x="1.5" y="7" width="9" height="3" rx=".8" stroke="currentColor" strokeWidth="1.1"/>
+    <circle cx="9.5" cy="3.5" r=".7" fill="currentColor" opacity=".6"/>
+    <circle cx="9.5" cy="8.5" r=".7" fill="currentColor" opacity=".6"/>
+  </svg>
+);
+
+// ── Service Kind constants ────────────────────────────────────────────────────
 
 const SK_REST = 'REST';
 const SK_SOAP = 'SOAP';
@@ -66,26 +128,27 @@ interface ServiceKindMeta {
   icon: React.ReactNode;
   barClass: string;
   textClass: string;
+  dotStyle: React.CSSProperties;
 }
 
 function getServiceKindMeta(kind: string | undefined): ServiceKindMeta {
   switch (kind) {
     case SK_REST:
-      return { label: 'REST', icon: <Globe className="w-3 h-3" />, barClass: 'bg-blue-500/70', textClass: 'text-blue-600 dark:text-blue-400' };
+      return { label: 'REST', icon: <IconRest className="w-3 h-3" />, barClass: 'bg-blue-500/80', textClass: 'text-blue-400', dotStyle: { background: 'var(--t-data-1)' } };
     case SK_SOAP:
-      return { label: 'SOAP', icon: <FileCode className="w-3 h-3" />, barClass: 'bg-orange-500/70', textClass: 'text-orange-600 dark:text-orange-400' };
+      return { label: 'SOAP', icon: <IconSoap className="w-3 h-3" />, barClass: 'bg-orange-500/80', textClass: 'text-orange-400', dotStyle: { background: 'var(--t-data-4)' } };
     case SK_KAFKA:
-      return { label: 'Kafka', icon: <Layers className="w-3 h-3" />, barClass: 'bg-purple-500/70', textClass: 'text-purple-600 dark:text-purple-400' };
+      return { label: 'Kafka', icon: <IconKafka className="w-3 h-3" />, barClass: 'bg-purple-500/80', textClass: 'text-purple-400', dotStyle: { background: 'var(--t-data-6)' } };
     case SK_BACKGROUND:
-      return { label: 'Background', icon: <Clock className="w-3 h-3" />, barClass: 'bg-slate-500/70', textClass: 'text-slate-500 dark:text-slate-400' };
+      return { label: 'Background', icon: <IconBackground className="w-3 h-3" />, barClass: 'bg-slate-500/70', textClass: 'text-slate-400', dotStyle: { background: 'var(--t-data-7)' } };
     case SK_DB:
-      return { label: 'DB', icon: <Database className="w-3 h-3" />, barClass: 'bg-emerald-500/70', textClass: 'text-emerald-600 dark:text-emerald-400' };
+      return { label: 'DB', icon: <IconDb className="w-3 h-3" />, barClass: 'bg-emerald-500/80', textClass: 'text-emerald-400', dotStyle: { background: 'var(--t-data-2)' } };
     case SK_GRPC:
-      return { label: 'gRPC', icon: <Zap className="w-3 h-3" />, barClass: 'bg-yellow-500/70', textClass: 'text-yellow-600 dark:text-yellow-400' };
+      return { label: 'gRPC', icon: <IconGrpc className="w-3 h-3" />, barClass: 'bg-yellow-500/80', textClass: 'text-yellow-400', dotStyle: { background: 'var(--t-data-4)' } };
     case SK_MESSAGING:
-      return { label: 'Messaging', icon: <MessageSquare className="w-3 h-3" />, barClass: 'bg-indigo-500/70', textClass: 'text-indigo-600 dark:text-indigo-400' };
+      return { label: 'Messaging', icon: <IconMessaging className="w-3 h-3" />, barClass: 'bg-indigo-500/80', textClass: 'text-indigo-400', dotStyle: { background: 'var(--t-data-8)' } };
     default:
-      return { label: 'Unknown', icon: <Server className="w-3 h-3" />, barClass: 'bg-primary/60', textClass: 'text-muted-foreground' };
+      return { label: 'Unknown', icon: <IconServiceUnknown className="w-3 h-3" />, barClass: 'bg-accent/60', textClass: 'text-muted-foreground', dotStyle: { background: 'var(--t-muted)' } };
   }
 }
 
@@ -118,30 +181,52 @@ function getDefaultTimeRange(): { from: string; until: string } {
   return { from: oneHourAgo.toISOString(), until: now.toISOString() };
 }
 
-/**
- * Constrói um mapa spanId → profundidade a partir da hierarquia parent-child.
- * Depth 0 = root span. Guarda contra ciclos via visited set.
- */
-function buildDepthMap(spans: SpanDetail[]): Map<string, number> {
-  const spanById = new Map<string, SpanDetail>(spans.map((s) => [s.spanId, s]));
-  const depthCache = new Map<string, number>();
+// ── Span tree helpers ─────────────────────────────────────────────────────────
 
-  function getDepth(spanId: string, visited = new Set<string>()): number {
-    if (depthCache.has(spanId)) return depthCache.get(spanId)!;
-    if (visited.has(spanId)) return 0;
-    const span = spanById.get(spanId);
-    if (!span || !span.parentSpanId) {
-      depthCache.set(spanId, 0);
-      return 0;
-    }
-    visited.add(spanId);
-    const depth = getDepth(span.parentSpanId, visited) + 1;
-    depthCache.set(spanId, depth);
-    return depth;
+interface SpanNode {
+  span: SpanDetail;
+  depth: number;
+  children: SpanNode[];
+  hasChildren: boolean;
+}
+
+function buildSpanTree(spans: SpanDetail[]): SpanNode[] {
+  const sorted = [...spans].sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+  );
+  const nodeMap = new Map<string, SpanNode>();
+  for (const span of sorted) {
+    nodeMap.set(span.spanId, { span, depth: 0, children: [], hasChildren: false });
   }
+  const roots: SpanNode[] = [];
+  for (const span of sorted) {
+    const node = nodeMap.get(span.spanId)!;
+    if (span.parentSpanId && nodeMap.has(span.parentSpanId)) {
+      const parent = nodeMap.get(span.parentSpanId)!;
+      parent.children.push(node);
+      parent.hasChildren = true;
+    } else {
+      roots.push(node);
+    }
+  }
+  function assignDepth(node: SpanNode, depth: number) {
+    node.depth = depth;
+    for (const child of node.children) assignDepth(child, depth + 1);
+  }
+  for (const root of roots) assignDepth(root, 0);
+  return roots;
+}
 
-  for (const span of spans) getDepth(span.spanId);
-  return depthCache;
+function flattenVisible(roots: SpanNode[], collapsed: Set<string>): SpanNode[] {
+  const result: SpanNode[] = [];
+  function visit(node: SpanNode) {
+    result.push(node);
+    if (!collapsed.has(node.span.spanId)) {
+      for (const child of node.children) visit(child);
+    }
+  }
+  for (const root of roots) visit(root);
+  return result;
 }
 
 // ── Attribute partition helpers ───────────────────────────────────────────────
@@ -164,6 +249,9 @@ function buildTimeMarks(durationMs: number): Array<{ label: string; pct: number 
   }));
 }
 
+// Vertical grid line positions matching time ruler marks
+const GRID_PCTS = [20, 40, 60, 80, 100];
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function TraceExplorerPage() {
@@ -183,6 +271,16 @@ export function TraceExplorerPage() {
 
   const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
   const [selectedSpan, setSelectedSpan] = useState<SpanDetail | null>(null);
+  const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
+
+  const toggleCollapse = useCallback((spanId: string) => {
+    setCollapsedSpans(prev => {
+      const next = new Set(prev);
+      if (next.has(spanId)) next.delete(spanId);
+      else next.add(spanId);
+      return next;
+    });
+  }, []);
 
   const tracesQuery = useQuery({
     queryKey: ['telemetry', 'traces', environment, from, until, serviceName, operationName, serviceKind, minDurationMs, errorsOnly, limit],
@@ -209,99 +307,94 @@ export function TraceExplorerPage() {
 
   const [spanSearch, setSpanSearch] = useState('');
 
-  const { sortedSpans, depthMap } = useMemo(() => {
-    if (!detailQuery.data?.spans) return { sortedSpans: [], depthMap: new Map<string, number>() };
-    const sorted = [...detailQuery.data.spans].sort(
-      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-    );
-    return { sortedSpans: sorted, depthMap: buildDepthMap(sorted) };
+  const { spanRoots, rootSpan } = useMemo(() => {
+    if (!detailQuery.data?.spans) return { spanRoots: [] as SpanNode[], rootSpan: undefined };
+    const roots = buildSpanTree(detailQuery.data.spans);
+    return { spanRoots: roots, rootSpan: roots[0]?.span };
   }, [detailQuery.data]);
 
-  const filteredSpans = useMemo(() => {
-    if (!spanSearch.trim()) return sortedSpans;
+  const visibleNodes = useMemo(() => {
+    if (!spanSearch.trim()) return flattenVisible(spanRoots, collapsedSpans);
+    // When searching: expand all, filter flat
     const q = spanSearch.toLowerCase();
-    return sortedSpans.filter(
-      (s) =>
-        s.operationName.toLowerCase().includes(q) ||
-        s.serviceName.toLowerCase().includes(q),
+    return flattenVisible(spanRoots, new Set()).filter(
+      node =>
+        node.span.operationName.toLowerCase().includes(q) ||
+        node.span.serviceName.toLowerCase().includes(q),
     );
-  }, [sortedSpans, spanSearch]);
+  }, [spanRoots, collapsedSpans, spanSearch]);
 
-  // ── Detail view (Dynatrace-style split layout) ───────────────────────────────
+  const maxTraceDuration = useMemo(
+    () => Math.max(...(tracesQuery.data ?? []).map(t => t.durationMs), 1),
+    [tracesQuery.data],
+  );
+
+  // ── Detail view (Dynatrace-style waterfall) ───────────────────────────────────
   if (selectedTraceId) {
     const traceData = detailQuery.data;
-    const rootSpan = sortedSpans[0];
     const traceStartMs = rootSpan ? new Date(rootSpan.startTime).getTime() : 0;
+
+    function closeDetail() {
+      setSelectedTraceId(null);
+      setSelectedSpan(null);
+      setSpanSearch('');
+      setCollapsedSpans(new Set());
+    }
 
     return (
       <div className="flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
         {/* ── Header bar ─────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => { setSelectedTraceId(null); setSelectedSpan(null); setSpanSearch(''); }}
-            >
+            <Button variant="ghost" size="sm" onClick={closeDetail}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {t('telemetryExplorer.traces.title')}
             </Button>
-            <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
             <span className="text-sm font-semibold truncate">
               {detailQuery.isLoading
                 ? t('telemetryExplorer.loading')
-                : `${t('telemetryExplorer.traces.detail.title')}: ${rootSpan?.operationName ?? selectedTraceId}`}
+                : (rootSpan?.operationName ?? selectedTraceId)}
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => { setSelectedTraceId(null); setSelectedSpan(null); setSpanSearch(''); }}
-          >
-            <X className="w-4 h-4 mr-1.5" />
-            {t('telemetryExplorer.traces.detail.closeDetails')}
-          </Button>
+          <div className="flex items-center gap-4">
+            {traceData && rootSpan && (
+              <>
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="font-medium text-foreground tabular-nums">{formatDuration(traceData.durationMs)}</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="text-foreground">{new Date(rootSpan.startTime).toLocaleString()}</span>
+                </span>
+                <code className="font-mono text-[11px] text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-sm border border-border/40">
+                  {selectedTraceId?.slice(0, 16)}…
+                </code>
+              </>
+            )}
+            <Button variant="ghost" size="sm" onClick={closeDetail}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
-        {/* ── Trace metadata bar ──────────────────────────────────────────────── */}
-        {traceData && rootSpan && (
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0 text-sm">
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Clock className="w-3.5 h-3.5" />
-              <span className="text-xs">{t('telemetryExplorer.traces.duration')}:</span>
-              <span className="font-medium text-foreground">{formatDuration(traceData.durationMs)}</span>
-            </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Activity className="w-3.5 h-3.5" />
-              <span className="text-xs">{t('telemetryExplorer.traces.detail.responseTime')}:</span>
-              <span className="font-medium text-foreground">{formatDuration(rootSpan.durationMs)}</span>
-            </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Calendar className="w-3.5 h-3.5" />
-              <span className="font-medium text-foreground text-xs">
-                {new Date(rootSpan.startTime).toLocaleString()}
-              </span>
-            </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <span className="text-xs">{t('telemetryExplorer.traces.detail.serviceName')}:</span>
-              <span className="font-medium text-primary">{rootSpan.serviceName}</span>
-            </span>
-          </div>
-        )}
-
-        {/* ── Trace ID + span count + span search ─────────────────────────────── */}
+        {/* ── Span count + search ──────────────────────────────────────────────── */}
         {traceData && (
-          <div className="flex items-center gap-3 px-4 py-2 border-b border-border flex-shrink-0 bg-muted/10">
-            <span className="font-mono text-xs text-muted-foreground truncate max-w-[320px]">
-              {t('telemetryExplorer.traces.detail.traceIdLabel')}: {selectedTraceId}
-            </span>
+          <div className="flex items-center gap-3 px-4 py-1.5 border-b border-border flex-shrink-0 bg-muted/5">
             <Badge variant="neutral" className="text-xs font-medium flex-shrink-0">
               {traceData.spans.length} {t('telemetryExplorer.traces.detail.spans').toLowerCase()}
             </Badge>
+            {rootSpan && (
+              <span className="text-xs text-muted-foreground">
+                {t('telemetryExplorer.traces.detail.serviceName')}:{' '}
+                <span className="text-accent font-medium">{rootSpan.serviceName}</span>
+              </span>
+            )}
             <div className="relative ml-auto w-72">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
               <input
-                className="w-full h-7 pl-8 pr-3 rounded-md border border-input bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                className="w-full h-7 pl-8 pr-3 rounded-sm border border-border bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-accent"
                 placeholder={t('telemetryExplorer.traces.detail.searchSpans')}
                 value={spanSearch}
                 onChange={(e) => setSpanSearch(e.target.value)}
@@ -323,17 +416,21 @@ export function TraceExplorerPage() {
                 selectedSpan ? 'flex-1' : 'w-full'
               }`}
             >
-              {/* Column header + timeline ruler */}
+              {/* Column headers + timeline ruler */}
               <div className="flex items-stretch border-b border-border bg-muted/20 flex-shrink-0 select-none">
-                <div className="flex items-center px-3 py-1.5 border-r border-border/40 text-xs font-semibold text-muted-foreground"
-                  style={{ width: '46%', flexShrink: 0 }}>
+                <div
+                  className="flex items-center px-3 py-1.5 border-r border-border/40 text-xs font-semibold text-muted-foreground"
+                  style={{ width: '46%', flexShrink: 0 }}
+                >
                   {t('telemetryExplorer.traces.detail.spans')} / {t('telemetryExplorer.traces.service')}
                 </div>
-                <div className="flex items-center px-2 py-1.5 text-xs font-semibold text-muted-foreground"
-                  style={{ width: '9%', flexShrink: 0 }}>
+                <div
+                  className="flex items-center px-2 py-1.5 border-r border-border/40 text-xs font-semibold text-muted-foreground"
+                  style={{ width: '9%', flexShrink: 0 }}
+                >
                   {t('telemetryExplorer.traces.duration')}
                 </div>
-                <div className="relative flex items-center flex-1 px-2 py-1.5">
+                <div className="relative flex items-center flex-1 px-2 py-1.5 overflow-hidden">
                   {buildTimeMarks(traceData.durationMs).map(({ label, pct }) => (
                     <span
                       key={pct}
@@ -347,68 +444,101 @@ export function TraceExplorerPage() {
               </div>
 
               {/* Span rows */}
-              <div className="flex-1 overflow-y-auto divide-y divide-border/40">
-                {filteredSpans.length === 0 && (
+              <div className="flex-1 overflow-y-auto">
+                {visibleNodes.length === 0 && (
                   <div className="text-center py-10 text-sm text-muted-foreground">
                     {t('telemetryExplorer.traces.noTraces')}
                   </div>
                 )}
-                {filteredSpans.map((span) => {
+                {visibleNodes.map((node) => {
+                  const { span } = node;
                   const spanStartMs = new Date(span.startTime).getTime();
                   const traceDuration = traceData.durationMs || 1;
                   const offsetPct = Math.min(((spanStartMs - traceStartMs) / traceDuration) * 100, 99);
-                  const widthPct = Math.max((span.durationMs / traceDuration) * 100, 0.5);
-                  const depth = depthMap.get(span.spanId) ?? 0;
+                  const widthPct = Math.max((span.durationMs / traceDuration) * 100, 0.4);
                   const isSelected = selectedSpan?.spanId === span.spanId;
                   const hasError = span.statusCode === 'Error';
                   const kindMeta = getServiceKindMeta(span.serviceKind);
+                  const isCollapsed = collapsedSpans.has(span.spanId);
 
                   return (
-                    <button
+                    <div
                       key={span.spanId}
-                      type="button"
-                      className={`w-full text-left flex items-center hover:bg-muted/40 transition-colors ${
-                        isSelected ? 'bg-primary/10 border-l-2 border-l-primary' : ''
+                      className={`flex items-center border-b border-border/30 hover:bg-muted/20 transition-colors cursor-pointer ${
+                        isSelected ? 'bg-accent/8 border-l-2 border-l-accent' : ''
                       }`}
+                      style={{ height: '28px' }}
                       onClick={() => setSelectedSpan(span)}
                     >
                       {/* Name + service column */}
                       <div
-                        className="flex items-center gap-1 px-2 py-1.5 border-r border-border/30 min-w-0"
+                        className="flex items-center gap-1 px-2 border-r border-border/30 h-full min-w-0"
                         style={{ width: '46%', flexShrink: 0 }}
                       >
-                        <div style={{ width: `${depth * 12}px`, flexShrink: 0 }} />
-                        <ChevronRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
-                        <span className={`flex-shrink-0 ${kindMeta.textClass}`} title={kindMeta.label}>
-                          {kindMeta.icon}
-                        </span>
+                        {/* Depth indent */}
+                        <div style={{ width: `${node.depth * 12}px`, flexShrink: 0 }} />
+                        {/* Expand/collapse toggle */}
+                        <button
+                          type="button"
+                          className="flex-shrink-0 w-4 h-4 flex items-center justify-center rounded hover:bg-muted/30 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (node.hasChildren) toggleCollapse(span.spanId);
+                          }}
+                          tabIndex={-1}
+                        >
+                          {node.hasChildren ? (
+                            <ChevronRight
+                              className={`w-3 h-3 text-muted-foreground/60 transition-transform duration-150 ${
+                                isCollapsed ? '' : 'rotate-90'
+                              }`}
+                            />
+                          ) : (
+                            <span className="w-3 h-3" />
+                          )}
+                        </button>
+                        {/* Service kind dot */}
+                        <span
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={kindMeta.dotStyle}
+                        />
+                        {/* Names */}
                         <span className="text-xs font-medium text-foreground truncate">{span.serviceName}</span>
-                        <span className="text-xs text-muted-foreground truncate ml-0.5">{span.operationName}</span>
+                        <span className="text-xs text-muted-foreground/70 truncate ml-0.5 flex-shrink-0" style={{ maxWidth: '40%' }}>{span.operationName}</span>
                         {hasError && <XCircle className="w-3 h-3 text-destructive flex-shrink-0 ml-auto" />}
                       </div>
                       {/* Duration column */}
                       <div
-                        className="flex items-center px-2 py-1.5 text-xs text-muted-foreground tabular-nums"
+                        className="flex items-center px-2 border-r border-border/30 text-xs text-muted-foreground tabular-nums h-full"
                         style={{ width: '9%', flexShrink: 0 }}
                       >
                         {formatDuration(span.durationMs)}
                       </div>
-                      {/* Timeline bar column */}
-                      <div className="flex items-center flex-1 px-2 py-1.5 min-w-0">
-                        <div className="relative w-full h-4">
+                      {/* Timeline Gantt column */}
+                      <div className="relative flex items-center flex-1 px-2 h-full overflow-hidden">
+                        {/* Vertical grid lines at 20% intervals */}
+                        {GRID_PCTS.map(pct => (
                           <div
-                            className={`absolute top-0.5 bottom-0.5 rounded-sm ${
-                              hasError ? 'bg-destructive/70' : kindMeta.barClass
-                            }`}
+                            key={pct}
+                            className="absolute inset-y-0 pointer-events-none"
+                            style={{ left: `${pct}%`, width: '1px', background: 'var(--t-divider)' }}
+                          />
+                        ))}
+                        {/* Gantt bar */}
+                        <div className="relative w-full h-full">
+                          <div
+                            className={`absolute rounded-sm ${hasError ? 'bg-danger/80' : kindMeta.barClass}`}
                             style={{
                               left: `${offsetPct}%`,
                               width: `${Math.min(widthPct, 100 - offsetPct)}%`,
-                              minWidth: '3px',
+                              minWidth: '4px',
+                              top: '7px',
+                              bottom: '7px',
                             }}
                           />
                         </div>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -550,36 +680,49 @@ export function TraceExplorerPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/30">
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.traceId')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.serviceKind')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.service')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.operation')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.duration')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.status')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.spanCount')}</th>
-                        <th className="text-left px-4 py-2 font-medium">{t('telemetryExplorer.traces.startTime')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.traceId')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.serviceKind')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.service')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.operation')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground" style={{ minWidth: '160px' }}>{t('telemetryExplorer.traces.duration')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.status')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.spanCount')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.startTime')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {tracesQuery.data.map((trace: TraceSummary) => {
                         const kindMeta = getServiceKindMeta(trace.rootServiceKind);
+                        const durationPct = (trace.durationMs / maxTraceDuration) * 100;
                         return (
                           <tr
                             key={trace.traceId}
                             className="hover:bg-muted/50 cursor-pointer transition-colors"
                             onClick={() => setSelectedTraceId(trace.traceId)}
                           >
-                            <td className="px-4 py-2 font-mono text-xs truncate max-w-[160px]">{trace.traceId}</td>
-                            <td className="px-4 py-2">
+                            <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground truncate max-w-[140px]">
+                              {trace.traceId.slice(0, 12)}…
+                            </td>
+                            <td className="px-4 py-2.5">
                               <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${kindMeta.textClass}`}>
                                 {kindMeta.icon}
                                 {kindMeta.label}
                               </span>
                             </td>
-                            <td className="px-4 py-2">{trace.serviceName}</td>
-                            <td className="px-4 py-2 text-muted-foreground truncate max-w-[180px]">{trace.operationName}</td>
-                            <td className="px-4 py-2">{formatDuration(trace.durationMs)}</td>
-                            <td className="px-4 py-2">
+                            <td className="px-4 py-2.5">{trace.serviceName}</td>
+                            <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[180px]">{trace.operationName}</td>
+                            <td className="px-4 py-2.5" style={{ minWidth: '160px' }}>
+                              <div className="flex items-center gap-2">
+                                <span className="tabular-nums text-xs w-14 flex-shrink-0">{formatDuration(trace.durationMs)}</span>
+                                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--t-divider)' }}>
+                                  <div
+                                    className={`h-full rounded-full ${trace.hasErrors ? 'bg-danger/70' : kindMeta.barClass}`}
+                                    style={{ width: `${durationPct}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-2.5">
                               <Badge variant={statusBadge(trace.statusCode, trace.hasErrors)}>
                                 {trace.hasErrors
                                   ? <><AlertTriangle className="w-3 h-3 mr-1" />{t('telemetryExplorer.traces.statusError')}</>
@@ -587,8 +730,8 @@ export function TraceExplorerPage() {
                                 }
                               </Badge>
                             </td>
-                            <td className="px-4 py-2 text-center">{trace.spanCount}</td>
-                            <td className="px-4 py-2 text-muted-foreground">{formatTimestamp(trace.startTime)}</td>
+                            <td className="px-4 py-2.5 text-center">{trace.spanCount}</td>
+                            <td className="px-4 py-2.5 text-muted-foreground">{formatTimestamp(trace.startTime)}</td>
                           </tr>
                         );
                       })}
@@ -654,7 +797,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
   const attrs = span.spanAttributes ?? {};
   const resAttrs = span.resourceAttributes ?? {};
 
-  // Partition span attributes into semantic groups
   const httpAttrs = filterAttrs(attrs, (k) =>
     k.startsWith('http.') || k.startsWith('url.') || k === 'network.protocol.name',
   );
@@ -677,7 +819,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
   ]);
   const otherAttrs = filterAttrs(attrs, (k) => !knownKeys.has(k));
 
-  // Filter all entries by detailSearch
   const filterEntries = (obj: Record<string, string>) => {
     if (!detailSearch.trim()) return Object.entries(obj);
     const q = detailSearch.toLowerCase();
@@ -688,7 +829,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Panel header: title + close */}
+      {/* Panel header */}
       <div className="flex items-start justify-between px-3 py-2.5 border-b border-border flex-shrink-0 bg-card">
         <div className="min-w-0 pr-2">
           <div className="text-sm font-semibold truncate">
@@ -712,7 +853,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
         </button>
       </div>
 
-      {/* Duration + failure badge + service kind */}
+      {/* Duration + status + kind */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border flex-shrink-0">
         <Clock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
         <span className="text-sm font-medium">{formatDuration(span.durationMs)}</span>
@@ -741,9 +882,8 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
         </div>
       </div>
 
-      {/* Scrollable sections */}
+      {/* Scrollable attribute sections */}
       <div className="flex-1 overflow-y-auto">
-        {/* Core */}
         <ExpandableSection title={t('telemetryExplorer.traces.detail.section.core')} defaultOpen>
           <DetailRow label={t('telemetryExplorer.traces.detail.endpoint')} value={span.operationName} />
           <DetailRow label={t('telemetryExplorer.traces.detail.responseTime')} value={formatDuration(span.durationMs)} />
@@ -767,7 +907,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           )}
         </ExpandableSection>
 
-        {/* HTTP */}
         {filterEntries(httpAttrs).length > 0 && (
           <ExpandableSection title="HTTP" defaultOpen>
             {filterEntries(httpAttrs).map(([k, v]) => (
@@ -776,7 +915,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Messaging / Kafka */}
         {filterEntries(msgAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.context.kafka.title')} defaultOpen>
             {filterEntries(msgAttrs).map(([k, v]) => (
@@ -785,7 +923,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* DB / RPC */}
         {filterEntries(dbAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.context.db.title')} defaultOpen>
             {filterEntries(dbAttrs).map(([k, v]) => (
@@ -794,7 +931,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Code attributes */}
         {filterEntries(codeAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.section.codeAttributes')}>
             {filterEntries(codeAttrs).map(([k, v]) => (
@@ -803,7 +939,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Networking */}
         {filterEntries(netAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.section.networking')}>
             {filterEntries(netAttrs).map(([k, v]) => (
@@ -812,7 +947,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Host */}
         {filterEntries(hostAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.section.host')}>
             {filterEntries(hostAttrs).map(([k, v]) => (
@@ -821,7 +955,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Deployment information */}
         {filterEntries(deployAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.section.deployment')}>
             {filterEntries(deployAttrs).map(([k, v]) => (
@@ -830,7 +963,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Events */}
         {span.events && span.events.length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.events')}>
             {span.events.map((evt, idx) => (
@@ -849,7 +981,6 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </ExpandableSection>
         )}
 
-        {/* Other */}
         {filterEntries(otherAttrs).length > 0 && (
           <ExpandableSection title={t('telemetryExplorer.traces.detail.section.other')}>
             {filterEntries(otherAttrs).map(([k, v]) => (

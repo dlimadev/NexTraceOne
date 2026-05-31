@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Activity, CheckCircle, AlertTriangle, XCircle,
+  Activity, CheckCircle2, AlertTriangle, XCircle,
   TrendingUp, TrendingDown, Minus, Shield, Search,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -20,7 +20,7 @@ type StatusFilter = 'all' | 'Healthy' | 'Degraded' | 'Unavailable' | 'NeedsAtten
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
-    case 'Healthy': return { variant: 'success', icon: <CheckCircle size={14} /> };
+    case 'Healthy': return { variant: 'success', icon: <CheckCircle2 size={14} /> };
     case 'Degraded': return { variant: 'warning', icon: <AlertTriangle size={14} /> };
     case 'Unavailable': return { variant: 'danger', icon: <XCircle size={14} /> };
     case 'NeedsAttention': return { variant: 'default', icon: <Shield size={14} /> };
@@ -80,7 +80,7 @@ export function TeamReliabilityPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('reliability.totalServices')} value={stats.total} icon={<Activity size={20} />} />
-        <StatCard title={t('reliability.healthyServices')} value={stats.healthy} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('reliability.healthyServices')} value={stats.healthy} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('reliability.degradedServices')} value={stats.degraded} icon={<AlertTriangle size={20} />} color="text-warning" />
         <StatCard title={t('reliability.needsAttention')} value={stats.needsAttention + stats.unavailable} icon={<Shield size={20} />} color="text-critical" />
       </div>

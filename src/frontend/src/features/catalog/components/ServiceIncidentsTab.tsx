@@ -8,7 +8,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ExternalLink, Clock, CheckCircle } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Clock, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Link } from 'react-router-dom';
@@ -29,7 +29,7 @@ function severityBadge(severity: string) {
 
 function statusIcon(status: string) {
   switch (status?.toLowerCase()) {
-    case 'resolved': return <CheckCircle size={13} className="text-success" />;
+    case 'resolved': return <CheckCircle2 size={13} className="text-success" />;
     case 'open': case 'active': return <AlertTriangle size={13} className="text-critical" />;
     default: return <Clock size={13} className="text-warning" />;
   }
@@ -96,7 +96,7 @@ export function ServiceIncidentsTab({ serviceId }: Props) {
             </div>
           ) : incidents.length === 0 ? (
             <div className="py-10 text-center px-4">
-              <CheckCircle size={20} className="text-success mx-auto mb-2" />
+              <CheckCircle2 size={20} className="text-success mx-auto mb-2" />
               <p className="text-sm text-muted">
                 {t('serviceDetail.incidents.noIncidents', 'No recent incidents. Great job! 🎉')}
               </p>

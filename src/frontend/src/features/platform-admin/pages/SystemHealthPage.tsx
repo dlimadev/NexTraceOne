@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   Activity,
-  CheckCircle,
+  CheckCircle2,
   RefreshCw,
   XCircle,
   ExternalLink,
@@ -84,7 +84,7 @@ export function SystemHealthPage() {
             label={t('summary.configured')}
             value={configured}
             tone="positive"
-            icon={<CheckCircle size={18} aria-hidden="true" />}
+            icon={<CheckCircle2 size={18} aria-hidden="true" />}
           />
           <SummaryCard
             label={t('summary.notConfigured')}
@@ -196,7 +196,7 @@ function StatusBadge({ status, label }: StatusBadgeProps) {
   if (status === 'Configured') {
     return (
       <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success border border-success/20">
-        <CheckCircle size={12} aria-hidden="true" />
+        <CheckCircle2 size={12} aria-hidden="true" />
         {label}
       </span>
     );

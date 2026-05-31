@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
+import { TrendingUp, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -27,7 +27,7 @@ export function CapacityForecastPage() {
     if (risk === 'Critical' || risk === 'High') {
       return <AlertTriangle size={14} className="text-warning" />;
     }
-    return <CheckCircle size={14} className="text-success" />;
+    return <CheckCircle2 size={14} className="text-success" />;
   }
 
   function usageBarWidth(current: number, capacity: number) {
@@ -77,7 +77,7 @@ export function CapacityForecastPage() {
           </div>
         ) : (
           <div className="bg-success/10 border border-success/20 rounded-lg p-4 flex items-center gap-3">
-            <CheckCircle size={18} className="text-success" />
+            <CheckCircle2 size={18} className="text-success" />
             <div className="text-sm text-success">{t('allGood')}</div>
           </div>
         )}

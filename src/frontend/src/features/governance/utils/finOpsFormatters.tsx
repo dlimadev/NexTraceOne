@@ -1,4 +1,4 @@
-import { CheckCircle, AlertCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { CostEfficiencyType } from '../../../types';
 
 /** Formata um valor monetário com o locale e moeda indicados. */
@@ -32,7 +32,7 @@ export function efficiencyBadgeVariant(
 export function efficiencyIcon(eff: CostEfficiencyType): React.ReactElement | null {
   switch (eff) {
     case 'Efficient':
-      return <CheckCircle size={14} className="text-success" />;
+      return <CheckCircle2 size={14} className="text-success" />;
     case 'Acceptable':
       return <AlertCircle size={14} className="text-muted" />;
     case 'Inefficient':

@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   Activity, 
   AlertTriangle, 
-  CheckCircle,
+  CheckCircle2,
   Server,
   Zap,
   BarChart3,
@@ -256,7 +256,7 @@ export function RuntimeIntelligenceDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Serviços Saudáveis</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -371,7 +371,7 @@ export function RuntimeIntelligenceDashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <p className="text-lg font-medium">Nenhum drift detectado</p>
                   <p className="text-muted-foreground">Todos os serviços estão dentro da baseline esperada</p>
                 </div>

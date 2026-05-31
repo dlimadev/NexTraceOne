@@ -5,7 +5,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, CheckCircle, Settings } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Settings } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import type { WidgetProps } from './WidgetRegistry';
 import client from '../../../api/client';
@@ -161,7 +161,7 @@ export function OtelErrorRateWidget({
           </>
         ) : (
           <>
-            <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+            <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
             <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
               {t('obs.errors.allClear', 'All Clear')}
             </span>

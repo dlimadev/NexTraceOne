@@ -9,7 +9,7 @@ import {
   ExternalLink,
   Lock,
   Unlock,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -170,7 +170,7 @@ export function ContractSourceOfTruthPage() {
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.signedStatus')}</dt>
                   <dd className="flex items-center gap-1.5 text-body">
                     {sot.governance.isSigned ? (
-                      <><CheckCircle size={14} className="text-success" /><span>{t('common.yes')}</span></>
+                      <><CheckCircle2 size={14} className="text-success" /><span>{t('common.yes')}</span></>
                     ) : (
                       <><XCircle size={14} className="text-muted" /><span>{t('common.no')}</span></>
                     )}

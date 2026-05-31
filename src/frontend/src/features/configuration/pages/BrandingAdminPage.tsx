@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Palette, Image, Type, Globe, Save, CheckCircle, XCircle,
+  Palette, Image, Type, Globe, Save, CheckCircle2, XCircle,
   RotateCcw, Eye, Monitor, Moon, Sun, LogIn, Shield, Link as LinkIcon,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -456,7 +456,7 @@ export function BrandingAdminPage() {
         </button>
         {saveStatus === 'saved' && (
           <span className="flex items-center gap-1 text-success text-sm">
-            <CheckCircle size={14} /> {t('branding.admin.saved')}
+            <CheckCircle2 size={14} /> {t('branding.admin.saved')}
           </span>
         )}
         {saveStatus === 'error' && (

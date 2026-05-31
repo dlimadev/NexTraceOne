@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Globe, Building2, CheckCircle, XCircle, Route } from 'lucide-react';
+import { Plus, Pencil, Trash2, Globe, Building2, CheckCircle2, XCircle, Route } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
@@ -264,7 +264,7 @@ export function JourneyConfigPage() {
       {/* Status toast */}
       {statusMessage && (
         <div className="mb-4 flex items-center gap-2 px-4 py-2 rounded-md bg-success/10 border border-success/30 text-success text-xs">
-          <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
           {statusMessage}
         </div>
       )}
@@ -310,7 +310,7 @@ export function JourneyConfigPage() {
                     <td className="py-3 px-4">
                       {def.isActive ? (
                         <span className="flex items-center gap-1 text-success">
-                          <CheckCircle className="w-3 h-3" /> {t('analytics.journeyConfig.isActive')}
+                          <CheckCircle2 className="w-3 h-3" /> {t('analytics.journeyConfig.isActive')}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-muted">

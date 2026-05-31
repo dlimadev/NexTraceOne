@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Zap, ShieldAlert, Search, Clock, AlertTriangle,
-  CheckCircle, XCircle, Loader2,
+  CheckCircle2, XCircle, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -21,7 +21,7 @@ type StatusFilter = 'all' | 'Created' | 'PendingApproval' | 'Approved' | 'Execut
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
-    case 'Completed': return { variant: 'success', icon: <CheckCircle size={14} /> };
+    case 'Completed': return { variant: 'success', icon: <CheckCircle2 size={14} /> };
     case 'Executing': return { variant: 'warning', icon: <Loader2 size={14} /> };
     case 'Failed': return { variant: 'danger', icon: <XCircle size={14} /> };
     case 'PendingApproval': return { variant: 'warning', icon: <Clock size={14} /> };
@@ -92,7 +92,7 @@ export function AutomationWorkflowsPage() {
 
       <StatsGrid columns={4}>
         <StatCard title={t('automation.stats.total')} value={data?.totalCount ?? 0} icon={<Zap size={20} />} color="text-accent" />
-        <StatCard title={t('automation.stats.completed')} value={completedCount} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('automation.stats.completed')} value={completedCount} icon={<CheckCircle2 size={20} />} color="text-success" />
         <StatCard title={t('automation.stats.failed')} value={failedCount} icon={<XCircle size={20} />} color="text-critical" />
         <StatCard title={t('automation.stats.pending')} value={pendingCount} icon={<Clock size={20} />} color="text-warning" />
       </StatsGrid>
