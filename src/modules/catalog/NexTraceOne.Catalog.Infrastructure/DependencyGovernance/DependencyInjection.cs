@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Ports;
+using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.External;
 using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance;
@@ -35,6 +36,25 @@ public static class DependencyInjection
         services.AddScoped<IDependencyGovernanceUnitOfWork>(sp => sp.GetRequiredService<DependencyGovernanceDbContext>());
         services.AddScoped<IServiceDependencyProfileRepository, ServiceDependencyProfileRepository>();
         services.AddScoped<IVulnerabilityAdvisoryRepository, EfVulnerabilityAdvisoryRepository>();
+
+        // ── External data sources ────────────────────────────────────
+        services.AddHttpClient<OSVVulnerabilityClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.osv.dev/v1/");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+        services.AddSingleton<IVulnerabilityDataSource>(sp =>
+            sp.GetRequiredService<OSVVulnerabilityClient>());
+
+        services.AddHttpClient<NuGetPackageClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.nuget.org/v3/");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddSingleton<IPackageMetadataClient>(sp =>
+            sp.GetRequiredService<NuGetPackageClient>());
+
+        services.AddScoped<IDependencyEnrichmentService, DependencyEnrichmentService>();
 
         return services;
     }

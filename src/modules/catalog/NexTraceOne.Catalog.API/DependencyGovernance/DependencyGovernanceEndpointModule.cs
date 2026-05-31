@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.CheckDependencyPolicies;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.CompareDependencyVersions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.DetectLicenseConflicts;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Features.EnrichServiceDependencies;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.GenerateSbom;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.GetDependencyHealthDashboard;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.GetServiceDependencyProfile;
@@ -46,6 +47,19 @@ public sealed class DependencyGovernanceEndpointModule
         .RequirePermission("catalog:dependencies:write")
         .WithName("ScanServiceDependencies")
         .WithSummary("Scan a service's project file and update its dependency profile");
+
+        group.MapPost("/{serviceId:guid}/enrich", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new EnrichServiceDependencies.Command(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("catalog:dependencies:write")
+        .WithName("EnrichServiceDependencies")
+        .WithSummary("Enrich dependency profile with live data from OSV and NuGet.org");
 
         group.MapGet("/{serviceId:guid}", async (
             Guid serviceId,

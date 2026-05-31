@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 using NexTraceOne.Catalog.Domain.DependencyGovernance.Entities;
 using NexTraceOne.Catalog.Domain.DependencyGovernance.Enums;
+using NexTraceOne.Catalog.Domain.DependencyGovernance.ValueObjects;
 
 namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.External;
 
@@ -10,7 +11,7 @@ namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.External;
 /// Enriquece um <see cref="ServiceDependencyProfile"/> com dados de registries públicos
 /// (vulnerabilidades via OSV, metadados via NuGet.org).
 /// </summary>
-internal sealed class DependencyEnrichmentService
+internal sealed class DependencyEnrichmentService : IDependencyEnrichmentService
 {
     private readonly IEnumerable<IVulnerabilityDataSource> _vulnSources;
     private readonly IPackageMetadataClient _metadataClient;
@@ -62,10 +63,9 @@ internal sealed class DependencyEnrichmentService
             }
 
             var (isDeprecated, deprecationMsg) = await _metadataClient.GetDeprecationInfoAsync(dep.PackageName, dep.Version, ct);
-            if (isDeprecated)
+            if (isDeprecated && !string.IsNullOrEmpty(latest))
             {
-                //TODO Remover comentario quando estiver implementado
-                //dep.MarkAsOutdated(deprecationMsg);
+                dep.MarkAsOutdated(latest);
             }
 
             var license = await _metadataClient.GetLicenseAsync(dep.PackageName, dep.Version, ct);
@@ -82,16 +82,16 @@ internal sealed class DependencyEnrichmentService
             var vulns = await source.QueryAsync(ecosystemName, dep.PackageName, dep.Version, ct);
             foreach (var v in vulns)
             {
-                //TODO Remover comentario quando estiver implementado
-                //dep.AddVulnerability(
-                //    cveId: v.CveId ?? v.AdvisoryId,
-                //    severity: MapSeverity(v.Severity),
-                //    cvssScore: v.CvssScore ?? 0,
-                //    description: v.Summary,
-                //    affectedVersionRange: v.AffectedVersionRange,
-                //    fixedInVersion: v.FixedVersion,
-                //    publishedAt: v.PublishedAt ?? DateTimeOffset.UtcNow,
-                //    source: $"{source.SourceName}:{v.AdvisoryId}");
+                dep.AddVulnerability(new PackageVulnerability(
+                    CveId: v.CveId ?? v.AdvisoryId,
+                    Severity: MapSeverity(v.Severity),
+                    CvssScore: (decimal)(v.CvssScore ?? 0),
+                    Description: v.Summary,
+                    AffectedVersionRange: v.AffectedVersionRange ?? "*",
+                    FixedInVersion: v.FixedVersion,
+                    PublishedAt: v.PublishedAt ?? DateTimeOffset.UtcNow,
+                    Source: $"{source.SourceName}:{v.AdvisoryId}",
+                    ExploitMaturity: ExploitMaturity.NotDefined));
             }
         }
     }
