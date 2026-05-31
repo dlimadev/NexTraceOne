@@ -11,6 +11,9 @@ public interface IServiceDependencyProfileRepository
     /// <summary>Lista todos os perfis que incluem uma dependência do pacote especificado.</summary>
     Task<IReadOnlyList<ServiceDependencyProfile>> ListByPackageNameAsync(string packageName, CancellationToken ct);
 
+    /// <summary>Lista perfis não escaneados desde o cutoff, limitado ao batchSize.</summary>
+    Task<IReadOnlyList<ServiceDependencyProfile>> ListStaleProfilesAsync(DateTimeOffset cutoff, int batchSize, CancellationToken ct);
+
     Task AddAsync(ServiceDependencyProfile profile, CancellationToken ct);
     Task UpdateAsync(ServiceDependencyProfile profile, CancellationToken ct);
 }

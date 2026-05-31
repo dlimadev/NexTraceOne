@@ -41,6 +41,16 @@ internal sealed class ServiceDependencyProfileRepository(DependencyGovernanceDbC
             .ToListAsync(ct)).AsReadOnly();
     }
 
+    public async Task<IReadOnlyList<ServiceDependencyProfile>> ListStaleProfilesAsync(DateTimeOffset cutoff, int batchSize, CancellationToken ct)
+    {
+        return (await context.ServiceDependencyProfiles
+            .Include(p => p.Dependencies)
+            .Where(p => p.LastScanAt < cutoff)
+            .OrderBy(p => p.LastScanAt)
+            .Take(batchSize)
+            .ToListAsync(ct)).AsReadOnly();
+    }
+
     public async Task AddAsync(ServiceDependencyProfile profile, CancellationToken ct)
     {
         await context.ServiceDependencyProfiles.AddAsync(profile, ct);

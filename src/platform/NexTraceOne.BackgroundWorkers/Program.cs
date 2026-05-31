@@ -302,6 +302,11 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [PlatformHealthMonitorJob.HealthCheckName, TimeSpan.FromMinutes(15)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "dependency-scan-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [DependencyScanJob.HealthCheckName, TimeSpan.FromHours(8)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "backup-coordinator-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
@@ -400,6 +405,7 @@ builder.Services.AddHostedService<BackupCoordinatorJob>();
 builder.Services.AddHostedService<WasteDetectionJob>();
 builder.Services.AddHostedService<ElasticsearchIndexMaintenanceJob>();
 builder.Services.AddHostedService<CarbonScoreCalculationJob>();
+builder.Services.AddHostedService<DependencyScanJob>();
 
 // W7-01: ES index manager — resolve via scoped scope in job
 var esUrl = builder.Configuration["Elasticsearch:Url"] ?? builder.Configuration["Elasticsearch:Uri"] ?? "http://localhost:9200";
