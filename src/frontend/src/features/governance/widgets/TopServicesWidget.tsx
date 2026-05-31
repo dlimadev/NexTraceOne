@@ -79,12 +79,12 @@ export function TopServicesWidget({ config, timeRange, title }: WidgetProps) {
             return (
               <div
                 key={svc.serviceId}
-                className="flex items-center gap-2 py-1 border-b border-gray-100 dark:border-gray-800 last:border-0"
+                className="flex items-center gap-2 py-1 border-b border-edge last:border-0"
               >
                 <span className="text-[10px] font-mono text-gray-400 w-4 shrink-0 text-right">
                   {idx + 1}
                 </span>
-                <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1">
+                <span className="text-xs text-body truncate flex-1">
                   {svc.serviceName}
                 </span>
                 <span className={`text-xs font-bold tabular-nums ${healthCls}`}>

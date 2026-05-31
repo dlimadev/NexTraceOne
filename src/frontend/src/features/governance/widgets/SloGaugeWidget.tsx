@@ -53,7 +53,7 @@ function ArcGauge({ value, target }: { value: number; target: number }) {
         fill="none"
         stroke="currentColor"
         strokeWidth="8"
-        className="text-gray-200 dark:text-gray-700"
+        className="text-faded"
         strokeLinecap="round"
       />
       {/* Filled arc */}

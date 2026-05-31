@@ -48,9 +48,9 @@ export function ReliabilitySloWidget({ config, environmentId, timeRange, title }
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.slice(0, 5).map((item) => (
-          <div key={item.serviceName} className="py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
+          <div key={item.serviceName} className="py-1 border-b border-edge last:border-0">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{item.serviceName}</span>
+              <span className="text-xs text-body truncate flex-1 mr-2">{item.serviceName}</span>
               <span className={`text-xs font-semibold tabular-nums ${item.sloActual >= item.sloTarget ? 'text-green-500' : 'text-red-500'}`}>
                 {item.sloActual?.toFixed(2)}%
               </span>

@@ -264,7 +264,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={onInspect}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
       >
         <BarChart2 size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.inspect', 'Inspect')}
@@ -273,7 +273,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleDownloadJson}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
       >
         <Download size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.downloadCsv', 'Download CSV')}
@@ -282,7 +282,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleCopyLink}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
       >
         <LinkIcon size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.copyLink', 'Copy link')}
@@ -291,7 +291,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleCreateAlert}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
       >
         <Bell size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.createAlert', 'Create alert')}
@@ -300,7 +300,7 @@ function WidgetActionsMenu({ widgetId, dashboardId, slot, onClose, onInspect, na
         type="button"
         role="menuitem"
         onClick={handleEditWidget}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
       >
         <Settings size={12} className="shrink-0" />
         {t('governance.dashboardView.widgetMenu.editWidget', 'Edit widget')}
@@ -327,7 +327,7 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="relative w-full max-w-lg rounded-md border border-edge bg-card shadow-2xl overflow-auto max-h-[80vh]">
-        <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-edge px-4 py-3">
           <div className="flex items-center gap-2">
             <BarChart2 size={14} className="text-accent" />
             <h3 className="text-sm font-semibold text-heading">
@@ -337,7 +337,7 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+            className="p-1 rounded-full text-faded hover:text-heading transition-colors"
             aria-label={t('governance.dashboardView.closeInspect', 'Close inspector')}
           >
             <X size={14} />
@@ -370,7 +370,7 @@ function WidgetInspectModal({ slot, onClose, t }: WidgetInspectModalProps) {
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
               {t('governance.dashboardView.inspectRawJson', 'Raw JSON')}
             </p>
-            <pre className="text-[10px] text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap">
+            <pre className="text-[10px] text-body overflow-x-auto whitespace-pre-wrap">
               {JSON.stringify(slot, null, 2)}
             </pre>
           </div>
@@ -638,7 +638,7 @@ function DashboardViewInner() {
             <select
               value={autoRefreshSeconds}
               onChange={(e) => setAutoRefreshSeconds(Number(e.target.value))}
-              className="text-xs rounded border border-edge bg-card text-gray-700 dark:text-gray-300 px-2 py-1 focus:outline-none"
+              className="text-xs rounded border border-edge bg-card text-body px-2 py-1 focus:outline-none"
               aria-label={t('governance.dashboardView.autoRefreshLabel', 'Auto-refresh')}
             >
               {AUTO_REFRESH_OPTIONS.map((opt) => (
@@ -669,7 +669,7 @@ function DashboardViewInner() {
                   ? isLive
                     ? 'border-green-600 bg-green-950 text-green-300'
                     : 'border-yellow-600 bg-yellow-950 text-yellow-300 animate-pulse'
-                  : 'border-gray-300 dark:border-gray-700 bg-card text-gray-500 hover:text-accent'
+                  : 'border-edge bg-card text-gray-500 hover:text-accent'
               }`}
             >
               <span className={`inline-block h-2 w-2 rounded-full ${isLiveEnabled && isLive ? 'bg-green-400' : isLiveEnabled ? 'bg-yellow-400' : 'bg-gray-500'}`} />
@@ -934,7 +934,7 @@ function DashboardViewInner() {
             <div className="relative w-full max-w-3xl max-h-[80vh] rounded-md border border-edge bg-card shadow-2xl overflow-auto">
               <button
                 onClick={() => setExpandedWidgetId(null)}
-                className="absolute top-3 right-3 p-1.5 rounded-full bg-elevated text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors z-10"
+                className="absolute top-3 right-3 p-1.5 rounded-full bg-elevated text-muted hover:text-heading transition-colors z-10"
                 aria-label={t('governance.dashboardView.closeExpanded', 'Close expanded view')}
               >
                 <X size={16} />

@@ -134,7 +134,7 @@ export function LogExplorerPage() {
                   {t('telemetryExplorer.filters.environment')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
                   value={environment}
                   onChange={(e) => setEnvironment(e.target.value)}
                 >
@@ -148,7 +148,7 @@ export function LogExplorerPage() {
                   {t('telemetryExplorer.logs.service')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-background px-3 text-sm w-40"
+                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-40"
                   placeholder={t('telemetryExplorer.logs.service')}
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
@@ -159,7 +159,7 @@ export function LogExplorerPage() {
                   {t('telemetryExplorer.logs.level')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
                 >
@@ -175,7 +175,7 @@ export function LogExplorerPage() {
                   {t('telemetryExplorer.logs.message')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-background px-3 text-sm w-full"
+                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-full"
                   placeholder={t('telemetryExplorer.logs.searchPlaceholder')}
                   value={messageContains}
                   onChange={(e) => setMessageContains(e.target.value)}
@@ -186,7 +186,7 @@ export function LogExplorerPage() {
                   {t('telemetryExplorer.logs.traceId')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-background px-3 text-sm w-40 font-mono"
+                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-40 font-mono"
                   placeholder={t('operations.logExplorer.traceIdPlaceholder', 'Trace ID')}
                   value={traceIdFilter}
                   onChange={(e) => setTraceIdFilter(e.target.value)}

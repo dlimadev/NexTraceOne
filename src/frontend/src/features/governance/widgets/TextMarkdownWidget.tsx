@@ -53,7 +53,7 @@ function parseMarkdown(raw: string): string[] {
 
     if (trimmed.startsWith('### ')) {
       if (inList) { result.push('</ul>'); inList = false; }
-      result.push(`<h3 class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide leading-tight">${applyInlineFormatting(trimmed.slice(4))}</h3>`);
+      result.push(`<h3 class="text-xs font-bold text-body uppercase tracking-wide leading-tight">${applyInlineFormatting(trimmed.slice(4))}</h3>`);
     } else if (trimmed.startsWith('## ')) {
       if (inList) { result.push('</ul>'); inList = false; }
       result.push(`<h2 class="text-sm font-bold text-heading leading-tight">${applyInlineFormatting(trimmed.slice(3))}</h2>`);
@@ -62,10 +62,10 @@ function parseMarkdown(raw: string): string[] {
       result.push(`<h1 class="text-base font-bold text-heading leading-tight">${applyInlineFormatting(trimmed.slice(2))}</h1>`);
     } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       if (!inList) { result.push('<ul class="list-disc pl-4 space-y-0.5">'); inList = true; }
-      result.push(`<li class="text-xs text-gray-700 dark:text-gray-300">${applyInlineFormatting(trimmed.slice(2))}</li>`);
+      result.push(`<li class="text-xs text-body">${applyInlineFormatting(trimmed.slice(2))}</li>`);
     } else {
       if (inList) { result.push('</ul>'); inList = false; }
-      result.push(`<p class="text-xs text-gray-700 dark:text-gray-300 leading-snug">${applyInlineFormatting(trimmed)}</p>`);
+      result.push(`<p class="text-xs text-body leading-snug">${applyInlineFormatting(trimmed)}</p>`);
     }
   }
 
@@ -85,7 +85,7 @@ export function TextMarkdownWidget({ config, title }: WidgetProps) {
   if (!content.trim()) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-2 p-3">
-        <FileText size={18} className="text-gray-300 dark:text-gray-600" />
+        <FileText size={18} className="text-faded" />
         <span className="text-xs text-gray-400">
           {t('governance.dashboardView.noContent', 'No content configured. Edit this widget to add a note.')}
         </span>

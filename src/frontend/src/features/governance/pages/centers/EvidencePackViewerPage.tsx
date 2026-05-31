@@ -142,7 +142,7 @@ export function EvidencePackViewerPage() {
                 placeholder={t('evidencePack.filterArtifacts')}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="ml-auto px-2 py-1 text-xs border rounded bg-background w-48"
+                className="ml-auto px-2 py-1 text-xs border rounded bg-elevated w-48"
               />
             </div>
 

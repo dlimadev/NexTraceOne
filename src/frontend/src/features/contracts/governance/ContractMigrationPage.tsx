@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeftRight, Code2, Copy, ChevronDown, ChevronUp, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
@@ -76,7 +76,7 @@ export function ContractMigrationPage() {
     const hintKey = `${side}-${idx}`;
     const isExpanded = expandedHints.has(hintKey);
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/60">
+      <div className="rounded-lg border border-edge bg-card p-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 shrink-0">{severityIcon(suggestion.severity)}</div>
           <div className="flex-1 min-w-0">
@@ -88,7 +88,7 @@ export function ContractMigrationPage() {
                 {suggestion.kind}
               </span>
             </div>
-            <p className="text-sm text-gray-800 dark:text-gray-200">{suggestion.description}</p>
+            <p className="text-sm text-body">{suggestion.description}</p>
             {suggestion.codeHint && (
               <div className="mt-2">
                 <button
@@ -135,7 +135,7 @@ export function ContractMigrationPage() {
 
       {/* Configuration Panel */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
+        <div className="rounded-lg border border-edge bg-card p-5">
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationBaseVersion')}
           </h3>
@@ -143,7 +143,7 @@ export function ContractMigrationPage() {
             aria-label={t('contracts.migrationSelectBaseVersion')}
             value={baseVersionId}
             onChange={(e) => setBaseVersionId(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-heading focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:border-accent focus:outline-none"
           >
             <option value="">{t('contracts.migrationSelectBaseVersion')}</option>
             {contracts.map((c) => (
@@ -154,7 +154,7 @@ export function ContractMigrationPage() {
           </select>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
+        <div className="rounded-lg border border-edge bg-card p-5">
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationTargetVersion')}
           </h3>
@@ -162,7 +162,7 @@ export function ContractMigrationPage() {
             aria-label={t('contracts.migrationSelectTargetVersion')}
             value={targetVersionId}
             onChange={(e) => setTargetVersionId(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-heading focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:border-accent focus:outline-none"
           >
             <option value="">{t('contracts.migrationSelectTargetVersion')}</option>
             {contracts.map((c) => (
@@ -173,7 +173,7 @@ export function ContractMigrationPage() {
           </select>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
+        <div className="rounded-lg border border-edge bg-card p-5">
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationTargetSide')}
           </h3>
@@ -196,7 +196,7 @@ export function ContractMigrationPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800/60">
+        <div className="rounded-lg border border-edge bg-card p-5">
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationLanguage')}
           </h3>
@@ -230,7 +230,7 @@ export function ContractMigrationPage() {
             'inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-colors',
             canGenerate && !migrationMutation.isPending
               ? 'bg-blue-600 hover:bg-blue-700'
-              : 'cursor-not-allowed bg-gray-300 dark:bg-gray-600',
+              : 'cursor-not-allowed bg-elevated',
           )}
         >
           <ArrowLeftRight className="h-4 w-4" />
@@ -256,9 +256,9 @@ export function ContractMigrationPage() {
               { label: t('contracts.migrationChangeLevel'), value: patch.changeLevel },
               { label: t('contracts.migrationBreakingCount'), value: String(patch.breakingChangeCount) },
             ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/60">
+              <div key={label} className="rounded-lg border border-edge bg-card p-4">
                 <p className="text-xs text-muted">{label}</p>
-                <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{value}</p>
+                <p className="mt-1 text-lg font-semibold text-heading">{value}</p>
               </div>
             ))}
           </div>
@@ -268,7 +268,7 @@ export function ContractMigrationPage() {
             <section>
               <h2 className="mb-3 text-base font-semibold text-heading">
                 {t('contracts.migrationProviderSuggestions')}
-                <span className="ml-2 text-sm font-normal text-gray-500">({patch.providerSuggestions.length})</span>
+                <span className="ml-2 text-sm font-normal text-muted">({patch.providerSuggestions.length})</span>
               </h2>
               <div className="space-y-3">
                 {patch.providerSuggestions.map((s, i) => (
@@ -283,7 +283,7 @@ export function ContractMigrationPage() {
             <section>
               <h2 className="mb-3 text-base font-semibold text-heading">
                 {t('contracts.migrationConsumerSuggestions')}
-                <span className="ml-2 text-sm font-normal text-gray-500">({patch.consumerSuggestions.length})</span>
+                <span className="ml-2 text-sm font-normal text-muted">({patch.consumerSuggestions.length})</span>
               </h2>
               <div className="space-y-3">
                 {patch.consumerSuggestions.map((s, i) => (
@@ -295,13 +295,13 @@ export function ContractMigrationPage() {
 
           {/* Empty state */}
           {patch.providerSuggestions.length === 0 && patch.consumerSuggestions.length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-700 dark:bg-gray-800/60">
+            <div className="rounded-lg border border-edge bg-card p-8 text-center">
               <CheckCircle2 className="mx-auto mb-3 h-8 w-8 text-green-500" />
               <p className="text-sm text-muted">{t('contracts.migrationEmpty')}</p>
             </div>
           )}
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-faded">
             {t('contracts.migrationGeneratedAt')}: {new Date(patch.generatedAt).toLocaleString()}
           </p>
         </div>

@@ -330,7 +330,7 @@ function PaletteCard({ type, label, meta, onAdd, onDragStart }: PaletteCardProps
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onAdd(type); }}
     >
       <span className="text-xl leading-none">{widgetIcon(type)}</span>
-      <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 text-center leading-tight line-clamp-2">
+      <span className="text-[10px] font-medium text-body text-center leading-tight line-clamp-2">
         {label}
       </span>
       <span className="text-[9px] text-gray-400 tabular-nums">
@@ -598,7 +598,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                     className={`flex-1 rounded border text-xs py-1 capitalize transition-colors ${
                       (slot.chartType || 'area') === ct
                         ? 'border-blue-500 bg-blue-600 text-white'
-                        : 'border-edge bg-card text-gray-700 dark:text-gray-300 hover:border-blue-400'
+                        : 'border-edge bg-card text-body hover:border-blue-400'
                     }`}
                   >
                     {ct}
@@ -856,7 +856,7 @@ function MetaAccordion({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-accent transition-colors"
+        className="w-full flex items-center justify-between text-xs font-semibold text-body hover:text-accent transition-colors"
       >
         <span>{t('governance.dashboardBuilder.metadata', 'Dashboard Metadata')}</span>
         {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}

@@ -58,8 +58,8 @@ export function IncidentSummaryWidget({ config, timeRange, title, environmentId 
           </p>
         ) : (
           data.items.slice(0, 5).map((inc) => (
-            <div key={inc.id} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
-              <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{inc.title}</span>
+            <div key={inc.id} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
+              <span className="text-xs text-body truncate flex-1 mr-2">{inc.title}</span>
               <span className={`text-xs font-semibold ${SEVERITY_COLOR[inc.severity] ?? 'text-gray-400'}`}>
                 {inc.severity}
               </span>

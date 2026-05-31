@@ -201,7 +201,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
               onClick={() => addTransform(def.type)}
               className="flex flex-col items-start gap-0.5 rounded border border-edge bg-elevated p-1.5 text-left hover:border-accent transition-colors"
             >
-              <span className="flex items-center gap-1 text-[10px] font-medium text-gray-700 dark:text-gray-300">
+              <span className="flex items-center gap-1 text-[10px] font-medium text-body">
                 {def.icon}
                 {def.label}
               </span>
@@ -217,7 +217,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
           return (
             <div
               key={transform.id}
-              className={`rounded border ${transform.enabled ? 'border-edge' : 'border-gray-100 dark:border-gray-800 opacity-50'} bg-card`}
+              className={`rounded border ${transform.enabled ? 'border-edge' : 'border-edge opacity-50'} bg-card`}
             >
               <div className="flex items-center gap-1 px-2 py-1">
                 <GripVertical size={10} className="text-gray-300 cursor-grab" />
@@ -227,7 +227,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
                   onChange={() => toggleEnabled(transform.id)}
                   className="rounded"
                 />
-                <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                <span className="text-[10px] font-medium text-body flex items-center gap-1">
                   {def?.icon}
                   {def?.label}
                 </span>

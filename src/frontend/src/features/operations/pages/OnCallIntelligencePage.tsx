@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Phone, TrendingDown, Clock, AlertTriangle, BarChart2, Calendar } from 'lucide-react';
@@ -139,7 +139,7 @@ export function OnCallIntelligencePage() {
         <PageSection title={t('operations.onCall.recommendations')}>
           <div className="space-y-2">
             {data.recommendations.map((rec, idx) => (
-              <div key={idx} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <div key={idx} className="flex items-start gap-2 text-sm text-body">
                 <TrendingDown size={14} className="mt-0.5 text-indigo-500 flex-shrink-0" />
                 {rec}
               </div>

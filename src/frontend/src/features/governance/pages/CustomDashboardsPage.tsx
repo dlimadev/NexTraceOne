@@ -237,7 +237,7 @@ function DashboardCard({
           <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={onFavoriteToggle}
-              className={`p-0.5 rounded transition-colors ${isFavorite ? 'text-yellow-500' : 'text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100'}`}
+              className={`p-0.5 rounded transition-colors ${isFavorite ? 'text-yellow-500' : 'text-faded opacity-0 group-hover:opacity-100'}`}
               aria-label={isFavorite ? t('governance.customDashboards.unfavorite', 'Remove from favorites') : t('governance.customDashboards.favorite', 'Add to favorites')}
             >
               <Star size={13} fill={isFavorite ? 'currentColor' : 'none'} />

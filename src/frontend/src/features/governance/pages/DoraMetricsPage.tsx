@@ -184,7 +184,7 @@ export function DoraMetricsPage() {
             <Card key={metric.name}>
               <CardHeader className="pb-0">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{metric.name}</h3>
+                  <h3 className="text-sm font-semibold text-body">{metric.name}</h3>
                   <Badge variant={RATING_VARIANT[metric.rating] ?? 'secondary'}>{metric.rating}</Badge>
                 </div>
               </CardHeader>
@@ -269,20 +269,20 @@ export function DoraMetricsPage() {
                 </thead>
                 <tbody>
                   {trendData.dataPoints.map((point, idx) => (
-                    <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/20">
-                      <td className="py-2 px-3 text-gray-700 dark:text-gray-300">
+                    <tr key={idx} className="border-b border-edge hover:bg-gray-50 dark:hover:bg-gray-900/20">
+                      <td className="py-2 px-3 text-body">
                         {new Date(point.periodStart).toLocaleDateString()}
                       </td>
-                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                      <td className="py-2 px-3 text-right text-body">
                         {point.deploymentFrequency}
                       </td>
-                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                      <td className="py-2 px-3 text-right text-body">
                         {point.leadTimeHours}h
                       </td>
-                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                      <td className="py-2 px-3 text-right text-body">
                         {point.changeFailureRatePct}%
                       </td>
-                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                      <td className="py-2 px-3 text-right text-body">
                         {point.mttrHours}h
                       </td>
                     </tr>

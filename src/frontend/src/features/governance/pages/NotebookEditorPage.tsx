@@ -210,7 +210,7 @@ export function NotebookEditorPage() {
 
       {/* Description */}
       <textarea
-        className="w-full rounded-lg border border-edge bg-transparent px-3 py-2 text-sm text-gray-700 dark:text-gray-300 resize-none"
+        className="w-full rounded-lg border border-edge bg-transparent px-3 py-2 text-sm text-body resize-none"
         rows={2}
         placeholder={t('notebook.edit')}
         value={description}
@@ -268,7 +268,7 @@ export function NotebookEditorPage() {
             {!cell.isCollapsed && (
               <div className="p-3">
                 <textarea
-                  className="w-full bg-transparent font-mono text-sm text-gray-800 dark:text-gray-200 outline-none resize-none min-h-[80px]"
+                  className="w-full bg-transparent font-mono text-sm text-body outline-none resize-none min-h-[80px]"
                   placeholder={`${t(`notebook.cellType${cell.cellType}`)} content…`}
                   value={cell.content}
                   onChange={(e) => updateCell(cell.localId, e.target.value)}

@@ -135,11 +135,11 @@ export function KnowledgeGraphPage() {
               <Card key={idx}>
                 <CardBody className="p-3">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-800 dark:text-gray-200">{edge.sourceId}</span>
+                    <span className="font-medium text-body">{edge.sourceId}</span>
                     <Layers size={14} className="text-gray-400" />
                     <Badge variant="secondary" className="text-xs">{edge.relationshipType}</Badge>
                     <Layers size={14} className="text-gray-400" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">{edge.targetId}</span>
+                    <span className="font-medium text-body">{edge.targetId}</span>
                   </div>
                 </CardBody>
               </Card>

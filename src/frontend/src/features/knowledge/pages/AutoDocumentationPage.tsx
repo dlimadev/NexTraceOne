@@ -142,7 +142,7 @@ export function AutoDocumentationPage() {
                   <CardBody className="p-4">
                     <div className="flex items-start gap-3">
                       <span className="mt-1 text-indigo-500">{SECTION_ICONS[section.sectionKey as SectionKey]}</span>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                      <p className="text-sm text-body whitespace-pre-line">
                         {section.content}
                       </p>
                     </div>

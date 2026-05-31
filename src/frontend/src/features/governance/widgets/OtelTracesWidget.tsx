@@ -126,9 +126,9 @@ function TraceDetail({
               {(data?.spans ?? []).map((span) => (
                 <tr
                   key={span.spanId}
-                  className="border-t border-gray-100 dark:border-gray-800"
+                  className="border-t border-edge"
                 >
-                  <td className="py-0.5 pr-1 truncate max-w-[140px] text-gray-700 dark:text-gray-300">
+                  <td className="py-0.5 pr-1 truncate max-w-[140px] text-body">
                     {span.hasError && (
                       <XCircle
                         size={9}
@@ -269,7 +269,7 @@ export function OtelTracesWidget({
               {(data?.traces ?? []).map((trace) => (
                 <tr
                   key={trace.traceId}
-                  className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  className="border-t border-edge hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedTraceId(trace.traceId)}
                   aria-label={`${t('obs.traces.openTrace', 'Open trace')} ${trace.traceId}`}
                 >
@@ -279,7 +279,7 @@ export function OtelTracesWidget({
                   <td className="py-0.5 pr-1 text-muted truncate max-w-[80px]">
                     {trace.serviceName}
                   </td>
-                  <td className="py-0.5 pr-1 text-gray-700 dark:text-gray-300 truncate max-w-[120px]">
+                  <td className="py-0.5 pr-1 text-body truncate max-w-[120px]">
                     {trace.operationName}
                   </td>
                   <td className={`py-0.5 pr-1 text-right tabular-nums ${durationColour(trace.durationMs)}`}>

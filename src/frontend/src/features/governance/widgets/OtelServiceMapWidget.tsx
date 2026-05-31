@@ -197,7 +197,7 @@ function ServiceMapFallbackList({ nodes }: { nodes: ServiceNode[] }): React.Reac
               style={{ backgroundColor: serviceNodeColor(node) }}
               aria-hidden="true"
             />
-            <span className="text-[11px] text-gray-700 dark:text-gray-300 truncate flex-1">
+            <span className="text-[11px] text-body truncate flex-1">
               {node.name}
             </span>
             <span className="text-[10px] text-faded tabular-nums shrink-0">

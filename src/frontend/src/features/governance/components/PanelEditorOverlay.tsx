@@ -114,7 +114,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-heading transition-colors"
         >
           <ArrowLeft size={16} />
           <span>{t('governance.dashboardBuilder.panelEditor.backToDashboard')}</span>
@@ -172,7 +172,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
               className={`text-xs px-2 py-1 rounded border transition-colors ${
                 tableView
                   ? 'bg-accent/10 border-accent/40 text-accent'
-                  : 'border-edge text-muted hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-edge text-muted hover:border-edge'
               }`}
             >
               {t('governance.dashboardBuilder.panelEditor.tableView')}
@@ -192,7 +192,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
           ) : previewSlot.nqlQuery ? (
             <div className="w-full h-full flex flex-col items-start justify-start gap-2">
               <div className="w-full rounded border border-edge bg-card p-3 overflow-auto max-h-full">
-                <pre className="text-xs font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all">
+                <pre className="text-xs font-mono text-body whitespace-pre-wrap break-all">
                   {previewSlot.nqlQuery}
                 </pre>
               </div>
@@ -228,7 +228,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
                 className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? 'border-accent text-accent'
-                    : 'border-transparent text-muted hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
+                    : 'border-transparent text-muted hover:text-heading hover:border-edge'
                 }`}
               >
                 {tab.label}
@@ -241,7 +241,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
             {activeTab === 'query' && (
               <div className="h-full flex flex-col">
                 {/* Query tab header */}
-                <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                <div className="flex items-center gap-2 px-3 py-1.5 border-b border-edge shrink-0">
                   <span className="text-[10px] text-gray-400 uppercase tracking-wider">
                     {t('governance.dashboardBuilder.queryBuilder.service')}
                   </span>

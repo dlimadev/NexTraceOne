@@ -104,7 +104,7 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
       {/* Suggestions dropdown */}
       {showSuggestions && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-lg border border-edge bg-card shadow-xl py-1">
-          <div className="px-3 py-1.5 border-b border-gray-100 dark:border-gray-800">
+          <div className="px-3 py-1.5 border-b border-edge">
             <span className="text-[10px] font-semibold text-muted uppercase tracking-wider">
               {t('dashboard.querySuggestions', 'Suggested queries')}
             </span>
@@ -114,7 +114,7 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
               key={s.query}
               type="button"
               onClick={() => handleSuggestionClick(s.query)}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-body hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Clock size={10} className="text-gray-400 shrink-0" />
               <span className="font-medium">{s.label}</span>

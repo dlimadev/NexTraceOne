@@ -45,8 +45,8 @@ export function CostTrendWidget({ config, environmentId, timeRange, title }: Wid
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.slice(0, 5).map((item, i) => (
-          <div key={i} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
-            <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{item.service}</span>
+          <div key={i} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
+            <span className="text-xs text-body truncate flex-1 mr-2">{item.service}</span>
             <span className="text-xs font-semibold tabular-nums text-heading">
               ${item.cost.toLocaleString()}
             </span>

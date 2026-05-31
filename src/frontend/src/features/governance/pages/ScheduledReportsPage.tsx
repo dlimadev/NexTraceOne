@@ -262,7 +262,7 @@ export function ScheduledReportsPage() {
                   type="text"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                 />
               </div>
 
@@ -274,7 +274,7 @@ export function ScheduledReportsPage() {
                   type="text"
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder="compliance"
                 />
               </div>
@@ -287,7 +287,7 @@ export function ScheduledReportsPage() {
                   <select
                     value={schedule}
                     onChange={(e) => setSchedule(e.target.value as Schedule)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-body"
                   >
                     {SCHEDULES.map((s) => (
                       <option key={s} value={s}>
@@ -303,7 +303,7 @@ export function ScheduledReportsPage() {
                   <select
                     value={format}
                     onChange={(e) => setFormat(e.target.value as Format)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-body"
                   >
                     {FORMATS.map((f) => (
                       <option key={f} value={f}>
@@ -322,7 +322,7 @@ export function ScheduledReportsPage() {
                   type="text"
                   value={recipients}
                   onChange={(e) => setRecipients(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder="user@example.com, team@example.com"
                 />
               </div>

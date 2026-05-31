@@ -138,7 +138,7 @@ export function ReleaseCalendarWidget({ config, environmentId, timeRange, title 
       )}
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-2 pt-0.5 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex flex-wrap gap-2 pt-0.5 border-t border-edge">
         {(['deploy', 'release', 'patch', 'rollback'] as ChangeType[]).map((type) => (
           <span key={type} className="flex items-center gap-1">
             <span className={`inline-block w-2 h-2 rounded-full ${CHANGE_TYPE_COLOR[type]}`} />

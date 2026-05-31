@@ -272,7 +272,7 @@ export function WarRoomPage() {
                   {t('warRoom.addComment')}
                 </h3>
                 <textarea
-                  className="w-full rounded border border-border bg-background text-sm p-2 resize-none focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded border border-border bg-elevated text-sm p-2 resize-none focus:outline-none focus:ring-1 focus:ring-accent"
                   rows={4}
                   placeholder={t('warRoom.commentPlaceholder')}
                   value={newComment}

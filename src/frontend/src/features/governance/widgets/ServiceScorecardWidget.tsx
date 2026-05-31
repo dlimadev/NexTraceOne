@@ -45,8 +45,8 @@ export function ServiceScorecardWidget({ config, timeRange, title }: WidgetProps
       </div>
       <div className="flex-1 overflow-auto">
         {data.items.slice(0, 5).map((s) => (
-          <div key={s.serviceName} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
-            <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{s.serviceName}</span>
+          <div key={s.serviceName} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
+            <span className="text-xs text-body truncate">{s.serviceName}</span>
             <span className="text-xs font-semibold tabular-nums text-heading">
               {s.finalScore} <span className="font-normal text-gray-400">/ 100</span>
             </span>

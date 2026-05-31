@@ -40,7 +40,7 @@ function severityBadgeClass(severity: string): string {
     case 'INFO':
       return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
     default:
-      return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400';
+      return 'bg-elevated text-muted';
   }
 }
 
@@ -150,7 +150,7 @@ export function OtelLogsWidget({
               {(data?.entries ?? []).map((entry, idx) => (
                 <tr
                   key={`${entry.timestamp}-${idx}`}
-                  className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  className="border-t border-edge hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                   onClick={() => {
                     if (entry.serviceName && onCrossFilter) {
                       onCrossFilter({ serviceId: entry.serviceName });
@@ -175,7 +175,7 @@ export function OtelLogsWidget({
                   <td className="py-0.5 pr-1.5 text-muted truncate max-w-[80px]">
                     {entry.serviceName ?? '—'}
                   </td>
-                  <td className="py-0.5 max-w-[160px] truncate text-gray-700 dark:text-gray-300">
+                  <td className="py-0.5 max-w-[160px] truncate text-body">
                     {entry.message}
                   </td>
                 </tr>

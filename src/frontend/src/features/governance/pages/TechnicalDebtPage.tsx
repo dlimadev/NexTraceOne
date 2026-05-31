@@ -201,7 +201,7 @@ export function TechnicalDebtPage() {
             {data.byType.map((item) => (
               <span
                 key={item.debtType}
-                className="inline-flex items-center gap-1 rounded-full bg-elevated px-3 py-1 text-xs text-gray-700 dark:text-gray-300"
+                className="inline-flex items-center gap-1 rounded-full bg-elevated px-3 py-1 text-xs text-body"
               >
                 <span className="font-medium">
                   {t(`governance.technicalDebt.${item.debtType.replace('-', '')}`, {
@@ -257,9 +257,9 @@ export function TechnicalDebtPage() {
                 {data?.debtItems.map((item) => (
                   <tr
                     key={item.debtId}
-                    className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/20"
+                    className="border-b border-edge hover:bg-gray-50 dark:hover:bg-gray-900/20"
                   >
-                    <td className="py-2 px-3 text-gray-700 dark:text-gray-300 font-medium">
+                    <td className="py-2 px-3 text-body font-medium">
                       {item.serviceName}
                     </td>
                     <td className="py-2 px-3">
@@ -267,13 +267,13 @@ export function TechnicalDebtPage() {
                         {item.debtType}
                       </Badge>
                     </td>
-                    <td className="py-2 px-3 text-gray-700 dark:text-gray-300">{item.title}</td>
+                    <td className="py-2 px-3 text-body">{item.title}</td>
                     <td className="py-2 px-3">
                       <Badge variant={SEVERITY_VARIANT[item.severity] ?? 'secondary'}>
                         {t(`governance.technicalDebt.${item.severity}`)}
                       </Badge>
                     </td>
-                    <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                    <td className="py-2 px-3 text-right text-body">
                       {item.estimatedEffortDays}d
                     </td>
                     <td className="py-2 px-3 text-right font-semibold text-heading">
@@ -300,7 +300,7 @@ export function TechnicalDebtPage() {
               {/* Service Name + Debt Type */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-body mb-1">
                     {t('governance.technicalDebt.serviceName')}
                   </label>
                   <input
@@ -313,7 +313,7 @@ export function TechnicalDebtPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-body mb-1">
                     {t('governance.technicalDebt.debtType')}
                   </label>
                   <select
@@ -334,7 +334,7 @@ export function TechnicalDebtPage() {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-body mb-1">
                   {t('governance.technicalDebt.debtTitle')}
                 </label>
                 <input
@@ -349,7 +349,7 @@ export function TechnicalDebtPage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-body mb-1">
                   {t('governance.technicalDebt.debtDescription')}
                 </label>
                 <textarea
@@ -365,7 +365,7 @@ export function TechnicalDebtPage() {
               {/* Severity + Effort Days */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-body mb-1">
                     {t('governance.technicalDebt.severity')}
                   </label>
                   <select
@@ -381,7 +381,7 @@ export function TechnicalDebtPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-body mb-1">
                     {t('governance.technicalDebt.effortDays')}
                   </label>
                   <input

@@ -148,7 +148,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
               <button
                 type="button"
                 onClick={() => setOpenMenuId((prev) => prev === row.queryId ? null : row.queryId)}
-                className="p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1 rounded text-faded hover:text-body hover:bg-elevated"
                 aria-label="Row menu"
               >
                 <MoreHorizontal size={12} />
@@ -158,7 +158,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   <button
                     type="button"
                     onClick={() => { duplicateRow(row.queryId); setOpenMenuId(null); }}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <Copy size={11} />
                     {t('governance.dashboardBuilder.queryBuilder.duplicate', 'Duplicate')}
@@ -166,7 +166,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   <button
                     type="button"
                     onClick={() => { void copyNql(row); setOpenMenuId(null); }}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-body hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <Copy size={11} />
                     {t('governance.dashboardBuilder.queryBuilder.copyNql', 'Copy NQL')}

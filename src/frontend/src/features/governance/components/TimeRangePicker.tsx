@@ -245,7 +245,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-label={t('timeRangePicker.label', 'Time range: {{range}}', { range: label })}
-        className="flex items-center gap-1.5 rounded border border-edge bg-card px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:border-accent hover:text-accent transition-colors"
+        className="flex items-center gap-1.5 rounded border border-edge bg-card px-2 py-1 text-xs text-body hover:border-accent hover:text-accent transition-colors"
       >
         <Clock size={12} className="text-faded shrink-0" />
         <span className="font-medium">{label}</span>
@@ -270,7 +270,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === 'quick'
                   ? 'border-b-2 border-accent text-accent -mb-px'
-                  : 'text-muted hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-muted hover:text-body'
               }`}
             >
               <Clock size={12} />
@@ -282,7 +282,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === 'absolute'
                   ? 'border-b-2 border-accent text-accent -mb-px'
-                  : 'text-muted hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-muted hover:text-body'
               }`}
             >
               <Calendar size={12} />
@@ -294,7 +294,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === 'custom'
                   ? 'border-b-2 border-accent text-accent -mb-px'
-                  : 'text-muted hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-muted hover:text-body'
               }`}
             >
               <Terminal size={12} />
@@ -322,7 +322,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                           className={`flex items-center justify-between gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
                             isSelected
                               ? 'bg-accent text-white'
-                              : 'bg-elevated text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
+                              : 'bg-elevated text-body hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
                           }`}
                         >
                           <span>{t(range.labelKey, range.label)}</span>
@@ -349,7 +349,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                           className={`flex items-center justify-center gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
                             isSelected
                               ? 'bg-accent text-white'
-                              : 'bg-elevated text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
+                              : 'bg-elevated text-body hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
                           }`}
                         >
                           <span>{t(range.labelKey, range.label)}</span>
@@ -435,7 +435,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
           </div>
 
           {/* Footer — resolved absolute range */}
-          <div className="border-t border-gray-100 dark:border-gray-800 px-3 py-2">
+          <div className="border-t border-edge px-3 py-2">
             <p className="text-[10px] text-faded font-mono">
               {resolvedRange}
             </p>

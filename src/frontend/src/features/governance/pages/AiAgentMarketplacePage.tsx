@@ -97,7 +97,7 @@ export function AiAgentMarketplacePage() {
               placeholder={t('aiAgentMarketplace.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-7 pr-3 py-1.5 text-xs border rounded bg-background"
+              className="w-full pl-7 pr-3 py-1.5 text-xs border rounded bg-elevated"
             />
           </div>
           <div className="flex gap-1 flex-wrap">

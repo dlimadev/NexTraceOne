@@ -123,7 +123,7 @@ export function AiComposeDashboardModal({
         {/* Prompt input */}
         {!proposal && (
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-body">
               {t('aiCompose.promptLabel')}
             </label>
             <textarea

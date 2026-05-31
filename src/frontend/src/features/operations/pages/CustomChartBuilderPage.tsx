@@ -228,7 +228,7 @@ export function CustomChartBuilderPage() {
 
             {builder.step === 1 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-sm font-medium text-body mb-3">
                   {t('customCharts.builder.chooseMetric')}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -251,7 +251,7 @@ export function CustomChartBuilderPage() {
 
             {builder.step === 2 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-sm font-medium text-body mb-3">
                   {t('customCharts.builder.chooseChartType')}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -274,7 +274,7 @@ export function CustomChartBuilderPage() {
 
             {builder.step === 3 && (
               <div className="space-y-4">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-body">
                   {t('customCharts.builder.defineFilters')}
                 </p>
                 <div>
@@ -285,7 +285,7 @@ export function CustomChartBuilderPage() {
                     type="text"
                     value={builder.groupBy}
                     onChange={(e) => setBuilder((b) => ({ ...b, groupBy: e.target.value }))}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                     placeholder={t('customCharts.builder.groupByPlaceholder')}
                   />
                 </div>
@@ -296,7 +296,7 @@ export function CustomChartBuilderPage() {
                   <select
                     value={builder.timeRange}
                     onChange={(e) => setBuilder((b) => ({ ...b, timeRange: e.target.value as TimeRange }))}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   >
                     {TIME_RANGES.map((tr) => (
                       <option key={tr} value={tr}>{tr}</option>
@@ -308,7 +308,7 @@ export function CustomChartBuilderPage() {
 
             {builder.step === 4 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-sm font-medium text-body mb-3">
                   {t('customCharts.builder.preview')}
                 </p>
                 <div className="border border-dashed border-edge rounded-lg p-8 flex items-center justify-center">
@@ -322,14 +322,14 @@ export function CustomChartBuilderPage() {
 
             {builder.step === 5 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-sm font-medium text-body mb-3">
                   {t('customCharts.builder.saveName')}
                 </p>
                 <input
                   type="text"
                   value={builder.name}
                   onChange={(e) => setBuilder((b) => ({ ...b, name: e.target.value }))}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
+                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
                   placeholder={t('customCharts.builder.namePlaceholder')}
                   autoFocus
                 />

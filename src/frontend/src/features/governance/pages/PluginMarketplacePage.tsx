@@ -158,7 +158,7 @@ export function PluginMarketplacePage() {
           <div className="relative">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
-              className="pl-8 pr-3 py-1.5 text-sm rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-accent"
+              className="pl-8 pr-3 py-1.5 text-sm rounded border border-border bg-elevated focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t('pluginMarketplace.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}

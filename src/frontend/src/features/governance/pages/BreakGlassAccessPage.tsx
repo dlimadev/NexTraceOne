@@ -105,11 +105,11 @@ export function BreakGlassAccessPage() {
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs text-muted-foreground">{t('breakGlass.resource')}</label>
-                    <input value={resource} onChange={(e) => setResource(e.target.value)} placeholder="e.g. prod-database" className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background" />
+                    <input value={resource} onChange={(e) => setResource(e.target.value)} placeholder="e.g. prod-database" className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground">{t('breakGlass.role')}</label>
-                    <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                    <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="">-- select --</option>
                       <option value="readonly">Read Only</option>
                       <option value="admin">Admin</option>
@@ -118,7 +118,7 @@ export function BreakGlassAccessPage() {
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground">{t('breakGlass.environment')}</label>
-                    <select value={env} onChange={(e) => setEnv(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background">
+                    <select value={env} onChange={(e) => setEnv(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="production">Production</option>
                       <option value="staging">Staging</option>
                       <option value="development">Development</option>
@@ -131,7 +131,7 @@ export function BreakGlassAccessPage() {
                       onChange={(e) => setJustification(e.target.value)}
                       rows={3}
                       placeholder={t('breakGlass.justificationPlaceholder')}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-background"
+                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated"
                     />
                   </div>
                   <Button

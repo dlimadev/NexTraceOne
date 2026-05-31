@@ -473,7 +473,7 @@ export function SetupWizardPage() {
   // Completion screen
   if (completed) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">
+      <div className="min-h-screen bg-elevated flex flex-col items-center justify-center py-12 px-4">
         <div className="text-center max-w-md">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-success/10 rounded-full mb-4">
             <CheckCircle2 size={32} className="text-success" />
@@ -489,7 +489,7 @@ export function SetupWizardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-elevated flex flex-col items-center justify-center py-12 px-4">
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-md mb-3">

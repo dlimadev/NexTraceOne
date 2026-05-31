@@ -45,7 +45,7 @@ export function OnCallStatusWidget({ config, title }: WidgetProps) {
       </div>
       <div className="flex-1 overflow-auto">
         {data.entries.map((e) => (
-          <div key={e.teamName} className="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-800 last:border-0">
+          <div key={e.teamName} className="flex items-center justify-between py-1 border-b border-edge last:border-0">
             <div>
               <div className="text-xs font-medium text-heading">{e.teamName}</div>
               <div className="text-xs text-muted">{e.oncallName}</div>

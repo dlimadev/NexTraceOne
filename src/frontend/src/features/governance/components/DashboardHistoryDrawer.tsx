@@ -143,7 +143,7 @@ export function DashboardHistoryDrawer({
 
         {/* Subtitle + count */}
         {data && (
-          <div className="px-5 py-2 bg-elevated border-b border-gray-100 dark:border-gray-700">
+          <div className="px-5 py-2 bg-elevated border-b border-edge">
             <p className="text-xs text-muted">
               {t('dashboardHistory.subtitle', 'Revision history for this dashboard')}
               {' · '}

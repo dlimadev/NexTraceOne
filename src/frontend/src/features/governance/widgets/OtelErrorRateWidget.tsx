@@ -176,7 +176,7 @@ export function OtelErrorRateWidget({
             <div key={idx} className="flex flex-col gap-0.5">
               <div className="flex items-center justify-between gap-1">
                 <span
-                  className="text-[10px] text-gray-700 dark:text-gray-300 truncate flex-1"
+                  className="text-[10px] text-body truncate flex-1"
                   title={error.message}
                 >
                   {error.message}

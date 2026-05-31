@@ -112,7 +112,7 @@ export function ApiPolicyAsCodePage() {
 
   const inputClass =
     'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
-  const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
+  const labelClass = 'mb-1 block text-xs font-medium text-body';
   const codeClass = `${inputClass} font-mono text-xs`;
 
   return (
@@ -127,7 +127,7 @@ export function ApiPolicyAsCodePage() {
       <PageSection title={t('apiPolicyAsCode.overview')}>
         <Card>
           <CardBody>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-body leading-relaxed">
               {t('apiPolicyAsCode.subtitle')}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -358,7 +358,7 @@ export function ApiPolicyAsCodePage() {
                 <p className="text-sm text-green-600 dark:text-green-400">{t('apiPolicyAsCode.noViolations')}</p>
               ) : (
                 <div>
-                  <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                  <p className="mb-2 text-xs font-medium text-body">
                     {t('apiPolicyAsCode.violationMessages')}
                   </p>
                   <ul className="space-y-1">

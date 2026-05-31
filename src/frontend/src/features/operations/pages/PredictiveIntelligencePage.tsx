@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { BrainCircuit } from 'lucide-react';
@@ -94,7 +94,7 @@ function ServiceFailurePredictionForm() {
 
   const inputClass =
     'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
-  const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
+  const labelClass = 'mb-1 block text-xs font-medium text-body';
 
   return (
     <div className="space-y-4">
@@ -233,7 +233,7 @@ function ServiceFailurePredictionForm() {
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+              <p className="mb-2 text-xs font-medium text-body">
                 {t('predictiveIntelligence.causalFactors')}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -249,10 +249,10 @@ function ServiceFailurePredictionForm() {
             </div>
 
             <div>
-              <p className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">
+              <p className="mb-1 text-xs font-medium text-body">
                 {t('predictiveIntelligence.recommendedAction')}
               </p>
-              <p className="text-sm text-gray-800 dark:text-gray-200">{result.recommendedAction}</p>
+              <p className="text-sm text-body">{result.recommendedAction}</p>
             </div>
 
             <p className="text-xs text-gray-400">
@@ -302,7 +302,7 @@ function ChangeRiskAssessmentForm() {
 
   const inputClass =
     'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-blue-400';
-  const labelClass = 'mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300';
+  const labelClass = 'mb-1 block text-xs font-medium text-body';
   const checkboxClass = 'mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-400';
 
   return (
@@ -376,7 +376,7 @@ function ChangeRiskAssessmentForm() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <label className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <label className="flex items-center text-sm text-body">
                 <input
                   type="checkbox"
                   className={checkboxClass}
@@ -385,7 +385,7 @@ function ChangeRiskAssessmentForm() {
                 />
                 {t('predictiveIntelligence.hasTestEvidence')}
               </label>
-              <label className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <label className="flex items-center text-sm text-body">
                 <input
                   type="checkbox"
                   className={checkboxClass}
@@ -431,12 +431,12 @@ function ChangeRiskAssessmentForm() {
 
             {result.riskFactors.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                <p className="mb-2 text-xs font-medium text-body">
                   {t('predictiveIntelligence.riskFactors')}
                 </p>
                 <ul className="space-y-1">
                   {result.riskFactors.map((factor, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={i} className="flex items-center gap-2 text-sm text-body">
                       <span className="h-1.5 w-1.5 rounded-full bg-orange-500 shrink-0" />
                       {factor}
                     </li>
@@ -447,12 +447,12 @@ function ChangeRiskAssessmentForm() {
 
             {result.recommendations.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                <p className="mb-2 text-xs font-medium text-body">
                   {t('predictiveIntelligence.recommendations')}
                 </p>
                 <ul className="space-y-1">
                   {result.recommendations.map((rec, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={i} className="flex items-center gap-2 text-sm text-body">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
                       {rec}
                     </li>
@@ -487,7 +487,7 @@ export function PredictiveIntelligencePage() {
     `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors ${
       activeTab === tab
         ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-        : 'border-transparent text-muted hover:text-gray-900 dark:hover:text-white'
+        : 'border-transparent text-muted hover:text-heading'
     }`;
 
   return (
