@@ -618,17 +618,17 @@ public sealed class WaveAvContractLifecycleTests
     }
 
     [Fact]
-    public async Task NullDeprecationScheduleRepository_GetReturnsNull()
+    public async Task TestDeprecationScheduleRepository_GetReturnsNull()
     {
-        var repo = new NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository();
+        var repo = new TestDeprecationScheduleRepository();
         var result = await repo.GetByContractIdAsync(Guid.NewGuid(), "t1", CancellationToken.None);
         result.Should().BeNull();
     }
 
     [Fact]
-    public async Task NullDeprecationScheduleRepository_UpsertCompletes()
+    public async Task TestDeprecationScheduleRepository_UpsertCompletes()
     {
-        var repo = new NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository();
+        var repo = new TestDeprecationScheduleRepository();
         var record = new DeprecationScheduleRecord(
             Guid.NewGuid(), Guid.NewGuid(), "t1", FixedNow.AddDays(30), null, null, null, null, "user", null, FixedNow);
         var act = async () => await repo.UpsertAsync(record, CancellationToken.None);

@@ -1,4 +1,7 @@
 <Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit" />
     <Using Include="Xunit" />

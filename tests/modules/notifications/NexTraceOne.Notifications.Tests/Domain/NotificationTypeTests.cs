@@ -7,7 +7,7 @@ public sealed class NotificationTypeTests
     [Fact]
     public void All_ShouldContainAllDeclaredTypes()
     {
-        NotificationType.All.Should().HaveCount(36);
+        NotificationType.All.Should().HaveCount(38);
     }
 
     [Theory]

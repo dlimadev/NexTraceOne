@@ -288,7 +288,7 @@ public sealed class WaveZTests
     public async Task GetEventConsumerStatus_EmptyStatus_ReturnsEmptyConsumersAndHealthy()
     {
         var statusReader = new NullEventConsumerStatusReader();
-        var deadLetterRepo = new NullEventConsumerDeadLetterRepository();
+        var deadLetterRepo = new TestEventConsumerDeadLetterRepository();
         var handler = new GetEventConsumerStatus.Handler(statusReader, deadLetterRepo);
 
         var result = await handler.Handle(new GetEventConsumerStatus.Query(), CancellationToken.None);
@@ -303,7 +303,7 @@ public sealed class WaveZTests
     public async Task GetEventConsumerStatus_WithDeadLetters_ReturnsUnhealthy()
     {
         var statusReader = new NullEventConsumerStatusReader();
-        var deadLetterRepo = new NullEventConsumerDeadLetterRepository();
+        var deadLetterRepo = new TestEventConsumerDeadLetterRepository();
 
         var record = EventConsumerDeadLetterRecord.Record(
             Guid.NewGuid(), "Kafka", "deploy.events", null,
@@ -322,7 +322,7 @@ public sealed class WaveZTests
     public async Task GetEventConsumerStatus_DeadLetterAfterResolve_CountsCorrectly()
     {
         var statusReader = new NullEventConsumerStatusReader();
-        var deadLetterRepo = new NullEventConsumerDeadLetterRepository();
+        var deadLetterRepo = new TestEventConsumerDeadLetterRepository();
 
         var record = EventConsumerDeadLetterRecord.Record(
             Guid.NewGuid(), "Kafka", "topic.a", null, "{}", "error");
@@ -342,7 +342,7 @@ public sealed class WaveZTests
         var before = DateTimeOffset.UtcNow.AddSeconds(-1);
         var handler = new GetEventConsumerStatus.Handler(
             new NullEventConsumerStatusReader(),
-            new NullEventConsumerDeadLetterRepository());
+            new TestEventConsumerDeadLetterRepository());
 
         var result = await handler.Handle(new GetEventConsumerStatus.Query(), CancellationToken.None);
 
@@ -352,7 +352,7 @@ public sealed class WaveZTests
     [Fact]
     public async Task GetEventConsumerStatus_MultipleDeadLetters_CountsAll()
     {
-        var repo = new NullEventConsumerDeadLetterRepository();
+        var repo = new TestEventConsumerDeadLetterRepository();
         var tenantId = Guid.NewGuid();
 
         for (var i = 0; i < 3; i++)

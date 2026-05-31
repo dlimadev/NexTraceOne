@@ -724,7 +724,7 @@ public sealed class WaveAtAiModelGovernanceTests
     [Fact]
     public async Task NullModelPredictionRepository_AllMethods_ReturnEmptyOrComplete()
     {
-        var repo = new NullModelPredictionRepository();
+        var repo = new TestModelPredictionRepository();
         var sample = ModelPredictionSample.Create(ModelA, "m", "s", TenantId, FixedNow, null, null, null, null, null, false);
 
         await repo.AddAsync(sample, CancellationToken.None); // should not throw

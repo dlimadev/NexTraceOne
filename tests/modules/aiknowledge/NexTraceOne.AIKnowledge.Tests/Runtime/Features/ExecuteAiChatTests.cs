@@ -29,6 +29,7 @@ public sealed class ExecuteAiChatTests
         _currentUser.Id.Returns("user-1");
         _currentUser.Name.Returns("Test User");
         _currentTenant.Id.Returns(Guid.NewGuid());
+        _currentTenant.HasCapability(Arg.Any<string>()).Returns(true);
         _dateTimeProvider.UtcNow.Returns(FixedNow);
 
         // Quota allowed by default

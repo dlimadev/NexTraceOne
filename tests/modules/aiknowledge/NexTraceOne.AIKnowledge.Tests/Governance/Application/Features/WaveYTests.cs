@@ -7,6 +7,8 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPlanStatus
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCostAttributionReport;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiTokenBudgetReport;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgentExecutionHistory;
+using NSubstitute;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitAgentExecutionPlan;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -59,8 +61,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_ValidCommand_ReturnsPendingPlan()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -79,8 +81,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_TooManySteps_ReturnsBusinessError()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("3");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -97,8 +99,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_EmptySteps_FailsGuard()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -113,8 +115,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_WithCorrelationId_PreservesCorrelationId()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -132,8 +134,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_WithRequiresApproval_ReturnsApprovalRequired()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -178,8 +180,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_SingleStep_SucceedsWithMinimalBudget()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -196,8 +198,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_MaxStepsExactlyAtLimit_Succeeds()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("5");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -214,8 +216,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_AllSixStepTypes_ParsedCorrectly()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -242,8 +244,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_BlastRadiusThresholdZero_IsValid()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -259,8 +261,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_ExactlyOneStepOverLimit_ReturnsError()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("2");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
 
@@ -277,8 +279,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_ConfigDefaultsTo10WhenNotParseable_AllowsTenSteps()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = Substitute.For<IConfigurationResolutionService>();
         config.ResolveEffectiveValueAsync(
                 Arg.Any<string>(), Arg.Any<ConfigurationScope>(),
@@ -298,8 +300,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task SubmitPlan_ElevenStepsWithDefaultLimit_ReturnsError()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = Substitute.For<IConfigurationResolutionService>();
         config.ResolveEffectiveValueAsync(
                 Arg.Any<string>(), Arg.Any<ConfigurationScope>(),
@@ -321,13 +323,13 @@ public sealed class WaveYTests
 
     private async Task<Guid> SubmitPlanWithApprovalStep()
     {
-        NullAgentExecutionPlanRepository.Clear();
+        TestAgentExecutionPlanRepository.Clear();
         var steps = new List<SubmitAgentExecutionPlan.StepRequest>
         {
             new(0, "Step A", "ContractLookup", "{}", RequiresApproval: true),
             new(1, "Step B", "DraftGeneration", "{}", RequiresApproval: false),
         };
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var handler = new SubmitAgentExecutionPlan.Handler(repo, config);
         var cmd = new SubmitAgentExecutionPlan.Command(
@@ -341,7 +343,7 @@ public sealed class WaveYTests
     public async Task ApproveStep_ValidStep_UpdatesPlanAndStep()
     {
         var planId = await SubmitPlanWithApprovalStep();
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
 
         // Move plan to WaitingApproval first
         var plan = await repo.GetByIdAsync(AgentExecutionPlanId.From(planId), CancellationToken.None);
@@ -362,8 +364,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task ApproveStep_PlanNotFound_ReturnsNotFoundError()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var handler = new ApproveAgentStep.Handler(repo);
 
         var result = await handler.Handle(
@@ -377,7 +379,7 @@ public sealed class WaveYTests
     public async Task ApproveStep_StepNotFound_ReturnsNotFoundError()
     {
         var planId = await SubmitPlanWithApprovalStep();
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
         var handler = new ApproveAgentStep.Handler(repo);
 
         var result = await handler.Handle(
@@ -392,7 +394,7 @@ public sealed class WaveYTests
     public async Task ApproveStep_NonApprovalStep_ReturnsBusinessError()
     {
         var planId = await SubmitPlanWithApprovalStep();
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
         var handler = new ApproveAgentStep.Handler(repo);
 
         // Step 1 does not require approval
@@ -408,7 +410,7 @@ public sealed class WaveYTests
     public async Task ApproveStep_AlreadyApproved_ReturnsBusinessError()
     {
         var planId = await SubmitPlanWithApprovalStep();
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
 
         var plan = await repo.GetByIdAsync(AgentExecutionPlanId.From(planId), CancellationToken.None);
         plan!.StartExecution(FixedNow);
@@ -429,7 +431,7 @@ public sealed class WaveYTests
     public async Task ApproveStep_AllRequiredInfoPresent_ResponseContainsExpectedData()
     {
         var planId = await SubmitPlanWithApprovalStep();
-        var repo = new NullAgentExecutionPlanRepository();
+        var repo = new TestAgentExecutionPlanRepository();
 
         var plan = await repo.GetByIdAsync(AgentExecutionPlanId.From(planId), CancellationToken.None);
         plan!.StartExecution(FixedNow);
@@ -451,8 +453,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task GetPlanStatus_ExistingPlan_ReturnsAllStepDetails()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var submitHandler = new SubmitAgentExecutionPlan.Handler(repo, config);
         var steps = new List<SubmitAgentExecutionPlan.StepRequest>
@@ -479,8 +481,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task GetPlanStatus_PlanNotFound_ReturnsError()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var handler = new GetAgentPlanStatus.Handler(repo);
 
         var result = await handler.Handle(
@@ -493,8 +495,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task GetPlanStatus_AfterStart_StatusIsRunning()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var submitHandler = new SubmitAgentExecutionPlan.Handler(repo, config);
         var submitted = await submitHandler.Handle(
@@ -520,8 +522,8 @@ public sealed class WaveYTests
     [Fact]
     public async Task GetPlanStatus_TokenBudgetAndConsumedReflected()
     {
-        NullAgentExecutionPlanRepository.Clear();
-        var repo = new NullAgentExecutionPlanRepository();
+        TestAgentExecutionPlanRepository.Clear();
+        var repo = new TestAgentExecutionPlanRepository();
         var config = CreateConfigService("10");
         var submitHandler = new SubmitAgentExecutionPlan.Handler(repo, config);
         var submitted = await submitHandler.Handle(
@@ -544,7 +546,7 @@ public sealed class WaveYTests
     private ClassifyPromptIntent.Handler CreateClassifyHandler()
     {
         var classifier = new PromptIntentClassifierService();
-        var policyRepo = new NullModelRoutingPolicyRepository();
+        var policyRepo = Substitute.For<IModelRoutingPolicyRepository>();
         return new ClassifyPromptIntent.Handler(classifier, policyRepo);
     }
 

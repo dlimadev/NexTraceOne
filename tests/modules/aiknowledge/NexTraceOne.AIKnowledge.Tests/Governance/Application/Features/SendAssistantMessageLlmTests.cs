@@ -36,6 +36,7 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IAiGuardrailEnforcementService _guardrailService = Substitute.For<IAiGuardrailEnforcementService>();
     private readonly IContextWindowManager _contextWindow = Substitute.For<IContextWindowManager>();
     private readonly IPromptCacheService _promptCache = Substitute.For<IPromptCacheService>();
+    private readonly IAiModelCatalogService _modelCatalogService = Substitute.For<IAiModelCatalogService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
@@ -47,6 +48,7 @@ public sealed class SendAssistantMessageLlmTests
         _currentUser.Name.Returns("Test Engineer");
         _currentUser.IsAuthenticated.Returns(true);
         _currentTenant.Id.Returns(Guid.NewGuid());
+        _currentTenant.HasCapability(Arg.Any<string>()).Returns(true);
 
         // Quota always allowed by default
         _quotaService.ValidateQuotaAsync(
@@ -158,6 +160,7 @@ public sealed class SendAssistantMessageLlmTests
         _guardrailService,
         _contextWindow,
         _promptCache,
+        _modelCatalogService,
         _currentUser,
         _currentTenant,
         _currentEnvironment,
