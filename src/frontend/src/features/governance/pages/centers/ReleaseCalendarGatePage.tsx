@@ -82,7 +82,7 @@ export function ReleaseCalendarGatePage() {
               key={t_}
               onClick={() => setTab(t_)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                tab === t_ ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                tab === t_ ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted hover:bg-muted/80'
               }`}
             >
               {t_ === 'calendar' ? t('releaseCalendar.windowsTab') : t('releaseCalendar.releasesTab')}
@@ -107,7 +107,7 @@ export function ReleaseCalendarGatePage() {
                   <CardBody className="p-4">
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-muted-foreground" />
+                        <Calendar size={14} className="text-muted" />
                         <span className="text-sm font-semibold">{win.name}</span>
                         {win.requiresApproval && (
                           <Badge variant="secondary" className="text-xs">{t('releaseCalendar.approvalRequired')}</Badge>
@@ -118,7 +118,7 @@ export function ReleaseCalendarGatePage() {
                         {win.status}
                       </Badge>
                     </div>
-                    <div className="text-xs text-muted-foreground flex gap-4">
+                    <div className="text-xs text-muted flex gap-4">
                       <span>{new Date(win.start).toLocaleString()}</span>
                       <span>→</span>
                       <span>{new Date(win.end).toLocaleString()}</span>
@@ -147,7 +147,7 @@ export function ReleaseCalendarGatePage() {
                           <Badge variant="outline" className="text-xs font-mono">{rel.version}</Badge>
                           <Badge variant="secondary" className="text-xs">{rel.targetEnvironment}</Badge>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-3 text-xs text-muted">
                           <span>{new Date(rel.scheduledAt).toLocaleString()}</span>
                           <span>{t('releaseCalendar.confidence')}: {rel.confidence}%</span>
                         </div>
@@ -174,14 +174,14 @@ export function ReleaseCalendarGatePage() {
               );
             })}
             {(data?.releases ?? []).length === 0 && (
-              <div className="text-center p-8 text-muted-foreground text-sm">
+              <div className="text-center p-8 text-muted text-sm">
                 {t('releaseCalendar.empty')}
               </div>
             )}
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

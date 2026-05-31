@@ -65,7 +65,7 @@ export function ChangeConfidenceHubPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card className="md:col-span-1">
             <CardBody className="p-6 text-center">
-              <p className="text-xs text-muted-foreground mb-2">{t('changeConfidenceHub.confidenceScore')}</p>
+              <p className="text-xs text-muted mb-2">{t('changeConfidenceHub.confidenceScore')}</p>
               <p className={`text-5xl font-bold ${levelColor}`}>{score}</p>
               <Badge
                 variant={level === 'high' ? 'success' : level === 'medium' ? 'warning' : 'destructive'}
@@ -103,7 +103,7 @@ export function ChangeConfidenceHubPage() {
               {subScores.map((sub) => (
                 <Card key={sub.name}>
                   <CardBody className="p-3">
-                    <p className="text-xs text-muted-foreground mb-1">{sub.name}</p>
+                    <p className="text-xs text-muted mb-1">{sub.name}</p>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-muted rounded-full h-1.5">
                         <div
@@ -113,7 +113,7 @@ export function ChangeConfidenceHubPage() {
                       </div>
                       <span className="text-xs font-bold">{sub.score}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{sub.label}</p>
+                    <p className="text-xs text-muted mt-1">{sub.label}</p>
                   </CardBody>
                 </Card>
               ))}
@@ -122,7 +122,7 @@ export function ChangeConfidenceHubPage() {
         )}
 
         {/* Promotion Decision */}
-        <div className="mt-6 p-4 rounded-lg border border-border">
+        <div className="mt-6 p-4 rounded-lg border border-edge">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
             <BarChart3 size={14} />
             {t('changeConfidenceHub.promotionDecision')}
@@ -143,7 +143,7 @@ export function ChangeConfidenceHubPage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

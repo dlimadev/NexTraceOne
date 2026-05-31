@@ -109,7 +109,7 @@ export function CardTitle({ children, className, ...rest }: CardTitleProps) {
 
 export function CardDescription({ children, className, ...rest }: CardDescriptionProps) {
   return (
-    <p className={cn('text-sm text-muted-foreground', className)} {...rest}>
+    <p className={cn('text-sm text-muted', className)} {...rest}>
       {children}
     </p>
   );

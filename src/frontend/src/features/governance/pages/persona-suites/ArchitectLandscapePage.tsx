@@ -37,14 +37,14 @@ export function ArchitectLandscapePage() {
                     {s.icon}
                     <h3 className="text-sm font-semibold">{t(s.label, { defaultValue: s.label })}</h3>
                   </div>
-                  <p className="text-xs text-muted-foreground">{t(s.description, { defaultValue: '' })}</p>
+                  <p className="text-xs text-muted">{t(s.description, { defaultValue: '' })}</p>
                 </CardBody>
               </Card>
             </Link>
           ))}
         </div>
 
-        <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('personaSuite.simulatedBanner')}
         </div>
       </PageSection>

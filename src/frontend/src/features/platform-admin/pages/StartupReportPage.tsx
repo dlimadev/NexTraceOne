@@ -77,7 +77,7 @@ function ReportCard({ report, index }: { report: StartupReportEntry; index: numb
                 className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${
                   value
                     ? 'bg-success/10 border-success/30 text-success'
-                    : 'bg-muted/20 border-border text-muted'
+                    : 'bg-muted/20 border-edge text-muted'
                 }`}
               >
                 <CheckCircle2 size={10} />
@@ -108,7 +108,7 @@ function ReportCard({ report, index }: { report: StartupReportEntry; index: numb
             <p className="text-xs text-muted mb-2">{t('startupReport.corsOrigins')}</p>
             <div className="flex flex-wrap gap-1">
               {report.configuration.corsOrigins.map((o) => (
-                <code key={o} className="text-xs bg-surface px-1.5 py-0.5 rounded border border-border">
+                <code key={o} className="text-xs bg-surface px-1.5 py-0.5 rounded border border-edge">
                   {o}
                 </code>
               ))}
@@ -152,7 +152,7 @@ export function StartupReportPage() {
           <>
             {/* Summary banner */}
             {query.data.reports.length > 0 && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border mb-4 text-sm">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-edge mb-4 text-sm">
                 <Package size={16} className="text-muted" />
                 <span className="text-muted">{t('startupReport.showing', { count: query.data.reports.length })}</span>
               </div>

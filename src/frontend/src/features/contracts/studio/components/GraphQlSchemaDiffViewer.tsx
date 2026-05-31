@@ -25,7 +25,7 @@ const lineClass = (kind: DiffChangeKind) => {
   switch (kind) {
     case 'breaking': return 'bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-200';
     case 'non-breaking': return 'bg-green-50 text-green-800 dark:bg-green-950/30 dark:text-green-200';
-    default: return 'text-foreground';
+    default: return 'text-body';
   }
 };
 
@@ -54,8 +54,8 @@ export function GraphQlSchemaDiffViewer({ before, after, breakingCount, nonBreak
       <div className="grid grid-cols-2 gap-2 flex-1 min-h-0">
         {[before, after].map((side) => (
           <div key={side.label} className="flex flex-col min-h-0">
-            <p className="text-xs font-semibold text-muted-foreground mb-1 px-2">{side.label}</p>
-            <div className="flex-1 overflow-y-auto rounded border border-border bg-muted/30 font-mono text-xs">
+            <p className="text-xs font-semibold text-muted mb-1 px-2">{side.label}</p>
+            <div className="flex-1 overflow-y-auto rounded border border-edge bg-muted/30 font-mono text-xs">
               {side.lines.map((line, idx) => (
                 <div
                   // eslint-disable-next-line react/no-array-index-key
@@ -66,7 +66,7 @@ export function GraphQlSchemaDiffViewer({ before, after, breakingCount, nonBreak
                 </div>
               ))}
               {side.lines.length === 0 && (
-                <p className="text-xs text-muted-foreground p-3">{t('graphqlDiffViewer.noSnapshots')}</p>
+                <p className="text-xs text-muted p-3">{t('graphqlDiffViewer.noSnapshots')}</p>
               )}
             </div>
           </div>

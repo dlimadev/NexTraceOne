@@ -86,13 +86,13 @@ export function OnCallSchedulePage() {
           icon={<CalendarDays className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -124,7 +124,7 @@ export function OnCallSchedulePage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -139,12 +139,12 @@ export function OnCallSchedulePage() {
               </CardHeader>
               <CardBody className="p-0">
                 {schedules.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('onCallSchedule.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('onCallSchedule.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('onCallSchedule.table.schedule')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('onCallSchedule.table.team')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('onCallSchedule.table.service')}</th>
@@ -156,9 +156,9 @@ export function OnCallSchedulePage() {
                       </thead>
                       <tbody>
                         {schedules.map((s) => (
-                          <tr key={s.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={s.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium">{s.name}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{s.teamName}</td>
+                            <td className="px-4 py-2.5 text-muted">{s.teamName}</td>
                             <td className="px-4 py-2.5"><Badge variant="secondary">{s.serviceName}</Badge></td>
                             <td className="px-4 py-2.5">
                               <div className="flex items-center gap-1.5">
@@ -166,11 +166,11 @@ export function OnCallSchedulePage() {
                                 <span className="font-medium">{s.currentOnCall}</span>
                               </div>
                             </td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{s.nextOnCall}</td>
+                            <td className="px-4 py-2.5 text-muted">{s.nextOnCall}</td>
                             <td className="px-4 py-2.5">
                               <Badge variant="info">{t(`onCallSchedule.rotationTypes.${s.rotationType}`)}</Badge>
                             </td>
-                            <td className="px-4 py-2.5 text-xs text-muted-foreground">{s.timezone}</td>
+                            <td className="px-4 py-2.5 text-xs text-muted">{s.timezone}</td>
                           </tr>
                         ))}
                       </tbody>

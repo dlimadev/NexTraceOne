@@ -45,7 +45,7 @@ const STATUS_CONFIG = {
   Compliant: { badge: 'success' as const, icon: <CheckCircle2 size={12} />, color: 'text-success' },
   Partial: { badge: 'warning' as const, icon: <AlertTriangle size={12} />, color: 'text-warning' },
   NonCompliant: { badge: 'destructive' as const, icon: <XCircle size={12} />, color: 'text-destructive' },
-  NotAssessed: { badge: 'secondary' as const, icon: <FileText size={12} />, color: 'text-muted-foreground' },
+  NotAssessed: { badge: 'secondary' as const, icon: <FileText size={12} />, color: 'text-muted' },
 };
 
 export function ComplianceScorecardCenterPage() {
@@ -100,11 +100,11 @@ export function ComplianceScorecardCenterPage() {
                 { label: t('complianceScorecard.compliant'), value: data?.compliantCount ?? 0, color: 'text-success' },
                 { label: t('complianceScorecard.partial'), value: data?.partialCount ?? 0, color: 'text-warning' },
                 { label: t('complianceScorecard.nonCompliant'), value: data?.nonCompliantCount ?? 0, color: 'text-destructive' },
-                { label: t('complianceScorecard.notAssessed'), value: data?.notAssessedCount ?? 0, color: 'text-muted-foreground' },
+                { label: t('complianceScorecard.notAssessed'), value: data?.notAssessedCount ?? 0, color: 'text-muted' },
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-4 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
+                    <p className="text-xs text-muted mb-1">{stat.label}</p>
                     <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                   </CardBody>
                 </Card>
@@ -130,8 +130,8 @@ export function ComplianceScorecardCenterPage() {
                                 <span className={cfg.color}>{cfg.icon}</span>
                                 <span className="text-sm font-medium">{ctrl.control}</span>
                               </div>
-                              <p className="text-xs text-muted-foreground">{ctrl.description}</p>
-                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                              <p className="text-xs text-muted">{ctrl.description}</p>
+                              <div className="flex items-center gap-3 mt-1 text-xs text-muted">
                                 <span>{t('complianceScorecard.owner')}: {ctrl.owner}</span>
                                 <span>{new Date(ctrl.lastAssessed).toLocaleDateString()}</span>
                               </div>
@@ -147,12 +147,12 @@ export function ComplianceScorecardCenterPage() {
             ))}
 
             {controls.length === 0 && (
-              <div className="text-center p-8 text-muted-foreground text-sm">
+              <div className="text-center p-8 text-muted text-sm">
                 {t('complianceScorecard.empty')}
               </div>
             )}
 
-            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('sotCenter.simulatedBanner')}
             </div>
           </>

@@ -37,13 +37,13 @@ export function ComplianceCoverageWidget({ data }: Props) {
       <CardBody>
         <div className="flex items-baseline gap-1 mb-3">
           <span className="text-2xl font-bold">{data.overallCoveragePct.toFixed(0)}%</span>
-          <span className="text-xs text-muted-foreground">overall</span>
+          <span className="text-xs text-muted">overall</span>
         </div>
         <div className="space-y-2">
           {data.standards.map((std) => (
             <div key={std.name}>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-muted-foreground font-medium">{std.name}</span>
+                <span className="text-muted font-medium">{std.name}</span>
                 <span className="font-medium">{std.coveragePct.toFixed(0)}%</span>
               </div>
               <div className="w-full h-1.5 bg-muted rounded-full">

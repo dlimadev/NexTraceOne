@@ -40,7 +40,7 @@ function clusterStatusVariant(status: EsClusterHealth['status']): 'success' | 'w
 const phaseColors: Record<string, string> = {
   hot: 'bg-warning/20 text-warning border-warning/30',
   warm: 'bg-accent/20 text-accent border-accent/30',
-  cold: 'bg-surface text-muted border-border',
+  cold: 'bg-surface text-muted border-edge',
   delete: 'bg-critical/10 text-critical border-critical/30',
 };
 
@@ -168,7 +168,7 @@ function PolicyRow({ policy }: { policy: EsIlmPolicy }) {
           }))
         }
         placeholder={t('elasticsearchManager.noPhase')}
-        className="w-full text-sm px-2.5 py-1.5 rounded border border-border bg-input focus:outline-none focus:ring-1 focus:ring-accent"
+        className="w-full text-sm px-2.5 py-1.5 rounded border border-edge bg-input focus:outline-none focus:ring-1 focus:ring-accent"
       />
     </div>
   );
@@ -196,7 +196,7 @@ function PolicyRow({ policy }: { policy: EsIlmPolicy }) {
         </div>
 
         {editing && (
-          <div className="mt-3 p-3 rounded-lg border border-border bg-surface space-y-3">
+          <div className="mt-3 p-3 rounded-lg border border-edge bg-surface space-y-3">
             <div className="grid grid-cols-3 gap-3">
               {numField(t('elasticsearchManager.hotDays'), 'hotMaxAgeDays')}
               {numField(t('elasticsearchManager.warmDays'), 'warmAfterDays')}
@@ -273,7 +273,7 @@ export function ElasticsearchManagerPage() {
         {query.isSuccess && (
           <>
             {/* Tabs */}
-            <div className="flex gap-1 border-b border-border mb-4">
+            <div className="flex gap-1 border-b border-edge mb-4">
               {tabs.map(({ id, label }) => (
                 <button
                   key={id}

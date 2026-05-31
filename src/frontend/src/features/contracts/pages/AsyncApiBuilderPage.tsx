@@ -54,16 +54,16 @@ export function AsyncApiBuilderPage() {
           <div className="lg:col-span-1 space-y-3">
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                   {t('asyncApiBuilder.apiInfo')}
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.apiTitle')}</label>
+                    <label className="text-xs text-muted">{t('asyncApiBuilder.apiTitle')}</label>
                     <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.version')}</label>
+                    <label className="text-xs text-muted">{t('asyncApiBuilder.version')}</label>
                     <input value={version} onChange={(e) => setVersion(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono" />
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export function AsyncApiBuilderPage() {
                     </Badge>
                     <span className="text-xs font-mono truncate">{ch.address}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{ch.protocol}</p>
+                  <p className="text-xs text-muted mt-0.5 truncate">{ch.protocol}</p>
                 </button>
               ))}
             </div>
@@ -121,30 +121,30 @@ export function AsyncApiBuilderPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.address')}</label>
+                      <label className="text-xs text-muted">{t('asyncApiBuilder.address')}</label>
                       <input value={active.address} onChange={(e) => update(active.id, { address: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono" />
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.protocol')}</label>
+                      <label className="text-xs text-muted">{t('asyncApiBuilder.protocol')}</label>
                       <select value={active.protocol} onChange={(e) => update(active.id, { protocol: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         {PROTOCOLS.map((p) => <option key={p} value={p}>{p}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.operation')}</label>
+                      <label className="text-xs text-muted">{t('asyncApiBuilder.operation')}</label>
                       <select value={active.operation} onChange={(e) => update(active.id, { operation: e.target.value as ChannelOperation })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         <option value="publish">publish</option>
                         <option value="subscribe">subscribe</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.description')}</label>
+                      <label className="text-xs text-muted">{t('asyncApiBuilder.description')}</label>
                       <input value={active.description} onChange={(e) => update(active.id, { description: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                     </div>
                   </div>
 
                   <div className="mt-3">
-                    <label className="text-xs text-muted-foreground">{t('asyncApiBuilder.messageSchema')}</label>
+                    <label className="text-xs text-muted">{t('asyncApiBuilder.messageSchema')}</label>
                     <textarea
                       value={active.messageSchema}
                       onChange={(e) => update(active.id, { messageSchema: e.target.value })}
@@ -155,14 +155,14 @@ export function AsyncApiBuilderPage() {
                 </CardBody>
               </Card>
             ) : (
-              <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+              <div className="flex items-center justify-center h-48 text-muted text-sm">
                 {t('asyncApiBuilder.selectChannel')}
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg border border-success/30 bg-success/5 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg border border-success/30 bg-success/5 text-xs text-muted">
           {t('asyncApiBuilder.asyncApiBanner')}
         </div>
       </PageSection>

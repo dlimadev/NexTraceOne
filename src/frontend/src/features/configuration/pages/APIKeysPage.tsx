@@ -148,7 +148,7 @@ export function APIKeysPage() {
             <button
               type="button"
               onClick={() => setNewKey(null)}
-              className="mt-3 text-xs text-muted-foreground hover:underline"
+              className="mt-3 text-xs text-muted hover:underline"
             >
               {t('common.dismiss', 'Dismiss')}
             </button>
@@ -244,7 +244,7 @@ export function APIKeysPage() {
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                    <td className="px-4 py-3 text-muted text-xs">
                       {item.expiresAt ? new Date(item.expiresAt).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-4 py-3">
@@ -252,7 +252,7 @@ export function APIKeysPage() {
                         type="button"
                         title={t('apiKeys.revoke')}
                         onClick={() => revokeApiKey.mutate(item.apiKeyId)}
-                        className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-critical transition-colors"
+                        className="p-1 rounded hover:bg-muted text-muted hover:text-critical transition-colors"
                       >
                         <Trash2 size={16} />
                       </button>

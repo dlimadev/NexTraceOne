@@ -72,20 +72,20 @@ export function GraphQLBuilderPage() {
           <div className="lg:col-span-1 space-y-3">
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                   {t('graphqlBuilder.schemaSummary')}
                 </h3>
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('graphqlBuilder.types')}</span>
+                    <span className="text-muted">{t('graphqlBuilder.types')}</span>
                     <span className="font-bold">{typeCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('graphqlBuilder.inputs')}</span>
+                    <span className="text-muted">{t('graphqlBuilder.inputs')}</span>
                     <span className="font-bold">{inputCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('graphqlBuilder.fields')}</span>
+                    <span className="text-muted">{t('graphqlBuilder.fields')}</span>
                     <span className="font-bold">{queryFields}</span>
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export function GraphQLBuilderPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted hover:bg-muted/80'
                   }`}
                 >
                   <Hash size={10} />
@@ -149,7 +149,7 @@ export function GraphQLBuilderPage() {
             {activeTab === 'diff' && (
               <Card>
                 <CardBody className="p-4">
-                  <p className="text-xs text-muted-foreground text-center py-8">{t('graphqlBuilder.noDiff')}</p>
+                  <p className="text-xs text-muted text-center py-8">{t('graphqlBuilder.noDiff')}</p>
                 </CardBody>
               </Card>
             )}
@@ -171,7 +171,7 @@ export function GraphQLBuilderPage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg border border-info/30 bg-info/5 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg border border-info/30 bg-info/5 text-xs text-muted">
           {t('graphqlBuilder.sdlBanner')}
         </div>
       </PageSection>

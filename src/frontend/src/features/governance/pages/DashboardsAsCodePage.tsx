@@ -101,14 +101,14 @@ export function DashboardsAsCodePage() {
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div>
                           <p className="text-sm font-semibold">{repo.name}</p>
-                          <p className="text-xs font-mono text-muted-foreground">{repo.branch}</p>
+                          <p className="text-xs font-mono text-muted">{repo.branch}</p>
                         </div>
                         <Badge variant={cfg.badge} className="flex items-center gap-1 text-xs">
                           {cfg.icon}
                           {repo.syncStatus}
                         </Badge>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center justify-between text-xs text-muted">
                         <span>{repo.dashboardCount} {t('dacGitOps.dashboards')}</span>
                         {repo.pendingChanges > 0 && (
                           <Badge variant="warning" className="text-xs">{repo.pendingChanges} pending</Badge>
@@ -136,7 +136,7 @@ export function DashboardsAsCodePage() {
           {/* Change log */}
           <div className="lg:col-span-2">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <GitCommit size={14} className="text-muted-foreground" />
+              <GitCommit size={14} className="text-muted" />
               {t('dacGitOps.recentChanges')}
             </h3>
             <div className="space-y-2">
@@ -151,7 +151,7 @@ export function DashboardsAsCodePage() {
                           </Badge>
                           <span className="text-sm font-medium truncate">{change.dashboardName}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-3 text-xs text-muted">
                           <Code size={10} />
                           <span className="font-mono">{change.commitSha.slice(0, 7)}</span>
                           <span>{change.author}</span>
@@ -169,7 +169,7 @@ export function DashboardsAsCodePage() {
                 </Card>
               ))}
               {changes.length === 0 && (
-                <div className="text-center p-8 text-muted-foreground text-sm">
+                <div className="text-center p-8 text-muted text-sm">
                   {t('dacGitOps.noChanges')}
                 </div>
               )}
@@ -177,7 +177,7 @@ export function DashboardsAsCodePage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

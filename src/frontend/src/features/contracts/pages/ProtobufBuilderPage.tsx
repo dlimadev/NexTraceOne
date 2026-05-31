@@ -94,20 +94,20 @@ export function ProtobufBuilderPage() {
           <div className="lg:col-span-1 space-y-3">
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                   {t('protobufBuilder.protoSummary')}
                 </h3>
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('protobufBuilder.services')}</span>
+                    <span className="text-muted">{t('protobufBuilder.services')}</span>
                     <span className="font-bold">{serviceCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('protobufBuilder.rpcs')}</span>
+                    <span className="text-muted">{t('protobufBuilder.rpcs')}</span>
                     <span className="font-bold">{rpcCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('protobufBuilder.messages')}</span>
+                    <span className="text-muted">{t('protobufBuilder.messages')}</span>
                     <span className="font-bold">{messageCount}</span>
                   </div>
                 </div>
@@ -133,7 +133,7 @@ export function ProtobufBuilderPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted hover:bg-muted/80'
                   }`}
                 >
                   <FileCode2 size={10} />
@@ -179,7 +179,7 @@ export function ProtobufBuilderPage() {
                   <div className="grid grid-cols-2 gap-2">
                     {messages.map((msg) => (
                       <div key={msg} className="flex items-center gap-2 p-2 rounded border">
-                        <AlertTriangle size={12} className="text-muted-foreground" />
+                        <AlertTriangle size={12} className="text-muted" />
                         <span className="text-xs font-mono">{msg}</span>
                       </div>
                     ))}
@@ -190,7 +190,7 @@ export function ProtobufBuilderPage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg border border-primary/30 bg-primary/5 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg border border-primary/30 bg-primary/5 text-xs text-muted">
           {t('protobufBuilder.protoBanner')}
         </div>
       </PageSection>

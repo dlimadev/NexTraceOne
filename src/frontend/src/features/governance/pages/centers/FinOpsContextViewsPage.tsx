@@ -69,7 +69,7 @@ export function FinOpsContextViewsPage() {
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 context === tab.key
                   ? 'bg-accent text-accent-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  : 'bg-muted text-muted hover:bg-muted/80'
               }`}
             >
               {tab.label}
@@ -83,7 +83,7 @@ export function FinOpsContextViewsPage() {
             <CardBody className="p-4 flex items-center gap-3">
               <DollarSign size={16} className="text-accent" />
               <div>
-                <p className="text-xs text-muted-foreground">{t('finOpsContext.totalCost')}</p>
+                <p className="text-xs text-muted">{t('finOpsContext.totalCost')}</p>
                 <p className="text-xl font-bold">{formatCost(data.totalCost)}</p>
               </div>
             </CardBody>
@@ -108,7 +108,7 @@ export function FinOpsContextViewsPage() {
                   <CardBody className="p-4">
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
-                        <BarChart3 size={14} className="text-muted-foreground" />
+                        <BarChart3 size={14} className="text-muted" />
                         <span className="text-sm font-medium">{node.name}</span>
                         {node.anomaly && (
                           <Badge variant="warning" className="text-xs">
@@ -125,7 +125,7 @@ export function FinOpsContextViewsPage() {
                           ) : node.trend === 'down' ? (
                             <TrendingDown size={10} className="text-success" />
                           ) : null}
-                          <span className={node.trend === 'up' ? 'text-destructive' : node.trend === 'down' ? 'text-success' : 'text-muted-foreground'}>
+                          <span className={node.trend === 'up' ? 'text-destructive' : node.trend === 'down' ? 'text-success' : 'text-muted'}>
                             {delta >= 0 ? '+' : ''}{deltaPct}%
                           </span>
                         </div>
@@ -143,14 +143,14 @@ export function FinOpsContextViewsPage() {
               );
             })}
             {nodes.length === 0 && (
-              <div className="text-center p-8 text-muted-foreground text-sm">
+              <div className="text-center p-8 text-muted text-sm">
                 {t('finOpsContext.empty')}
               </div>
             )}
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

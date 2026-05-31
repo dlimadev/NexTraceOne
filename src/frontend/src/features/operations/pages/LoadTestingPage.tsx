@@ -107,13 +107,13 @@ export function LoadTestingPage() {
           icon={<Gauge className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -141,7 +141,7 @@ export function LoadTestingPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -156,12 +156,12 @@ export function LoadTestingPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {runs.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('loadTesting.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('loadTesting.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('loadTesting.table.name')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('loadTesting.table.service')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('loadTesting.table.source')}</th>
@@ -175,9 +175,9 @@ export function LoadTestingPage() {
                       </thead>
                       <tbody>
                         {runs.map((r) => (
-                          <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={r.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium">{r.name}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{r.serviceName}</td>
+                            <td className="px-4 py-2.5 text-muted">{r.serviceName}</td>
                             <td className="px-4 py-2.5"><Badge variant="secondary">{t(`loadTesting.sources.${r.source}`)}</Badge></td>
                             <td className="px-4 py-2.5"><Badge variant={statusVariant(r.status)}>{t(`loadTesting.status.${r.status}`)}</Badge></td>
                             <td className="px-4 py-2.5 tabular-nums">{r.vus.toLocaleString()}</td>
@@ -188,7 +188,7 @@ export function LoadTestingPage() {
                             <td className="px-4 py-2.5 tabular-nums">
                               <span className={r.errorRate > 1 ? 'text-red-500 font-semibold' : ''}>{r.errorRate.toFixed(2)}%</span>
                             </td>
-                            <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                            <td className="px-4 py-2.5 text-xs text-muted">
                               {r.maxCapacityVus ? `${r.maxCapacityVus} VUs / ${r.maxRps} RPS` : '—'}
                             </td>
                           </tr>

@@ -63,7 +63,7 @@ export function AiAgentMarketplacePage() {
           <div className="grid grid-cols-3 gap-3 mb-6">
             <Card>
               <CardBody className="p-3">
-                <p className="text-xs text-muted-foreground mb-1">{t('aiAgentMarketplace.totalAgents')}</p>
+                <p className="text-xs text-muted mb-1">{t('aiAgentMarketplace.totalAgents')}</p>
                 <p className="text-2xl font-bold">{data.agents.length}</p>
               </CardBody>
             </Card>
@@ -91,7 +91,7 @@ export function AiAgentMarketplacePage() {
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-4">
           <div className="relative flex-1 min-w-48">
-            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="text"
               placeholder={t('aiAgentMarketplace.search')}
@@ -106,7 +106,7 @@ export function AiAgentMarketplacePage() {
                 key={cat}
                 onClick={() => setCategory(cat)}
                 className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  category === cat ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  category === cat ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted hover:bg-muted/80'
                 }`}
               >
                 {cat}
@@ -131,7 +131,7 @@ export function AiAgentMarketplacePage() {
                         </div>
                         <div>
                           <p className="text-sm font-semibold">{agent.name}</p>
-                          <p className="text-xs text-muted-foreground">{agent.provider} · {agent.model}</p>
+                          <p className="text-xs text-muted">{agent.provider} · {agent.model}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -150,9 +150,9 @@ export function AiAgentMarketplacePage() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground mb-3">{agent.description}</p>
+                    <p className="text-xs text-muted mb-3">{agent.description}</p>
 
-                    <div className="flex items-center gap-1 mb-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mb-2 text-xs text-muted">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star key={i} size={10} className={i < agent.rating ? 'text-warning fill-warning' : ''} />
                       ))}
@@ -160,7 +160,7 @@ export function AiAgentMarketplacePage() {
                     </div>
 
                     <div className="mb-3">
-                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                      <div className="flex justify-between text-xs text-muted mb-1">
                         <span>{t('aiAgentMarketplace.budget')}</span>
                         <span>{agent.budgetUsed.toLocaleString()} / {agent.budgetLimit.toLocaleString()} tokens</span>
                       </div>
@@ -193,14 +193,14 @@ export function AiAgentMarketplacePage() {
               );
             })}
             {agents.length === 0 && (
-              <div className="col-span-2 text-center p-8 text-muted-foreground text-sm">
+              <div className="col-span-2 text-center p-8 text-muted text-sm">
                 {t('aiAgentMarketplace.empty')}
               </div>
             )}
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

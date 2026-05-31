@@ -84,13 +84,13 @@ export function AiIncidentSummarizerPage() {
           icon={<FileSearch className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -117,7 +117,7 @@ export function AiIncidentSummarizerPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -129,7 +129,7 @@ export function AiIncidentSummarizerPage() {
             <div className="flex flex-col gap-4">
               {summaries.length === 0 ? (
                 <Card>
-                  <CardBody className="p-8 text-center text-muted-foreground text-sm">{t('aiIncidentSummarizer.noRecords')}</CardBody>
+                  <CardBody className="p-8 text-center text-muted text-sm">{t('aiIncidentSummarizer.noRecords')}</CardBody>
                 </Card>
               ) : (
                 summaries.map((s) => (
@@ -144,7 +144,7 @@ export function AiIncidentSummarizerPage() {
                               {s.severity}
                             </Badge>
                           </div>
-                          <div className="text-xs text-muted-foreground">{s.serviceName} · {s.modelName} · {t('aiIncidentSummarizer.table.confidence')}: {s.confidencePercent}%</div>
+                          <div className="text-xs text-muted">{s.serviceName} · {s.modelName} · {t('aiIncidentSummarizer.table.confidence')}: {s.confidencePercent}%</div>
                         </div>
                         <div className="flex gap-2 flex-shrink-0">
                           <Button variant="outline" size="sm">
@@ -157,8 +157,8 @@ export function AiIncidentSummarizerPage() {
                       </div>
                     </CardHeader>
                     <CardBody className="pt-0">
-                      <p className="text-sm text-muted-foreground leading-relaxed">{s.summaryText}</p>
-                      <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground/70">
+                      <p className="text-sm text-muted leading-relaxed">{s.summaryText}</p>
+                      <div className="mt-3 flex items-center gap-4 text-xs text-muted/70">
                         <span>{t('aiIncidentSummarizer.audit.requestedBy')}: {s.requestedBy}</span>
                         <span>{t('aiIncidentSummarizer.audit.tokens')}: {s.tokensUsed.toLocaleString()}</span>
                         <span>{new Date(s.generatedAt).toLocaleString()}</span>

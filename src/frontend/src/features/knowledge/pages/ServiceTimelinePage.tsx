@@ -47,7 +47,7 @@ function TimelineEntryCard({ entry }: { entry: ServiceTimelineEntryDto }) {
   const severity = entry.severity as NoteSeverity;
 
   return (
-    <Card className={`border-l-4 ${SEVERITY_BORDER[severity] ?? 'border-border'}`}>
+    <Card className={`border-l-4 ${SEVERITY_BORDER[severity] ?? 'border-edge'}`}>
       <CardBody>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
@@ -150,7 +150,7 @@ export function ServiceTimelinePage() {
                 className={`px-2 py-0.5 rounded text-xs border transition-colors ${
                   severityFilter === s
                     ? 'bg-accent border-accent text-white'
-                    : 'border-border text-secondary hover:border-accent'
+                    : 'border-edge text-secondary hover:border-accent'
                 }`}
               >
                 {s === '' ? t('common.all') : s}
@@ -168,7 +168,7 @@ export function ServiceTimelinePage() {
                 );
                 setPage(1);
               }}
-              className="text-xs border border-border rounded px-2 py-1 bg-surface"
+              className="text-xs border border-edge rounded px-2 py-1 bg-surface"
             >
               <option value="">{t('common.all')}</option>
               <option value="open">{t('knowledge.serviceTimeline.open')}</option>

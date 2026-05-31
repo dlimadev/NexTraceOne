@@ -87,13 +87,13 @@ export function AiRunbookSuggesterPage() {
           icon={<Lightbulb className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -121,7 +121,7 @@ export function AiRunbookSuggesterPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -133,7 +133,7 @@ export function AiRunbookSuggesterPage() {
             <div className="flex flex-col gap-4">
               {suggestions.length === 0 ? (
                 <Card>
-                  <CardBody className="p-8 text-center text-muted-foreground text-sm">{t('aiRunbookSuggester.noRecords')}</CardBody>
+                  <CardBody className="p-8 text-center text-muted text-sm">{t('aiRunbookSuggester.noRecords')}</CardBody>
                 </Card>
               ) : (
                 suggestions.map((s) => (
@@ -150,7 +150,7 @@ export function AiRunbookSuggesterPage() {
                               {t(`aiRunbookSuggester.actions.${s.status === 'pending' ? 'accept' : s.status}`)}
                             </Badge>
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-muted">
                             {t('aiRunbookSuggester.table.incident')}: <span className="font-mono">{s.incidentId}</span> · {s.serviceName} · {s.environment} · {s.version}
                           </div>
                         </div>
@@ -169,8 +169,8 @@ export function AiRunbookSuggesterPage() {
                       </div>
                     </CardHeader>
                     <CardBody className="pt-0">
-                      <p className="text-sm text-muted-foreground">{s.reasoning}</p>
-                      <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground/70">
+                      <p className="text-sm text-muted">{s.reasoning}</p>
+                      <div className="mt-2 flex items-center gap-4 text-xs text-muted/70">
                         <span>{t('aiRunbookSuggester.audit.tokensUsed')}: {s.tokensUsed}</span>
                         <span>{t('aiRunbookSuggester.audit.knowledgeSources')}: {s.knowledgeSources.join(', ')}</span>
                         <span>{new Date(s.suggestedAt).toLocaleString()}</span>

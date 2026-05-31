@@ -99,12 +99,12 @@ export function EvidencePackViewerPage() {
                         <h2 className="text-sm font-semibold">{data.name}</h2>
                         <Badge variant={STATUS_BADGE[data.status]}>{data.status}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted">
                         {data.serviceName} {data.version}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right text-xs text-muted-foreground">
+                  <div className="text-right text-xs text-muted">
                     {data.sealedAt ? (
                       <div className="flex items-center gap-1">
                         <Lock size={10} />
@@ -133,7 +133,7 @@ export function EvidencePackViewerPage() {
 
             {/* Artifacts */}
             <div className="flex items-center gap-2 mb-3">
-              <FileCheck size={14} className="text-muted-foreground" />
+              <FileCheck size={14} className="text-muted" />
               <h3 className="text-sm font-semibold">
                 {t('evidencePack.artifacts')} ({artifacts.length})
               </h3>
@@ -153,12 +153,12 @@ export function EvidencePackViewerPage() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <ShieldCheck size={12} className={SLSA_COLORS[art.slsaLevel] ?? 'text-muted-foreground'} />
+                          <ShieldCheck size={12} className={SLSA_COLORS[art.slsaLevel] ?? 'text-muted'} />
                           <span className="text-sm font-medium truncate">{art.name}</span>
                           <Badge variant="secondary" className="text-xs">{art.type}</Badge>
                         </div>
-                        <p className="text-xs font-mono text-muted-foreground truncate">{art.hash}</p>
-                        <div className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-xs font-mono text-muted truncate">{art.hash}</p>
+                        <div className="text-xs text-muted mt-0.5">
                           {art.signer} · {new Date(art.signedAt).toLocaleString()}
                         </div>
                       </div>
@@ -173,13 +173,13 @@ export function EvidencePackViewerPage() {
                 </Card>
               ))}
               {artifacts.length === 0 && (
-                <div className="text-center p-8 text-muted-foreground text-sm">
+                <div className="text-center p-8 text-muted text-sm">
                   {t('evidencePack.noArtifacts')}
                 </div>
               )}
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('sotCenter.simulatedBanner')}
             </div>
           </>

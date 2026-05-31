@@ -105,7 +105,7 @@ export function ExecutiveBriefCenterPage() {
                 <a key={s.href} href={s.href}>
                   <Card className="hover:border-accent/60 transition-colors">
                     <CardBody className="p-3 flex items-center gap-3">
-                      <span className="text-muted-foreground">{s.icon}</span>
+                      <span className="text-muted">{s.icon}</span>
                       <span className="text-sm font-medium">{s.title}</span>
                     </CardBody>
                   </Card>
@@ -113,7 +113,7 @@ export function ExecutiveBriefCenterPage() {
               ))}
             </div>
 
-            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('personaSuite.simulatedBanner')}
             </div>
           </>

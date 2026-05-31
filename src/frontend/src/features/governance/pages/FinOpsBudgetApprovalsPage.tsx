@@ -72,7 +72,7 @@ export function FinOpsBudgetApprovalsPage() {
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
-            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${statusFilter === s ? 'bg-accent text-white border-accent' : 'border-border hover:border-accent/50'}`}
+            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${statusFilter === s ? 'bg-accent text-white border-accent' : 'border-edge hover:border-accent/50'}`}
           >
             {s === 'all' ? t('common.all') : t(`finops.approvals.status.${s.toLowerCase()}`)}
           </button>
@@ -142,7 +142,7 @@ export function FinOpsBudgetApprovalsPage() {
                 )}
 
                 {item.status === 'Pending' && (
-                  <div className="border-t border-border pt-4">
+                  <div className="border-t border-edge pt-4">
                     <p className="text-xs text-muted mb-2">{t('finops.approvals.comment')}</p>
                     <textarea
                       className="input w-full text-sm min-h-[60px] mb-3"
@@ -173,7 +173,7 @@ export function FinOpsBudgetApprovalsPage() {
                 )}
 
                 {item.status !== 'Pending' && item.resolvedBy && (
-                  <div className="border-t border-border pt-4 flex items-start gap-3">
+                  <div className="border-t border-edge pt-4 flex items-start gap-3">
                     {item.status === 'Approved'
                       ? <CheckCircle2 size={14} className="text-success mt-0.5" />
                       : <XCircle size={14} className="text-critical mt-0.5" />}

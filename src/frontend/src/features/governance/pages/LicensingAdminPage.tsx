@@ -81,8 +81,8 @@ export function LicensingAdminPage() {
                         {data.mode}
                       </Badge>
                     </div>
-                    <p className="text-xs font-mono text-muted-foreground">{data.licenseKey}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs font-mono text-muted">{data.licenseKey}</p>
+                    <p className="text-xs text-muted mt-1">
                       {t('licensing.lastValidated')}: {new Date(data.lastValidated).toLocaleString()}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ export function LicensingAdminPage() {
                             <h4 className="text-sm font-semibold">{ent.module}</h4>
                             <Badge variant="secondary" className="text-xs">{ent.tier}</Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-xs text-muted mt-0.5">
                             {t('licensing.expires')}: {new Date(ent.expiresAt).toLocaleDateString()}
                           </p>
                         </div>
@@ -123,7 +123,7 @@ export function LicensingAdminPage() {
 
                       {/* Seats */}
                       <div className="mb-3">
-                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <div className="flex justify-between text-xs text-muted mb-1">
                           <span>{t('licensing.seats')}</span>
                           <span>{ent.usedSeats} / {ent.seats === -1 ? '∞' : ent.seats}</span>
                         </div>
@@ -149,7 +149,7 @@ export function LicensingAdminPage() {
               })}
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('sotCenter.simulatedBanner')}
             </div>
           </>

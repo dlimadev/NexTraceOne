@@ -68,7 +68,7 @@ function formatSizeGb(gb: number | null): string {
 function BackupRow({ backup }: { backup: BackupRecord }) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-border last:border-0">
+    <div className="flex items-center gap-3 py-3 border-b border-edge last:border-0">
       {statusIcon(backup.status)}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -122,7 +122,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
   });
 
   return (
-    <div className="bg-card border border-border rounded-md p-5 space-y-4">
+    <div className="bg-card border border-edge rounded-md p-5 space-y-4">
       <h2 className="text-base font-semibold text-heading">{t('backup.scheduleTitle')}</h2>
 
       <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
           <label className="block text-xs text-muted mb-1">{t('backup.cronLabel')}</label>
           <input
             type="text"
-            className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="0 3 * * *"
             {...field('cronExpression')}
           />
@@ -155,7 +155,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
             type="number"
             min={1}
             max={365}
-            className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-lg text-heading focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:border-accent"
             {...field('retentionDays')}
           />
           <p className="text-xs text-muted mt-1">{t('backup.retentionHint')}</p>
@@ -164,7 +164,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
           <label className="block text-xs text-muted mb-1">{t('backup.destinationLabel')}</label>
           <input
             type="text"
-            className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="/data/backups"
             {...field('destination')}
           />
@@ -314,7 +314,7 @@ export function BackupCoordinatorPage() {
             {/* Backup history */}
             <div>
               <h2 className="text-base font-semibold text-heading mb-3">{t('backup.historyTitle')}</h2>
-              <div className="bg-card border border-border rounded-md">
+              <div className="bg-card border border-edge rounded-md">
                 {data.recentBackups.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-muted text-sm gap-2">
                     <DatabaseBackup size={24} className="text-muted/40" />

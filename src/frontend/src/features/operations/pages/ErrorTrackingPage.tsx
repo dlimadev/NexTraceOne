@@ -95,13 +95,13 @@ export function ErrorTrackingPage() {
           subtitle={t('errorTracking.subtitle')}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -129,7 +129,7 @@ export function ErrorTrackingPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -144,12 +144,12 @@ export function ErrorTrackingPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {groups.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('errorTracking.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('errorTracking.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('errorTracking.table.fingerprint')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('errorTracking.table.message')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('errorTracking.table.service')}</th>
@@ -161,8 +161,8 @@ export function ErrorTrackingPage() {
                       </thead>
                       <tbody>
                         {groups.map((g) => (
-                          <tr key={g.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                            <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{g.fingerprint}</td>
+                          <tr key={g.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
+                            <td className="px-4 py-2.5 font-mono text-xs text-muted">{g.fingerprint}</td>
                             <td className="px-4 py-2.5 max-w-xs truncate font-medium text-xs" title={g.message}>{g.message}</td>
                             <td className="px-4 py-2.5">{g.serviceName}</td>
                             <td className="px-4 py-2.5 tabular-nums font-semibold">{g.count.toLocaleString()}</td>
@@ -172,7 +172,7 @@ export function ErrorTrackingPage() {
                                 {t(`errorTracking.status.${g.status}`)}
                               </Badge>
                             </td>
-                            <td className="px-4 py-2.5 text-xs text-muted-foreground">{new Date(g.lastSeen).toLocaleString()}</td>
+                            <td className="px-4 py-2.5 text-xs text-muted">{new Date(g.lastSeen).toLocaleString()}</td>
                           </tr>
                         ))}
                       </tbody>

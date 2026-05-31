@@ -115,8 +115,8 @@ export function DriftCenterPage() {
                         <span className="text-sm font-medium truncate">{drift.serviceName}</span>
                         <Badge variant="outline" className="text-xs">{drift.environment}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">{drift.description}</p>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <p className="text-xs text-muted">{drift.description}</p>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-muted">
                         <Clock size={10} />
                         <span>{new Date(drift.detectedAt).toLocaleString()}</span>
                         {drift.lastChangeId && (
@@ -147,7 +147,7 @@ export function DriftCenterPage() {
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

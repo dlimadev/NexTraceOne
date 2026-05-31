@@ -74,7 +74,7 @@ export function RollbackCockpitPage() {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <Card>
             <CardBody className="p-3">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <div className="flex items-center gap-2 text-muted mb-1">
                 <RotateCcw size={12} />
                 <span className="text-xs">{t('rollbackCockpit.available')}</span>
               </div>
@@ -124,14 +124,14 @@ export function RollbackCockpitPage() {
                           <Badge variant="outline" className="text-xs">{c.environment}</Badge>
                           <Badge variant={riskCfg.badge} className="text-xs">{c.riskLevel} risk</Badge>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+                        <div className="flex items-center gap-2 text-xs text-muted mb-1">
                           <GitBranch size={10} />
                           <span className="font-mono">{c.currentVersion}</span>
                           <span>→</span>
                           <span className="font-mono">{c.targetVersion}</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">{c.reason}</p>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                        <p className="text-xs text-muted">{c.reason}</p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted">
                           <span>{t('rollbackCockpit.downtime')}: ~{c.estimatedDowntime}s</span>
                           <span>{new Date(c.deployedAt).toLocaleString()}</span>
                         </div>
@@ -168,7 +168,7 @@ export function RollbackCockpitPage() {
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

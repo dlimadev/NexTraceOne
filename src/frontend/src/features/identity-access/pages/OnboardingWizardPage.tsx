@@ -195,7 +195,7 @@ export function OnboardingWizardPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">{t('onboarding.wizard.title')}</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted mt-2">
           {t('onboarding.wizard.subtitle')}
         </p>
       </div>
@@ -207,7 +207,7 @@ export function OnboardingWizardPage() {
             <span className="text-sm font-medium">
               {t('onboarding.progress.label')}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted">
               {Math.round(progressPercentage)}%
             </span>
           </div>
@@ -237,7 +237,7 @@ export function OnboardingWizardPage() {
                         ? 'bg-green-500 text-white'
                         : isCurrent
                         ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
+                        : 'bg-muted text-muted'
                     }`}
                   >
                     {isCompleted ? (

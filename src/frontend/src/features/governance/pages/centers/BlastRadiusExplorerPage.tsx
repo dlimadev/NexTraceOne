@@ -73,8 +73,8 @@ export function BlastRadiusExplorerPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardBody className="p-4">
-              <p className="text-xs text-muted-foreground mb-1">{t('blastRadius.bucket')}</p>
-              <p className={`text-2xl font-bold ${BUCKET_COLOR[data?.bucket as keyof typeof BUCKET_COLOR] ?? 'text-foreground'}`}>
+              <p className="text-xs text-muted mb-1">{t('blastRadius.bucket')}</p>
+              <p className={`text-2xl font-bold ${BUCKET_COLOR[data?.bucket as keyof typeof BUCKET_COLOR] ?? 'text-body'}`}>
                 {data?.bucket ?? 'Medium'}
               </p>
             </CardBody>
@@ -119,7 +119,7 @@ export function BlastRadiusExplorerPage() {
               <CardBody className="p-3 flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{node.service}</p>
-                  <p className="text-xs text-muted-foreground">{node.reason}</p>
+                  <p className="text-xs text-muted">{node.reason}</p>
                 </div>
                 <Badge
                   variant={node.impactLevel === 'critical' ? 'destructive' : node.impactLevel === 'high' ? 'warning' : 'secondary'}
@@ -130,14 +130,14 @@ export function BlastRadiusExplorerPage() {
             </Card>
           ))}
           {(data?.impactedNodes ?? []).length === 0 && (
-            <div className="p-4 text-center text-sm text-muted-foreground">
+            <div className="p-4 text-center text-sm text-muted">
               {t('blastRadius.noImpact')}
             </div>
           )}
         </div>
 
         {data?.isSimulated && (
-          <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+          <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
             {t('sotCenter.simulatedBanner')}
           </div>
         )}

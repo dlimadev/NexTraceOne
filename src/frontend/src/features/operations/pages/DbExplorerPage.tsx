@@ -99,13 +99,13 @@ export function DbExplorerPage() {
           icon={<HardDrive className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -133,7 +133,7 @@ export function DbExplorerPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -149,7 +149,7 @@ export function DbExplorerPage() {
                     <AlertTriangle className="w-4 h-4" />
                     {t('dbExplorer.indexWarnings.title')}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted">
                     {t('dbExplorer.indexWarnings.message', { count: indexMisses })}
                   </p>
                 </CardBody>
@@ -166,7 +166,7 @@ export function DbExplorerPage() {
                       key={tab.value}
                       type="button"
                       onClick={() => setSortBy(tab.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${sortBy === tab.value ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${sortBy === tab.value ? 'bg-primary text-primary-foreground' : 'text-muted hover:bg-muted'}`}
                     >
                       {t(tab.labelKey)}
                     </button>
@@ -175,12 +175,12 @@ export function DbExplorerPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {queries.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('dbExplorer.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('dbExplorer.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('dbExplorer.table.fingerprint')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('dbExplorer.table.database')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('dbExplorer.table.avgDuration')}</th>
@@ -192,9 +192,9 @@ export function DbExplorerPage() {
                       </thead>
                       <tbody>
                         {queries.map((q) => (
-                          <tr key={q.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={q.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-mono text-xs max-w-xs truncate" title={q.fingerprint}>{q.fingerprint}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{q.database}</td>
+                            <td className="px-4 py-2.5 text-muted">{q.database}</td>
                             <td className="px-4 py-2.5 tabular-nums">
                               <span className={q.avgDurationMs > 2000 ? 'text-red-500 font-semibold' : ''}>{fmtMs(q.avgDurationMs)}</span>
                             </td>
@@ -205,7 +205,7 @@ export function DbExplorerPage() {
                               {q.hasIndexMiss ? (
                                 <Badge variant="warning">{q.indexMissCount.toLocaleString()}x</Badge>
                               ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
+                                <span className="text-muted text-xs">—</span>
                               )}
                             </td>
                           </tr>

@@ -58,11 +58,11 @@ export function FinOpsBudgetBurnWidget({ data }: Props) {
             style={{ width: `${Math.min(data.budgetConsumedPct, 100)}%` }}
           />
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-xs text-muted">
           <span>${data.totalSpent.toLocaleString()}</span>
           <span>/ ${data.totalBudget.toLocaleString()}</span>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">{data.periodLabel}</p>
+        <p className="text-xs text-muted mt-1">{data.periodLabel}</p>
       </CardBody>
     </Card>
   );

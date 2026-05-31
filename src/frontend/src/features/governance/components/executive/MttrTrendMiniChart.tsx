@@ -37,7 +37,7 @@ export function MttrTrendMiniChart({ data }: Props) {
       </CardHeader>
       <CardBody>
         {data.services.length === 0 ? (
-          <p className="text-xs text-muted-foreground">{t('executiveDashboard.noData')}</p>
+          <p className="text-xs text-muted">{t('executiveDashboard.noData')}</p>
         ) : (
           <div className="space-y-3">
             {data.services.map((svc) => {
@@ -48,7 +48,7 @@ export function MttrTrendMiniChart({ data }: Props) {
                     <span className="font-medium truncate max-w-[120px]">{svc.serviceName}</span>
                     <div className="flex items-center gap-1">
                       {trendIcon(svc.trend)}
-                      <span className="text-muted-foreground">{svc.currentMttrHours.toFixed(1)}h</span>
+                      <span className="text-muted">{svc.currentMttrHours.toFixed(1)}h</span>
                     </div>
                   </div>
                   {/* Mini sparkline using SVG */}

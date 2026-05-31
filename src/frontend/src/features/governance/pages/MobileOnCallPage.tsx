@@ -57,7 +57,7 @@ function SeverityBadge({ severity }: { severity: string }) {
     critical: 'bg-destructive/10 text-destructive border-destructive/30',
     high: 'bg-warning/10 text-warning border-warning/30',
     medium: 'bg-info/10 text-info border-info/30',
-    low: 'bg-muted text-muted-foreground border-border',
+    low: 'bg-muted text-muted border-edge',
   };
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium border ${variants[severity] ?? variants.low}`}>
@@ -91,7 +91,7 @@ export function MobileOnCallPage() {
       {/* PWA Install Banner */}
       <div className="mx-4 mb-4 p-3 rounded-lg border border-accent/40 bg-accent/5 flex items-center gap-2 text-xs">
         <Smartphone size={12} className="text-accent shrink-0" />
-        <span className="text-muted-foreground">{t('mobileOnCall.pwaBanner')}</span>
+        <span className="text-muted">{t('mobileOnCall.pwaBanner')}</span>
         <Button size="sm" variant="ghost" className="ml-auto shrink-0 text-accent text-xs px-2 py-0.5 h-6">
           {t('mobileOnCall.installPwa')}
         </Button>
@@ -137,9 +137,9 @@ export function MobileOnCallPage() {
                         <SeverityBadge severity={inc.severity} />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-medium truncate">{inc.title}</p>
-                          <p className="text-xs text-muted-foreground">{inc.service}</p>
+                          <p className="text-xs text-muted">{inc.service}</p>
                         </div>
-                        <ChevronRight size={12} className="text-muted-foreground group-hover:text-foreground" />
+                        <ChevronRight size={12} className="text-muted group-hover:text-body" />
                       </div>
                     </Link>
                   ))}
@@ -169,12 +169,12 @@ export function MobileOnCallPage() {
                 </h3>
                 <div className="space-y-2">
                   {(data?.approvals ?? []).slice(0, 5).map((appr) => (
-                    <div key={appr.id} className="p-2 rounded border border-border hover:bg-muted/40">
+                    <div key={appr.id} className="p-2 rounded border border-edge hover:bg-muted/40">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <p className="text-xs font-medium truncate">{appr.title}</p>
                         <SeverityBadge severity={appr.riskLevel} />
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted">
                         {t('mobileOnCall.requestedBy', { user: appr.requestedBy })}
                       </p>
                       <div className="flex gap-2 mt-2">
@@ -212,9 +212,9 @@ export function MobileOnCallPage() {
               <Link key={link.to} to={link.to}>
                 <Card className="hover:border-accent/60 transition-colors">
                   <CardBody className="p-3 flex items-center gap-2">
-                    <span className="text-muted-foreground">{link.icon}</span>
+                    <span className="text-muted">{link.icon}</span>
                     <span className="text-xs font-medium">{link.label}</span>
-                    <ChevronRight size={12} className="ml-auto text-muted-foreground" />
+                    <ChevronRight size={12} className="ml-auto text-muted" />
                   </CardBody>
                 </Card>
               </Link>

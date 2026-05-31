@@ -94,7 +94,7 @@ export function AuditorConsolePage() {
           ))}
         </div>
 
-        <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('personaSuite.simulatedBanner')}
         </div>
       </PageSection>

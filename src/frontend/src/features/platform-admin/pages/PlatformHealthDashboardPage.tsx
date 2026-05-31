@@ -171,7 +171,7 @@ function ConfigHealthTab() {
           { label: t('platformHealth.config.warning'), count: counts.warning, variant: 'warning' as const },
           { label: t('platformHealth.config.degraded'), count: counts.degraded, variant: 'danger' as const },
         ].map(({ label, count, variant }) => (
-          <div key={label} className="bg-surface border border-border rounded-md p-3 text-center">
+          <div key={label} className="bg-surface border border-edge rounded-md p-3 text-center">
             <p className="text-2xl font-bold text-heading">{count}</p>
             <Badge variant={variant} className="mt-1 text-xs">{label}</Badge>
           </div>
@@ -349,7 +349,7 @@ export function PlatformHealthDashboardPage() {
             <a
               key={to}
               href={to}
-              className="flex items-center justify-between px-4 py-3 bg-surface border border-border rounded-md hover:border-accent/40 transition-colors"
+              className="flex items-center justify-between px-4 py-3 bg-surface border border-edge rounded-md hover:border-accent/40 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <span className={color}>{icon}</span>
@@ -361,7 +361,7 @@ export function PlatformHealthDashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4 border-b border-border">
+        <div className="flex items-center gap-1 mb-4 border-b border-edge">
           {tabs.map((tab) => (
             <button
               key={tab.id}

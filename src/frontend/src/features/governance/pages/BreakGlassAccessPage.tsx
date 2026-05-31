@@ -104,11 +104,11 @@ export function BreakGlassAccessPage() {
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('breakGlass.resource')}</label>
+                    <label className="text-xs text-muted">{t('breakGlass.resource')}</label>
                     <input value={resource} onChange={(e) => setResource(e.target.value)} placeholder="e.g. prod-database" className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('breakGlass.role')}</label>
+                    <label className="text-xs text-muted">{t('breakGlass.role')}</label>
                     <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="">-- select --</option>
                       <option value="readonly">Read Only</option>
@@ -117,7 +117,7 @@ export function BreakGlassAccessPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('breakGlass.environment')}</label>
+                    <label className="text-xs text-muted">{t('breakGlass.environment')}</label>
                     <select value={env} onChange={(e) => setEnv(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="production">Production</option>
                       <option value="staging">Staging</option>
@@ -125,7 +125,7 @@ export function BreakGlassAccessPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('breakGlass.justification')}</label>
+                    <label className="text-xs text-muted">{t('breakGlass.justification')}</label>
                     <textarea
                       value={justification}
                       onChange={(e) => setJustification(e.target.value)}
@@ -167,7 +167,7 @@ export function BreakGlassAccessPage() {
                             <div className="flex items-center justify-between gap-2">
                               <div>
                                 <p className="text-sm font-medium">{req.resource} — <span className="font-mono text-xs">{req.role}</span></p>
-                                <p className="text-xs text-muted-foreground">{req.requestedBy} · {req.environment}</p>
+                                <p className="text-xs text-muted">{req.requestedBy} · {req.environment}</p>
                                 {req.expiresAt && <p className="text-xs text-warning">{t('breakGlass.expires')}: {new Date(req.expiresAt).toLocaleString()}</p>}
                               </div>
                               <Badge variant="info">{t('breakGlass.active')}</Badge>
@@ -195,8 +195,8 @@ export function BreakGlassAccessPage() {
                                 <span className="text-sm font-medium">{req.requestedBy}</span>
                                 <Badge variant="outline" className="text-xs">{req.environment}</Badge>
                               </div>
-                              <p className="text-xs font-mono text-muted-foreground">{req.resource} → {req.role}</p>
-                              <p className="text-xs text-muted-foreground mt-1 italic">{req.justification}</p>
+                              <p className="text-xs font-mono text-muted">{req.resource} → {req.role}</p>
+                              <p className="text-xs text-muted mt-1 italic">{req.justification}</p>
                             </div>
                             <div className="flex gap-1">
                               <Button size="sm" variant="ghost" className="text-success" onClick={() => approve.mutate(req.id)} disabled={approve.isPending}>
@@ -211,7 +211,7 @@ export function BreakGlassAccessPage() {
                       </Card>
                     ))}
                     {pending.length === 0 && (
-                      <div className="text-center p-4 text-muted-foreground text-sm">{t('breakGlass.noPending')}</div>
+                      <div className="text-center p-4 text-muted text-sm">{t('breakGlass.noPending')}</div>
                     )}
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export function BreakGlassAccessPage() {
                             <CardBody className="p-2.5 flex items-center justify-between gap-3">
                               <div>
                                 <p className="text-xs font-medium">{req.requestedBy} — {req.resource}</p>
-                                <p className="text-xs text-muted-foreground">{new Date(req.requestedAt).toLocaleString()}</p>
+                                <p className="text-xs text-muted">{new Date(req.requestedAt).toLocaleString()}</p>
                               </div>
                               <Badge variant={cfg.badge} className="flex items-center gap-1 text-xs">
                                 {cfg.icon}
@@ -246,7 +246,7 @@ export function BreakGlassAccessPage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

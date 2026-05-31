@@ -50,7 +50,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
 
   if (submitted) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 text-sm text-muted">
         <span>✓</span>
         <span>{t('ai.feedback.submitted')}</span>
       </div>
@@ -58,8 +58,8 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
   }
 
   return (
-    <div className="flex flex-col gap-2 pt-2 border-t border-border/50">
-      <p className="text-xs text-muted-foreground">{t('ai.feedback.prompt')}</p>
+    <div className="flex flex-col gap-2 pt-2 border-t border-edge/50">
+      <p className="text-xs text-muted">{t('ai.feedback.prompt')}</p>
 
       <div className="flex gap-1" role="group" aria-label={t('ai.feedback.ratingLabel')}>
         {[1, 2, 3, 4, 5].map((star) => (
@@ -67,7 +67,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
             key={star}
             type="button"
             onClick={() => setRating(star)}
-            className={`text-lg transition-colors ${star <= rating ? 'text-yellow-400' : 'text-muted-foreground/30 hover:text-yellow-300'}`}
+            className={`text-lg transition-colors ${star <= rating ? 'text-yellow-400' : 'text-muted/30 hover:text-yellow-300'}`}
             aria-label={t('ai.feedback.star', { count: star })}
           >
             ★
@@ -84,7 +84,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
             className={`px-2 py-1 text-xs rounded border transition-colors ${
               outcome === o
                 ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border hover:border-primary/50'
+                : 'border-edge hover:border-primary/50'
             }`}
           >
             {t(`ai.feedback.outcome.${o}`)}
@@ -96,7 +96,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder={t('ai.feedback.commentPlaceholder')}
-        className="w-full text-xs resize-none rounded border border-border bg-elevated p-2 focus:outline-none focus:ring-1 focus:ring-ring"
+        className="w-full text-xs resize-none rounded border border-edge bg-elevated p-2 focus:outline-none focus:ring-1 focus:ring-accent"
         rows={2}
         maxLength={500}
       />

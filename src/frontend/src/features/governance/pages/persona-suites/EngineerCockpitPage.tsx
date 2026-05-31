@@ -83,14 +83,14 @@ export function EngineerCockpitPage() {
                 <Link key={card.key} to={card.linkTo ?? '#'}>
                   <Card className="hover:border-accent/60 transition-colors h-full">
                     <CardBody className="p-4">
-                      <div className={`flex items-center gap-2 mb-2 ${SEVERITY_COLOR[card.severity] ?? 'text-muted-foreground'}`}>
+                      <div className={`flex items-center gap-2 mb-2 ${SEVERITY_COLOR[card.severity] ?? 'text-muted'}`}>
                         {ICON_MAP[card.key] ?? <Activity size={14} />}
                         <span className="text-xs font-medium">{card.title}</span>
                         {card.isSimulated && (
                           <Badge variant="secondary" className="text-xs ml-auto">~</Badge>
                         )}
                       </div>
-                      <p className={`text-2xl font-bold ${SEVERITY_COLOR[card.severity] ?? 'text-foreground'}`}>
+                      <p className={`text-2xl font-bold ${SEVERITY_COLOR[card.severity] ?? 'text-body'}`}>
                         {card.value ?? '—'}
                       </p>
                     </CardBody>
@@ -100,7 +100,7 @@ export function EngineerCockpitPage() {
             </div>
 
             {/* Simulated Banner */}
-            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('personaSuite.simulatedBanner')}
             </div>
           </>

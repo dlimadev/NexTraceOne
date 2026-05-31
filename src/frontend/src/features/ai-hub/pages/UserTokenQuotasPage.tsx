@@ -339,7 +339,7 @@ export function UserTokenQuotasPage() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleEdit(quota)}
-                    className="p-1.5 rounded hover:bg-surface-hover text-muted hover:text-foreground transition-colors"
+                    className="p-1.5 rounded hover:bg-surface-hover text-muted hover:text-body transition-colors"
                     title={t('common.edit', 'Editar')}
                   >
                     <Pencil className="w-4 h-4" />

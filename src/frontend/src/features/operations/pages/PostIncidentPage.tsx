@@ -94,13 +94,13 @@ export function PostIncidentPage() {
           icon={<FileText className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -131,7 +131,7 @@ export function PostIncidentPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -146,12 +146,12 @@ export function PostIncidentPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {mortems.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('postIncident.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('postIncident.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('postIncident.table.title')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('postIncident.table.incident')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('postIncident.table.severity')}</th>
@@ -163,9 +163,9 @@ export function PostIncidentPage() {
                       </thead>
                       <tbody>
                         {mortems.map((m) => (
-                          <tr key={m.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={m.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium max-w-xs truncate" title={m.title}>{m.title}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground font-mono text-xs">{m.incidentId}</td>
+                            <td className="px-4 py-2.5 text-muted font-mono text-xs">{m.incidentId}</td>
                             <td className="px-4 py-2.5">
                               <Badge variant={m.severity === 'critical' ? 'danger' : m.severity === 'high' ? 'warning' : 'secondary'}>
                                 {m.severity}
@@ -174,7 +174,7 @@ export function PostIncidentPage() {
                             <td className="px-4 py-2.5">
                               <Badge variant={statusVariant(m.status)}>{t(`postIncident.status.${m.status}`)}</Badge>
                             </td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{m.author}</td>
+                            <td className="px-4 py-2.5 text-muted">{m.author}</td>
                             <td className="px-4 py-2.5 tabular-nums">
                               {m.openActionItemsCount > 0 ? (
                                 <Badge variant="warning">{m.openActionItemsCount}/{m.actionItemsCount}</Badge>
@@ -182,7 +182,7 @@ export function PostIncidentPage() {
                                 <Badge variant="success">{m.actionItemsCount}/{m.actionItemsCount}</Badge>
                               )}
                             </td>
-                            <td className="px-4 py-2.5 text-xs text-muted-foreground">{new Date(m.createdAt).toLocaleDateString()}</td>
+                            <td className="px-4 py-2.5 text-xs text-muted">{new Date(m.createdAt).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>

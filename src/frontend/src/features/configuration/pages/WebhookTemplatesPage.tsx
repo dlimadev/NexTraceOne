@@ -209,7 +209,7 @@ export function WebhookTemplatesPage() {
                           type="button"
                           title={item.isEnabled ? t('webhookTemplates.disabled') : t('webhookTemplates.enabled')}
                           onClick={() => toggleTemplate.mutate({ templateId: item.templateId, enabled: !item.isEnabled })}
-                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                          className="p-1 rounded hover:bg-muted text-muted hover:text-body transition-colors"
                         >
                           {item.isEnabled ? <ToggleRight size={16} className="text-success" /> : <ToggleLeft size={16} />}
                         </button>
@@ -217,7 +217,7 @@ export function WebhookTemplatesPage() {
                           type="button"
                           title={t('common.delete', 'Delete')}
                           onClick={() => deleteTemplate.mutate(item.templateId)}
-                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-critical transition-colors"
+                          className="p-1 rounded hover:bg-muted text-muted hover:text-critical transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>

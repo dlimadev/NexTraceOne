@@ -34,7 +34,7 @@ const QUICK_LINKS = [
   { key: 'audit', label: 'platformAdmin.auditLog', icon: <Shield size={14} />, to: '/audit-compliance/audit', color: 'text-destructive' },
   { key: 'health', label: 'platformAdmin.systemHealth', icon: <Activity size={14} />, to: '/admin/system-health', color: 'text-primary' },
   { key: 'api-keys', label: 'platformAdmin.apiKeys', icon: <Key size={14} />, to: '/platform/api-keys', color: 'text-secondary' },
-  { key: 'access-reviews', label: 'platformAdmin.accessReviews', icon: <BarChart3 size={14} />, to: '/identity-access/access-reviews', color: 'text-muted-foreground' },
+  { key: 'access-reviews', label: 'platformAdmin.accessReviews', icon: <BarChart3 size={14} />, to: '/identity-access/access-reviews', color: 'text-muted' },
 ];
 
 export function PlatformAdminCockpitPage() {
@@ -69,7 +69,7 @@ export function PlatformAdminCockpitPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
+                    <p className="text-xs text-muted mb-1">{stat.label}</p>
                     <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
                     {data?.isSimulated && <Badge variant="secondary" className="text-xs">~</Badge>}
                   </CardBody>
@@ -91,7 +91,7 @@ export function PlatformAdminCockpitPage() {
               ))}
             </div>
 
-            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-6 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('personaSuite.simulatedBanner')}
             </div>
           </>

@@ -91,13 +91,13 @@ export function ProfilingExplorerPage() {
           icon={<Cpu className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -125,7 +125,7 @@ export function ProfilingExplorerPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -140,12 +140,12 @@ export function ProfilingExplorerPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {sessions.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('profilingExplorer.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('profilingExplorer.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           {(['service', 'version', 'environment', 'cpu', 'memory', 'heap', 'samples', 'duration', 'deploy'] as const).map((col) => (
                             <th key={col} className="px-4 py-2.5 text-left font-medium">
                               {t(`profilingExplorer.table.${col}`)}
@@ -155,9 +155,9 @@ export function ProfilingExplorerPage() {
                       </thead>
                       <tbody>
                         {sessions.map((s) => (
-                          <tr key={s.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={s.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium">{s.serviceName}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground font-mono text-xs">{s.version}</td>
+                            <td className="px-4 py-2.5 text-muted font-mono text-xs">{s.version}</td>
                             <td className="px-4 py-2.5"><Badge variant="secondary">{s.environment}</Badge></td>
                             <td className="px-4 py-2.5 tabular-nums">
                               <span className={s.cpuPercent > 75 ? 'text-red-500 font-semibold' : ''}>{s.cpuPercent.toFixed(1)}%</span>
@@ -173,7 +173,7 @@ export function ProfilingExplorerPage() {
                                   {t('profilingExplorer.table.deployCorrelated')}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
+                                <span className="text-muted text-xs">—</span>
                               )}
                             </td>
                           </tr>

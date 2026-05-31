@@ -64,9 +64,9 @@ export function ChangeConfidenceGauge({ data }: Props) {
         <div className="space-y-1 mt-2">
           {data.byTier.map((tier) => (
             <div key={tier.tier} className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{tier.tier}</span>
+              <span className="text-muted">{tier.tier}</span>
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-xs">({tier.serviceCount})</span>
+                <span className="text-muted text-xs">({tier.serviceCount})</span>
                 <span className={`font-medium ${gaugeColor(tier.confidencePct)}`}>
                   {tier.confidencePct.toFixed(0)}%
                 </span>
@@ -74,7 +74,7 @@ export function ChangeConfidenceGauge({ data }: Props) {
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground mt-2">{data.periodLabel}</p>
+        <p className="text-xs text-muted mt-2">{data.periodLabel}</p>
       </CardBody>
     </Card>
   );

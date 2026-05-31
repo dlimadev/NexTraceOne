@@ -41,7 +41,7 @@ function BundleRow({ bundle }: { bundle: SupportBundleEntry }) {
   const downloadUrl = platformAdminApi.getSupportBundleDownloadUrl(bundle.id);
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-border last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-edge last:border-0">
       <div className="flex items-center gap-3 min-w-0">
         <FileArchive size={16} className="text-muted shrink-0" />
         <div className="min-w-0">
@@ -49,7 +49,7 @@ function BundleRow({ bundle }: { bundle: SupportBundleEntry }) {
             <span className="text-sm font-medium text-heading">
               {t('supportBundle.bundleTitle', { date: formatDate(bundle.generatedAt) })}
             </span>
-            <span className="text-xs text-muted bg-surface border border-border rounded px-1.5 py-0.5">
+            <span className="text-xs text-muted bg-surface border border-edge rounded px-1.5 py-0.5">
               {formatBytes(bundle.fileSizeKb)}
             </span>
           </div>
@@ -188,7 +188,7 @@ export function SupportBundlePage() {
           </button>
         </div>
 
-        <div className="bg-card border border-border rounded-md divide-y divide-border">
+        <div className="bg-card border border-edge rounded-md divide-y divide-border">
           {listQuery.isLoading ? (
             <div className="flex items-center justify-center py-8 gap-2 text-muted">
               <Loader2 size={16} className="animate-spin" />

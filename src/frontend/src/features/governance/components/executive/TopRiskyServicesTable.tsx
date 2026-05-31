@@ -39,7 +39,7 @@ export function TopRiskyServicesTable({ data }: Props) {
       </CardHeader>
       <CardBody>
         {data.services.length === 0 ? (
-          <p className="text-xs text-muted-foreground">{t('executiveDashboard.noData')}</p>
+          <p className="text-xs text-muted">{t('executiveDashboard.noData')}</p>
         ) : (
           <div className="space-y-2">
             {data.services.map((svc) => (
@@ -51,13 +51,13 @@ export function TopRiskyServicesTable({ data }: Props) {
               >
                 <div className="min-w-0">
                   <p className="text-xs font-medium truncate">{svc.serviceName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{svc.domain} · {svc.topRiskDimension}</p>
+                  <p className="text-xs text-muted truncate">{svc.domain} · {svc.topRiskDimension}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-2">
                   <Badge variant={riskVariant(svc.riskLevel)} size="sm">
                     {svc.riskScore.toFixed(0)}
                   </Badge>
-                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                  <ArrowRight className="h-3 w-3 text-muted" />
                 </div>
               </button>
             ))}

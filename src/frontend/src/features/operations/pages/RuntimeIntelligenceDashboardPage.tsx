@@ -145,7 +145,7 @@ export function RuntimeIntelligenceDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Runtime Intelligence</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted">
             Monitoramento em tempo real da saúde e performance dos serviços
           </p>
         </div>
@@ -217,11 +217,11 @@ export function RuntimeIntelligenceDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Latência Média</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+              <Activity className="h-4 w-4 text-muted" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{aggregatedMetrics.avgLatency} ms</div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted">
                 Tempo médio de resposta
               </p>
             </CardContent>
@@ -230,11 +230,11 @@ export function RuntimeIntelligenceDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Taxa de Erro</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              <AlertTriangle className="h-4 w-4 text-muted" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{aggregatedMetrics.avgErrorRate}%</div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted">
                 Requisições com falha
               </p>
             </CardContent>
@@ -243,11 +243,11 @@ export function RuntimeIntelligenceDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Throughput</CardTitle>
-              <Server className="h-4 w-4 text-muted-foreground" />
+              <Server className="h-4 w-4 text-muted" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{aggregatedMetrics.avgThroughput} req/s</div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted">
                 Requisições por segundo
               </p>
             </CardContent>
@@ -256,13 +256,13 @@ export function RuntimeIntelligenceDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Serviços Saudáveis</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+              <CheckCircle2 className="h-4 w-4 text-muted" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {aggregatedMetrics.healthyCount}/{aggregatedMetrics.totalSnapshots}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted">
                 {Math.round((aggregatedMetrics.healthyCount / aggregatedMetrics.totalSnapshots) * 100)}% saudáveis
               </p>
             </CardContent>
@@ -373,7 +373,7 @@ export function RuntimeIntelligenceDashboardPage() {
                 <div className="text-center py-12">
                   <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <p className="text-lg font-medium">Nenhum drift detectado</p>
-                  <p className="text-muted-foreground">Todos os serviços estão dentro da baseline esperada</p>
+                  <p className="text-muted">Todos os serviços estão dentro da baseline esperada</p>
                 </div>
               )}
             </CardContent>
@@ -395,14 +395,14 @@ export function RuntimeIntelligenceDashboardPage() {
                     <div key={score.serviceName} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-semibold">{score.serviceName}</h4>
-                        <p className="text-sm text-muted-foreground">{score.environment}</p>
+                        <p className="text-sm text-muted">{score.environment}</p>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <div className="text-2xl font-bold" style={{ color: score.score >= 80 ? '#10b981' : score.score >= 60 ? '#f59e0b' : '#ef4444' }}>
                             {(score.score * 100).toFixed(0)}%
                           </div>
-                          <p className="text-xs text-muted-foreground">Score</p>
+                          <p className="text-xs text-muted">Score</p>
                         </div>
                         <Badge variant={score.hasCriticalDrift ? 'destructive' : 'default'}>
                           {score.hasCriticalDrift ? 'Crítico' : 'Normal'}
@@ -413,9 +413,9 @@ export function RuntimeIntelligenceDashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <BarChart3 className="h-12 w-12 text-muted mx-auto mb-4" />
                   <p className="text-lg font-medium">Nenhum score disponível</p>
-                  <p className="text-muted-foreground">Configure perfis de observabilidade para os serviços</p>
+                  <p className="text-muted">Configure perfis de observabilidade para os serviços</p>
                 </div>
               )}
             </CardContent>
@@ -465,7 +465,7 @@ export function RuntimeIntelligenceDashboardPage() {
                     <td className="p-3">{snapshot.avgLatencyMs.toFixed(2)}</td>
                     <td className="p-3">{(snapshot.errorRate * 100).toFixed(2)}%</td>
                     <td className="p-3">{snapshot.requestsPerSecond.toFixed(0)} req/s</td>
-                    <td className="p-3 text-sm text-muted-foreground">
+                    <td className="p-3 text-sm text-muted">
                       {new Date(snapshot.timestamp).toLocaleString('pt-BR')}
                     </td>
                   </tr>

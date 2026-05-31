@@ -95,7 +95,7 @@ export function SLOServiceCenterPage() {
               key={tb.key}
               onClick={() => setTab(tb.key)}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                tab === tb.key ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                tab === tb.key ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted hover:bg-muted/80'
               }`}
             >
               {tb.icon}
@@ -125,23 +125,23 @@ export function SLOServiceCenterPage() {
                         <div className="flex items-center gap-2">
                           <span className={cfg.color}>{cfg.icon}</span>
                           <span className="text-sm font-semibold">{slo.serviceName}</span>
-                          <span className="text-xs text-muted-foreground">— {slo.sloName}</span>
+                          <span className="text-xs text-muted">— {slo.sloName}</span>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">{slo.window}</p>
+                        <p className="text-xs text-muted mt-0.5">{slo.window}</p>
                       </div>
                       <Badge variant={cfg.badge}>{slo.status}</Badge>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-center text-xs">
                       <div>
-                        <p className="text-muted-foreground mb-0.5">{t('sloCenter.target')}</p>
+                        <p className="text-muted mb-0.5">{t('sloCenter.target')}</p>
                         <p className="font-bold">{slo.target}%</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground mb-0.5">{t('sloCenter.current')}</p>
+                        <p className="text-muted mb-0.5">{t('sloCenter.current')}</p>
                         <p className={`font-bold ${cfg.color}`}>{slo.current}%</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground mb-0.5">{t('sloCenter.errorBudget')}</p>
+                        <p className="text-muted mb-0.5">{t('sloCenter.errorBudget')}</p>
                         <p className="font-bold">{slo.errorBudgetRemaining}%</p>
                       </div>
                     </div>
@@ -153,7 +153,7 @@ export function SLOServiceCenterPage() {
               );
             })}
             {(data?.slos ?? []).length === 0 && (
-              <div className="text-center p-8 text-muted-foreground text-sm">{t('sloCenter.empty')}</div>
+              <div className="text-center p-8 text-muted text-sm">{t('sloCenter.empty')}</div>
             )}
           </div>
         ) : tab === 'chaos' ? (
@@ -166,13 +166,13 @@ export function SLOServiceCenterPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Zap size={12} className="text-muted-foreground" />
+                          <Zap size={12} className="text-muted" />
                           <span className="text-sm font-medium">{exp.name}</span>
                           <Badge variant="outline" className="text-xs">{exp.targetService}</Badge>
                           <Badge variant="secondary" className="text-xs">{exp.type}</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground italic">{exp.hypothesis}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-xs text-muted italic">{exp.hypothesis}</p>
+                        <p className="text-xs text-muted mt-0.5">
                           {t('sloCenter.lastRun')}: {exp.lastRun !== 'never' ? new Date(exp.lastRun).toLocaleString() : t('sloCenter.never')}
                         </p>
                       </div>
@@ -191,12 +191,12 @@ export function SLOServiceCenterPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <BookOpen size={12} className="text-muted-foreground" />
+                        <BookOpen size={12} className="text-muted" />
                         <span className="text-sm font-medium truncate">{pm.title}</span>
                         <Badge variant="secondary" className="text-xs">{pm.severity}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">{pm.serviceName} · {new Date(pm.occurredAt).toLocaleDateString()}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted">{pm.serviceName} · {new Date(pm.occurredAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted mt-0.5">
                         {t('sloCenter.actionItems')}: {pm.openItems}/{pm.actionItems} {t('sloCenter.open')}
                       </p>
                     </div>
@@ -210,7 +210,7 @@ export function SLOServiceCenterPage() {
           </div>
         )}
 
-        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
           {t('sotCenter.simulatedBanner')}
         </div>
       </PageSection>

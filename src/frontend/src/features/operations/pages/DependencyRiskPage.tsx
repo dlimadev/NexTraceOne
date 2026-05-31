@@ -103,13 +103,13 @@ export function DependencyRiskPage() {
           icon={<GitFork className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -137,7 +137,7 @@ export function DependencyRiskPage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -152,12 +152,12 @@ export function DependencyRiskPage() {
               </CardHeader>
               <CardBody className="p-0">
                 {entries.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('dependencyRisk.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('dependencyRisk.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('dependencyRisk.table.service')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('dependencyRisk.table.riskScore')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('dependencyRisk.table.failureHistory')}</th>
@@ -169,7 +169,7 @@ export function DependencyRiskPage() {
                       </thead>
                       <tbody>
                         {entries.map((e) => (
-                          <tr key={e.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={e.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium">{e.serviceName}</td>
                             <td className="px-4 py-2.5">
                               <div className="flex items-center gap-2">
@@ -177,7 +177,7 @@ export function DependencyRiskPage() {
                                 <Badge variant={riskVariant(e.riskLevel)}>{t(`dependencyRisk.riskLevel.${e.riskLevel}`)}</Badge>
                               </div>
                             </td>
-                            <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{e.failureCount30d}x</td>
+                            <td className="px-4 py-2.5 tabular-nums text-muted">{e.failureCount30d}x</td>
                             <td className="px-4 py-2.5 tabular-nums">
                               <span className={e.sloHealthPercent < 95 ? 'text-amber-500 font-semibold' : 'text-emerald-500'}>
                                 {e.sloHealthPercent.toFixed(1)}%
@@ -186,7 +186,7 @@ export function DependencyRiskPage() {
                             <td className="px-4 py-2.5 tabular-nums">{e.blastRadius} {e.blastRadius === 1 ? 'svc' : 'svcs'}</td>
                             <td className="px-4 py-2.5 tabular-nums">{e.dependentsCount}</td>
                             <td className="px-4 py-2.5">
-                              <span className={e.trendDirection === 'up' ? 'text-red-500' : e.trendDirection === 'down' ? 'text-emerald-500' : 'text-muted-foreground'}>
+                              <span className={e.trendDirection === 'up' ? 'text-red-500' : e.trendDirection === 'down' ? 'text-emerald-500' : 'text-muted'}>
                                 {e.trendDirection === 'up' ? '↑' : e.trendDirection === 'down' ? '↓' : '→'}
                               </span>
                             </td>

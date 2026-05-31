@@ -79,13 +79,13 @@ function QuotaEditor({ entry, onSave, onCancel, saving }: QuotaEditorProps) {
           }))
         }
         placeholder={t('resourceBudget.unlimited')}
-        className="w-full text-sm px-2.5 py-1.5 rounded border border-border bg-input focus:outline-none focus:ring-1 focus:ring-accent"
+        className="w-full text-sm px-2.5 py-1.5 rounded border border-edge bg-input focus:outline-none focus:ring-1 focus:ring-accent"
       />
     </div>
   );
 
   return (
-    <div className="mt-4 p-3 rounded-lg border border-border bg-surface space-y-3">
+    <div className="mt-4 p-3 rounded-lg border border-edge bg-surface space-y-3">
       <p className="text-xs font-medium text-muted">{t('resourceBudget.editQuota')}</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {field('maxCpuCores', t('resourceBudget.cpu'), 'cores')}

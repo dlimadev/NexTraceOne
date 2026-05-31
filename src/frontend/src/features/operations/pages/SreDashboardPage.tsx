@@ -135,7 +135,7 @@ function HeroCard({ title, items, icon }: HeroCardProps) {
   return (
     <Card className="flex-1 min-w-[140px]">
       <CardBody className="p-3">
-        <div className="flex items-center gap-1.5 mb-2 text-muted-foreground text-xs font-semibold">
+        <div className="flex items-center gap-1.5 mb-2 text-muted text-xs font-semibold">
           {icon}
           <span>{title}</span>
         </div>
@@ -178,10 +178,10 @@ function ChartCard({ title, subtitle, points, color, isEmpty, emptyMessage, form
         <div className="flex items-baseline justify-between gap-2">
           <div>
             <h4 className="text-sm font-semibold">{title}</h4>
-            {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-muted mt-0.5">{subtitle}</p>}
           </div>
           {!isEmpty && points.length > 0 && (
-            <span className="text-xs text-muted-foreground tabular-nums flex-shrink-0">
+            <span className="text-xs text-muted tabular-nums flex-shrink-0">
               max {formattedMax}
             </span>
           )}
@@ -189,14 +189,14 @@ function ChartCard({ title, subtitle, points, color, isEmpty, emptyMessage, form
       </CardHeader>
       <CardBody className="pt-0 pb-3 px-3">
         {isEmpty || points.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-6 text-muted-foreground/60 text-xs gap-1">
+          <div className="flex flex-col items-center justify-center py-6 text-muted/60 text-xs gap-1">
             <Database className="w-6 h-6 opacity-30" />
             <span>{emptyMessage ?? t('sreDashboard.noRecords')}</span>
           </div>
         ) : (
           <>
             <Sparkline points={points} color={color} height={56} />
-            <div className="flex justify-between mt-1 text-[10px] text-muted-foreground/60">
+            <div className="flex justify-between mt-1 text-[10px] text-muted/60">
               <span>{new Date(points[0]?.timestamp ?? '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               <span>{new Date(points[points.length - 1]?.timestamp ?? '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
@@ -223,14 +223,14 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
 
   const toggleSort = (f: SortField) => setSort(f);
 
-  const thClass = 'text-left text-xs font-semibold text-muted-foreground py-2 px-3 cursor-pointer hover:text-foreground select-none whitespace-nowrap';
-  const tdClass = 'text-xs py-1.5 px-3 text-foreground';
+  const thClass = 'text-left text-xs font-semibold text-muted py-2 px-3 cursor-pointer hover:text-body select-none whitespace-nowrap';
+  const tdClass = 'text-xs py-1.5 px-3 text-body';
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-b border-edge">
             <th className={thClass}>{t('sreDashboard.table.service')}</th>
             <th className={thClass}>{t('sreDashboard.table.request')}</th>
             <th className={`${thClass} text-right`} onClick={() => toggleSort('count')}>
@@ -256,7 +256,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
         <tbody>
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i} className="border-b border-border/40">{/* eslint-disable-line react/no-array-index-key */}
+              <tr key={i} className="border-b border-edge/40">{/* eslint-disable-line react/no-array-index-key */}
                 <td colSpan={5} className="py-2 px-3">
                   <div className="h-3 rounded bg-muted/40 animate-pulse w-full" />
                 </td>
@@ -265,7 +265,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
             : sorted.map((row, i) => (
               <tr
                 key={`${row.service}-${row.request}-${i}`} // eslint-disable-line react/no-array-index-key
-                className="border-b border-border/40 hover:bg-muted/20 transition-colors"
+                className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
                 <td className={`${tdClass} font-medium text-primary`}>{row.service}</td>
                 <td className={`${tdClass} font-mono max-w-[200px] truncate`}>{row.request}</td>
@@ -275,7 +275,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
                   {row.errors > 0 ? (
                     <span className="text-destructive font-semibold">{fmtNumber(row.errors)}</span>
                   ) : (
-                    <span className="text-muted-foreground">0</span>
+                    <span className="text-muted">0</span>
                   )}
                 </td>
               </tr>
@@ -283,7 +283,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
         </tbody>
       </table>
       {!isLoading && rows.length === 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">{t('sreDashboard.noRecords')}</div>
+        <div className="text-center py-8 text-sm text-muted">{t('sreDashboard.noRecords')}</div>
       )}
     </div>
   );
@@ -302,14 +302,14 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
     return b.count - a.count;
   });
 
-  const thClass = 'text-left text-xs font-semibold text-muted-foreground py-2 px-3 cursor-pointer hover:text-foreground select-none whitespace-nowrap';
-  const tdClass = 'text-xs py-1.5 px-3 text-foreground';
+  const thClass = 'text-left text-xs font-semibold text-muted py-2 px-3 cursor-pointer hover:text-body select-none whitespace-nowrap';
+  const tdClass = 'text-xs py-1.5 px-3 text-body';
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-b border-edge">
             <th className={thClass}>{t('sreDashboard.table.database')}</th>
             <th className={thClass}>{t('sreDashboard.table.query')}</th>
             <th className={`${thClass} text-right`} onClick={() => setSort('count')}>
@@ -329,7 +329,7 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
         <tbody>
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i} className="border-b border-border/40">{/* eslint-disable-line react/no-array-index-key */}
+              <tr key={i} className="border-b border-edge/40">{/* eslint-disable-line react/no-array-index-key */}
                 <td colSpan={4} className="py-2 px-3">
                   <div className="h-3 rounded bg-muted/40 animate-pulse w-full" />
                 </td>
@@ -338,10 +338,10 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
             : sorted.map((row, i) => (
               <tr
                 key={`${row.database}-${row.query}-${i}`} // eslint-disable-line react/no-array-index-key
-                className="border-b border-border/40 hover:bg-muted/20 transition-colors"
+                className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
                 <td className={`${tdClass} font-medium text-primary`}>{row.database}</td>
-                <td className={`${tdClass} font-mono text-muted-foreground max-w-[240px] truncate`}>{row.query}</td>
+                <td className={`${tdClass} font-mono text-muted max-w-[240px] truncate`}>{row.query}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtNumber(row.count)}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtMs(row.avgLatencyMs)}</td>
               </tr>
@@ -349,7 +349,7 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
         </tbody>
       </table>
       {!isLoading && rows.length === 0 && (
-        <div className="text-center py-8 text-sm text-muted-foreground">{t('sreDashboard.noRecords')}</div>
+        <div className="text-center py-8 text-sm text-muted">{t('sreDashboard.noRecords')}</div>
       )}
     </div>
   );
@@ -466,7 +466,7 @@ export function SreDashboardPage() {
               <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
             </Button>
             {showTimeMenu && (
-              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-border rounded-md shadow-md min-w-[120px]">
+              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
                 {TIME_RANGE_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
@@ -502,11 +502,11 @@ export function SreDashboardPage() {
           {/* Problems */}
           <Card className="flex-1 min-w-[120px]">
             <CardBody className="p-3">
-              <div className="flex items-center gap-1.5 mb-2 text-muted-foreground text-xs font-semibold">
+              <div className="flex items-center gap-1.5 mb-2 text-muted text-xs font-semibold">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>{t('sreDashboard.hero.status')}</span>
               </div>
-              <div className="text-xs text-muted-foreground mb-1">{t('sreDashboard.hero.problems')}</div>
+              <div className="text-xs text-muted mb-1">{t('sreDashboard.hero.problems')}</div>
               <div className="flex items-baseline gap-1">
                 <span
                   className={`text-xl font-extrabold ${
@@ -515,7 +515,7 @@ export function SreDashboardPage() {
                 >
                   {summary.problems.open}
                 </span>
-                <span className="text-xs text-muted-foreground">/ {summary.problems.total}</span>
+                <span className="text-xs text-muted">/ {summary.problems.total}</span>
               </div>
               <Badge
                 variant={summary.problems.open === 0 ? 'success' : 'danger'}
@@ -634,7 +634,7 @@ export function SreDashboardPage() {
                 <Server className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.serviceAnalysis.title')}</h3>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">{t('sreDashboard.serviceAnalysis.subtitle')}</p>
+              <p className="text-xs text-muted mt-0.5">{t('sreDashboard.serviceAnalysis.subtitle')}</p>
             </CardHeader>
             <CardBody className="pt-0 p-0">
               <TopRequestsTable rows={topRequests} isLoading={topRequestsQuery.isLoading} />
@@ -648,7 +648,7 @@ export function SreDashboardPage() {
                 <Database className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.dbAnalysis.title')}</h3>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">{t('sreDashboard.dbAnalysis.subtitle')}</p>
+              <p className="text-xs text-muted mt-0.5">{t('sreDashboard.dbAnalysis.subtitle')}</p>
             </CardHeader>
             <CardBody className="pt-0 p-0">
               <TopQueriesTable rows={topQueries} isLoading={topQueriesQuery.isLoading} />

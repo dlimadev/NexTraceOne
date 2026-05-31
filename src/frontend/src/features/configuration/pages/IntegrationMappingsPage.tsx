@@ -22,7 +22,7 @@ export function IntegrationMappingsPage() {
 
       <Card>
         <CardBody className="flex flex-col items-start gap-4 py-8">
-          <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="flex items-center gap-3 text-muted">
             <Map size={32} className="text-blue-500 opacity-70" />
             <p className="text-sm">{t('integrationMappings.description')}</p>
           </div>

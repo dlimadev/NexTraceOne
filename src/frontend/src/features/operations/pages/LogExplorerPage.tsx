@@ -130,11 +130,11 @@ export function LogExplorerPage() {
           <CardBody className="p-4">
             <div className="flex flex-wrap items-end gap-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.filters.environment')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
                   value={environment}
                   onChange={(e) => setEnvironment(e.target.value)}
                 >
@@ -144,22 +144,22 @@ export function LogExplorerPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.logs.service')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-40"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-40"
                   placeholder={t('telemetryExplorer.logs.service')}
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.logs.level')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
                 >
@@ -171,22 +171,22 @@ export function LogExplorerPage() {
                 </select>
               </div>
               <div className="flex-1 min-w-[200px]">
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.logs.message')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-full"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-full"
                   placeholder={t('telemetryExplorer.logs.searchPlaceholder')}
                   value={messageContains}
                   onChange={(e) => setMessageContains(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.logs.traceId')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-40 font-mono"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-40 font-mono"
                   placeholder={t('operations.logExplorer.traceIdPlaceholder', 'Trace ID')}
                   value={traceIdFilter}
                   onChange={(e) => setTraceIdFilter(e.target.value)}
@@ -211,15 +211,15 @@ export function LogExplorerPage() {
             <CardBody className="p-0">
               {logsQuery.data.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <FileText className="w-10 h-10 text-muted mx-auto mb-3" />
                   <p className="text-sm font-medium">{t('telemetryExplorer.logs.noLogs')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{t('telemetryExplorer.logs.noLogsDescription')}</p>
+                  <p className="text-xs text-muted mt-1">{t('telemetryExplorer.logs.noLogsDescription')}</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border bg-muted/30">
+                      <tr className="border-b border-edge bg-muted/30">
                         <th className="text-left px-4 py-2 font-medium w-[180px]">{t('telemetryExplorer.logs.timestamp')}</th>
                         <th className="text-left px-4 py-2 font-medium w-[80px]">{t('telemetryExplorer.logs.level')}</th>
                         <th className="text-left px-4 py-2 font-medium w-[140px]">{t('telemetryExplorer.logs.service')}</th>
@@ -231,7 +231,7 @@ export function LogExplorerPage() {
                       {logsQuery.data.map((log: LogEntry, index: number) => (
                         <React.Fragment key={`${log.timestamp}-${index}`}>
                           <tr className="hover:bg-muted/50 transition-colors">
-                            <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                            <td className="px-4 py-2 text-xs text-muted whitespace-nowrap">
                               {formatTimestamp(log.timestamp)}
                             </td>
                             <td className="px-4 py-2">
@@ -246,7 +246,7 @@ export function LogExplorerPage() {
                                 {log.exception && (
                                   <button
                                     type="button"
-                                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                                    className="text-muted hover:text-body flex-shrink-0"
                                     onClick={() => setExpandedRow(expandedRow === index ? null : index)}
                                   >
                                     {expandedRow === index ? (

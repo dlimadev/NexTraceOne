@@ -67,7 +67,7 @@ function TemplateCard({ template, onInstall }: { template: DashboardTemplate; on
               )}
             </div>
             {template.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{template.description}</p>
+              <p className="text-xs text-muted line-clamp-2 mb-2">{template.description}</p>
             )}
             <div className="flex flex-wrap gap-1 mb-2">
               {template.persona && (
@@ -80,7 +80,7 @@ function TemplateCard({ template, onInstall }: { template: DashboardTemplate; on
                 <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
               ))}
             </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-3 text-xs text-muted">
               <span className="flex items-center gap-1">
                 <Download size={10} />
                 {template.installCount}
@@ -147,7 +147,7 @@ export function PluginMarketplacePage() {
       />
 
       {/* Simulated Banner */}
-      <div className="mx-4 mb-4 p-3 rounded-lg border border-info/40 bg-info/5 flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="mx-4 mb-4 p-3 rounded-lg border border-info/40 bg-info/5 flex items-center gap-2 text-xs text-muted">
         <AlertCircle size={12} className="text-info" />
         {t('pluginMarketplace.simulatedBanner')}
       </div>
@@ -156,9 +156,9 @@ export function PluginMarketplacePage() {
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-6">
           <div className="relative">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              className="pl-8 pr-3 py-1.5 text-sm rounded border border-border bg-elevated focus:outline-none focus:ring-1 focus:ring-accent"
+              className="pl-8 pr-3 py-1.5 text-sm rounded border border-edge bg-elevated focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t('pluginMarketplace.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -166,7 +166,7 @@ export function PluginMarketplacePage() {
           </div>
 
           <div className="flex items-center gap-1 flex-wrap">
-            <Filter size={12} className="text-muted-foreground" />
+            <Filter size={12} className="text-muted" />
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -174,7 +174,7 @@ export function PluginMarketplacePage() {
                 className={`px-2 py-1 rounded text-xs transition-colors ${
                   selectedCategory === cat
                     ? 'bg-accent text-white'
-                    : 'bg-muted text-muted-foreground hover:text-foreground'
+                    : 'bg-muted text-muted hover:text-body'
                 }`}
               >
                 {t(`pluginMarketplace.category.${cat}`, { defaultValue: cat })}
@@ -190,7 +190,7 @@ export function PluginMarketplacePage() {
                 className={`px-2 py-1 rounded text-xs transition-colors ${
                   selectedPersona === p
                     ? 'bg-primary text-white'
-                    : 'bg-muted text-muted-foreground hover:text-foreground'
+                    : 'bg-muted text-muted hover:text-body'
                 }`}
               >
                 {t(`pluginMarketplace.persona.${p}`, { defaultValue: p })}

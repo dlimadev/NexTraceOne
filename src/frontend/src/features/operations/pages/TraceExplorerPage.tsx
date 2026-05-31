@@ -362,11 +362,11 @@ export function TraceExplorerPage() {
               <>
                 <span className="flex items-center gap-1.5 text-xs text-muted">
                   <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="font-medium text-foreground tabular-nums">{formatDuration(traceData.durationMs)}</span>
+                  <span className="font-medium text-body tabular-nums">{formatDuration(traceData.durationMs)}</span>
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-muted">
                   <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="text-foreground">{new Date(rootSpan.startTime).toLocaleString()}</span>
+                  <span className="text-body">{new Date(rootSpan.startTime).toLocaleString()}</span>
                 </span>
                 <code className="font-mono text-[11px] text-muted bg-muted/30 px-2 py-0.5 rounded-sm border border-edge/40">
                   {selectedTraceId?.slice(0, 16)}…
@@ -390,6 +390,11 @@ export function TraceExplorerPage() {
                 {t('telemetryExplorer.traces.detail.serviceName')}:{' '}
                 <span className="text-accent font-medium">{rootSpan.serviceName}</span>
               </span>
+            )}
+            {traceData.services.length > 1 && (
+              <Badge variant="neutral" className="text-xs font-medium flex-shrink-0">
+                {traceData.services.length} services
+              </Badge>
             )}
             <div className="relative ml-auto w-72">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
@@ -465,7 +470,7 @@ export function TraceExplorerPage() {
                     <div
                       key={span.spanId}
                       className={`flex items-center border-b border-edge/30 hover:bg-muted/20 transition-colors cursor-pointer ${
-                        isSelected ? 'bg-accent/8 border-l-2 border-l-accent' : ''
+                        isSelected ? 'bg-accent/12 border-l-2 border-l-accent' : ''
                       }`}
                       style={{ height: '28px' }}
                       onClick={() => setSelectedSpan(span)}
@@ -503,8 +508,8 @@ export function TraceExplorerPage() {
                           style={kindMeta.dotStyle}
                         />
                         {/* Names */}
-                        <span className="text-xs font-medium text-foreground truncate">{span.serviceName}</span>
-                        <span className="text-xs text-muted/70 truncate ml-0.5 flex-shrink-0" style={{ maxWidth: '40%' }}>{span.operationName}</span>
+                        <span className="text-xs font-medium text-body truncate">{span.operationName}</span>
+                        <span className="text-[10px] text-muted/60 truncate ml-1 flex-shrink-0 leading-none" style={{ maxWidth: '35%' }}>{span.serviceName}</span>
                         {hasError && <XCircle className="w-3 h-3 text-destructive flex-shrink-0 ml-auto" />}
                       </div>
                       {/* Duration column */}
@@ -574,7 +579,7 @@ export function TraceExplorerPage() {
                   {t('telemetryExplorer.filters.environment')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
                   value={environment}
                   onChange={(e) => setEnvironment(e.target.value)}
                 >
@@ -589,7 +594,7 @@ export function TraceExplorerPage() {
                   {t('telemetryExplorer.filters.service')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-36"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-36"
                   placeholder={t('telemetryExplorer.traces.service')}
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
@@ -601,7 +606,7 @@ export function TraceExplorerPage() {
                   {t('telemetryExplorer.traces.operation')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-36"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-36"
                   placeholder={t('telemetryExplorer.traces.operation')}
                   value={operationName}
                   onChange={(e) => setOperationName(e.target.value)}
@@ -613,7 +618,7 @@ export function TraceExplorerPage() {
                   {t('telemetryExplorer.traces.serviceKind')}
                 </label>
                 <select
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
                   value={serviceKind}
                   onChange={(e) => setServiceKind(e.target.value)}
                   data-testid="service-kind-filter"
@@ -634,7 +639,7 @@ export function TraceExplorerPage() {
                   {t('telemetryExplorer.traces.minDuration')}
                 </label>
                 <input
-                  className="h-9 rounded-md border border-input bg-elevated px-3 text-sm w-28"
+                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-28"
                   type="number"
                   placeholder="0"
                   value={minDurationMs}
@@ -648,7 +653,7 @@ export function TraceExplorerPage() {
                   id="errorsOnly"
                   checked={errorsOnly}
                   onChange={(e) => setErrorsOnly(e.target.checked)}
-                  className="h-4 w-4 rounded border-input"
+                  className="h-4 w-4 rounded border-edge"
                 />
                 <label htmlFor="errorsOnly" className="text-sm">{t('telemetryExplorer.traces.errorsOnly')}</label>
               </div>
@@ -761,7 +766,7 @@ function ExpandableSection({ title, children, defaultOpen = false }: ExpandableS
     <div className="border-b border-edge/50 last:border-b-0">
       <button
         type="button"
-        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted/30 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-body hover:bg-muted/30 transition-colors"
         onClick={() => setOpen(!open)}
       >
         <span className="text-left">{title}</span>
@@ -874,7 +879,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
           <input
-            className="w-full h-7 pl-8 pr-3 rounded-md border border-input bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            className="w-full h-7 pl-8 pr-3 rounded-md border border-edge bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-accent"
             placeholder={t('telemetryExplorer.traces.detail.searchDetails')}
             value={detailSearch}
             onChange={(e) => setDetailSearch(e.target.value)}

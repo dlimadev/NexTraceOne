@@ -82,13 +82,13 @@ export function SloMarketplacePage() {
           icon={<Store className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
             {TIME_RANGE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted-foreground'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -115,7 +115,7 @@ export function SloMarketplacePage() {
               ].map((stat) => (
                 <Card key={stat.label}>
                   <CardBody className="p-3">
-                    <div className="text-xs text-muted-foreground mb-1">{stat.label}</div>
+                    <div className="text-xs text-muted mb-1">{stat.label}</div>
                     <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
                   </CardBody>
                 </Card>
@@ -132,7 +132,7 @@ export function SloMarketplacePage() {
                       key={cat.value}
                       type="button"
                       onClick={() => setCategory(cat.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${category === cat.value ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${category === cat.value ? 'bg-primary text-primary-foreground' : 'text-muted hover:bg-muted'}`}
                     >
                       {t(cat.labelKey)}
                     </button>
@@ -141,12 +141,12 @@ export function SloMarketplacePage() {
               </CardHeader>
               <CardBody className="p-0">
                 {filtered.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-sm">{t('sloMarketplace.noRecords')}</div>
+                  <div className="p-8 text-center text-muted text-sm">{t('sloMarketplace.noRecords')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+                        <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
                           <th className="px-4 py-2.5 text-left font-medium">{t('sloMarketplace.table.name')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('sloMarketplace.table.type')}</th>
                           <th className="px-4 py-2.5 text-left font-medium">{t('sloMarketplace.table.sli')}</th>
@@ -160,21 +160,21 @@ export function SloMarketplacePage() {
                       </thead>
                       <tbody>
                         {filtered.map((tmpl) => (
-                          <tr key={tmpl.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <tr key={tmpl.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-2.5 font-medium">{tmpl.name}</td>
                             <td className="px-4 py-2.5"><Badge variant="secondary">{t(`sloMarketplace.categories.${tmpl.category}`)}</Badge></td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{tmpl.sliType}</td>
+                            <td className="px-4 py-2.5 text-muted">{tmpl.sliType}</td>
                             <td className="px-4 py-2.5 tabular-nums font-semibold">{tmpl.target}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{tmpl.window}</td>
+                            <td className="px-4 py-2.5 text-muted">{tmpl.window}</td>
                             <td className="px-4 py-2.5">
                               {tmpl.compliancePreset ? (
                                 <Badge variant="info">{tmpl.compliancePreset}</Badge>
                               ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
+                                <span className="text-muted text-xs">—</span>
                               )}
                             </td>
-                            <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{tmpl.uses}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground text-xs">{tmpl.author}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-muted">{tmpl.uses}</td>
+                            <td className="px-4 py-2.5 text-muted text-xs">{tmpl.author}</td>
                             <td className="px-4 py-2.5">
                               <Button variant="ghost" size="sm">
                                 <Download className="w-3.5 h-3.5 mr-1" />

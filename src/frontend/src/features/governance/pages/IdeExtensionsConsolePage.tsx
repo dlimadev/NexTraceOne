@@ -79,7 +79,7 @@ export function IdeExtensionsConsolePage() {
                       {IDE_ICONS[ext.ide]}
                       <div>
                         <p className="text-sm font-semibold">{IDE_LABELS[ext.ide] ?? ext.ide}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{ext.version}</p>
+                        <p className="text-xs text-muted font-mono">{ext.version}</p>
                       </div>
                       <Badge
                         variant={ext.status === 'UpToDate' ? 'success' : ext.status === 'UpdateAvailable' ? 'warning' : 'secondary'}
@@ -91,13 +91,13 @@ export function IdeExtensionsConsolePage() {
 
                     <div className="grid grid-cols-2 gap-2 text-xs mb-3">
                       <div className="flex items-center gap-1">
-                        <Download size={10} className="text-muted-foreground" />
-                        <span className="text-muted-foreground">{t('ideConsole.installed')}</span>
+                        <Download size={10} className="text-muted" />
+                        <span className="text-muted">{t('ideConsole.installed')}</span>
                         <span className="font-bold ml-auto">{ext.installedCount}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Users size={10} className="text-muted-foreground" />
-                        <span className="text-muted-foreground">{t('ideConsole.enrolled')}</span>
+                        <Users size={10} className="text-muted" />
+                        <span className="text-muted">{t('ideConsole.enrolled')}</span>
                         <span className="font-bold ml-auto">{ext.enrolledDevelopers}</span>
                       </div>
                     </div>
@@ -141,7 +141,7 @@ export function IdeExtensionsConsolePage() {
                           <Badge variant="outline" className="text-xs">{IDE_LABELS[dev.ide] ?? dev.ide}</Badge>
                           <Badge variant="secondary" className="text-xs font-mono">{dev.extensionVersion}</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">{dev.email} · {t('ideConsole.lastSeen')}: {new Date(dev.lastSeen).toLocaleString()}</p>
+                        <p className="text-xs text-muted">{dev.email} · {t('ideConsole.lastSeen')}: {new Date(dev.lastSeen).toLocaleString()}</p>
                       </div>
                       <Badge
                         variant={dev.status === 'Active' ? 'success' : dev.status === 'Pending' ? 'warning' : 'secondary'}
@@ -154,13 +154,13 @@ export function IdeExtensionsConsolePage() {
                 </Card>
               ))}
               {(data?.enrollments ?? []).length === 0 && (
-                <div className="text-center p-8 text-muted-foreground text-sm">
+                <div className="text-center p-8 text-muted text-sm">
                   {t('ideConsole.noEnrollments')}
                 </div>
               )}
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('sotCenter.simulatedBanner')}
             </div>
           </>

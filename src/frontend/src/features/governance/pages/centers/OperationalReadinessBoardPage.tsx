@@ -83,7 +83,7 @@ export function OperationalReadinessBoardPage() {
                           { label: t('operationalReadiness.baseline'), score: svc.baselineScore, icon: <CheckCircle2 size={10} /> },
                         ].map((dim) => (
                           <div key={dim.label} className="text-center">
-                            <div className="flex items-center justify-center gap-1 mb-1 text-muted-foreground">{dim.icon}<span className="text-xs">{dim.label}</span></div>
+                            <div className="flex items-center justify-center gap-1 mb-1 text-muted">{dim.icon}<span className="text-xs">{dim.label}</span></div>
                             <div className="relative w-full bg-muted rounded-full h-1.5">
                               <div
                                 className={`h-1.5 rounded-full ${dim.score >= 80 ? 'bg-success' : dim.score >= 60 ? 'bg-warning' : 'bg-destructive'}`}
@@ -111,13 +111,13 @@ export function OperationalReadinessBoardPage() {
                 );
               })}
               {(data?.services ?? []).length === 0 && (
-                <div className="text-center p-8 text-muted-foreground text-sm">
+                <div className="text-center p-8 text-muted text-sm">
                   {t('operationalReadiness.empty')}
                 </div>
               )}
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted-foreground">
+            <div className="mt-4 p-3 rounded-lg bg-muted/40 text-xs text-muted">
               {t('sotCenter.simulatedBanner')}
             </div>
           </>

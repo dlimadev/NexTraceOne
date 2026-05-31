@@ -86,9 +86,9 @@ function PresenceBar({ users }: { users: PresenceUser[] }) {
   if (!users.length) return null;
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-surface-elevated rounded-lg border border-border">
-      <Users size={14} className="text-muted-foreground" />
-      <span className="text-xs text-muted-foreground">{t('warRoom.activeNow', { count: users.length })}</span>
+    <div className="flex items-center gap-2 px-4 py-2 bg-surface-elevated rounded-lg border border-edge">
+      <Users size={14} className="text-muted" />
+      <span className="text-xs text-muted">{t('warRoom.activeNow', { count: users.length })}</span>
       <div className="flex -space-x-2">
         {users.slice(0, 8).map((u) => (
           <div
@@ -101,7 +101,7 @@ function PresenceBar({ users }: { users: PresenceUser[] }) {
           </div>
         ))}
         {users.length > 8 && (
-          <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs text-muted-foreground">
+          <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs text-muted">
             +{users.length - 8}
           </div>
         )}
@@ -148,8 +148,8 @@ function CommentItem({
           )}
         </div>
       </div>
-      <p className="mt-2 text-sm text-foreground">{comment.content}</p>
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="mt-2 text-sm text-body">{comment.content}</p>
+      <p className="mt-1 text-xs text-muted">
         {new Date(comment.createdAt).toLocaleString()}
         {comment.editedAt && ` · ${t('warRoom.edited')}`}
       </p>
@@ -203,10 +203,10 @@ export function WarRoomPage() {
                   <h3 className="text-sm font-semibold">{t('warRoom.activeContext')}</h3>
                   <Badge variant="warning">{t('warRoom.live')}</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted">
                   {t('warRoom.contextHint')}
                 </p>
-                <div className="mt-4 p-3 rounded bg-muted/40 text-xs text-muted-foreground">
+                <div className="mt-4 p-3 rounded bg-muted/40 text-xs text-muted">
                   {t('warRoom.simulatedBanner')}
                 </div>
               </CardBody>
@@ -250,7 +250,7 @@ export function WarRoomPage() {
 
               {showResolved && resolvedComments.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  <h4 className="text-xs font-medium text-muted-foreground">{t('warRoom.resolvedThreads', { count: resolvedComments.length })}</h4>
+                  <h4 className="text-xs font-medium text-muted">{t('warRoom.resolvedThreads', { count: resolvedComments.length })}</h4>
                   {resolvedComments.map((c) => (
                     <CommentItem
                       key={c.id}
@@ -272,7 +272,7 @@ export function WarRoomPage() {
                   {t('warRoom.addComment')}
                 </h3>
                 <textarea
-                  className="w-full rounded border border-border bg-elevated text-sm p-2 resize-none focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded border border-edge bg-elevated text-sm p-2 resize-none focus:outline-none focus:ring-1 focus:ring-accent"
                   rows={4}
                   placeholder={t('warRoom.commentPlaceholder')}
                   value={newComment}
@@ -315,7 +315,7 @@ export function WarRoomPage() {
                       </div>
                     ))}
                     {(presenceQuery.data?.count ?? 0) === 0 && (
-                      <p className="text-xs text-muted-foreground">{t('warRoom.noParticipants')}</p>
+                      <p className="text-xs text-muted">{t('warRoom.noParticipants')}</p>
                     )}
                   </div>
                 )}

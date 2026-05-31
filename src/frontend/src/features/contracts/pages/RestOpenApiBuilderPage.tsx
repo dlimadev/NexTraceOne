@@ -75,12 +75,12 @@ export function RestOpenApiBuilderPage() {
           <div className="lg:col-span-1 space-y-3">
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                   {t('restBuilder.apiInfo')}
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('restBuilder.title')}</label>
+                    <label className="text-xs text-muted">{t('restBuilder.title')}</label>
                     <input
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
@@ -88,7 +88,7 @@ export function RestOpenApiBuilderPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('restBuilder.version')}</label>
+                    <label className="text-xs text-muted">{t('restBuilder.version')}</label>
                     <input
                       value={version}
                       onChange={(e) => setVersion(e.target.value)}
@@ -96,7 +96,7 @@ export function RestOpenApiBuilderPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('restBuilder.baseUrl')}</label>
+                    <label className="text-xs text-muted">{t('restBuilder.baseUrl')}</label>
                     <input
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
@@ -109,7 +109,7 @@ export function RestOpenApiBuilderPage() {
 
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                   {t('restBuilder.summary')}
                 </h3>
                 <div className="space-y-1 text-xs">
@@ -119,7 +119,7 @@ export function RestOpenApiBuilderPage() {
                     return (
                       <div key={method} className="flex items-center justify-between">
                         <span className={`font-mono font-bold ${color}`}>{method}</span>
-                        <span className="text-muted-foreground">{count}</span>
+                        <span className="text-muted">{count}</span>
                       </div>
                     );
                   })}
@@ -159,14 +159,14 @@ export function RestOpenApiBuilderPage() {
                         {ep.method}
                       </Badge>
                       <span className="text-sm font-mono flex-1">{ep.path}</span>
-                      <span className="text-xs text-muted-foreground">{ep.summary}</span>
+                      <span className="text-xs text-muted">{ep.summary}</span>
                     </button>
 
                     {expanded === ep.id && (
                       <div className="border-t p-3 space-y-2 bg-muted/20">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="text-xs text-muted-foreground">{t('restBuilder.method')}</label>
+                            <label className="text-xs text-muted">{t('restBuilder.method')}</label>
                             <select
                               value={ep.method}
                               onChange={(e) => updateEndpoint(ep.id, { method: e.target.value as Endpoint['method'] })}
@@ -178,7 +178,7 @@ export function RestOpenApiBuilderPage() {
                             </select>
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground">{t('restBuilder.path')}</label>
+                            <label className="text-xs text-muted">{t('restBuilder.path')}</label>
                             <input
                               value={ep.path}
                               onChange={(e) => updateEndpoint(ep.id, { path: e.target.value })}
@@ -187,7 +187,7 @@ export function RestOpenApiBuilderPage() {
                           </div>
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground">{t('restBuilder.summary')}</label>
+                          <label className="text-xs text-muted">{t('restBuilder.summary')}</label>
                           <input
                             value={ep.summary}
                             onChange={(e) => updateEndpoint(ep.id, { summary: e.target.value })}
@@ -209,7 +209,7 @@ export function RestOpenApiBuilderPage() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg border border-accent/30 bg-accent/5 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg border border-accent/30 bg-accent/5 text-xs text-muted">
           {t('restBuilder.openApiBanner')}
         </div>
       </PageSection>

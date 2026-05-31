@@ -310,7 +310,7 @@ export function McpServerPage() {
                   </button>
 
                   {isExpanded && paramKeys.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-border">
+                    <div className="mt-3 pt-3 border-t border-edge">
                       <p className="text-xs font-semibold text-content-secondary mb-2 uppercase tracking-wide">
                         {t('mcpServer.tools.parameters')}
                       </p>

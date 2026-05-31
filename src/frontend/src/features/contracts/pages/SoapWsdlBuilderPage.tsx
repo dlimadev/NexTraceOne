@@ -51,20 +51,20 @@ export function SoapWsdlBuilderPage() {
           <div className="lg:col-span-1 space-y-3">
             <Card>
               <CardBody className="p-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                   {t('soapBuilder.serviceInfo')}
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('soapBuilder.serviceName')}</label>
+                    <label className="text-xs text-muted">{t('soapBuilder.serviceName')}</label>
                     <input value={serviceName} onChange={(e) => setServiceName(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('soapBuilder.targetNamespace')}</label>
+                    <label className="text-xs text-muted">{t('soapBuilder.targetNamespace')}</label>
                     <input value={targetNamespace} onChange={(e) => setTargetNamespace(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-xs border rounded bg-elevated font-mono" />
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">{t('soapBuilder.wsdlVersion')}</label>
+                    <label className="text-xs text-muted">{t('soapBuilder.wsdlVersion')}</label>
                     <select value={wsdlVersion} onChange={(e) => setWsdlVersion(e.target.value as '1.1' | '2.0')} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                       <option value="1.1">WSDL 1.1</option>
                       <option value="2.0">WSDL 2.0</option>
@@ -96,7 +96,7 @@ export function SoapWsdlBuilderPage() {
                   }`}
                 >
                   <p className="text-sm font-medium">{op.name}</p>
-                  <p className="text-xs text-muted-foreground font-mono">{op.inputMessage} → {op.outputMessage}</p>
+                  <p className="text-xs text-muted font-mono">{op.inputMessage} → {op.outputMessage}</p>
                 </button>
               ))}
             </div>
@@ -120,28 +120,28 @@ export function SoapWsdlBuilderPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('soapBuilder.operationName')}</label>
+                      <label className="text-xs text-muted">{t('soapBuilder.operationName')}</label>
                       <input value={active.name} onChange={(e) => update(active.id, { name: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('soapBuilder.style')}</label>
+                      <label className="text-xs text-muted">{t('soapBuilder.style')}</label>
                       <select value={active.style} onChange={(e) => update(active.id, { style: e.target.value as 'document' | 'rpc' })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
                         <option value="document">document</option>
                         <option value="rpc">rpc</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('soapBuilder.inputMessage')}</label>
+                      <label className="text-xs text-muted">{t('soapBuilder.inputMessage')}</label>
                       <input value={active.inputMessage} onChange={(e) => update(active.id, { inputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono text-xs" />
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">{t('soapBuilder.outputMessage')}</label>
+                      <label className="text-xs text-muted">{t('soapBuilder.outputMessage')}</label>
                       <input value={active.outputMessage} onChange={(e) => update(active.id, { outputMessage: e.target.value })} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated font-mono text-xs" />
                     </div>
                   </div>
 
                   <div className="mt-3">
-                    <label className="text-xs text-muted-foreground">{t('soapBuilder.documentation')}</label>
+                    <label className="text-xs text-muted">{t('soapBuilder.documentation')}</label>
                     <textarea
                       value={active.documentation}
                       onChange={(e) => update(active.id, { documentation: e.target.value })}
@@ -152,14 +152,14 @@ export function SoapWsdlBuilderPage() {
                 </CardBody>
               </Card>
             ) : (
-              <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+              <div className="flex items-center justify-center h-48 text-muted text-sm">
                 {t('soapBuilder.selectOperation')}
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg border border-warning/30 bg-warning/5 text-xs text-muted-foreground">
+        <div className="mt-4 p-3 rounded-lg border border-warning/30 bg-warning/5 text-xs text-muted">
           {t('soapBuilder.wsdlBanner')}
         </div>
       </PageSection>
