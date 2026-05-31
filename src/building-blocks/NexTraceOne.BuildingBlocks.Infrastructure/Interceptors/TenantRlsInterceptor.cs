@@ -87,11 +87,6 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
     /// </summary>
     private void ApplyTenantContext(DbCommand command)
     {
-        if (currentTenant.Id == Guid.Empty)
-        {
-            return;
-        }
-
         using var configCmd = CreateTenantCommand(command);
 
         if (command.CommandTimeout > 0)
@@ -117,11 +112,6 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
     /// </summary>
     private async Task ApplyTenantContextAsync(DbCommand command, CancellationToken cancellationToken)
     {
-        if (currentTenant.Id == Guid.Empty)
-        {
-            return;
-        }
-
         await using var configCmd = CreateTenantCommand(command);
         // align timeouts so the helper command doesn't outlive the main command
         if (command.CommandTimeout > 0)
@@ -152,7 +142,7 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
 
         var tenantParam = configCmd.CreateParameter();
         tenantParam.ParameterName = "__tenantId";
-        tenantParam.Value = currentTenant.Id.ToString();
+        tenantParam.Value = currentTenant.Id == Guid.Empty ? string.Empty : currentTenant.Id.ToString();
         tenantParam.DbType = DbType.String;
         configCmd.Parameters.Add(tenantParam);
 

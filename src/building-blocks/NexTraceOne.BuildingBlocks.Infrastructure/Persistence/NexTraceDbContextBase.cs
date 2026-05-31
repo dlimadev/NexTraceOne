@@ -13,8 +13,8 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 /// Classe base para todos os DbContexts dos módulos.
 /// Configura automaticamente: TenantRlsInterceptor (RLS PostgreSQL),
 /// AuditInterceptor (CreatedAt/By, UpdatedAt/By),
-/// EncryptionInterceptor (AES-256-GCM via EncryptedStringConverter para propriedades
-/// marcadas com [EncryptedField]), OutboxInterceptor (Domain Events → Outbox).
+/// EncryptedFieldConvention (AES-256-GCM via EncryptedStringConverter para propriedades
+/// marcadas com [EncryptedField]), OutboxMessage (Domain Events → Outbox).
 /// </summary>
 public abstract class NexTraceDbContextBase(
     DbContextOptions options,

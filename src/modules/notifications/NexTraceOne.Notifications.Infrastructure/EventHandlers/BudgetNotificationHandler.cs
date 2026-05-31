@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -54,5 +55,5 @@ internal sealed class BudgetNotificationHandler(
         }, ct);
     }
 
-    private static string FormatCost(decimal cost) => $"${cost:N2}";
+    private static string FormatCost(decimal cost) => $"${cost.ToString("N2", CultureInfo.InvariantCulture)}";
 }

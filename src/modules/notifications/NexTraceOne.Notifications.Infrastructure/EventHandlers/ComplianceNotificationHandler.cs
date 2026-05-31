@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -174,7 +175,7 @@ internal sealed class ComplianceNotificationHandler(
             Category = nameof(NotificationCategory.FinOps),
             Severity = severity,
             Title = $"Budget at {@event.ThresholdPercent}% — {@event.ServiceName}",
-            Message = $"Service {@event.ServiceName} has reached {@event.ThresholdPercent}% of budget (${@event.CurrentSpend:N2} of ${@event.BudgetLimit:N2}). Review spending.",
+            Message = $"Service {@event.ServiceName} has reached {@event.ThresholdPercent}% of budget (${@event.CurrentSpend.ToString("N2", CultureInfo.InvariantCulture)} of ${@event.BudgetLimit.ToString("N2", CultureInfo.InvariantCulture)}). Review spending.",
             SourceModule = "Governance",
             SourceEntityType = "Budget",
             SourceEntityId = @event.ServiceName,

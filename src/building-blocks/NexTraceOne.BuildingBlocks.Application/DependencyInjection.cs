@@ -26,11 +26,11 @@ public static class DependencyInjection
         services.AddScoped<IErrorLocalizer, ErrorLocalizer>();
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualLoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualLoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
         return services;

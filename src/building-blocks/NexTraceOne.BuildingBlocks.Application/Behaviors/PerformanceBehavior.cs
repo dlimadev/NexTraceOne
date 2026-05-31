@@ -22,25 +22,39 @@ public sealed class PerformanceBehavior<TRequest, TResponse>(
         CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
-        var response = await next();
+        try
+        {
+            var response = await next();
+            stopwatch.Stop();
+            LogIfThresholdExceeded(stopwatch.ElapsedMilliseconds, typeof(TRequest).Name);
+            return response;
+        }
+        catch (OperationCanceledException)
+        {
+            stopwatch.Stop();
+            logger.LogInformation(
+                "Request {RequestName} was cancelled after {ElapsedMilliseconds}ms",
+                typeof(TRequest).Name,
+                stopwatch.ElapsedMilliseconds);
+            throw;
+        }
+    }
 
-        stopwatch.Stop();
-
-        if (stopwatch.ElapsedMilliseconds >= ErrorThresholdMs)
+    private void LogIfThresholdExceeded(long elapsedMs, string requestName)
+    {
+        if (elapsedMs >= ErrorThresholdMs)
         {
             logger.LogError(
                 "Request {RequestName} exceeded critical threshold with {ElapsedMilliseconds}ms",
-                typeof(TRequest).Name,
-                stopwatch.ElapsedMilliseconds);
+                requestName,
+                elapsedMs);
         }
-        else if (stopwatch.ElapsedMilliseconds >= WarningThresholdMs)
+        else if (elapsedMs >= WarningThresholdMs)
         {
             logger.LogWarning(
                 "Request {RequestName} exceeded warning threshold with {ElapsedMilliseconds}ms",
-                typeof(TRequest).Name,
-                stopwatch.ElapsedMilliseconds);
+                requestName,
+                elapsedMs);
         }
-
-        return response;
     }
 }

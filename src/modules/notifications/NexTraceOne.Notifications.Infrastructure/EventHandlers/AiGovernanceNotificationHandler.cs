@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -83,7 +84,7 @@ internal sealed class AiGovernanceNotificationHandler(
             Category = nameof(NotificationCategory.AI),
             Severity = nameof(NotificationSeverity.Warning),
             Title = $"Token budget exceeded — {@event.ProviderName}",
-            Message = $"You have used {@event.TokensUsed:N0} of {@event.TokenLimit:N0} allocated tokens for {@event.ProviderName}. Further AI requests may be limited.",
+            Message = $"You have used {@event.TokensUsed.ToString("N0", CultureInfo.InvariantCulture)} of {@event.TokenLimit.ToString("N0", CultureInfo.InvariantCulture)} allocated tokens for {@event.ProviderName}. Further AI requests may be limited.",
             SourceModule = "AIKnowledge",
             SourceEntityType = "TokenBudget",
             SourceEntityId = @event.UserId.ToString(),
