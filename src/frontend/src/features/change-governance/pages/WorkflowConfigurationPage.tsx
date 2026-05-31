@@ -10,7 +10,7 @@ import {
   Snowflake,
   ChevronDown,
   ChevronUp,
-  Edit3,
+  Pencil,
   Search,
   Filter,
   Check,
@@ -502,7 +502,7 @@ export function WorkflowConfigurationPage() {
                           className="p-2 rounded-lg text-muted hover:text-info hover:bg-info/15 transition-colors"
                           title={t('workflowConfig.actions.edit', 'Edit')}
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <Pencil className="w-4 h-4" />
                         </button>
                       )}
                       <button

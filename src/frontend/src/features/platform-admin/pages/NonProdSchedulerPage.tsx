@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Clock, RefreshCw, Edit2, Save, X, Zap } from 'lucide-react';
+import { Clock, RefreshCw, Pencil, Save, X, Zap } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -138,7 +138,7 @@ export function NonProdSchedulerPage() {
                         onClick={() => startEdit(schedule)}
                         className="flex items-center gap-1 px-2 py-1 text-xs border border-edge rounded hover:bg-elevated text-muted"
                       >
-                        <Edit2 size={12} />
+                        <Pencil size={12} />
                         {t('edit')}
                       </button>
                     </>

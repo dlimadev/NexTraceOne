@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Edit2, Shield } from 'lucide-react';
+import { Plus, Trash2, Pencil, Shield } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -295,7 +295,7 @@ export function UserModelPoliciesPage() {
                     className="p-1.5 rounded hover:bg-surface-hover text-muted hover:text-foreground transition-colors"
                     title={t('common.edit', 'Editar')}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Pencil className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => deleteMutation.mutate(policy.policyId)}

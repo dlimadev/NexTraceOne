@@ -10,7 +10,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
-  Edit3,
+  Pencil,
   Search,
   Filter,
   Check,
@@ -324,7 +324,7 @@ export function AiIntegrationsConfigurationPage() {
                         onClick={() => startEdit(def)}
                         className="p-1 text-muted hover:text-brand-600"
                       >
-                        <Edit3 className="w-4 h-4" />
+                        <Pencil className="w-4 h-4" />
                       </button>
                     )}
                   </div>

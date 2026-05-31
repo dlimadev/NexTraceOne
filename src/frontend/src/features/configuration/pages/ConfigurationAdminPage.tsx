@@ -12,7 +12,7 @@ import {
   Check,
   X,
   RefreshCw,
-  Edit3,
+  Pencil,
   Trash2,
   ToggleLeft,
   ToggleRight,
@@ -273,7 +273,7 @@ export function ConfigurationAdminPage() {
         <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg mx-4">
           <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
             <h3 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <Edit3 size={16} className="text-accent" />
+              <Pencil size={16} className="text-accent" />
               {t('configuration.edit.title')}
             </h3>
             <button
@@ -760,7 +760,7 @@ export function ConfigurationAdminPage() {
                                   className="text-muted hover:text-accent transition-colors p-1"
                                   title={t('configuration.actions.edit')}
                                 >
-                                  <Edit3 size={14} />
+                                  <Pencil size={14} />
                                 </button>
                               )}
                               <button
@@ -875,7 +875,7 @@ export function ConfigurationAdminPage() {
                                   className="text-muted hover:text-accent transition-colors p-1"
                                   title={t('configuration.actions.edit')}
                                 >
-                                  <Edit3 size={14} />
+                                  <Pencil size={14} />
                                 </button>
                               )}
                               <button
