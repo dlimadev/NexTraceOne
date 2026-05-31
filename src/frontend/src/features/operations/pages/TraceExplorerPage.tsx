@@ -148,7 +148,7 @@ function getServiceKindMeta(kind: string | undefined): ServiceKindMeta {
     case SK_MESSAGING:
       return { label: 'Messaging', icon: <IconMessaging className="w-3 h-3" />, barClass: 'bg-indigo-500/80', textClass: 'text-indigo-400', dotStyle: { background: 'var(--t-data-8)' } };
     default:
-      return { label: 'Unknown', icon: <IconServiceUnknown className="w-3 h-3" />, barClass: 'bg-accent/60', textClass: 'text-muted-foreground', dotStyle: { background: 'var(--t-muted)' } };
+      return { label: 'Unknown', icon: <IconServiceUnknown className="w-3 h-3" />, barClass: 'bg-accent/60', textClass: 'text-muted', dotStyle: { background: 'var(--t-muted)' } };
   }
 }
 
@@ -344,13 +344,13 @@ export function TraceExplorerPage() {
     return (
       <div className="flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
         {/* ── Header bar ─────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-edge bg-card flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <Button variant="ghost" size="sm" onClick={closeDetail}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {t('telemetryExplorer.traces.title')}
             </Button>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted flex-shrink-0" />
             <span className="text-sm font-semibold truncate">
               {detailQuery.isLoading
                 ? t('telemetryExplorer.loading')
@@ -360,15 +360,15 @@ export function TraceExplorerPage() {
           <div className="flex items-center gap-4">
             {traceData && rootSpan && (
               <>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 text-xs text-muted">
                   <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="font-medium text-foreground tabular-nums">{formatDuration(traceData.durationMs)}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 text-xs text-muted">
                   <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="text-foreground">{new Date(rootSpan.startTime).toLocaleString()}</span>
                 </span>
-                <code className="font-mono text-[11px] text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-sm border border-border/40">
+                <code className="font-mono text-[11px] text-muted bg-muted/30 px-2 py-0.5 rounded-sm border border-edge/40">
                   {selectedTraceId?.slice(0, 16)}…
                 </code>
               </>
@@ -381,20 +381,20 @@ export function TraceExplorerPage() {
 
         {/* ── Span count + search ──────────────────────────────────────────────── */}
         {traceData && (
-          <div className="flex items-center gap-3 px-4 py-1.5 border-b border-border flex-shrink-0 bg-muted/5">
+          <div className="flex items-center gap-3 px-4 py-1.5 border-b border-edge flex-shrink-0 bg-muted/5">
             <Badge variant="neutral" className="text-xs font-medium flex-shrink-0">
               {traceData.spans.length} {t('telemetryExplorer.traces.detail.spans').toLowerCase()}
             </Badge>
             {rootSpan && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted">
                 {t('telemetryExplorer.traces.detail.serviceName')}:{' '}
                 <span className="text-accent font-medium">{rootSpan.serviceName}</span>
               </span>
             )}
             <div className="relative ml-auto w-72">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
               <input
-                className="w-full h-7 pl-8 pr-3 rounded-sm border border-border bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full h-7 pl-8 pr-3 rounded-sm border border-edge bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-accent"
                 placeholder={t('telemetryExplorer.traces.detail.searchSpans')}
                 value={spanSearch}
                 onChange={(e) => setSpanSearch(e.target.value)}
@@ -412,20 +412,20 @@ export function TraceExplorerPage() {
           <div className="flex flex-1 min-h-0 overflow-hidden">
             {/* Waterfall panel */}
             <div
-              className={`flex flex-col min-h-0 overflow-hidden border-r border-border transition-all ${
+              className={`flex flex-col min-h-0 overflow-hidden border-r border-edge transition-all ${
                 selectedSpan ? 'flex-1' : 'w-full'
               }`}
             >
               {/* Column headers + timeline ruler */}
-              <div className="flex items-stretch border-b border-border bg-muted/20 flex-shrink-0 select-none">
+              <div className="flex items-stretch border-b border-edge bg-muted/20 flex-shrink-0 select-none">
                 <div
-                  className="flex items-center px-3 py-1.5 border-r border-border/40 text-xs font-semibold text-muted-foreground"
+                  className="flex items-center px-3 py-1.5 border-r border-edge/40 text-xs font-semibold text-muted"
                   style={{ width: '46%', flexShrink: 0 }}
                 >
                   {t('telemetryExplorer.traces.detail.spans')} / {t('telemetryExplorer.traces.service')}
                 </div>
                 <div
-                  className="flex items-center px-2 py-1.5 border-r border-border/40 text-xs font-semibold text-muted-foreground"
+                  className="flex items-center px-2 py-1.5 border-r border-edge/40 text-xs font-semibold text-muted"
                   style={{ width: '9%', flexShrink: 0 }}
                 >
                   {t('telemetryExplorer.traces.duration')}
@@ -434,7 +434,7 @@ export function TraceExplorerPage() {
                   {buildTimeMarks(traceData.durationMs).map(({ label, pct }) => (
                     <span
                       key={pct}
-                      className="absolute text-[10px] text-muted-foreground/60"
+                      className="absolute text-[10px] text-muted/60"
                       style={{ left: `${pct}%`, transform: pct > 0 ? 'translateX(-50%)' : undefined }}
                     >
                       {label}
@@ -446,7 +446,7 @@ export function TraceExplorerPage() {
               {/* Span rows */}
               <div className="flex-1 overflow-y-auto">
                 {visibleNodes.length === 0 && (
-                  <div className="text-center py-10 text-sm text-muted-foreground">
+                  <div className="text-center py-10 text-sm text-muted">
                     {t('telemetryExplorer.traces.noTraces')}
                   </div>
                 )}
@@ -464,7 +464,7 @@ export function TraceExplorerPage() {
                   return (
                     <div
                       key={span.spanId}
-                      className={`flex items-center border-b border-border/30 hover:bg-muted/20 transition-colors cursor-pointer ${
+                      className={`flex items-center border-b border-edge/30 hover:bg-muted/20 transition-colors cursor-pointer ${
                         isSelected ? 'bg-accent/8 border-l-2 border-l-accent' : ''
                       }`}
                       style={{ height: '28px' }}
@@ -472,7 +472,7 @@ export function TraceExplorerPage() {
                     >
                       {/* Name + service column */}
                       <div
-                        className="flex items-center gap-1 px-2 border-r border-border/30 h-full min-w-0"
+                        className="flex items-center gap-1 px-2 border-r border-edge/30 h-full min-w-0"
                         style={{ width: '46%', flexShrink: 0 }}
                       >
                         {/* Depth indent */}
@@ -489,7 +489,7 @@ export function TraceExplorerPage() {
                         >
                           {node.hasChildren ? (
                             <ChevronRight
-                              className={`w-3 h-3 text-muted-foreground/60 transition-transform duration-150 ${
+                              className={`w-3 h-3 text-muted/60 transition-transform duration-150 ${
                                 isCollapsed ? '' : 'rotate-90'
                               }`}
                             />
@@ -504,12 +504,12 @@ export function TraceExplorerPage() {
                         />
                         {/* Names */}
                         <span className="text-xs font-medium text-foreground truncate">{span.serviceName}</span>
-                        <span className="text-xs text-muted-foreground/70 truncate ml-0.5 flex-shrink-0" style={{ maxWidth: '40%' }}>{span.operationName}</span>
+                        <span className="text-xs text-muted/70 truncate ml-0.5 flex-shrink-0" style={{ maxWidth: '40%' }}>{span.operationName}</span>
                         {hasError && <XCircle className="w-3 h-3 text-destructive flex-shrink-0 ml-auto" />}
                       </div>
                       {/* Duration column */}
                       <div
-                        className="flex items-center px-2 border-r border-border/30 text-xs text-muted-foreground tabular-nums h-full"
+                        className="flex items-center px-2 border-r border-edge/30 text-xs text-muted tabular-nums h-full"
                         style={{ width: '9%', flexShrink: 0 }}
                       >
                         {formatDuration(span.durationMs)}
@@ -546,7 +546,7 @@ export function TraceExplorerPage() {
 
             {/* Span detail panel */}
             {selectedSpan && (
-              <div className="flex-shrink-0 flex flex-col overflow-hidden border-l border-border" style={{ width: '380px' }}>
+              <div className="flex-shrink-0 flex flex-col overflow-hidden border-l border-edge" style={{ width: '380px' }}>
                 <SpanDetailPanel span={selectedSpan} t={t} onClose={() => setSelectedSpan(null)} />
               </div>
             )}
@@ -570,7 +570,7 @@ export function TraceExplorerPage() {
           <CardBody className="p-4">
             <div className="flex flex-wrap items-end gap-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.filters.environment')}
                 </label>
                 <select
@@ -585,7 +585,7 @@ export function TraceExplorerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.filters.service')}
                 </label>
                 <input
@@ -597,7 +597,7 @@ export function TraceExplorerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.traces.operation')}
                 </label>
                 <input
@@ -609,7 +609,7 @@ export function TraceExplorerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.traces.serviceKind')}
                 </label>
                 <select
@@ -630,7 +630,7 @@ export function TraceExplorerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1">
+                <label className="text-xs font-medium text-muted block mb-1">
                   {t('telemetryExplorer.traces.minDuration')}
                 </label>
                 <input
@@ -671,23 +671,23 @@ export function TraceExplorerPage() {
             <CardBody className="p-0">
               {tracesQuery.data.length === 0 ? (
                 <div className="text-center py-12">
-                  <Activity className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <Activity className="w-10 h-10 text-muted mx-auto mb-3" />
                   <p className="text-sm font-medium">{t('telemetryExplorer.traces.noTraces')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{t('telemetryExplorer.traces.noTracesDescription')}</p>
+                  <p className="text-xs text-muted mt-1">{t('telemetryExplorer.traces.noTracesDescription')}</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border bg-muted/30">
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.traceId')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.serviceKind')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.service')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.operation')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground" style={{ minWidth: '160px' }}>{t('telemetryExplorer.traces.duration')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.status')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.spanCount')}</th>
-                        <th className="text-left px-4 py-2 font-medium text-xs text-muted-foreground">{t('telemetryExplorer.traces.startTime')}</th>
+                      <tr className="border-b border-edge bg-muted/30">
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.traceId')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.serviceKind')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.service')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.operation')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted" style={{ minWidth: '160px' }}>{t('telemetryExplorer.traces.duration')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.status')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.spanCount')}</th>
+                        <th className="text-left px-4 py-2 font-medium text-xs text-muted">{t('telemetryExplorer.traces.startTime')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -700,7 +700,7 @@ export function TraceExplorerPage() {
                             className="hover:bg-muted/50 cursor-pointer transition-colors"
                             onClick={() => setSelectedTraceId(trace.traceId)}
                           >
-                            <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground truncate max-w-[140px]">
+                            <td className="px-4 py-2.5 font-mono text-xs text-muted truncate max-w-[140px]">
                               {trace.traceId.slice(0, 12)}…
                             </td>
                             <td className="px-4 py-2.5">
@@ -710,7 +710,7 @@ export function TraceExplorerPage() {
                               </span>
                             </td>
                             <td className="px-4 py-2.5">{trace.serviceName}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[180px]">{trace.operationName}</td>
+                            <td className="px-4 py-2.5 text-muted truncate max-w-[180px]">{trace.operationName}</td>
                             <td className="px-4 py-2.5" style={{ minWidth: '160px' }}>
                               <div className="flex items-center gap-2">
                                 <span className="tabular-nums text-xs w-14 flex-shrink-0">{formatDuration(trace.durationMs)}</span>
@@ -731,7 +731,7 @@ export function TraceExplorerPage() {
                               </Badge>
                             </td>
                             <td className="px-4 py-2.5 text-center">{trace.spanCount}</td>
-                            <td className="px-4 py-2.5 text-muted-foreground">{formatTimestamp(trace.startTime)}</td>
+                            <td className="px-4 py-2.5 text-muted">{formatTimestamp(trace.startTime)}</td>
                           </tr>
                         );
                       })}
@@ -758,7 +758,7 @@ interface ExpandableSectionProps {
 function ExpandableSection({ title, children, defaultOpen = false }: ExpandableSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-border/50 last:border-b-0">
+    <div className="border-b border-edge/50 last:border-b-0">
       <button
         type="button"
         className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted/30 transition-colors"
@@ -766,7 +766,7 @@ function ExpandableSection({ title, children, defaultOpen = false }: ExpandableS
       >
         <span className="text-left">{title}</span>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-muted-foreground flex-shrink-0 transition-transform ${open ? '' : '-rotate-90'}`}
+          className={`w-3.5 h-3.5 text-muted flex-shrink-0 transition-transform ${open ? '' : '-rotate-90'}`}
         />
       </button>
       {open && (
@@ -830,12 +830,12 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Panel header */}
-      <div className="flex items-start justify-between px-3 py-2.5 border-b border-border flex-shrink-0 bg-card">
+      <div className="flex items-start justify-between px-3 py-2.5 border-b border-edge flex-shrink-0 bg-card">
         <div className="min-w-0 pr-2">
           <div className="text-sm font-semibold truncate">
             Span {span.operationName}
           </div>
-          <div className="flex flex-wrap items-center gap-x-1.5 mt-0.5 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-1.5 mt-0.5 text-xs text-muted">
             <span>{t('telemetryExplorer.traces.detail.endpoint')}:</span>
             <span className="text-primary font-medium truncate max-w-[120px]">{span.operationName}</span>
             <span className="opacity-40">|</span>
@@ -849,13 +849,13 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           onClick={onClose}
           aria-label="Close span detail"
         >
-          <X className="w-4 h-4 text-muted-foreground" />
+          <X className="w-4 h-4 text-muted" />
         </button>
       </div>
 
       {/* Duration + status + kind */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border flex-shrink-0">
-        <Clock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-edge flex-shrink-0">
+        <Clock className="w-3.5 h-3.5 text-muted flex-shrink-0" />
         <span className="text-sm font-medium">{formatDuration(span.durationMs)}</span>
         {hasError && (
           <Badge variant="danger" className="text-xs">
@@ -870,9 +870,9 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
       </div>
 
       {/* Search details */}
-      <div className="px-3 py-2 border-b border-border flex-shrink-0">
+      <div className="px-3 py-2 border-b border-edge flex-shrink-0">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
           <input
             className="w-full h-7 pl-8 pr-3 rounded-md border border-input bg-elevated text-xs focus:outline-none focus:ring-1 focus:ring-ring"
             placeholder={t('telemetryExplorer.traces.detail.searchDetails')}
@@ -893,7 +893,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           )}
           {span.statusCode && (
             <div className="flex justify-between items-center py-0.5 text-xs">
-              <span className="text-muted-foreground">{t('telemetryExplorer.traces.detail.spanStatus')}</span>
+              <span className="text-muted">{t('telemetryExplorer.traces.detail.spanStatus')}</span>
               <Badge variant={hasError ? 'danger' : 'success'} className="text-xs">
                 {span.statusCode.toLowerCase()}
               </Badge>
@@ -969,10 +969,10 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
               // eslint-disable-next-line react/no-array-index-key
               <div key={idx} className="border-l-2 border-primary/30 pl-2 mb-2">
                 <div className="text-xs font-medium">{evt.name}</div>
-                <div className="text-xs text-muted-foreground">{new Date(evt.timestamp).toLocaleString()}</div>
+                <div className="text-xs text-muted">{new Date(evt.timestamp).toLocaleString()}</div>
                 {evt.attributes &&
                   Object.entries(evt.attributes).map(([k, v]) => (
-                    <div key={k} className="text-xs font-mono text-muted-foreground">
+                    <div key={k} className="text-xs font-mono text-muted">
                       {k}: {v}
                     </div>
                   ))}
@@ -998,7 +998,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex justify-between items-start gap-2 py-0.5 text-xs">
-      <span className="text-muted-foreground flex-shrink-0 max-w-[140px] truncate">{label}</span>
+      <span className="text-muted flex-shrink-0 max-w-[140px] truncate">{label}</span>
       <span className={`text-right break-all max-w-[180px] ${mono ? 'font-mono' : ''}`}>{value}</span>
     </div>
   );
