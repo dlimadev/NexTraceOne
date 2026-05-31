@@ -135,7 +135,7 @@ public sealed class WorkflowEntitiesTests
         var cl = ChangeChecklist.Create("t1", "Deploy", "standard", null, true, [], now);
         cl.UpdateItems(["Valid Item", "  ", ""], false, now.AddMinutes(1));
 
-        Assert.Equal(1, cl.Items.Count);
+        Assert.Single(cl.Items);
     }
 
     // ── ContractTemplate — Create ─────────────────────────────────────────────

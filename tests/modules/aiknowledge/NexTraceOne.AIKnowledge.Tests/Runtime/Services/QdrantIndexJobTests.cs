@@ -35,7 +35,7 @@ public sealed class QdrantIndexJobTests
         await Task.Delay(200);
         await job.StopAsync(CancellationToken.None);
 
-        _sourceRepo.DidNotReceive().ListAsync(Arg.Any<KnowledgeSourceType?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        _ = _sourceRepo.DidNotReceive().ListAsync(Arg.Any<KnowledgeSourceType?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class QdrantIndexJobTests
         await Task.Delay(200);
         await job.StopAsync(CancellationToken.None);
 
-        _vectorStore.DidNotReceive().StoreAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<ReadOnlyMemory<float>>(), Arg.Any<Dictionary<string, object>>(), Arg.Any<CancellationToken>());
+        _ = _vectorStore.DidNotReceive().StoreAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<ReadOnlyMemory<float>>(), Arg.Any<Dictionary<string, object>>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

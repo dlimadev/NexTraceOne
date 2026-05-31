@@ -12,12 +12,7 @@ public sealed class TenantResolutionMiddlewareTests
     private static (TenantResolutionMiddleware Middleware, CurrentTenantAccessor Accessor) CreateMiddleware(
         bool nextCalled = true)
     {
-        var wasCalled = false;
-        RequestDelegate next = _ =>
-        {
-            wasCalled = true;
-            return Task.CompletedTask;
-        };
+        RequestDelegate next = _ => Task.CompletedTask;
         var logger = Substitute.For<ILogger<TenantResolutionMiddleware>>();
         var middleware = new TenantResolutionMiddleware(next, logger);
         var accessor = new CurrentTenantAccessor();

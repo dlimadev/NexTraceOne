@@ -36,7 +36,7 @@ public sealed class NotificationOrchestratorTests
 
         // Grouping: return deterministic correlation key and null group (no active group)
         _grouping.GenerateCorrelationKey(
-                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string?>(),
+                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<string?>(), Arg.Any<string?>())
             .Returns("test-correlation-key");
         _grouping.ResolveGroupAsync(

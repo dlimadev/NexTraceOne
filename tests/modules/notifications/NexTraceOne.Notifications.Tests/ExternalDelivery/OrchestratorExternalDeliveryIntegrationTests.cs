@@ -37,7 +37,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
 
         // Grouping: deterministic values
         _grouping.GenerateCorrelationKey(
-                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string?>(),
+                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<string?>(), Arg.Any<string?>())
             .Returns("test-key");
         _grouping.ResolveGroupAsync(

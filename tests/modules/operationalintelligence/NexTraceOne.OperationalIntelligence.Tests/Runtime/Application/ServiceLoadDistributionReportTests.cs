@@ -56,7 +56,6 @@ public sealed class ServiceLoadDistributionReportTests
 
         foreach (var (svc, env) in servicePairs)
         {
-            var key = (svc, env);
             snapshotRepo.ListByServiceAsync(
                     svc, env,
                     Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())

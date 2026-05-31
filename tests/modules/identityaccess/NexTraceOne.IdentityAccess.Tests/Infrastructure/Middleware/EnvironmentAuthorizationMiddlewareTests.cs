@@ -41,7 +41,7 @@ public class EnvironmentAuthorizationMiddlewareTests
 
         // Assert
         nextCalled.Should().BeTrue();
-        _policyRepository.DidNotReceiveWithAnyArgs().ListByTenantAsync(default, default);
+        _ = _policyRepository.DidNotReceiveWithAnyArgs().ListByTenantAsync(default, default);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class EnvironmentAuthorizationMiddlewareTests
 
         // Assert
         nextCalled.Should().BeTrue();
-        _policyRepository.DidNotReceiveWithAnyArgs().ListByTenantAsync(default, default);
+        _ = _policyRepository.DidNotReceiveWithAnyArgs().ListByTenantAsync(default, default);
     }
 
     [Fact]
@@ -157,6 +157,7 @@ public class EnvironmentAuthorizationMiddlewareTests
         await middleware.InvokeAsync(_httpContext, _currentTenant, _policyRepository, _jitRepository);
 
         // Assert
+        nextCalled.Should().BeFalse();
         _httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
     }
 

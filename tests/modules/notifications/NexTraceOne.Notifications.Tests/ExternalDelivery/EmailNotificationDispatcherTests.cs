@@ -36,7 +36,7 @@ public sealed class EmailNotificationDispatcherTests
             }
         });
 
-        _templateResolver.ResolveEmailTemplate(Arg.Any<Notification>(), Arg.Any<string?>())
+        _templateResolver.ResolveEmailTemplate(Arg.Any<Notification>(), Arg.Any<string>())
             .Returns(new EmailTemplate("Test Subject", "<html>Test Body</html>", "Test Body"));
 
         // P7.2: Por padrão, sem configuração persistida → fallback para appsettings

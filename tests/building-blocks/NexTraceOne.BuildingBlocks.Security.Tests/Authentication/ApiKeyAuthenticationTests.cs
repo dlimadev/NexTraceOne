@@ -65,9 +65,9 @@ public sealed class ApiKeyAuthenticationTests
 
         result.Succeeded.Should().BeTrue();
         result.Principal!.FindFirstValue(ClaimTypes.NameIdentifier).Should().Be(ValidClientId);
-        result.Principal.FindFirstValue(ClaimTypes.Name).Should().Be(ValidClientName);
-        result.Principal.FindFirstValue("tenant_id").Should().Be(ValidTenantId);
-        result.Principal.FindFirstValue("auth_method").Should().Be("api_key");
+        result.Principal!.FindFirstValue(ClaimTypes.Name).Should().Be(ValidClientName);
+        result.Principal!.FindFirstValue("tenant_id").Should().Be(ValidTenantId);
+        result.Principal!.FindFirstValue("auth_method").Should().Be("api_key");
     }
 
     [Fact]

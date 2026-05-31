@@ -206,7 +206,7 @@ design/      ← tokens de design system, variáveis CSS
 src/platform/
 ├── NexTraceOne.ApiHost/          ← REST + GraphQL (porta 5000)
 │   ├── Program.cs                   # registro de serviços + pipeline
-│   ├── appsettings*.json            # 24 connection strings (por DbContext)
+│   ├── appsettings*.json            # 28 connection strings (por DbContext)
 │   └── Preflight/Checks/            # 10 verificações pré-startup
 │       ├── PostgreSqlPreflightCheck
 │       ├── JwtSecretPreflightCheck
@@ -434,18 +434,20 @@ Todos os DbContexts de módulo estendem `NexTraceDbContextBase`. Esta base:
 - Aplica `[EncryptedField]` convention (AES-256-GCM via `EncryptedStringConverter`)
 - Tabelas com prefixo de módulo para evitar colisões (ex.: `iam_roles`, `aud_audit_events`)
 
-### 24 Connection Strings
+### 28 Connection Strings
 
 Cada DbContext tem sua própria connection string em `appsettings.json`. Em desenvolvimento local, todas apontam para o mesmo servidor PostgreSQL com diferentes pools. Em produção, podem ser bancos separados:
 
 ```
 NexTraceOne (shared), IdentityDatabase, CatalogDatabase, ContractsDatabase,
-DeveloperPortalDatabase, ChangeIntelligenceDatabase, WorkflowDatabase,
-RulesetGovernanceDatabase, PromotionDatabase, IncidentDatabase,
+DependencyGovernanceDatabase, DeveloperExperienceDatabase, LegacyAssetsDatabase,
+TemplatesDatabase, DeveloperPortalDatabase, ChangeIntelligenceDatabase,
+WorkflowDatabase, RulesetGovernanceDatabase, PromotionDatabase, IncidentDatabase,
 CostIntelligenceDatabase, RuntimeIntelligenceDatabase, ReliabilityDatabase,
 AuditDatabase, AiGovernanceDatabase, GovernanceDatabase, IntegrationsDatabase,
 ProductAnalyticsDatabase, ExternalAiDatabase, AiOrchestrationDatabase,
-AutomationDatabase, ConfigurationDatabase, KnowledgeDatabase, NotificationsDatabase
+AutomationDatabase, ConfigurationDatabase, KnowledgeDatabase, NotificationsDatabase,
+TelemetryStoreDatabase
 ```
 
 ### Isolamento de Tenant (duas camadas)
@@ -941,7 +943,7 @@ const form = useForm<FormValues>({
 
 | Feature | Status |
 |---------|--------|
-| 24 PostgreSQL DbContexts (um por contexto) | ✅ Operacional |
+| 28 PostgreSQL DbContexts (um por contexto) | ✅ Operacional |
 | Outbox + pg_advisory_lock | ✅ Operacional |
 | Row-Level Security via TenantRlsInterceptor | ✅ Operacional |
 | JWT multi-tenant auth + capability claims | ✅ Operacional |

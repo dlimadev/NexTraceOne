@@ -69,7 +69,7 @@ public sealed class PlanExecutionIntegrationTests
         _modelCatalogService.ResolveDefaultModelAsync("chat", Arg.Any<CancellationToken>())
             .Returns(DefaultModel);
         _providerFactory.GetChatProvider(DefaultModel.ProviderId).Returns(_chatProvider);
-        _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
+        _toolPermissionValidator.GetAllowedTools(Arg.Any<string>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
         _currentTenant.Id.Returns(Guid.NewGuid());
@@ -119,7 +119,7 @@ public sealed class PlanExecutionIntegrationTests
         _modelCatalogService.ResolveDefaultModelAsync("chat", Arg.Any<CancellationToken>())
             .Returns(DefaultModel);
         _providerFactory.GetChatProvider(DefaultModel.ProviderId).Returns(_chatProvider);
-        _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
+        _toolPermissionValidator.GetAllowedTools(Arg.Any<string>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
         _currentTenant.Id.Returns(Guid.NewGuid());
@@ -168,7 +168,7 @@ public sealed class PlanExecutionIntegrationTests
         _modelCatalogService.ResolveDefaultModelAsync("chat", Arg.Any<CancellationToken>())
             .Returns(DefaultModel);
         _providerFactory.GetChatProvider(DefaultModel.ProviderId).Returns(_chatProvider);
-        _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
+        _toolPermissionValidator.GetAllowedTools(Arg.Any<string>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
         _currentTenant.Id.Returns(Guid.NewGuid());

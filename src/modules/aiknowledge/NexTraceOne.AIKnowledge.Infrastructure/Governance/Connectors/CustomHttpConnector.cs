@@ -141,7 +141,7 @@ internal sealed class CustomHttpConnector(
 
     private HttpClient BuildClient()
     {
-        return httpClientFactory.CreateClient("custom-http-connector");
+        return httpClientFactory.CreateClient("CustomHttpConnector");
     }
 
     private static HttpRequestMessage BuildRequest(HttpMethod method, string url, CustomHttpConfig config)
