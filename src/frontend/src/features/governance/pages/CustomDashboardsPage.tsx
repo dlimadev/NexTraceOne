@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Plus, Eye, Settings, Copy, Trash2,
+  LayoutGrid, Plus, Eye, Settings, Copy, Trash2,
   Layout as LayoutIcon, Search, ArrowUpDown, Tag, Star,
   Clock, Filter, X, Globe, Lock, Users,
 } from 'lucide-react';
@@ -451,7 +451,7 @@ export function CustomDashboardsPage() {
       <PageHeader
         title={t('governance.customDashboards.title', 'Custom Dashboards')}
         subtitle={t('governance.customDashboards.subtitle', 'Build and manage personalized dashboard views')}
-        icon={<LayoutDashboard size={24} />}
+        icon={<LayoutGrid size={24} />}
       />
 
       {/* Template Picker */}
