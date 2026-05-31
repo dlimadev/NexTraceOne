@@ -1,0 +1,329 @@
+
+============================================================
+MODULE: aiknowledge
+============================================================
+Endpoints: 192
+Handlers: 204
+Orphan endpoints: 0
+Dead handlers: 20
+  DEAD   ExportPendingTrajectories [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/ExportPendingTrajectories/ExportPendingTrajectories.cs]
+  DEAD   GetAiGovernanceComplianceReport [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetAiGovernanceComplianceReport/GetAiGovernanceComplianceReport.cs]
+  DEAD   GetAiModelQualityReport [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetAiModelQualityReport/GetAiModelQualityReport.cs]
+  DEAD   GetFeedbackMetrics [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetFeedbackMetrics/GetFeedbackMetrics.cs]
+  DEAD   GetMemoryNodeDetails [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetMemoryNodeDetails/GetMemoryNodeDetails.cs]
+  DEAD   GetModelCostAttribution [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetModelCostAttribution/GetModelCostAttribution.cs]
+  DEAD   GetModelDriftReport [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetModelDriftReport/GetModelDriftReport.cs]
+  DEAD   GetOnboardingSession [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/GetOnboardingSession/GetOnboardingSession.cs]
+  DEAD   IngestModelPredictionSample [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/IngestModelPredictionSample/IngestModelPredictionSample.cs]
+  DEAD   ListNegativeFeedback [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/ListNegativeFeedback/ListNegativeFeedback.cs]
+  DEAD   ListOnboardingSessions [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/ListOnboardingSessions/ListOnboardingSessions.cs]
+  DEAD   QueryOrganizationalMemory [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/QueryOrganizationalMemory/QueryOrganizationalMemory.cs]
+  DEAD   RecordMemoryNode [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/RecordMemoryNode/RecordMemoryNode.cs]
+  DEAD   RegisterExternalDataSource [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/RegisterExternalDataSource/RegisterExternalDataSource.cs]
+  DEAD   StartOnboardingSession [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/StartOnboardingSession/StartOnboardingSession.cs]
+  DEAD   SubmitAgentExecutionPlan [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/SubmitAgentExecutionPlan/SubmitAgentExecutionPlan.cs]
+  DEAD   SubmitAiFeedback [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/SubmitAiFeedback/SubmitAiFeedback.cs]
+  DEAD   ValidateCustomAgentCreation [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/ValidateCustomAgentCreation/ValidateCustomAgentCreation.cs]
+  DEAD   ValidateExternalModelUsage [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/ValidateExternalModelUsage/ValidateExternalModelUsage.cs]
+  DEAD   ExecuteMcpTool [/src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Runtime/Features/ExecuteMcpTool/ExecuteMcpTool.cs]
+HTTP issues: 3
+  HTTP   [MapPost] /api/v1/ai/tech-debt/quantify -> QuantifyTechDebt [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /api/v1/ai/sla/intelligence -> GetSlaIntelligence [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /api/v1/ai/routing/classify-intent -> ClassifyPromptIntent [POST/PUT/PATCH endpoint with Query (no body)]
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: auditcompliance
+============================================================
+Endpoints: 28
+Handlers: 26
+Orphan endpoints: 0
+Dead handlers: 0
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: catalog
+============================================================
+Endpoints: 226
+Handlers: 326
+Orphan endpoints: 0
+Dead handlers: 112
+  DEAD   AddNegotiationComment [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/AddNegotiationComment/AddNegotiationComment.cs]
+  DEAD   AnalyzeGraphQlSchema [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/AnalyzeGraphQlSchema/AnalyzeGraphQlSchema.cs]
+  DEAD   AnalyzeProtobufSchema [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/AnalyzeProtobufSchema/AnalyzeProtobufSchema.cs]
+  DEAD   AnalyzeSchemaEvolution [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/AnalyzeSchemaEvolution/AnalyzeSchemaEvolution.cs]
+  DEAD   CreateComplianceGate [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/CreateComplianceGate/CreateComplianceGate.cs]
+  DEAD   CreateContractNegotiation [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/CreateContractNegotiation/CreateContractNegotiation.cs]
+  DEAD   CreateDraft [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/CreateDraft/CreateDraft.cs]
+  DEAD   DetectGraphQlBreakingChanges [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/DetectGraphQlBreakingChanges/DetectGraphQlBreakingChanges.cs]
+  DEAD   DetectProtobufBreakingChanges [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/DetectProtobufBreakingChanges/DetectProtobufBreakingChanges.cs]
+  DEAD   EvaluateContractCompliance [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/EvaluateContractCompliance/EvaluateContractCompliance.cs]
+  DEAD   ExecuteContractPipeline [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/ExecuteContractPipeline/ExecuteContractPipeline.cs]
+  DEAD   GenerateSemanticDiff [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GenerateSemanticDiff/GenerateSemanticDiff.cs]
+  DEAD   GetApiBackwardCompatibilityReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetApiBackwardCompatibilityReport/GetApiBackwardCompatibilityReport.cs]
+  DEAD   GetApiSchemaCoverageReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetApiSchemaCoverageReport/GetApiSchemaCoverageReport.cs]
+  DEAD   GetApiSchemaStabilityReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetApiSchemaStabilityReport/GetApiSchemaStabilityReport.cs]
+  DEAD   GetApiVersionStrategyReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetApiVersionStrategyReport/GetApiVersionStrategyReport.cs]
+  DEAD   GetComplianceStatus [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetComplianceStatus/GetComplianceStatus.cs]
+  DEAD   GetContractAdoptionReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractAdoptionReport/GetContractAdoptionReport.cs]
+  DEAD   GetContractConsumerImpactReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractConsumerImpactReport/GetContractConsumerImpactReport.cs]
+  DEAD   GetContractDeprecationForecast [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractDeprecationForecast/GetContractDeprecationForecast.cs]
+  DEAD   GetContractDeprecationPipelineReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractDeprecationPipelineReport/GetContractDeprecationPipelineReport.cs]
+  DEAD   GetContractDriftFromRealityReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractDriftFromRealityReport/GetContractDriftFromRealityReport.cs]
+  DEAD   GetContractHealthDistributionReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractHealthDistributionReport/GetContractHealthDistributionReport.cs]
+  DEAD   GetContractHealthScore [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractHealthScore/GetContractHealthScore.cs]
+  DEAD   GetContractLineageReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractLineageReport/GetContractLineageReport.cs]
+  DEAD   GetContractListing [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractListing/GetContractListing.cs]
+  DEAD   GetContractNegotiation [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractNegotiation/GetContractNegotiation.cs]
+  DEAD   GetContractTestCoverageReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractTestCoverageReport/GetContractTestCoverageReport.cs]
+  DEAD   GetContractVersioningReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetContractVersioningReport/GetContractVersioningReport.cs]
+  DEAD   GetCriticalPathReport [/src/modules/catalog/NexTraceOne.Catalog.Application/Contracts/Features/GetCriticalPathReport/GetCriticalPathReport.cs]
+  ... and 82 more
+HTTP issues: 5
+  HTTP   [MapPost] /diff -> ComputeSemanticDiff [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /compatibility -> GetCompatibilityAssessment [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /parse-preview -> ParseSpecPreview [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /validate-spec -> ValidateDraftSpec [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /{apiAssetId:guid}/drift -> DetectContractDrift [POST/PUT/PATCH endpoint with Query (no body)]
+GraphQL files: 6
+GraphQL without resolvers: 6
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/CatalogQuery.cs
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/CatalogSubscription.cs
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/Publishers/GraphQLEventPublisher.cs
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/Types/ContractSummaryType.cs
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/Types/NpsSummaryType.cs
+  GQL    /src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/Types/ServiceType.cs
+
+============================================================
+MODULE: changegovernance
+============================================================
+Endpoints: 114
+Handlers: 173
+Orphan endpoints: 0
+Dead handlers: 65
+  DEAD   AttachSlsaProvenance [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/AttachSlsaProvenance/AttachSlsaProvenance.cs]
+  DEAD   CloseReleaseWindow [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/CloseReleaseWindow/CloseReleaseWindow.cs]
+  DEAD   CreatePromotionGate [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/CreatePromotionGate/CreatePromotionGate.cs]
+  DEAD   EvaluatePromotionGate [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/EvaluatePromotionGate/EvaluatePromotionGate.cs]
+  DEAD   GetBlastRadiusDistributionReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetBlastRadiusDistributionReport/GetBlastRadiusDistributionReport.cs]
+  DEAD   GetChangeConfidenceTimeline [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeConfidenceTimeline/GetChangeConfidenceTimeline.cs]
+  DEAD   GetChangeFrequencyHeatmap [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeFrequencyHeatmap/GetChangeFrequencyHeatmap.cs]
+  DEAD   GetChangeLeadTimeReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeLeadTimeReport/GetChangeLeadTimeReport.cs]
+  DEAD   GetChangeRollbackRecommendation [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeRollbackRecommendation/GetChangeRollbackRecommendation.cs]
+  DEAD   GetChangeWindowUtilizationReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeWindowUtilizationReport/GetChangeWindowUtilizationReport.cs]
+  DEAD   GetDeploymentCadenceReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetDeploymentCadenceReport/GetDeploymentCadenceReport.cs]
+  DEAD   GetDeploymentFrequencyHealthReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetDeploymentFrequencyHealthReport/GetDeploymentFrequencyHealthReport.cs]
+  DEAD   GetIncidentChangeCorrelationReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetIncidentChangeCorrelationReport/GetIncidentChangeCorrelationReport.cs]
+  DEAD   GetPromotionGateStatus [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetPromotionGateStatus/GetPromotionGateStatus.cs]
+  DEAD   GetReleaseFrequencyDeviationReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetReleaseFrequencyDeviationReport/GetReleaseFrequencyDeviationReport.cs]
+  DEAD   GetReleasePatternAnalysisReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetReleasePatternAnalysisReport/GetReleasePatternAnalysisReport.cs]
+  DEAD   GetReleaseSuccessRateReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetReleaseSuccessRateReport/GetReleaseSuccessRateReport.cs]
+  DEAD   GetRollbackPatternReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetRollbackPatternReport/GetRollbackPatternReport.cs]
+  DEAD   GetTeamChangeVelocityReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetTeamChangeVelocityReport/GetTeamChangeVelocityReport.cs]
+  DEAD   IsChangeWindowOpen [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/IsChangeWindowOpen/IsChangeWindowOpen.cs]
+  DEAD   ListPromotionGatesByEnvironment [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/ListPromotionGatesByEnvironment/ListPromotionGatesByEnvironment.cs]
+  DEAD   ListReleasesByService [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/ListReleasesByService/ListReleasesByService.cs]
+  DEAD   ListReleaseWindows [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/ListReleaseWindows/ListReleaseWindows.cs]
+  DEAD   RecordConfidenceEvent [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/RecordConfidenceEvent/RecordConfidenceEvent.cs]
+  DEAD   RegisterReleaseWindow [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/RegisterReleaseWindow/RegisterReleaseWindow.cs]
+  DEAD   ResolveReleaseByExternalKey [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/ResolveReleaseByExternalKey/ResolveReleaseByExternalKey.cs]
+  DEAD   SyncJiraWorkItems [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/SyncJiraWorkItems/SyncJiraWorkItems.cs]
+  DEAD   ComputeServiceRiskProfile [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/Compliance/Features/ComputeServiceRiskProfile/ComputeServiceRiskProfile.cs]
+  DEAD   GetApprovalWorkflowReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/Compliance/Features/GetApprovalWorkflowReport/GetApprovalWorkflowReport.cs]
+  DEAD   GetCmmcComplianceReport [/src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/Compliance/Features/GetCmmcComplianceReport/GetCmmcComplianceReport.cs]
+  ... and 35 more
+HTTP issues: 0
+GraphQL files: 1
+GraphQL without resolvers: 1
+  GQL    /src/modules/changegovernance/NexTraceOne.ChangeGovernance.API/GraphQL/ChangeGovernanceQuery.cs
+
+============================================================
+MODULE: configuration
+============================================================
+Endpoints: 66
+Handlers: 66
+Orphan endpoints: 0
+Dead handlers: 9
+  DEAD   ExportData [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/ExportData/ExportData.cs]
+  DEAD   GetEffectiveFeatureFlag [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/GetEffectiveFeatureFlag/GetEffectiveFeatureFlag.cs]
+  DEAD   GetEffectiveSettings [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/GetEffectiveSettings/GetEffectiveSettings.cs]
+  DEAD   GetEntries [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/GetEntries/GetEntries.cs]
+  DEAD   RemoveFeatureFlagOverride [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/RemoveFeatureFlagOverride/RemoveFeatureFlagOverride.cs]
+  DEAD   RemoveOverride [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/RemoveOverride/RemoveOverride.cs]
+  DEAD   SetConfigurationValue [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/SetConfigurationValue/SetConfigurationValue.cs]
+  DEAD   SetFeatureFlagOverride [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/SetFeatureFlagOverride/SetFeatureFlagOverride.cs]
+  DEAD   ToggleConfiguration [/src/modules/configuration/NexTraceOne.Configuration.Application/Features/ToggleConfiguration/ToggleConfiguration.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: governance
+============================================================
+Endpoints: 207
+Handlers: 190
+Orphan endpoints: 0
+Dead handlers: 21
+  DEAD   AssessServiceMaturity [/src/modules/governance/NexTraceOne.Governance.Application/Features/AssessServiceMaturity/AssessServiceMaturity.cs]
+  DEAD   ComputeCostAttribution [/src/modules/governance/NexTraceOne.Governance.Application/Features/ComputeCostAttribution/ComputeCostAttribution.cs]
+  DEAD   ComputeTeamHealth [/src/modules/governance/NexTraceOne.Governance.Application/Features/ComputeTeamHealth/ComputeTeamHealth.cs]
+  DEAD   GenerateExecutiveBriefing [/src/modules/governance/NexTraceOne.Governance.Application/Features/GenerateExecutiveBriefing/GenerateExecutiveBriefing.cs]
+  DEAD   GenerateLicenseComplianceReport [/src/modules/governance/NexTraceOne.Governance.Application/Features/GenerateLicenseComplianceReport/GenerateLicenseComplianceReport.cs]
+  DEAD   GetChangeCostImpact [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetChangeCostImpact/GetChangeCostImpact.cs]
+  DEAD   GetCostAttribution [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetCostAttribution/GetCostAttribution.cs]
+  DEAD   GetDashboardAnnotations [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetDashboardAnnotations/GetDashboardAnnotations.cs]
+  DEAD   GetDatabaseHealth [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetDatabaseHealth/GetDatabaseHealth.cs]
+  DEAD   GetExecutiveBriefing [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetExecutiveBriefing/GetExecutiveBriefing.cs]
+  DEAD   GetLicenseComplianceReport [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetLicenseComplianceReport/GetLicenseComplianceReport.cs]
+  DEAD   GetServiceMaturity [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetServiceMaturity/GetServiceMaturity.cs]
+  DEAD   GetTeamHealthSnapshot [/src/modules/governance/NexTraceOne.Governance.Application/Features/GetTeamHealthSnapshot/GetTeamHealthSnapshot.cs]
+  DEAD   ListCostAttributions [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListCostAttributions/ListCostAttributions.cs]
+  DEAD   ListCostliestChanges [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListCostliestChanges/ListCostliestChanges.cs]
+  DEAD   ListExecutiveBriefings [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListExecutiveBriefings/ListExecutiveBriefings.cs]
+  DEAD   ListLicenseComplianceReports [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListLicenseComplianceReports/ListLicenseComplianceReports.cs]
+  DEAD   ListServicesByMaturityLevel [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListServicesByMaturityLevel/ListServicesByMaturityLevel.cs]
+  DEAD   ListTeamHealthSnapshots [/src/modules/governance/NexTraceOne.Governance.Application/Features/ListTeamHealthSnapshots/ListTeamHealthSnapshots.cs]
+  DEAD   PublishExecutiveBriefing [/src/modules/governance/NexTraceOne.Governance.Application/Features/PublishExecutiveBriefing/PublishExecutiveBriefing.cs]
+  DEAD   RecordChangeCostImpact [/src/modules/governance/NexTraceOne.Governance.Application/Features/RecordChangeCostImpact/RecordChangeCostImpact.cs]
+HTTP issues: 3
+  HTTP   [MapPost] /execute -> ExecuteNqlQuery [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /validate -> ValidateNqlQuery [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /releases/evaluate-budget-gate -> EvaluateReleaseBudgetGate [POST/PUT/PATCH endpoint with Query (no body)]
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: identityaccess
+============================================================
+Endpoints: 77
+Handlers: 86
+Orphan endpoints: 0
+Dead handlers: 15
+  DEAD   CreatePlatformApiToken [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/CreatePlatformApiToken/CreatePlatformApiToken.cs]
+  DEAD   CreatePolicyDefinition [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/CreatePolicyDefinition/CreatePolicyDefinition.cs]
+  DEAD   EscalateOverdueAccessReviews [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/EscalateOverdueAccessReviews/EscalateOverdueAccessReviews.cs]
+  DEAD   EvaluatePolicyDefinition [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/EvaluatePolicyDefinition/EvaluatePolicyDefinition.cs]
+  DEAD   GetAccessPatternAnomalyReport [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/GetAccessPatternAnomalyReport/GetAccessPatternAnomalyReport.cs]
+  DEAD   GetAgentQueryAuditLog [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/GetAgentQueryAuditLog/GetAgentQueryAuditLog.cs]
+  DEAD   GetDeveloperActivityReport [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/GetDeveloperActivityReport/GetDeveloperActivityReport.cs]
+  DEAD   GetMigrationHealthReport [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/GetMigrationHealthReport/GetMigrationHealthReport.cs]
+  DEAD   ListPlatformApiTokens [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/ListPlatformApiTokens/ListPlatformApiTokens.cs]
+  DEAD   ListPolicyDefinitions [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/ListPolicyDefinitions/ListPolicyDefinitions.cs]
+  DEAD   OidcCallback [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/OidcCallback/OidcCallback.cs]
+  DEAD   RecordAgentQuery [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/RecordAgentQuery/RecordAgentQuery.cs]
+  DEAD   RevokePlatformApiToken [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/RevokePlatformApiToken/RevokePlatformApiToken.cs]
+  DEAD   SamlAcsCallback [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/SamlAcsCallback/SamlAcsCallback.cs]
+  DEAD   UpdatePolicyDefinition [/src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/UpdatePolicyDefinition/UpdatePolicyDefinition.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: integrations
+============================================================
+Endpoints: 24
+Handlers: 26
+Orphan endpoints: 0
+Dead handlers: 2
+  DEAD   GetIntegrationHealthReport [/src/modules/integrations/NexTraceOne.Integrations.Application/Features/GetIntegrationHealthReport/GetIntegrationHealthReport.cs]
+  DEAD   ProcessIngestionPayload [/src/modules/integrations/NexTraceOne.Integrations.Application/Features/ProcessIngestionPayload/ProcessIngestionPayload.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: knowledge
+============================================================
+Endpoints: 15
+Handlers: 23
+Orphan endpoints: 0
+Dead handlers: 12
+  DEAD   BuildKnowledgeGraphSnapshot [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/BuildKnowledgeGraphSnapshot/BuildKnowledgeGraphSnapshot.cs]
+  DEAD   GenerateAutoDocumentation [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GenerateAutoDocumentation/GenerateAutoDocumentation.cs]
+  DEAD   GetFreshnessReport [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GetFreshnessReport/GetFreshnessReport.cs]
+  DEAD   GetKnowledgeBaseUtilizationReport [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GetKnowledgeBaseUtilizationReport/GetKnowledgeBaseUtilizationReport.cs]
+  DEAD   GetKnowledgeByRelationTarget [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GetKnowledgeByRelationTarget/GetKnowledgeByRelationTarget.cs]
+  DEAD   GetKnowledgeGraphSnapshot [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GetKnowledgeGraphSnapshot/GetKnowledgeGraphSnapshot.cs]
+  DEAD   GetTeamKnowledgeSharingReport [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/GetTeamKnowledgeSharingReport/GetTeamKnowledgeSharingReport.cs]
+  DEAD   ListKnowledgeGraphSnapshots [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/ListKnowledgeGraphSnapshots/ListKnowledgeGraphSnapshots.cs]
+  DEAD   ProposeRunbookFromIncident [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/ProposeRunbookFromIncident/ProposeRunbookFromIncident.cs]
+  DEAD   ScoreDocumentFreshness [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/ScoreDocumentFreshness/ScoreDocumentFreshness.cs]
+  DEAD   SearchAcrossModules [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/SearchAcrossModules/SearchAcrossModules.cs]
+  DEAD   ValidateDocumentReviewGate [/src/modules/knowledge/NexTraceOne.Knowledge.Application/Features/ValidateDocumentReviewGate/ValidateDocumentReviewGate.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: notifications
+============================================================
+Endpoints: 22
+Handlers: 23
+Orphan endpoints: 0
+Dead handlers: 2
+  DEAD   GetNotificationDeliveryReport [/src/modules/notifications/NexTraceOne.Notifications.Application/Features/GetNotificationDeliveryReport/GetNotificationDeliveryReport.cs]
+  DEAD   GetNotificationEffectivenessReport [/src/modules/notifications/NexTraceOne.Notifications.Application/Features/GetNotificationEffectivenessReport/GetNotificationEffectivenessReport.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: operationalintelligence
+============================================================
+Endpoints: 133
+Handlers: 172
+Orphan endpoints: 0
+Dead handlers: 58
+  DEAD   GetCostPerReleaseReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetCostPerReleaseReport/GetCostPerReleaseReport.cs]
+  DEAD   GetEnvironmentCostComparisonReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetEnvironmentCostComparisonReport/GetEnvironmentCostComparisonReport.cs]
+  DEAD   GetFinOpsInsights [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetFinOpsInsights/GetFinOpsInsights.cs]
+  DEAD   GetFinOpsTrendReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetFinOpsTrendReport/GetFinOpsTrendReport.cs]
+  DEAD   GetFinOpsWasteAnalysisReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetFinOpsWasteAnalysisReport/GetFinOpsWasteAnalysisReport.cs]
+  DEAD   GetServiceCostAllocationReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/GetServiceCostAllocationReport/GetServiceCostAllocationReport.cs]
+  DEAD   IngestServiceCostRecord [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/FinOps/Features/IngestServiceCostRecord/IngestServiceCostRecord.cs]
+  DEAD   GenerateIncidentNarrative [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Incidents/Features/GenerateIncidentNarrative/GenerateIncidentNarrative.cs]
+  DEAD   GetIncidentNarrative [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Incidents/Features/GetIncidentNarrative/GetIncidentNarrative.cs]
+  DEAD   RefreshIncidentNarrative [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Incidents/Features/RefreshIncidentNarrative/RefreshIncidentNarrative.cs]
+  DEAD   ResolveIncident [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Incidents/Features/ResolveIncident/ResolveIncident.cs]
+  DEAD   AnalyzePredictivePatterns [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/AnalyzePredictivePatterns/AnalyzePredictivePatterns.cs]
+  DEAD   ApproveHealingRecommendation [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/ApproveHealingRecommendation/ApproveHealingRecommendation.cs]
+  DEAD   GenerateHealingRecommendation [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/GenerateHealingRecommendation/GenerateHealingRecommendation.cs]
+  DEAD   GetHealingRecommendation [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/GetHealingRecommendation/GetHealingRecommendation.cs]
+  DEAD   GetIncidentPredictionPattern [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/GetIncidentPredictionPattern/GetIncidentPredictionPattern.cs]
+  DEAD   ListHealingRecommendations [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/ListHealingRecommendations/ListHealingRecommendations.cs]
+  DEAD   ListIncidentPredictionPatterns [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Reliability/Features/ListIncidentPredictionPatterns/ListIncidentPredictionPatterns.cs]
+  DEAD   CreateOperationalPlaybook [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/CreateOperationalPlaybook/CreateOperationalPlaybook.cs]
+  DEAD   DetectEnvironmentDrift [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/DetectEnvironmentDrift/DetectEnvironmentDrift.cs]
+  DEAD   ExecutePlaybook [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/ExecutePlaybook/ExecutePlaybook.cs]
+  DEAD   GenerateAnomalyNarrative [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GenerateAnomalyNarrative/GenerateAnomalyNarrative.cs]
+  DEAD   GenerateResilienceReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GenerateResilienceReport/GenerateResilienceReport.cs]
+  DEAD   GetAnomalyDetectionSummaryReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetAnomalyDetectionSummaryReport/GetAnomalyDetectionSummaryReport.cs]
+  DEAD   GetAnomalyNarrative [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetAnomalyNarrative/GetAnomalyNarrative.cs]
+  DEAD   GetCapacityTrendForecastReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetCapacityTrendForecastReport/GetCapacityTrendForecastReport.cs]
+  DEAD   GetChaosCoverageGapReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetChaosCoverageGapReport/GetChaosCoverageGapReport.cs]
+  DEAD   GetChaosExperimentReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetChaosExperimentReport/GetChaosExperimentReport.cs]
+  DEAD   GetEnvironmentBehaviorComparisonReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetEnvironmentBehaviorComparisonReport/GetEnvironmentBehaviorComparisonReport.cs]
+  DEAD   GetEnvironmentDriftReport [/src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetEnvironmentDriftReport/GetEnvironmentDriftReport.cs]
+  ... and 28 more
+HTTP issues: 3
+  HTTP   [MapGet] /profiles -> CreateServiceCostProfile [GET endpoint with Command body]
+  HTTP   [MapPost] /correlate-metrics -> CorrelateServiceMetrics [POST/PUT/PATCH endpoint with Query (no body)]
+  HTTP   [MapPost] /topology-alerts -> GetTopologyAwareAlerts [POST/PUT/PATCH endpoint with Query (no body)]
+GraphQL files: 0
+GraphQL without resolvers: 0
+
+============================================================
+MODULE: productanalytics
+============================================================
+Endpoints: 16
+Handlers: 17
+Orphan endpoints: 0
+Dead handlers: 2
+  DEAD   GetPortalAdoptionFunnelReport [/src/modules/productanalytics/NexTraceOne.ProductAnalytics.Application/Features/GetPortalAdoptionFunnelReport/GetPortalAdoptionFunnelReport.cs]
+  DEAD   GetSelfServiceWorkflowHealthReport [/src/modules/productanalytics/NexTraceOne.ProductAnalytics.Application/Features/GetSelfServiceWorkflowHealthReport/GetSelfServiceWorkflowHealthReport.cs]
+HTTP issues: 0
+GraphQL files: 0
+GraphQL without resolvers: 0
