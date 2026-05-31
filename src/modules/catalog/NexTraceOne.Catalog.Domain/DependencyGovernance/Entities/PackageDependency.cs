@@ -66,4 +66,24 @@ public sealed class PackageDependency
         IsOutdated = true;
         LatestStableVersion = latestVersion;
     }
+
+    public void UpdateLatestVersion(string latestVersion)
+    {
+        Guard.Against.NullOrWhiteSpace(latestVersion);
+        LatestStableVersion = latestVersion;
+        IsOutdated = latestVersion != Version;
+    }
+
+    public void UpdateLicense(string license)
+    {
+        Guard.Against.NullOrWhiteSpace(license);
+        License = license;
+        LicenseRisk = license.ToUpperInvariant() switch
+        {
+            var l when l.Contains("GPL") || l.Contains("AGPL") => LicenseRiskLevel.Critical,
+            var l when l.Contains("LGPL") => LicenseRiskLevel.High,
+            var l when l.Contains("MIT") || l.Contains("APACHE") || l.Contains("BSD") => LicenseRiskLevel.Low,
+            _ => LicenseRiskLevel.Medium
+        };
+    }
 }

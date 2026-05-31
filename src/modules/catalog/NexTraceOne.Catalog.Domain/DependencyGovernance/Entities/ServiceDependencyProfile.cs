@@ -84,4 +84,9 @@ public sealed class ServiceDependencyProfile : AuditableEntity<ServiceDependency
         }
         return Math.Max(0, score);
     }
+
+    public void RecalculateHealthScore()
+    {
+        HealthScore = CalculateHealthScore(_dependencies);
+    }
 }
