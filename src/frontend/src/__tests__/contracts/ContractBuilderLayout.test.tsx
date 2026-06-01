@@ -72,7 +72,7 @@ describe('ContractBuilderLayout', () => {
         onSave={onSave}
       />,
     );
-    screen.getByTestId('btn-save').click();
+    act(() => { screen.getByTestId('btn-save').click(); });
     expect(onSave).toHaveBeenCalledWith('openapi: 3.1.0');
   });
 
