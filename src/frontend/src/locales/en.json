@@ -8151,7 +8151,19 @@
     "subGroupPlatformHealth": "Platform Health",
     "subGroupSecurityAdmin": "Security",
     "subGroupAiAdmin": "AI Administration",
-    "subGroupProductAnalytics": "Product Analytics"
+    "subGroupProductAnalytics": "Product Analytics",
+    "sectionCatalog": "Catalog",
+    "sectionIntelligence": "Intelligence",
+    "sectionCompliance": "Compliance",
+    "subGroupDiscovery": "Discovery & Maturity",
+    "subGroupDeveloperEnablement": "Developer Enablement",
+    "subGroupTesting": "Testing & Resilience",
+    "subGroupControlsPolicies": "Controls & Policies",
+    "subGroupScorecardsAssessment": "Scorecards & Assessment",
+    "subGroupDashboards": "Dashboards",
+    "subGroupCostSustainability": "Cost & Sustainability",
+    "subGroupIdentityAccess": "Identity & Access",
+    "subGroupPlatformConfig": "Configuration"
   },
   "sourceOfTruth": {
     "assetTypes": {

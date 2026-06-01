@@ -54,7 +54,7 @@ export function derivePersona(roleName: string): Persona {
  * Define a ordem de prioridade das secções da sidebar para cada persona.
  * As secções listadas primeiro aparecem no topo da navegação.
  */
-export type NavSection = 'home' | 'services' | 'contracts' | 'changes' | 'operations' | 'aiHub' | 'governance' | 'organization' | 'integrations' | 'admin';
+export type NavSection = 'home' | 'catalog' | 'changes' | 'operations' | 'intelligence' | 'compliance' | 'aiHub' | 'admin';
 
 export interface PersonaConfig {
   /** Secções da sidebar na ordem de prioridade para esta persona. */
@@ -108,8 +108,8 @@ export interface QuickAction {
 // ── Configurações por persona ──
 
 const engineerConfig: PersonaConfig = {
-  sectionOrder: ['home', 'services', 'contracts', 'operations', 'changes', 'organization', 'aiHub', 'governance', 'integrations', 'admin'],
-  highlightedSections: ['services', 'operations'],
+  sectionOrder: ['home', 'catalog', 'changes', 'operations', 'intelligence', 'compliance', 'aiHub', 'admin'],
+  highlightedSections: ['catalog', 'operations'],
   homeSubtitleKey: 'persona.Engineer.homeSubtitle',
   homeWidgets: [
     { id: 'my-services', titleKey: 'persona.Engineer.widgets.myServices', type: 'services' },
@@ -133,8 +133,8 @@ const engineerConfig: PersonaConfig = {
 };
 
 const techLeadConfig: PersonaConfig = {
-  sectionOrder: ['home', 'services', 'contracts', 'changes', 'operations', 'organization', 'aiHub', 'governance', 'integrations', 'admin'],
-  highlightedSections: ['services', 'changes', 'operations'],
+  sectionOrder: ['home', 'catalog', 'changes', 'operations', 'compliance', 'intelligence', 'aiHub', 'admin'],
+  highlightedSections: ['catalog', 'changes', 'operations'],
   homeSubtitleKey: 'persona.TechLead.homeSubtitle',
   homeWidgets: [
     { id: 'team-services', titleKey: 'persona.TechLead.widgets.teamServices', type: 'services' },
@@ -158,8 +158,8 @@ const techLeadConfig: PersonaConfig = {
 };
 
 const architectConfig: PersonaConfig = {
-  sectionOrder: ['home', 'services', 'contracts', 'organization', 'changes', 'operations', 'governance', 'integrations', 'aiHub', 'admin'],
-  highlightedSections: ['services', 'contracts'],
+  sectionOrder: ['home', 'catalog', 'changes', 'intelligence', 'compliance', 'operations', 'aiHub', 'admin'],
+  highlightedSections: ['catalog', 'compliance'],
   homeSubtitleKey: 'persona.Architect.homeSubtitle',
   homeWidgets: [
     { id: 'dependencies', titleKey: 'persona.Architect.widgets.dependencies', type: 'dependencies' },
@@ -182,8 +182,8 @@ const architectConfig: PersonaConfig = {
 };
 
 const productConfig: PersonaConfig = {
-  sectionOrder: ['home', 'changes', 'services', 'contracts', 'operations', 'organization', 'governance', 'aiHub', 'integrations', 'admin'],
-  highlightedSections: ['changes', 'services'],
+  sectionOrder: ['home', 'changes', 'catalog', 'intelligence', 'operations', 'compliance', 'aiHub', 'admin'],
+  highlightedSections: ['changes', 'catalog'],
   homeSubtitleKey: 'persona.Product.homeSubtitle',
   homeWidgets: [
     { id: 'release-confidence', titleKey: 'persona.Product.widgets.releaseConfidence', type: 'releaseConfidence' },
@@ -206,8 +206,8 @@ const productConfig: PersonaConfig = {
 };
 
 const executiveConfig: PersonaConfig = {
-  sectionOrder: ['home', 'governance', 'organization', 'changes', 'services', 'contracts', 'operations', 'aiHub', 'integrations', 'admin'],
-  highlightedSections: ['governance'],
+  sectionOrder: ['home', 'intelligence', 'compliance', 'changes', 'catalog', 'operations', 'aiHub', 'admin'],
+  highlightedSections: ['intelligence'],
   homeSubtitleKey: 'persona.Executive.homeSubtitle',
   homeWidgets: [
     { id: 'operational-trend', titleKey: 'persona.Executive.widgets.operationalTrend', type: 'trend' },
@@ -231,8 +231,8 @@ const executiveConfig: PersonaConfig = {
 };
 
 const platformAdminConfig: PersonaConfig = {
-  sectionOrder: ['home', 'admin', 'organization', 'integrations', 'aiHub', 'governance', 'services', 'contracts', 'changes', 'operations'],
-  highlightedSections: ['admin', 'aiHub', 'governance', 'integrations'],
+  sectionOrder: ['home', 'admin', 'compliance', 'intelligence', 'aiHub', 'catalog', 'changes', 'operations'],
+  highlightedSections: ['admin', 'aiHub', 'compliance'],
   homeSubtitleKey: 'persona.PlatformAdmin.homeSubtitle',
   homeWidgets: [
     { id: 'policy-health', titleKey: 'persona.PlatformAdmin.widgets.policyHealth', type: 'governance' },
@@ -255,8 +255,8 @@ const platformAdminConfig: PersonaConfig = {
 };
 
 const auditorConfig: PersonaConfig = {
-  sectionOrder: ['home', 'governance', 'organization', 'admin', 'changes', 'contracts', 'operations', 'aiHub', 'services', 'integrations'],
-  highlightedSections: ['governance', 'admin'],
+  sectionOrder: ['home', 'compliance', 'intelligence', 'admin', 'changes', 'catalog', 'operations', 'aiHub'],
+  highlightedSections: ['compliance', 'admin'],
   homeSubtitleKey: 'persona.Auditor.homeSubtitle',
   homeWidgets: [
     { id: 'audit-activity', titleKey: 'persona.Auditor.widgets.auditActivity', type: 'audit' },
@@ -280,7 +280,7 @@ const auditorConfig: PersonaConfig = {
 };
 
 const aiUserConfig: PersonaConfig = {
-  sectionOrder: ['aiHub'],
+  sectionOrder: ['home', 'aiHub'],
   highlightedSections: ['aiHub'],
   homeSubtitleKey: 'persona.AiUser.homeSubtitle',
   homeWidgets: [],

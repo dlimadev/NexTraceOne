@@ -9452,7 +9452,19 @@
     "subGroupPlatformHealth": "Salud de la Plataforma",
     "subGroupSecurityAdmin": "Seguridad",
     "subGroupAiAdmin": "Administración de IA",
-    "subGroupProductAnalytics": "Analytics de Producto"
+    "subGroupProductAnalytics": "Analytics de Producto",
+    "sectionCatalog": "Catálogo",
+    "sectionIntelligence": "Inteligencia",
+    "sectionCompliance": "Conformidad",
+    "subGroupDiscovery": "Descubrimiento & Madurez",
+    "subGroupDeveloperEnablement": "Habilitación de Desarrolladores",
+    "subGroupTesting": "Pruebas & Resiliencia",
+    "subGroupControlsPolicies": "Controles & Políticas",
+    "subGroupScorecardsAssessment": "Cuadros de Mando & Evaluación",
+    "subGroupDashboards": "Dashboards",
+    "subGroupCostSustainability": "Costo & Sostenibilidad",
+    "subGroupIdentityAccess": "Identidad & Acceso",
+    "subGroupPlatformConfig": "Configuración"
   },
   "sourceOfTruth": {
     "assetTypes": {

@@ -64,6 +64,7 @@ const ADMIN_PERMISSIONS = [
   'ruleset-governance:write',
   'integrations:read',
   'platform:admin:read',
+  'platform:admin:write',
 ];
 
 /** Permissões para o perfil Engineer (acesso limitado). */
