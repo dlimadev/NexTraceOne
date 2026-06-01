@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.CheckDependencyPolicies;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.CompareDependencyVersions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.DetectLicenseConflicts;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Features.AdviseOnServiceDependencies;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.EnrichServiceDependencies;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.GenerateSbom;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Features.GetDependencyHealthDashboard;
@@ -60,6 +61,19 @@ public sealed class DependencyGovernanceEndpointModule
         .RequirePermission("catalog:dependencies:write")
         .WithName("EnrichServiceDependencies")
         .WithSummary("Enrich dependency profile with live data from OSV and NuGet.org");
+
+        group.MapPost("/{serviceId:guid}/advise", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new AdviseOnServiceDependencies.Command(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("catalog:dependencies:read")
+        .WithName("AdviseOnServiceDependencies")
+        .WithSummary("Generate AI-powered dependency advisory with prioritized upgrade path");
 
         group.MapGet("/{serviceId:guid}", async (
             Guid serviceId,

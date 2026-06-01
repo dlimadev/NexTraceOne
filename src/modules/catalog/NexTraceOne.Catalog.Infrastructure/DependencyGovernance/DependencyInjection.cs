@@ -56,6 +56,12 @@ public static class DependencyInjection
 
         services.AddScoped<IDependencyEnrichmentService, DependencyEnrichmentService>();
 
+        services.AddHttpClient<ILlmCompletionClient, OllamaCompletionClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://localhost:11434");
+            client.Timeout = TimeSpan.FromSeconds(60);
+        });
+
         return services;
     }
 }
