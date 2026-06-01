@@ -9467,7 +9467,19 @@
     "subGroupPlatformHealth": "Saúde da Plataforma",
     "subGroupSecurityAdmin": "Segurança",
     "subGroupAiAdmin": "Administração de IA",
-    "subGroupProductAnalytics": "Analytics de Produto"
+    "subGroupProductAnalytics": "Analytics de Produto",
+    "sectionCatalog": "Catálogo",
+    "sectionIntelligence": "Inteligência",
+    "sectionCompliance": "Conformidade",
+    "subGroupDiscovery": "Descoberta & Maturidade",
+    "subGroupDeveloperEnablement": "Habilitação de Desenvolvedores",
+    "subGroupTesting": "Testes & Resiliência",
+    "subGroupControlsPolicies": "Controles & Políticas",
+    "subGroupScorecardsAssessment": "Scorecards & Avaliação",
+    "subGroupDashboards": "Dashboards",
+    "subGroupCostSustainability": "Custo & Sustentabilidade",
+    "subGroupIdentityAccess": "Identidade & Acesso",
+    "subGroupPlatformConfig": "Configuração"
   },
   "sourceOfTruth": {
     "assetTypes": {

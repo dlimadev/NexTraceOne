@@ -50,26 +50,27 @@ const navItems: NavItem[] = [
   // ── HOME ──────────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
 
-  // ── SERVIÇOS ──────────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.scoreMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'services' },
-  { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <BookOpenCheck size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Star size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'services' },
-
-  // ── CONTRATOS ─────────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <GitBranch size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'contracts' },
-  { labelKey: 'sidebar.contractsHealth', to: '/contracts/health', icon: <Stethoscope size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <FlaskConical size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ListChecks size={18} />, permission: 'rulesets:read', section: 'contracts' },
-  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Boxes size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <Send size={18} />, permission: 'contracts:write', section: 'contracts' },
+  // ── CATÁLOGO ──────────────────────────────────────────────────────────────
+  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
+  { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
+  { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'catalog' },
+  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'catalog' },
+  { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <BookOpenCheck size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
+  // Descoberta & Maturidade
+  { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.scoreMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Star size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  // Governança de Contratos
+  { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <GitBranch size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.contractsHealth', to: '/contracts/health', icon: <Stethoscope size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <FlaskConical size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ListChecks size={18} />, permission: 'rulesets:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Boxes size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <Send size={18} />, permission: 'contracts:write', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  // Habilitação de Desenvolvedores
+  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDeveloperEnablement' },
 
   // ── MUDANÇAS ──────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.changes', to: '/changes', icon: <Diff size={18} />, permission: 'change-intelligence:read', section: 'changes' },
@@ -77,61 +78,107 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.releaseCalendar', to: '/release-calendar', icon: <CalendarDays size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.doraMetrics', to: '/dora-metrics', icon: <LineChart size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   // Ciclo de Vida do Release
-  { labelKey: 'sidebar.releaseTrain', to: '/release-train', icon: <Train size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.releaseCommitPool', to: '/releases/commit-pool', icon: <GitCommit size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.releaseImpactReport', to: '/releases/impact-report', icon: <BarChart3 size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.releaseNotes', to: '/releases/notes', icon: <BookOpen size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.postReleaseReview', to: '/releases/post-review', icon: <PackageCheck size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.releaseExternalIngest', to: '/releases/ingest-external', icon: <Download size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.releaseParameterAudit', to: '/releases/parameter-audit', icon: <History size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  { labelKey: 'sidebar.evidencePackViewer', to: '/releases/evidence-pack', icon: <GitBranch size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseDeeperNav' },
-  // Aprovação e Governança
-  { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:requests:read', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
-  { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
-  { labelKey: 'sidebar.workflowConfiguration', to: '/workflow/configuration', icon: <SlidersHorizontal size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  { labelKey: 'sidebar.releaseTrain', to: '/release-train', icon: <Train size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.releaseCommitPool', to: '/releases/commit-pool', icon: <GitCommit size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.releaseImpactReport', to: '/releases/impact-report', icon: <BarChart3 size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.releaseNotes', to: '/releases/notes', icon: <BookOpen size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.postReleaseReview', to: '/releases/post-review', icon: <PackageCheck size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.releaseExternalIngest', to: '/releases/ingest-external', icon: <Download size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.releaseParameterAudit', to: '/releases/parameter-audit', icon: <History size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  { labelKey: 'sidebar.evidencePackViewer', to: '/releases/evidence-pack', icon: <PackageCheck size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupReleaseLifecycle' },
+  // Aprovação & Workflow
   { labelKey: 'sidebar.releaseApprovalGateway', to: '/releases/approval-gateway', icon: <DoorOpen size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
   { labelKey: 'sidebar.releaseApprovalPolicies', to: '/releases/approval-policies', icon: <FileLock2 size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
   { labelKey: 'sidebar.releaseControlParameters', to: '/releases/control-parameters', icon: <Sliders size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
-  // Risco e Rollback
+  { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:requests:read', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  { labelKey: 'sidebar.workflowConfiguration', to: '/workflow/configuration', icon: <SlidersHorizontal size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  // Risco & Segurança
   { labelKey: 'sidebar.releaseGatesDashboard', to: '/releases/gates', icon: <GitMerge size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
   { labelKey: 'sidebar.releaseRollback', to: '/releases/rollback', icon: <RotateCcw size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
+  { labelKey: 'sidebar.blastRadiusExplorer', to: '/governance/blast-radius', icon: <AlertTriangle size={18} />, permission: 'governance:reports:read', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
 
   // ── OPERAÇÕES ─────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
-  { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <ScrollText size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
   { labelKey: 'sidebar.reliabilityAndSlos', to: '/operations/reliability', icon: <HeartPulse size={18} />, permission: 'operations:reliability:read', section: 'operations' },
-  { labelKey: 'sidebar.sloManagement', to: '/operations/reliability/slos', icon: <Target size={18} />, permission: 'operations:reliability:read', section: 'operations' },
   { labelKey: 'sidebar.onCallSchedule', to: '/operations/on-call-schedule', icon: <PhoneCall size={18} />, permission: 'operations:incidents:read', section: 'operations' },
-  { labelKey: 'sidebar.onCallIntelligence', to: '/operations/on-call-intelligence', icon: <Brain size={18} />, permission: 'operations:incidents:read', section: 'operations' },
-  { labelKey: 'sidebar.postIncident', to: '/operations/post-incident', icon: <FileSearch size={18} />, permission: 'operations:incidents:read', section: 'operations' },
-  // Telemetria
+  { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <ScrollText size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
+  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
+  // Observabilidade
   { labelKey: 'sidebar.requestExplorer', to: '/operations/request-explorer', icon: <ArrowRightLeft size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
   { labelKey: 'sidebar.traceExplorer', to: '/operations/telemetry/traces', icon: <Waypoints size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
   { labelKey: 'sidebar.logExplorer', to: '/operations/telemetry/logs', icon: <FileText size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
   { labelKey: 'sidebar.profilingExplorer', to: '/operations/profiling-explorer', icon: <BarChart2 size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
   { labelKey: 'sidebar.dbExplorer', to: '/operations/db-explorer', icon: <Database size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
   { labelKey: 'sidebar.errorTracking', to: '/operations/error-tracking', icon: <Bug size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupTelemetry' },
-  // SRE & Inteligência
+  // SRE & Confiabilidade
   { labelKey: 'sidebar.sreDashboard', to: '/operations/sre-dashboard', icon: <Monitor size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.syntheticMonitoring', to: '/operations/synthetic-monitoring', icon: <Gauge size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.runtimeIntelligence', to: '/operations/runtime-comparison', icon: <Cpu size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.predictiveIntelligence', to: '/operations/predictive-intelligence', icon: <Lightbulb size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
-  { labelKey: 'sidebar.serviceMaturitySre', to: '/operations/service-maturity-sre', icon: <Award size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
+  { labelKey: 'sidebar.onCallIntelligence', to: '/operations/on-call-intelligence', icon: <Brain size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
+  { labelKey: 'sidebar.postIncident', to: '/operations/post-incident', icon: <FileSearch size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   // Ferramentas SLO
+  { labelKey: 'sidebar.sloManagement', to: '/operations/reliability/slos', icon: <Target size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSloTools' },
   { labelKey: 'sidebar.sloBurnRate', to: '/operations/slo-burn-rate', icon: <Flame size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSloTools' },
   { labelKey: 'sidebar.sloMarketplace', to: '/operations/slo-marketplace', icon: <Store size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSloTools' },
   { labelKey: 'sidebar.dependencyRisk', to: '/operations/dependency-risk', icon: <ShieldAlert size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSloTools' },
-  // AI-Powered Ops
+  // Testes & Resiliência
+  { labelKey: 'sidebar.chaosEngineering', to: '/operations/chaos-engineering', icon: <AlertTriangle size={18} />, permission: 'operations:runtime:write', section: 'operations', subGroup: 'sidebar.subGroupTesting' },
+  { labelKey: 'sidebar.loadTesting', to: '/operations/load-testing', icon: <Activity size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTesting' },
+  { labelKey: 'sidebar.apiRegression', to: '/operations/api-regression', icon: <FlaskConical size={18} />, permission: 'operations:telemetry:read', section: 'operations', subGroup: 'sidebar.subGroupTesting' },
+  // IA Operacional
   { labelKey: 'sidebar.aiAnomaly', to: '/operations/ai-anomaly', icon: <Sparkles size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupAiOps' },
   { labelKey: 'sidebar.aiIncidentSummarizer', to: '/operations/ai-incident-summarizer', icon: <Bot size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupAiOps' },
   { labelKey: 'sidebar.aiRunbookSuggester', to: '/operations/ai-runbook-suggester', icon: <BrainCircuit size={18} />, permission: 'operations:runbooks:read', section: 'operations', subGroup: 'sidebar.subGroupAiOps' },
-  // Outros
-  { labelKey: 'sidebar.chaosEngineering', to: '/operations/chaos-engineering', icon: <AlertTriangle size={18} />, permission: 'operations:runtime:write', section: 'operations' },
-  { labelKey: 'sidebar.loadTesting', to: '/operations/load-testing', icon: <Activity size={18} />, permission: 'operations:telemetry:read', section: 'operations' },
-  { labelKey: 'sidebar.apiRegression', to: '/operations/api-regression', icon: <FlaskConical size={18} />, permission: 'operations:telemetry:read', section: 'operations' },
-  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
-  { labelKey: 'sidebar.automationAdmin', to: '/operations/automation/admin', icon: <Settings size={18} />, permission: 'operations:automation:read', section: 'operations' },
-  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'operations' },
+  { labelKey: 'sidebar.serviceMaturitySre', to: '/operations/service-maturity-sre', icon: <Award size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupAiOps' },
+
+  // ── INTELIGÊNCIA ──────────────────────────────────────────────────────────
+  { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'intelligence' },
+  { labelKey: 'sidebar.executiveIntelligence', to: '/governance/executive-intelligence', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'intelligence' },
+  { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <PieChart size={18} />, permission: 'governance:reports:read', section: 'intelligence' },
+  { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'intelligence' },
+  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users2 size={18} />, permission: 'governance:teams:read', section: 'intelligence' },
+  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:domains:read', section: 'intelligence' },
+  // Dashboards & Analytics
+  { labelKey: 'sidebar.customDashboards', to: '/governance/custom-dashboards', icon: <LayoutGrid size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  { labelKey: 'sidebar.notebooks', to: '/governance/notebooks', icon: <Edit3 size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  { labelKey: 'sidebar.scheduledReports', to: '/governance/scheduled-reports', icon: <CalendarDays size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  { labelKey: 'sidebar.dashboardsAsCode', to: '/governance/dashboards-as-code', icon: <FileCode size={18} />, permission: 'governance:reports:write', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  // Custo & Sustentabilidade
+  { labelKey: 'sidebar.wasteDetection', to: '/governance/waste-detection', icon: <TrendingDown size={18} />, permission: 'governance:finops:read', section: 'intelligence', subGroup: 'sidebar.subGroupCostSustainability' },
+  { labelKey: 'sidebar.greenOps', to: '/governance/greenops', icon: <Leaf size={18} />, permission: 'governance:finops:read', section: 'intelligence', subGroup: 'sidebar.subGroupCostSustainability' },
+  // Centros de Insights
+  { labelKey: 'sidebar.changeConfidenceHub', to: '/governance/centers/change-confidence', icon: <Target size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupInsightCenters' },
+  { labelKey: 'sidebar.operationalReadiness', to: '/governance/centers/operational-readiness', icon: <Monitor size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupInsightCenters' },
+  { labelKey: 'sidebar.driftCenter', to: '/governance/centers/drift', icon: <ArrowRightLeft size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupInsightCenters' },
+  { labelKey: 'sidebar.sloServiceCenter', to: '/governance/centers/slo', icon: <HeartPulse size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupInsightCenters' },
+  { labelKey: 'sidebar.warRoom', to: '/governance/war-room', icon: <Zap size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupInsightCenters' },
+  // Visões por Persona
+  { labelKey: 'sidebar.engineerCockpit', to: '/governance/persona/engineer', icon: <Cpu size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+  { labelKey: 'sidebar.techLeadCommandCenter', to: '/governance/persona/tech-lead', icon: <Users2 size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+  { labelKey: 'sidebar.architectLandscape', to: '/governance/persona/architect', icon: <Map size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+  { labelKey: 'sidebar.productPortfolio', to: '/governance/persona/product', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+  { labelKey: 'sidebar.executiveBrief', to: '/governance/persona/executive', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+  { labelKey: 'sidebar.auditorConsole', to: '/governance/persona/auditor', icon: <ScanEye size={18} />, permission: 'governance:compliance:read', section: 'intelligence', subGroup: 'sidebar.subGroupPersonaSuites' },
+
+  // ── CONFORMIDADE ──────────────────────────────────────────────────────────
+  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'compliance' },
+  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'compliance' },
+  { labelKey: 'sidebar.auditTrail', to: '/audit', icon: <History size={18} />, permission: 'audit:trail:read', section: 'compliance' },
+  // Controles & Políticas
+  { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <Lock size={18} />, permission: 'governance:controls:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Scale size={18} />, permission: 'governance:policies:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.governanceGates', to: '/governance/gates', icon: <GitMerge size={18} />, permission: 'governance:gates:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.apiPolicyAsCode', to: '/governance/api-policy-as-code', icon: <FileCode size={18} />, permission: 'governance:policies:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <BookOpenCheck size={18} />, permission: 'governance:waivers:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  { labelKey: 'sidebar.evidencePackages', to: '/governance/evidence', icon: <BookText size={18} />, permission: 'governance:evidence:read', section: 'compliance', subGroup: 'sidebar.subGroupControlsPolicies' },
+  // Scorecards & Avaliação
+  { labelKey: 'sidebar.maturityScorecards', to: '/governance/maturity', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'compliance', subGroup: 'sidebar.subGroupScorecardsAssessment' },
+  { labelKey: 'sidebar.complianceScorecardCenter', to: '/governance/centers/compliance-scorecard', icon: <ShieldCheck size={18} />, permission: 'governance:compliance:read', section: 'compliance', subGroup: 'sidebar.subGroupScorecardsAssessment' },
+  { labelKey: 'sidebar.benchmarking', to: '/governance/benchmarking', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'compliance', subGroup: 'sidebar.subGroupScorecardsAssessment' },
+  { labelKey: 'sidebar.technicalDebt', to: '/governance/technical-debt', icon: <TrendingDown size={18} />, permission: 'governance:reports:read', section: 'compliance', subGroup: 'sidebar.subGroupScorecardsAssessment' },
 
   // ── HUB DE IA ─────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
@@ -139,6 +186,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.agentMarketplace', to: '/ai/marketplace', icon: <Store size={18} />, permission: 'ai:runtime:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiAnalysis', to: '/ai/analysis', icon: <BarChart3 size={18} />, permission: 'ai:runtime:write', section: 'aiHub' },
   { labelKey: 'sidebar.aiMemoryIntelligence', to: '/ai/intelligence', icon: <Brain size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiAudit', to: '/ai/audit', icon: <ScanEye size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   // Governança de Modelos
   { labelKey: 'sidebar.modelGovernance', to: '/ai/models', icon: <BrainCircuit size={18} />, permission: 'ai:governance:read', section: 'aiHub', subGroup: 'sidebar.subGroupModelGovernance' },
   { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <FileLock2 size={18} />, permission: 'ai:governance:read', section: 'aiHub', subGroup: 'sidebar.subGroupModelGovernance' },
@@ -150,77 +198,26 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.userTokenQuotas', to: '/ai/user-token-quotas', icon: <Clock size={18} />, permission: 'ai:governance:write', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
   { labelKey: 'sidebar.aiMcp', to: '/ai/mcp', icon: <Network size={18} />, permission: 'ai:runtime:read', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
   { labelKey: 'sidebar.aiIde', to: '/ai/ide', icon: <Code2 size={18} />, permission: 'ai:governance:read', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
-  { labelKey: 'sidebar.aiAudit', to: '/ai/audit', icon: <ScanEye size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
-
-  // ── GOVERNANÇA ────────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.executiveIntelligence', to: '/governance/executive-intelligence', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <PieChart size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.scheduledReports', to: '/governance/scheduled-reports', icon: <CalendarDays size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.customDashboards', to: '/governance/custom-dashboards', icon: <LayoutGrid size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.dashboardTemplates', to: '/governance/dashboard-templates', icon: <LayoutGrid size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.dashboardReports', to: '/governance/dashboard-reports', icon: <LineChart size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.notebooks', to: '/governance/notebooks', icon: <Edit3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
-  { labelKey: 'sidebar.dashboardsAsCode', to: '/governance/dashboards-as-code', icon: <FileCode size={18} />, permission: 'governance:reports:write', section: 'governance' },
-  { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },
-  { labelKey: 'sidebar.wasteDetection', to: '/governance/waste-detection', icon: <TrendingDown size={18} />, permission: 'governance:finops:read', section: 'governance' },
-  { labelKey: 'sidebar.greenOps', to: '/governance/greenops', icon: <Leaf size={18} />, permission: 'governance:finops:read', section: 'governance' },
-  // Compliance & Controles
-  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.complianceScorecardCenter', to: '/governance/centers/compliance-scorecard', icon: <ShieldCheck size={18} />, permission: 'governance:compliance:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Scale size={18} />, permission: 'governance:policies:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <Lock size={18} />, permission: 'governance:controls:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.governanceGates', to: '/governance/gates', icon: <GitMerge size={18} />, permission: 'governance:gates:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.apiPolicyAsCode', to: '/governance/api-policy-as-code', icon: <FileCode size={18} />, permission: 'governance:policies:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.evidencePackages', to: '/governance/evidence', icon: <BookText size={18} />, permission: 'governance:evidence:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <BookOpenCheck size={18} />, permission: 'governance:waivers:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.maturityScorecards', to: '/governance/maturity', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  { labelKey: 'sidebar.benchmarking', to: '/governance/benchmarking', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupComplianceControls' },
-  // Tracking & Audit
-  { labelKey: 'sidebar.technicalDebt', to: '/governance/technical-debt', icon: <TrendingDown size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupTrackingAudit' },
-  { labelKey: 'sidebar.auditTrail', to: '/audit', icon: <History size={18} />, permission: 'audit:trail:read', section: 'governance', subGroup: 'sidebar.subGroupTrackingAudit' },
-  // Centros de Insights
-  { labelKey: 'sidebar.changeConfidenceHub', to: '/governance/centers/change-confidence', icon: <Target size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  { labelKey: 'sidebar.blastRadiusExplorer', to: '/governance/blast-radius', icon: <AlertTriangle size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  { labelKey: 'sidebar.operationalReadiness', to: '/governance/centers/operational-readiness', icon: <Monitor size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  { labelKey: 'sidebar.driftCenter', to: '/governance/centers/drift', icon: <ArrowRightLeft size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  { labelKey: 'sidebar.sloServiceCenter', to: '/governance/centers/slo', icon: <HeartPulse size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  { labelKey: 'sidebar.warRoom', to: '/governance/war-room', icon: <Zap size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupInsightCenters' },
-  // Visões por Persona
-  { labelKey: 'sidebar.engineerCockpit', to: '/governance/persona/engineer', icon: <Cpu size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-  { labelKey: 'sidebar.techLeadCommandCenter', to: '/governance/persona/tech-lead', icon: <Users2 size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-  { labelKey: 'sidebar.architectLandscape', to: '/governance/persona/architect', icon: <Map size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-  { labelKey: 'sidebar.productPortfolio', to: '/governance/persona/product', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-  { labelKey: 'sidebar.executiveBrief', to: '/governance/persona/executive', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-  { labelKey: 'sidebar.auditorConsole', to: '/governance/persona/auditor', icon: <ScanEye size={18} />, permission: 'governance:compliance:read', section: 'governance', subGroup: 'sidebar.subGroupPersonaSuites' },
-
-  // ── ORGANIZAÇÃO ───────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users2 size={18} />, permission: 'governance:teams:read', section: 'organization' },
-  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:domains:read', section: 'organization' },
-
-  // ── INTEGRAÇÕES ───────────────────────────────────────────────────────────
-  { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
 
   // ── ADMIN ─────────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
-  { labelKey: 'sidebar.tenants', to: '/tenants', icon: <Building2 size={18} />, permission: 'identity:tenants:admin', section: 'admin' },
-  { labelKey: 'sidebar.breakGlassAndJit', to: '/break-glass', icon: <KeyRound size={18} />, permission: 'identity:sessions:read', section: 'admin' },
-  { labelKey: 'sidebar.accessReview', to: '/access-reviews', icon: <UserCheck size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.environments', to: '/environments', icon: <Layers size={18} />, permission: 'env:environments:read', section: 'admin' },
-  { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:admin:read', section: 'admin' },
-  { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformHealthDashboard', to: '/platform/health', icon: <MonitorDot size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'admin' },
+  // Identidade & Acesso
+  { labelKey: 'sidebar.tenants', to: '/tenants', icon: <Building2 size={18} />, permission: 'identity:tenants:admin', section: 'admin', subGroup: 'sidebar.subGroupIdentityAccess' },
+  { labelKey: 'sidebar.accessReview', to: '/access-reviews', icon: <UserCheck size={18} />, permission: 'identity:users:read', section: 'admin', subGroup: 'sidebar.subGroupIdentityAccess' },
+  { labelKey: 'sidebar.breakGlassAndJit', to: '/break-glass', icon: <KeyRound size={18} />, permission: 'identity:sessions:read', section: 'admin', subGroup: 'sidebar.subGroupIdentityAccess' },
+  { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:admin:read', section: 'admin', subGroup: 'sidebar.subGroupIdentityAccess' },
   // Saúde da Plataforma
   { labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Server size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
   { labelKey: 'sidebar.startupReport', to: '/admin/startup-report', icon: <Activity size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
-  { labelKey: 'sidebar.supportBundle', to: '/admin/support-bundle', icon: <Archive size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
   { labelKey: 'sidebar.databaseHealth', to: '/admin/database-health', icon: <Database size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
   { labelKey: 'sidebar.backupCoordinator', to: '/admin/backup', icon: <HardDrive size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
+  { labelKey: 'sidebar.supportBundle', to: '/admin/support-bundle', icon: <Archive size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
   { labelKey: 'sidebar.platformAlertRules', to: '/admin/platform-alerts', icon: <Bell size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
   { labelKey: 'sidebar.capacityForecast', to: '/admin/capacity-forecast', icon: <TrendingUp size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformHealth' },
-  // Segurança Admin
+  // Segurança
   { labelKey: 'sidebar.sessionSecurity', to: '/admin/session-security', icon: <Fingerprint size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupSecurityAdmin' },
   { labelKey: 'sidebar.samlSso', to: '/admin/saml-sso', icon: <Lock size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupSecurityAdmin' },
   { labelKey: 'sidebar.mtlsManager', to: '/admin/mtls', icon: <Shield size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupSecurityAdmin' },
@@ -232,50 +229,47 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiResourceGovernor', to: '/admin/ai-governor', icon: <Gauge size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupAiAdmin' },
   { labelKey: 'sidebar.ideExtensionsConsole', to: '/governance/ide-extensions', icon: <Code2 size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupAiAdmin' },
   { labelKey: 'sidebar.licensingAdmin', to: '/governance/licensing', icon: <Coins size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupAiAdmin' },
-  { labelKey: 'sidebar.pluginMarketplace', to: '/governance/marketplace', icon: <Store size={18} />, permission: 'governance:reports:read', section: 'admin', subGroup: 'sidebar.subGroupAiAdmin' },
   // Product Analytics
   { labelKey: 'sidebar.productAnalytics', to: '/analytics', icon: <BarChart3 size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
   { labelKey: 'sidebar.moduleAdoption', to: '/analytics/adoption', icon: <TrendingUp size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
   { labelKey: 'sidebar.journeyFunnels', to: '/analytics/journeys', icon: <Waypoints size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
   { labelKey: 'sidebar.personaUsage', to: '/analytics/personas', icon: <Users2 size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
   { labelKey: 'sidebar.valueTracking', to: '/analytics/value', icon: <Target size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
-  // Geral
-  { labelKey: 'sidebar.branding', to: '/platform/branding', icon: <Palette size={18} />, permission: 'configuration:admin', section: 'admin' },
-  { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <SlidersHorizontal size={18} />, section: 'admin' },
+  // Configuração da Plataforma
+  { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
+  { labelKey: 'sidebar.branding', to: '/platform/branding', icon: <Palette size={18} />, permission: 'configuration:admin', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
+  { labelKey: 'sidebar.pluginMarketplace', to: '/governance/marketplace', icon: <Store size={18} />, permission: 'governance:reports:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
+  { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <SlidersHorizontal size={18} />, section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
 ];
 
 const sectionLabels: Record<NavSection, string> = {
   home: '',
-  services: 'sidebar.sectionServices',
-  contracts: 'sidebar.sectionContracts',
+  catalog: 'sidebar.sectionCatalog',
   changes: 'sidebar.sectionChanges',
   operations: 'sidebar.sectionOperations',
+  intelligence: 'sidebar.sectionIntelligence',
+  compliance: 'sidebar.sectionCompliance',
   aiHub: 'sidebar.sectionAiHub',
-  governance: 'sidebar.sectionGovernance',
-  organization: 'sidebar.sectionOwnershipTeams',
-  integrations: 'sidebar.sectionIntegrations',
   admin: 'sidebar.sectionAdmin',
 };
 
 /** Ícone representativo de cada secção — exibido no icon rail. */
 const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
   home: <LayoutDashboard size={22} />,
-  services: <Server size={22} />,
-  contracts: <FileText size={22} />,
+  catalog: <Server size={22} />,
   changes: <Zap size={22} />,
   operations: <Activity size={22} />,
+  intelligence: <BarChart3 size={22} />,
+  compliance: <ShieldCheck size={22} />,
   aiHub: <Bot size={22} />,
-  governance: <Briefcase size={22} />,
-  organization: <Users size={22} />,
-  integrations: <Cable size={22} />,
   admin: <Settings size={22} />,
 };
 
 /** Agrupamento visual para separadores no icon rail. */
 const sectionGroups: NavSection[][] = [
-  ['home', 'services', 'contracts', 'changes', 'operations'],
+  ['home', 'catalog', 'changes', 'operations'],
+  ['intelligence', 'compliance'],
   ['aiHub'],
-  ['governance', 'organization', 'integrations'],
   ['admin'],
 ];
 
