@@ -71,6 +71,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <Send size={18} />, permission: 'contracts:write', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
   // Habilitação de Desenvolvedores
   { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDeveloperEnablement' },
+  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDeveloperEnablement' },
 
   // ── MUDANÇAS ──────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.changes', to: '/changes', icon: <Diff size={18} />, permission: 'change-intelligence:read', section: 'changes' },
@@ -142,6 +143,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:domains:read', section: 'intelligence' },
   // Dashboards & Analytics
   { labelKey: 'sidebar.customDashboards', to: '/governance/custom-dashboards', icon: <LayoutGrid size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  { labelKey: 'sidebar.dashboardTemplates', to: '/governance/dashboard-templates', icon: <LayoutGrid size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
+  { labelKey: 'sidebar.dashboardReports', to: '/governance/dashboard-reports', icon: <LineChart size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
   { labelKey: 'sidebar.notebooks', to: '/governance/notebooks', icon: <Edit3 size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
   { labelKey: 'sidebar.scheduledReports', to: '/governance/scheduled-reports', icon: <CalendarDays size={18} />, permission: 'governance:reports:read', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
   { labelKey: 'sidebar.dashboardsAsCode', to: '/governance/dashboards-as-code', icon: <FileCode size={18} />, permission: 'governance:reports:write', section: 'intelligence', subGroup: 'sidebar.subGroupDashboards' },
@@ -237,6 +240,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.valueTracking', to: '/analytics/value', icon: <Target size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupProductAnalytics' },
   // Configuração da Plataforma
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
+  { labelKey: 'sidebar.automationAdmin', to: '/operations/automation/admin', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
   { labelKey: 'sidebar.branding', to: '/platform/branding', icon: <Palette size={18} />, permission: 'configuration:admin', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
   { labelKey: 'sidebar.pluginMarketplace', to: '/governance/marketplace', icon: <Store size={18} />, permission: 'governance:reports:read', section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
   { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <SlidersHorizontal size={18} />, section: 'admin', subGroup: 'sidebar.subGroupPlatformConfig' },
