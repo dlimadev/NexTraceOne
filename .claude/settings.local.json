@@ -38,7 +38,10 @@
       "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
       "Bash(grep -E \"types/index.ts$\")",
       "Skill(gsd-progress)",
-      "Bash(xargs sed -i 's/border-border/border-edge/g; s/text-muted-foreground/text-muted/g; s/border-input/border-edge/g; s/ring-ring/ring-accent/g; s/text-foreground/text-body/g')"
+      "Bash(xargs sed -i 's/border-border/border-edge/g; s/text-muted-foreground/text-muted/g; s/border-input/border-edge/g; s/ring-ring/ring-accent/g; s/text-foreground/text-body/g')",
+      "Bash(node -e \"require\\('js-yaml'\\); console.log\\('ok'\\)\")",
+      "Bash(node -e \"const f=require\\('fs'\\); ['en','pt-BR','es','pt-PT'].forEach\\(l => { try { JSON.parse\\(f.readFileSync\\('src/frontend/src/locales/'+l+'.json','utf8'\\)\\); console.log\\(l+': valid JSON'\\); } catch\\(e\\) { console.log\\(l+': INVALID - '+e.message\\); }}\\)\")",
+      "Bash(node -e ' *)"
     ]
   }
 }
