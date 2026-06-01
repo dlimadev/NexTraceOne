@@ -17064,7 +17064,36 @@
     "chooseType": "Escolha o tipo de contrato",
     "openBuilder": "Abrir builder",
     "unifiedPublication": "Fluxo de Publicação Unificado",
-    "publicationFlow": "Projetar → Validar → Publicar → Governar"
+    "publicationFlow": "Projetar → Validar → Publicar → Governar",
+    "stats": {
+      "total": "Contratos",
+      "published": "Publicados",
+      "inDraft": "Em Rascunho"
+    },
+    "inProgress": {
+      "title": "Em Progresso",
+      "resume": "Continuar",
+      "viewAll": "Ver todos",
+      "empty": "Nenhum contrato em rascunho"
+    },
+    "newContract": {
+      "title": "Novo Contrato",
+      "categories": {
+        "rest": "REST & HTTP",
+        "events": "Event-Driven",
+        "shared": "Compartilhado"
+      }
+    },
+    "type": {
+      "bestFor": {
+        "rest": "APIs públicas, microsserviços",
+        "soap": "Integrações enterprise, mainframe",
+        "graphql": "Queries flexíveis, agregação",
+        "asyncapi": "Kafka, SNS, AMQP, WebSocket",
+        "protobuf": "gRPC, IoT, RPC de alto desempenho",
+        "sharedSchema": "Schemas compartilhados, refs cross-contract"
+      }
+    }
   },
   "restBuilder": {
     "title": "Designer REST / OpenAPI",
@@ -17399,6 +17428,21 @@
       "Adopting": "Adotando",
       "Exploring": "Explorando",
       "Initiating": "Iniciando"
+    }
+  },
+  "contractBuilder": {
+    "header": {
+      "format": "Formatar",
+      "saveDraft": "Salvar Rascunho",
+      "publish": "Publicar"
+    },
+    "validation": {
+      "valid": "Válido",
+      "errors": "Erro de parse"
+    },
+    "preview": {
+      "parseError": "Erro de parse",
+      "empty": "Nenhum preview — escreva para ver o preview ao vivo"
     }
   }
 }

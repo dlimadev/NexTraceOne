@@ -15749,7 +15749,36 @@
     "chooseType": "Choose contract type",
     "openBuilder": "Open builder",
     "unifiedPublication": "Unified Publication Workflow",
-    "publicationFlow": "Design → Validate → Publish → Govern"
+    "publicationFlow": "Design → Validate → Publish → Govern",
+    "stats": {
+      "total": "Contracts",
+      "published": "Published",
+      "inDraft": "In Draft"
+    },
+    "inProgress": {
+      "title": "In Progress",
+      "resume": "Resume",
+      "viewAll": "View all",
+      "empty": "No contracts in draft"
+    },
+    "newContract": {
+      "title": "New Contract",
+      "categories": {
+        "rest": "REST & HTTP",
+        "events": "Event-Driven",
+        "shared": "Shared / Cross-cutting"
+      }
+    },
+    "type": {
+      "bestFor": {
+        "rest": "Public APIs, microservices, webhooks",
+        "soap": "Enterprise integrations, mainframe services",
+        "graphql": "Flexible queries, API aggregation",
+        "asyncapi": "Kafka, SNS, AMQP, WebSocket events",
+        "protobuf": "gRPC, IoT, high-performance RPC",
+        "sharedSchema": "Shared schemas, cross-contract references"
+      }
+    }
   },
   "restBuilder": {
     "title": "Title",
@@ -16084,6 +16113,21 @@
       "Adopting": "Adopting",
       "Exploring": "Exploring",
       "Initiating": "Initiating"
+    }
+  },
+  "contractBuilder": {
+    "header": {
+      "format": "Format",
+      "saveDraft": "Save Draft",
+      "publish": "Publish"
+    },
+    "validation": {
+      "valid": "Valid",
+      "errors": "Parse error"
+    },
+    "preview": {
+      "parseError": "Parse error",
+      "empty": "No preview — start writing to see a live preview"
     }
   }
 }
