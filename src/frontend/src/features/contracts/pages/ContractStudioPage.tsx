@@ -12,10 +12,15 @@ import {
   GitBranch,
   ShieldCheck,
   Eye,
+  Clock,
+  LayoutGrid,
+  Plus,
 } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Badge } from '../../../components/Badge';
+import { useContractsSummary, useContractList } from '../hooks';
+import type { ContractListItem } from '../../../types';
 
 // ── Contract Type Registry ────────────────────────────────────────────────────
 
@@ -109,12 +114,61 @@ const WORKFLOW_STEPS = [
   { icon: <CheckCircle2 size={12} />, label: 'Publish' },
 ];
 
+// ── Stat Card ─────────────────────────────────────────────────────────────────
+
+interface StatCardProps {
+  testId: string;
+  label: string;
+  value: number | undefined;
+  loading?: boolean;
+}
+
+function StatCard({ testId, label, value, loading }: StatCardProps) {
+  return (
+    <div
+      data-testid={testId}
+      className="rounded-md border border-edge bg-card p-4 flex flex-col gap-1"
+    >
+      <span className="text-xs text-muted font-medium">{label}</span>
+      <span className="text-2xl font-bold text-heading">
+        {loading ? '—' : (value ?? 0)}
+      </span>
+    </div>
+  );
+}
+
+// ── Draft Resume Card ─────────────────────────────────────────────────────────
+
+function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onResume}
+      className="group flex-shrink-0 w-56 text-left rounded-md border border-edge bg-card hover:bg-elevated hover:border-edge-strong transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-accent p-3"
+    >
+      <div className="flex items-center justify-between mb-2">
+        <Badge variant="warning" size="sm">{item.lifecycleState}</Badge>
+        <Clock size={11} className="text-faded" />
+      </div>
+      <p className="text-xs font-semibold text-heading truncate mb-1">
+        {item.apiName ?? item.name ?? 'Untitled'}
+      </p>
+      <p className="text-[11px] text-faded font-mono">{item.protocol}</p>
+      <div className="flex items-center gap-1 text-[11px] font-medium text-accent mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span>Resume</span>
+        <ArrowRight size={10} />
+      </div>
+    </button>
+  );
+}
+
 // ── Contract Type Card ────────────────────────────────────────────────────────
 
 function ContractTypeCard({ type, onSelect }: { type: ContractType; onSelect: () => void }) {
   return (
     <button
       type="button"
+      data-testid={`type-card-${type.key}`}
       onClick={onSelect}
       className={`
         group w-full text-left rounded-md border-l-2 border border-edge
@@ -168,15 +222,85 @@ export function ContractStudioPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const { data: summary, isLoading: summaryLoading } = useContractsSummary();
+  const { data: draftsData, isLoading: draftsLoading } = useContractList({
+    lifecycleState: 'Draft',
+    pageSize: 10,
+  });
+
+  const draftItems = draftsData?.items ?? [];
+
   return (
     <PageContainer>
       <PageHeader
         title={t('contractStudio.title')}
         subtitle={t('contractStudio.subtitle')}
+        icon={<LayoutGrid size={20} />}
+        actions={
+          <button
+            type="button"
+            onClick={() => navigate('/contracts/studio/new')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 transition-colors"
+          >
+            <Plus size={13} />
+            {t('contractStudio.newContract')}
+          </button>
+        }
       />
 
+      {/* ── Stats ─────────────────────────────────────────────────────────── */}
       <PageSection>
-        {/* Publication workflow banner */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <StatCard
+            testId="stat-total"
+            label={t('contractStudio.stats.total')}
+            value={summary?.totalCount}
+            loading={summaryLoading}
+          />
+          <StatCard
+            testId="stat-published"
+            label={t('contractStudio.stats.published')}
+            value={summary?.approvedCount}
+            loading={summaryLoading}
+          />
+          <StatCard
+            testId="stat-draft"
+            label={t('contractStudio.stats.draft')}
+            value={summary?.draftCount}
+            loading={summaryLoading}
+          />
+        </div>
+
+        {/* ── In-progress drafts ───────────────────────────────────────────── */}
+        {(draftsLoading || draftItems.length > 0) && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-semibold text-muted uppercase tracking-wider">
+                {t('contractStudio.inProgress')}
+              </h2>
+              {draftItems.length > 0 && (
+                <span className="text-xs text-faded">{draftItems.length} drafts</span>
+              )}
+            </div>
+            {draftsLoading ? (
+              <div className="h-24 rounded-md border border-edge bg-card animate-pulse" />
+            ) : (
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {draftItems.map(item => (
+                  <DraftCard
+                    key={item.contractVersionId ?? item.id ?? item.apiAssetId}
+                    item={item}
+                    onResume={() =>
+                      navigate(`/contracts/workspace/${item.contractVersionId ?? item.id}`)
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Publication workflow banner ──────────────────────────────────── */}
         <div className="mb-6 rounded-md border border-edge bg-elevated px-4 py-3">
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-xs font-semibold text-heading">
@@ -198,7 +322,7 @@ export function ContractStudioPage() {
           </div>
         </div>
 
-        {/* Section header */}
+        {/* ── Type picker ─────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-semibold text-muted uppercase tracking-wider">
             {t('contractStudio.chooseType')}
@@ -208,7 +332,6 @@ export function ContractStudioPage() {
           </span>
         </div>
 
-        {/* Contract type grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {CONTRACT_TYPES.map(type => (
             <ContractTypeCard
