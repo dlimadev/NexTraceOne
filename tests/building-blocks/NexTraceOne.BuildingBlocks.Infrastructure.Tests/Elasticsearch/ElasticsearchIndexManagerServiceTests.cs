@@ -176,9 +176,24 @@ public sealed class ElasticsearchIndexManagerServiceTests
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            // Snapshot body bytes now, before the caller's `using var content` disposes
+            // the original StringContent (disposing the buffer too). ByteArrayContent is
+            // independent and survives the original content's disposal.
             if (request.Content is not null)
-                await request.Content.LoadIntoBufferAsync(cancellationToken);
-            _requests.Add(request);
+            {
+                var body = await request.Content.ReadAsByteArrayAsync(cancellationToken);
+                var snapshot = new HttpRequestMessage(request.Method, request.RequestUri)
+                {
+                    Content = new ByteArrayContent(body)
+                };
+                if (request.Content.Headers.ContentType is { } ct)
+                    snapshot.Content.Headers.ContentType = ct;
+                _requests.Add(snapshot);
+            }
+            else
+            {
+                _requests.Add(new HttpRequestMessage(request.Method, request.RequestUri));
+            }
             return new HttpResponseMessage(status);
         }
     }

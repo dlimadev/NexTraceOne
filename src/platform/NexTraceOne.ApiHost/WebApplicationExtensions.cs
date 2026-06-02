@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Diagnostics;
 
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
@@ -112,10 +110,8 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<NotificationsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<KnowledgeDbContext>(migrationScope, pendingContexts);
 
-            // Wave 7 — AI & Knowledge (highest complexity, lowest maturity)
-            await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<ExternalAiDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<AiOrchestrationDbContext>(migrationScope, pendingContexts);
+            // Wave 7 — AI Hub (consolidated: AiGovernance + ExternalAi + AiOrchestration)
+            await MigrateContextAsync<AiHubDbContext>(migrationScope, pendingContexts);
 
             if (pendingContexts.Count > 0)
             {
