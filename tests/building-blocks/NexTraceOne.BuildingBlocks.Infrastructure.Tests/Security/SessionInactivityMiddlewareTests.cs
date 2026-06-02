@@ -134,6 +134,8 @@ public sealed class SessionInactivityMiddlewareTests
     public async Task AuthenticatedRequest_MismatchedIp_PassesThroughButLogsWarning()
     {
         // IP guardado diferente do actual — deve passar mas registar warning
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns((byte[]?)null);
         _cache.GetAsync(
             Arg.Is<string>(k => k.Contains("session-activity")),
             Arg.Any<CancellationToken>()).Returns((byte[]?)null);
@@ -156,6 +158,8 @@ public sealed class SessionInactivityMiddlewareTests
     public async Task AuthenticatedRequest_SameIp_PassesThrough()
     {
         // IP actual igual ao guardado — deve passar normalmente
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns((byte[]?)null);
         _cache.GetAsync(
             Arg.Is<string>(k => k.Contains("session-activity")),
             Arg.Any<CancellationToken>()).Returns((byte[]?)null);
