@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
+using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;

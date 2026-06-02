@@ -1,4 +1,9 @@
+using NexTraceOne.BuildingBlocks.Core.Enums;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Services;
 

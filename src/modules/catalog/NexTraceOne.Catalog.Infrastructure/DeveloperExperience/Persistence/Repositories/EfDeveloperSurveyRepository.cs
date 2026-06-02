@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
+using NexTraceOne.Catalog.Domain.DeveloperExperience.Entities;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Repositories;

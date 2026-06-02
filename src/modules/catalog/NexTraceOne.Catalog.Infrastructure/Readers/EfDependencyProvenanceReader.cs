@@ -1,7 +1,7 @@
-using NexTraceOne.Catalog.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using static NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;

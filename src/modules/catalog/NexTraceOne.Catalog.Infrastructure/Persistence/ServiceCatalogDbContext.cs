@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -23,8 +24,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Persistence;
 
 /// <summary>
 /// DbContext consolidado do módulo ServiceCatalog.
-/// Unifica CatalogGraphDbContext + ContractsDbContext + DependencyGovernanceDbContext +
-/// DeveloperExperienceDbContext + LegacyAssetsDbContext + TemplatesDbContext + DeveloperPortalDbContext.
+/// Unifica ServiceCatalogDbContext + ServiceCatalogDbContext + ServiceCatalogDbContext +
+/// ServiceCatalogDbContext + ServiceCatalogDbContext + ServiceCatalogDbContext + ServiceCatalogDbContext.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>

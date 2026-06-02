@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Templates.Abstractions;

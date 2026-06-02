@@ -1,3 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;

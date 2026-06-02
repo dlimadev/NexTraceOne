@@ -1,3 +1,6 @@
+using NexTraceOne.Catalog.Application.DependencyGovernance.Ports;
+using NexTraceOne.Catalog.Domain.DependencyGovernance.Entities;
+using NexTraceOne.Catalog.Domain.DependencyGovernance.Enums;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;

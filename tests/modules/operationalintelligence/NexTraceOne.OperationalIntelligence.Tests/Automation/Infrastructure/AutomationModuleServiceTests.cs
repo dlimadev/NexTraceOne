@@ -23,7 +23,7 @@ public sealed class AutomationModuleServiceTests
             "restart-controlled", "orders", null, null,
             "Service degraded", "admin", "orders", "production",
             RiskLevel.Medium, FixedNow);
-        db.Workflows.Add(workflow);
+        db.AutomationWorkflows.Add(workflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -72,7 +72,7 @@ public sealed class AutomationModuleServiceTests
             RiskLevel.Low, FixedNow.AddHours(-2));
         completed.UpdateStatus(AutomationWorkflowStatus.Completed, FixedNow.AddHours(-1));
 
-        db.Workflows.AddRange(active, completed);
+        db.AutomationWorkflows.AddRange(active, completed);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -92,7 +92,7 @@ public sealed class AutomationModuleServiceTests
             "Completed", "admin", "orders", "production",
             RiskLevel.Low, FixedNow);
         completed.UpdateStatus(AutomationWorkflowStatus.Completed, FixedNow);
-        db.Workflows.Add(completed);
+        db.AutomationWorkflows.Add(completed);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -114,7 +114,7 @@ public sealed class AutomationModuleServiceTests
             "restart-controlled", "payments", null, null,
             "Payments restart", "admin", "payments", "production",
             RiskLevel.Medium, FixedNow);
-        db.Workflows.AddRange(ordersWorkflow, paymentsWorkflow);
+        db.AutomationWorkflows.AddRange(ordersWorkflow, paymentsWorkflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -136,7 +136,7 @@ public sealed class AutomationModuleServiceTests
             "Executing", "admin", "orders", "production",
             RiskLevel.High, FixedNow);
         workflow.UpdateStatus(AutomationWorkflowStatus.Executing, FixedNow);
-        db.Workflows.Add(workflow);
+        db.AutomationWorkflows.Add(workflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -155,7 +155,7 @@ public sealed class AutomationModuleServiceTests
             "Awaiting approval", "admin", "orders", "production",
             RiskLevel.High, FixedNow);
         workflow.UpdateStatus(AutomationWorkflowStatus.AwaitingApproval, FixedNow);
-        db.Workflows.Add(workflow);
+        db.AutomationWorkflows.Add(workflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -173,7 +173,7 @@ public sealed class AutomationModuleServiceTests
             "restart-controlled", "orders", null, null,
             "Draft only", "admin", "orders", "production",
             RiskLevel.Low, FixedNow);
-        db.Workflows.Add(workflow);
+        db.AutomationWorkflows.Add(workflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -203,7 +203,7 @@ public sealed class AutomationModuleServiceTests
             "Staging restart", "admin", "orders", "staging",
             RiskLevel.High, FixedNow);
         stagingWorkflow.UpdateStatus(AutomationWorkflowStatus.Executing, FixedNow);
-        db.Workflows.Add(stagingWorkflow);
+        db.AutomationWorkflows.Add(stagingWorkflow);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
