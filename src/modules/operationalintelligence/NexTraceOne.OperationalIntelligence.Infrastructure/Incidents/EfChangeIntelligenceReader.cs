@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
 /// <summary>
-/// Implementação de leitura somente de releases do módulo ChangeIntelligence.
-/// Consulta ChangeIntelligenceDbContext de forma independente, sem acoplar
+/// Implementação de leitura somente de releases do módulo ChangeGovernance.
+/// Consulta ChangeGovernanceDbContext de forma independente, sem acoplar
 /// o domínio de OperationalIntelligence ao domínio de ChangeGovernance.
 /// </summary>
-internal sealed class EfChangeIntelligenceReader(ChangeIntelligenceDbContext context)
+internal sealed class EfChangeIntelligenceReader(ChangeGovernanceDbContext context)
     : IChangeIntelligenceReader
 {
     /// <inheritdoc />
