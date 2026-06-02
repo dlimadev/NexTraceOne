@@ -173,11 +173,13 @@ public sealed class ElasticsearchIndexManagerServiceTests
         private readonly List<HttpRequestMessage> _requests = [];
         public IReadOnlyList<HttpRequestMessage> Requests => _requests;
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (request.Content is not null)
+                await request.Content.LoadIntoBufferAsync(cancellationToken);
             _requests.Add(request);
-            return Task.FromResult(new HttpResponseMessage(status));
+            return new HttpResponseMessage(status);
         }
     }
 

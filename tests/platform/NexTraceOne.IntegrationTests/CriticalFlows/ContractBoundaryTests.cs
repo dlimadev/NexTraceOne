@@ -167,6 +167,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
             correlationConfidence: CorrelationConfidence.NotAssessed,
             mitigationStatus: MitigationStatus.NotStarted);
 
+        incident.SetTenantContext(Guid.NewGuid(), null);
         incidentContext.Incidents.Add(incident);
         await incidentContext.SaveChangesAsync();
 
@@ -276,7 +277,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     {
         // Assert — verificar que as tabelas de ambos os módulos existem no mesmo banco
         var auditEventsTableExists = await Fixture.TableExistsAsync(
-            Fixture.AuditConnectionString, "audit_events");
+            Fixture.AuditConnectionString, "aud_audit_events");
 
         var identityUsersTableExists = await Fixture.TableExistsAsync(
             Fixture.IdentityConnectionString, "ia_users");
@@ -286,7 +287,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
             "AuditCompliance e IdentityAccess devem compartilhar o mesmo database identity (ADR-001)");
 
         auditEventsTableExists.Should().BeTrue(
-            "a tabela audit_events deve existir no database identity após migrations do AuditCompliance");
+            "a tabela aud_audit_events deve existir no database identity após migrations do AuditCompliance");
 
         identityUsersTableExists.Should().BeTrue(
             "a tabela ia_users deve existir no database identity após migrations do IdentityAccess");
@@ -458,6 +459,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
             correlationConfidence: CorrelationConfidence.NotAssessed,
             mitigationStatus: MitigationStatus.NotStarted);
 
+        incident.SetTenantContext(Guid.NewGuid(), null);
         incidentContext.Incidents.Add(incident);
         await incidentContext.SaveChangesAsync();
 

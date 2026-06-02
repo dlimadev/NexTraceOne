@@ -33,13 +33,13 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     [RequiresDockerFact]
     public async Task AiKnowledge_Tables_Should_Exist_After_Migrations()
     {
-        var conversationsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "ai_gov_conversations");
-        var modelsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "ai_gov_models");
-        var providersExist = await Fixture.TableExistsAsync(Fixture.ExternalAiConnectionString, "ext_ai_providers");
+        var conversationsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "aik_conversations");
+        var modelsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "aik_models");
+        var providersExist = await Fixture.TableExistsAsync(Fixture.ExternalAiConnectionString, "aik_ext_providers");
 
-        conversationsExist.Should().BeTrue("ai_gov_conversations deve ser criada pela migration AiGovernance");
-        modelsExist.Should().BeTrue("ai_gov_models deve ser criada pela migration AiGovernance");
-        providersExist.Should().BeTrue("ext_ai_providers deve ser criada pela migration ExternalAi no banco externalai");
+        conversationsExist.Should().BeTrue("aik_conversations deve ser criada pela migration AiGovernance");
+        modelsExist.Should().BeTrue("aik_models deve ser criada pela migration AiGovernance");
+        providersExist.Should().BeTrue("aik_ext_providers deve ser criada pela migration ExternalAi no banco externalai");
     }
 
     // ── AiGovernanceDbContext ────────────────────────────────────────────────
