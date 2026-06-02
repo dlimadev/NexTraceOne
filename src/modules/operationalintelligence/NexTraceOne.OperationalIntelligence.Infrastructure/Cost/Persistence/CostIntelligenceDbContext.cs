@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 
@@ -50,13 +51,15 @@ public sealed class CostIntelligenceDbContext(
     /// <summary>Registos de carbon score calculados diariamente por serviço.</summary>
     public DbSet<CarbonScoreRecord> CarbonScoreRecords => Set<CarbonScoreRecord>();
 
+    /// <summary>Registos de alocação de custo operacional por serviço (FinOps Contextual).</summary>
+    public DbSet<ServiceCostAllocationRecord> ServiceCostAllocations => Set<ServiceCostAllocationRecord>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;
 
     /// <inheritdoc />
-    protected override string? ConfigurationsNamespace
-        => "NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Configurations";
+    protected override string? ConfigurationsNamespace => null;
 
     /// <inheritdoc />
     protected override string OutboxTableName => "ops_outbox_messages";

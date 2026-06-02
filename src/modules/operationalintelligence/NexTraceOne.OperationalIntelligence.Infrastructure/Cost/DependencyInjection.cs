@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.FinOps.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
@@ -51,6 +52,7 @@ public static class DependencyInjection
         services.AddScoped<IEfficiencyRecommendationRepository, EfficiencyRecommendationRepository>();
         services.AddScoped<IWasteSignalRepository, WasteSignalRepository>();
         services.AddScoped<ICarbonScoreRepository, CarbonScoreRepository>();
+        services.AddScoped<IServiceCostAllocationRepository, ServiceCostAllocationRepository>();
         services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
         // ── FinOps Report null readers ────────────────────────────────────

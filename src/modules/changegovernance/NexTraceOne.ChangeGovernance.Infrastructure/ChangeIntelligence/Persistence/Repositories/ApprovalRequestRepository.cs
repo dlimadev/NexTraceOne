@@ -1,3 +1,4 @@
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
