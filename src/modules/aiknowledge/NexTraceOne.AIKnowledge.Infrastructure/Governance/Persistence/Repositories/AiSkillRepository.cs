@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
