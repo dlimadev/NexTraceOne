@@ -280,7 +280,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
             Fixture.AuditConnectionString, "aud_audit_events");
 
         var identityUsersTableExists = await Fixture.TableExistsAsync(
-            Fixture.IdentityConnectionString, "ia_users");
+            Fixture.IdentityConnectionString, "iam_users");
 
         // As duas connection strings apontam para o mesmo banco (identity)
         Fixture.AuditConnectionString.Should().Be(Fixture.IdentityConnectionString,
@@ -290,7 +290,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
             "a tabela aud_audit_events deve existir no database identity após migrations do AuditCompliance");
 
         identityUsersTableExists.Should().BeTrue(
-            "a tabela ia_users deve existir no database identity após migrations do IdentityAccess");
+            "a tabela iam_users deve existir no database identity após migrations do IdentityAccess");
     }
 
     /// <summary>

@@ -37,7 +37,7 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
   }),
 }));
 
-import { getRequests, getRequestFacets } from '../../features/operations/api/telemetry';
+import { getRequests, getRequestFacets, getSreTopRequests } from '../../features/operations/api/telemetry';
 import { RequestExplorerPage } from '../../features/operations/pages/RequestExplorerPage';
 
 function renderPage() {
@@ -101,6 +101,7 @@ const mockResult = {
 beforeEach(() => {
   vi.mocked(getRequests).mockResolvedValue(mockResult);
   vi.mocked(getRequestFacets).mockResolvedValue(mockFacets);
+  vi.mocked(getSreTopRequests).mockResolvedValue([]);
 });
 
 describe('RequestExplorerPage', () => {
@@ -210,7 +211,8 @@ describe('RequestExplorerPage', () => {
   });
 
   it('shows error state when query fails', async () => {
-    vi.mocked(getRequests).mockRejectedValue(new Error('network error'));
+    // In 'requests' mode (default), sreTopRequestsQuery drives the table — mock that to fail
+    vi.mocked(getSreTopRequests).mockRejectedValue(new Error('network error'));
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('Failed to load requests. Please try again.')).toBeTruthy();

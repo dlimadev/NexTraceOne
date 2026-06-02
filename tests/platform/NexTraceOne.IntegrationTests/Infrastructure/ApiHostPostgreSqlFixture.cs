@@ -327,7 +327,7 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         await connection.OpenAsync();
 
         const string sql = """
-                           INSERT INTO identity_tenant_memberships ("Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
+                           INSERT INTO iam_tenant_memberships ("Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
                            VALUES (
                                'e0000000-0000-0000-0000-000000000099',
                                'b0000000-0000-0000-0000-000000000001',
