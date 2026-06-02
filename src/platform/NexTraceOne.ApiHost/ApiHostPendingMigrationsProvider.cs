@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
@@ -54,9 +52,7 @@ internal sealed class ApiHostPendingMigrationsProvider(IServiceScopeFactory scop
         await CollectPendingAsync<ProductAnalyticsDbContext>(sp, "ProductAnalytics", allPending, cancellationToken);
         await CollectPendingAsync<NotificationsDbContext>(sp, "Notifications", allPending, cancellationToken);
         await CollectPendingAsync<KnowledgeDbContext>(sp, "Knowledge", allPending, cancellationToken);
-        await CollectPendingAsync<AiGovernanceDbContext>(sp, "AiGovernance", allPending, cancellationToken);
-        await CollectPendingAsync<ExternalAiDbContext>(sp, "ExternalAi", allPending, cancellationToken);
-        await CollectPendingAsync<AiOrchestrationDbContext>(sp, "AiOrchestration", allPending, cancellationToken);
+        await CollectPendingAsync<AiHubDbContext>(sp, "AiHub", allPending, cancellationToken);
 
         return allPending;
     }
