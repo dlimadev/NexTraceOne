@@ -9,7 +9,7 @@ using Xunit;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
+// AuditDbContext removed — audit entities consolidated into PlatformGovernanceDbContext
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
@@ -243,19 +243,13 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         return new AiOrchestrationDbContext(BuildOptions<AiOrchestrationDbContext>(AiOrchestrationConnectionString), _tenant, _user, _clock);
     }
 
-    // ── DbContext factories — Governance ──────────────────────────────────────
+    // ── DbContext factories — PlatformGovernance (consolidated) ──────────────
 
-    public GovernanceDbContext CreateGovernanceDbContext()
-    {
-        return new GovernanceDbContext(BuildOptions<GovernanceDbContext>(GovernanceConnectionString), _tenant, _user, _clock);
-    }
+    public PlatformGovernanceDbContext CreateGovernanceDbContext()
+        => new(BuildOptions<PlatformGovernanceDbContext>(GovernanceConnectionString), _tenant, _user, _clock);
 
-    // ── DbContext factories — Audit ───────────────────────────────────────────
-
-    public AuditDbContext CreateAuditDbContext()
-    {
-        return new AuditDbContext(BuildOptions<AuditDbContext>(AuditConnectionString), _tenant, _user, _clock);
-    }
+    public PlatformGovernanceDbContext CreateAuditDbContext()
+        => new(BuildOptions<PlatformGovernanceDbContext>(GovernanceConnectionString), _tenant, _user, _clock);
 
     // ── Options builder helper ────────────────────────────────────────────────
 
@@ -401,9 +395,6 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         // ── Identity database ────────────────────────────────────────────────
         await using var identityContext = CreateIdentityDbContext();
         await identityContext.Database.MigrateAsync();
-
-        await using var auditContext = CreateAuditDbContext();
-        await auditContext.Database.MigrateAsync();
 
         // ── Operations database — use sub-contexts that have migrations ───────
         await using var changeIntCtx = CreateChangeIntelligenceDbContext();

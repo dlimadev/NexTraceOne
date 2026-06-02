@@ -12,7 +12,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Providers;
 /// Retorna contagens reais de mensagens pendentes e com falha da fila gov_outbox_messages.
 /// Bounded context: apenas a fila de outbox deste módulo é acessível aqui.
 /// </summary>
-internal sealed class GovernanceOutboxQueueMetricsProvider(GovernanceDbContext context)
+internal sealed class GovernanceOutboxQueueMetricsProvider(PlatformGovernanceDbContext context)
     : IPlatformQueueMetricsProvider
 {
     private const int MaxRetryCount = 5;
@@ -72,7 +72,7 @@ internal sealed class KnownJobsStatusProvider : IPlatformJobStatusProvider
 
 /// <summary>
 /// Implementação de IPlatformEventProvider que deriva eventos operacionais
-/// a partir de registos reais de rollout e waivers persistidos no GovernanceDbContext.
+/// a partir de registos reais de rollout e waivers persistidos no PlatformGovernanceDbContext.
 /// Mapeamento de severidade:
 ///   RolloutStatus.Failed      → Error,   Resolved = false
 ///   RolloutStatus.RolledBack  → Warning, Resolved = false
@@ -81,7 +81,7 @@ internal sealed class KnownJobsStatusProvider : IPlatformJobStatusProvider
 ///   WaiverStatus.Approved     → Info,    Resolved = true
 ///   WaiverStatus.Pending      → Warning, Resolved = false
 /// </summary>
-internal sealed class GovernanceEventProvider(GovernanceDbContext context) : IPlatformEventProvider
+internal sealed class GovernanceEventProvider(PlatformGovernanceDbContext context) : IPlatformEventProvider
 {
     public async Task<IReadOnlyList<GovernanceOperationalEvent>> GetRecentEventsAsync(
         int limit, CancellationToken ct)

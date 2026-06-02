@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Diagnostics;
 
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
@@ -37,7 +36,7 @@ public static class WebApplicationExtensions
     /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
     /// and by independent DbContext per module (or sub-domain).
     ///
-    /// All 16 DbContexts are registered across 7 waves ordered by dependency priority.
+    /// All 15 DbContexts are registered across 7 waves ordered by dependency priority.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -83,7 +82,7 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations for all 16 DbContexts...");
+                "Applying pending database migrations for all 15 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
@@ -98,9 +97,8 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<TelemetryStoreDbContext>(migrationScope, pendingContexts);
 
-            // Wave 4 — Audit & Governance
-            await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
+            // Wave 4 — PlatformGovernance (consolidated: Governance + AuditCompliance)
+            await MigrateContextAsync<PlatformGovernanceDbContext>(migrationScope, pendingContexts);
 
             // Wave 5 — Integrations & Product Analytics
             await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
@@ -125,7 +123,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 16 DbContexts are up-to-date.");
+                    "No pending migrations found. All 15 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

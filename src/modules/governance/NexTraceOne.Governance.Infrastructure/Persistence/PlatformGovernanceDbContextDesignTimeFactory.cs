@@ -3,25 +3,24 @@ using Microsoft.EntityFrameworkCore.Design;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
-namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence;
+namespace NexTraceOne.Governance.Infrastructure.Persistence;
 
 /// <summary>
 /// Fábrica de DbContext para uso em tempo de design (EF Core migrations).
 /// Fornece implementações mínimas de ICurrentTenant, ICurrentUser e IDateTimeProvider.
 /// </summary>
-internal sealed class AuditDbContextDesignTimeFactory : IDesignTimeDbContextFactory<AuditDbContext>
+internal sealed class PlatformGovernanceDbContextDesignTimeFactory : IDesignTimeDbContextFactory<PlatformGovernanceDbContext>
 {
-    /// <summary>Cria instância do AuditDbContext configurada para geração de migrations.</summary>
-    public AuditDbContext CreateDbContext(string[] args)
+    public PlatformGovernanceDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<AuditDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<PlatformGovernanceDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
             ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
-            npgsql => npgsql.MigrationsAssembly(typeof(AuditDbContext).Assembly.FullName));
+            npgsql => npgsql.MigrationsAssembly(typeof(PlatformGovernanceDbContext).Assembly.FullName));
 
-        return new AuditDbContext(
+        return new PlatformGovernanceDbContext(
             optionsBuilder.Options,
             new DesignTimeCurrentTenant(),
             new DesignTimeCurrentUser(),

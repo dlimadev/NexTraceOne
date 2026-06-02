@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(GovernanceDbContext))]
-    partial class GovernanceDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PlatformGovernanceDbContext))]
+    partial class PlatformGovernanceDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

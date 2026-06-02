@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de Technical Debt Items usando EF Core.
 /// </summary>
-internal sealed class TechnicalDebtRepository(GovernanceDbContext context) : ITechnicalDebtRepository
+internal sealed class TechnicalDebtRepository(PlatformGovernanceDbContext context) : ITechnicalDebtRepository
 {
     public async Task<IReadOnlyList<TechnicalDebtItem>> ListAsync(
         string? serviceName,

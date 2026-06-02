@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de TeamDomainLinks usando EF Core.
 /// </summary>
-internal sealed class TeamDomainLinkRepository(GovernanceDbContext context) : ITeamDomainLinkRepository
+internal sealed class TeamDomainLinkRepository(PlatformGovernanceDbContext context) : ITeamDomainLinkRepository
 {
     public async Task<IReadOnlyList<TeamDomainLink>> ListByTeamIdAsync(TeamId teamId, CancellationToken ct)
         => await context.TeamDomainLinks

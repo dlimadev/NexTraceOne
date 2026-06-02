@@ -6,7 +6,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Implementação EF Core do repositório de configuração GreenOps.</summary>
-internal sealed class GreenOpsConfigurationRepository(GovernanceDbContext context) : IGreenOpsConfigurationRepository
+internal sealed class GreenOpsConfigurationRepository(PlatformGovernanceDbContext context) : IGreenOpsConfigurationRepository
 {
     public async Task<GreenOpsConfiguration?> GetActiveAsync(Guid? tenantId, CancellationToken ct)
         => await context.GreenOpsConfigurations

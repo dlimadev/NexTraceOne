@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de LicenseComplianceReport usando EF Core.
 /// </summary>
-internal sealed class LicenseComplianceReportRepository(GovernanceDbContext context)
+internal sealed class LicenseComplianceReportRepository(PlatformGovernanceDbContext context)
     : ILicenseComplianceReportRepository
 {
     public async Task<LicenseComplianceReport?> GetByIdAsync(

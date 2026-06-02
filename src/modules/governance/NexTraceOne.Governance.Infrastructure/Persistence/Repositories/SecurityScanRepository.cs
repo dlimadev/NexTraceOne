@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Repositório EF Core para SecurityScanResult e SecurityFinding.
 /// </summary>
-internal sealed class SecurityScanRepository(GovernanceDbContext context) : ISecurityScanRepository
+internal sealed class SecurityScanRepository(PlatformGovernanceDbContext context) : ISecurityScanRepository
 {
     public async Task<SecurityScanResult?> FindByIdAsync(Guid scanId, CancellationToken ct)
         => await context.SecurityScanResults

@@ -34,7 +34,6 @@ using NexTraceOne.Configuration.Infrastructure;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
@@ -147,18 +146,12 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<AiHubDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // Governance module
+    // PlatformGovernance module (consolidated: Governance + AuditCompliance)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-governance",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [ModuleOutboxProcessorJob<GovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // AuditCompliance module
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-audit",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<AuditDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+        args: [ModuleOutboxProcessorJob<PlatformGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     // OperationalIntelligence module (IncidentResponse consolidated DbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-incident-response",
@@ -261,11 +254,8 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<ChangeGovernanceDbCon
 // AIKnowledge (consolidated DbContext)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<AiHubDbContext>>();
 
-// Governance (database: nextraceone_operations)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<GovernanceDbContext>>();
-
-// AuditCompliance (database: nextraceone_operations)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<AuditDbContext>>();
+// PlatformGovernance consolidated (Governance + AuditCompliance)
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<PlatformGovernanceDbContext>>();
 
 // OperationalIntelligence — IncidentResponse (consolidated DbContext) + Cost (separate)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentResponseDbContext>>();

@@ -6,7 +6,7 @@ using NexTraceOne.Governance.Infrastructure.Persistence;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para ScheduledDashboardReport (V3.6).</summary>
-public sealed class ScheduledDashboardReportRepository(GovernanceDbContext db)
+public sealed class ScheduledDashboardReportRepository(PlatformGovernanceDbContext db)
     : IScheduledDashboardReportRepository
 {
     public async Task<ScheduledDashboardReport?> GetByIdAsync(

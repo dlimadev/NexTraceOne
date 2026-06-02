@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.HealthChecks;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
@@ -25,9 +24,8 @@ internal static class ApiHostHealthChecks
             .AddCheck<DbContextConnectivityHealthCheck<ServiceCatalogDbContext>>("service-catalog-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<ChangeGovernanceDbContext>>("change-governance-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<IncidentResponseDbContext>>("incident-response-db", HealthStatus.Unhealthy, ["ready", "health"])
-            .AddCheck<DbContextConnectivityHealthCheck<GovernanceDbContext>>("governance-db", HealthStatus.Unhealthy, ["ready", "health"])
+            .AddCheck<DbContextConnectivityHealthCheck<PlatformGovernanceDbContext>>("governance-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<CostIntelligenceDbContext>>("cost-intelligence-db", HealthStatus.Unhealthy, ["health"])
-            .AddCheck<DbContextConnectivityHealthCheck<AuditDbContext>>("audit-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<AiHubDbContext>>("ai-hub-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<AiProvidersHealthCheck>("ai-providers", HealthStatus.Degraded, ["health"]);
 

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(GovernanceDbContext))]
+    [DbContext(typeof(PlatformGovernanceDbContext))]
     [Migration("20260522214144_AddCustomDashboardTags")]
     partial class AddCustomDashboardTags
     {

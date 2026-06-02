@@ -35,15 +35,15 @@ public static class DependencyInjection
 
         var connectionString = configuration.GetRequiredConnectionString("GovernanceDatabase", "NexTraceOne");
 
-        services.AddDbContext<GovernanceDbContext>((serviceProvider, options) =>
+        services.AddDbContext<PlatformGovernanceDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         // UnitOfWork
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<GovernanceDbContext>());
-        services.AddScoped<IGovernanceUnitOfWork>(sp => sp.GetRequiredService<GovernanceDbContext>());
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PlatformGovernanceDbContext>());
+        services.AddScoped<IGovernanceUnitOfWork>(sp => sp.GetRequiredService<PlatformGovernanceDbContext>());
 
         // Repositories
         services.AddScoped<ITeamRepository, TeamRepository>();

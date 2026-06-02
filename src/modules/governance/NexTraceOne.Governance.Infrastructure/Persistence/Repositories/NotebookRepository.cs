@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação EF Core do repositório de Notebook (V3.4).
 /// </summary>
-internal sealed class NotebookRepository(GovernanceDbContext context) : INotebookRepository
+internal sealed class NotebookRepository(PlatformGovernanceDbContext context) : INotebookRepository
 {
     public async Task<IReadOnlyList<Notebook>> ListAsync(
         string tenantId,

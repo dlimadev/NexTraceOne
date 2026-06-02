@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
@@ -20,7 +19,7 @@ using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 namespace NexTraceOne.ApiHost;
 
 /// <summary>
-/// Implementação de IPendingMigrationsProvider que consulta todos os 17 DbContexts
+/// Implementação de IPendingMigrationsProvider que consulta todos os 16 DbContexts
 /// registados no ApiHost para obter a lista de migrations pendentes.
 ///
 /// Esta classe reside no ApiHost (e não nos módulos) porque é o único ponto
@@ -46,8 +45,7 @@ internal sealed class ApiHostPendingMigrationsProvider(IServiceScopeFactory scop
         await CollectPendingAsync<IncidentResponseDbContext>(sp, "IncidentResponse", allPending, cancellationToken);
         await CollectPendingAsync<CostIntelligenceDbContext>(sp, "CostIntelligence", allPending, cancellationToken);
         await CollectPendingAsync<TelemetryStoreDbContext>(sp, "TelemetryStore", allPending, cancellationToken);
-        await CollectPendingAsync<AuditDbContext>(sp, "Audit", allPending, cancellationToken);
-        await CollectPendingAsync<GovernanceDbContext>(sp, "Governance", allPending, cancellationToken);
+        await CollectPendingAsync<PlatformGovernanceDbContext>(sp, "PlatformGovernance", allPending, cancellationToken);
         await CollectPendingAsync<IntegrationsDbContext>(sp, "Integrations", allPending, cancellationToken);
         await CollectPendingAsync<ProductAnalyticsDbContext>(sp, "ProductAnalytics", allPending, cancellationToken);
         await CollectPendingAsync<NotificationsDbContext>(sp, "Notifications", allPending, cancellationToken);

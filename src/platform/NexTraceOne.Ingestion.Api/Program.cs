@@ -95,7 +95,7 @@ builder.Services.AddOpenApi("ingestion", options =>
     });
 });
 builder.Services.AddHealthChecks()
-    .AddCheck<DbContextConnectivityHealthCheck<GovernanceDbContext>>(
+    .AddCheck<DbContextConnectivityHealthCheck<PlatformGovernanceDbContext>>(
         "governance-db",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["ready", "health"]);

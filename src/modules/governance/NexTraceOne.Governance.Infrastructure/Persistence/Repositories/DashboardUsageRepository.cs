@@ -7,7 +7,7 @@ using NexTraceOne.Governance.Infrastructure.Persistence;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para DashboardUsageEvent e analytics de uso (V3.6).</summary>
-public sealed class DashboardUsageRepository(GovernanceDbContext db) : IDashboardUsageRepository
+public sealed class DashboardUsageRepository(PlatformGovernanceDbContext db) : IDashboardUsageRepository
 {
     public async Task AddAsync(DashboardUsageEvent evt, CancellationToken ct = default)
         => await db.DashboardUsageEvents.AddAsync(evt, ct);

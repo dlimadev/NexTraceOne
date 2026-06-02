@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Implementação EF Core do repositório de agendas de ambientes não produtivos.</summary>
-internal sealed class NonProdScheduleRepository(GovernanceDbContext context) : INonProdScheduleRepository
+internal sealed class NonProdScheduleRepository(PlatformGovernanceDbContext context) : INonProdScheduleRepository
 {
     public async Task<IReadOnlyList<NonProdSchedule>> ListAllAsync(CancellationToken ct)
         => await context.NonProdSchedules.AsNoTracking().OrderBy(s => s.EnvironmentName).ToListAsync(ct);

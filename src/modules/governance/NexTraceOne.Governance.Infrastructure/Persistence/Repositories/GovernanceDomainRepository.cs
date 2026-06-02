@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de GovernanceDomains usando EF Core.
 /// </summary>
-internal sealed class GovernanceDomainRepository(GovernanceDbContext context) : IGovernanceDomainRepository
+internal sealed class GovernanceDomainRepository(PlatformGovernanceDbContext context) : IGovernanceDomainRepository
 {
     public async Task<IReadOnlyList<GovernanceDomain>> ListAsync(DomainCriticality? criticality, CancellationToken ct)
     {

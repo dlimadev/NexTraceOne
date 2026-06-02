@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de PolicyAsCodeDefinition usando EF Core.
 /// </summary>
-internal sealed class PolicyAsCodeRepository(GovernanceDbContext context) : IPolicyAsCodeRepository
+internal sealed class PolicyAsCodeRepository(PlatformGovernanceDbContext context) : IPolicyAsCodeRepository
 {
     public async Task<IReadOnlyList<PolicyAsCodeDefinition>> ListAsync(
         PolicyDefinitionStatus? status,

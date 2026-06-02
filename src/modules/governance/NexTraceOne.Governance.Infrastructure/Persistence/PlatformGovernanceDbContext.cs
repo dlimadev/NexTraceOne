@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Governance.Application.Abstractions;
@@ -10,16 +12,16 @@ using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 namespace NexTraceOne.Governance.Infrastructure.Persistence;
 
 /// <summary>
-/// DbContext do módulo Governance.
+/// DbContext unificado do bounded context PlatformGovernance.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
-/// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
+/// Consolida Governance e AuditCompliance num único contexto partilhado.
 /// </summary>
-public sealed class GovernanceDbContext(
-    DbContextOptions<GovernanceDbContext> options,
+public sealed class PlatformGovernanceDbContext(
+    DbContextOptions<PlatformGovernanceDbContext> options,
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IGovernanceUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IGovernanceUnitOfWork, IAuditComplianceUnitOfWork
 {
     /// <summary>Equipas da organização.</summary>
     public DbSet<Team> Teams => Set<Team>();
@@ -144,8 +146,28 @@ public sealed class GovernanceDbContext(
     /// <summary>Snapshots de widgets para cálculo de delta real (B-02).</summary>
     public DbSet<WidgetSnapshot> WidgetSnapshots => Set<WidgetSnapshot>();
 
+    // ── AuditCompliance DbSets (consolidated from AuditDbContext) ───────────
+
+    /// <summary>Eventos de auditoria imutáveis.</summary>
+    public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
+
+    /// <summary>Links da cadeia de hash de auditoria.</summary>
+    public DbSet<AuditChainLink> AuditChainLinks => Set<AuditChainLink>();
+
+    /// <summary>Políticas de retenção de eventos de auditoria.</summary>
+    public DbSet<RetentionPolicy> RetentionPolicies => Set<RetentionPolicy>();
+
+    /// <summary>Políticas de compliance.</summary>
+    public DbSet<CompliancePolicy> CompliancePolicies => Set<CompliancePolicy>();
+
+    /// <summary>Campanhas de auditoria.</summary>
+    public DbSet<AuditCampaign> AuditCampaigns => Set<AuditCampaign>();
+
+    /// <summary>Resultados de avaliação de compliance.</summary>
+    public DbSet<ComplianceResult> ComplianceResults => Set<ComplianceResult>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
-        => typeof(GovernanceDbContext).Assembly;
+        => typeof(PlatformGovernanceDbContext).Assembly;
 
     /// <inheritdoc />
     protected override string OutboxTableName => "gov_outbox_messages";

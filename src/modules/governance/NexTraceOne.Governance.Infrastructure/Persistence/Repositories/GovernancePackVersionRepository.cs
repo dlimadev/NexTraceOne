@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de GovernancePackVersions usando EF Core.
 /// </summary>
-internal sealed class GovernancePackVersionRepository(GovernanceDbContext context) : IGovernancePackVersionRepository
+internal sealed class GovernancePackVersionRepository(PlatformGovernanceDbContext context) : IGovernancePackVersionRepository
 {
     public async Task<IReadOnlyList<GovernancePackVersion>> ListByPackIdAsync(GovernancePackId packId, CancellationToken ct)
         => await context.PackVersions

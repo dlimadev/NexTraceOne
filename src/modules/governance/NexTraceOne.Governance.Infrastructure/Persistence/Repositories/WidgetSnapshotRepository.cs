@@ -4,7 +4,7 @@ using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
-internal sealed class WidgetSnapshotRepository(GovernanceDbContext context) : IWidgetSnapshotRepository
+internal sealed class WidgetSnapshotRepository(PlatformGovernanceDbContext context) : IWidgetSnapshotRepository
 {
     public Task<WidgetSnapshot?> GetLatestBeforeAsync(
         string tenantId, Guid dashboardId, string widgetId, DateTimeOffset before, CancellationToken ct)

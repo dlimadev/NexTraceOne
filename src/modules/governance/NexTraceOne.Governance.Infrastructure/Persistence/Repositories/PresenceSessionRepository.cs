@@ -4,7 +4,7 @@ using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
-public sealed class PresenceSessionRepository(GovernanceDbContext context) : IPresenceSessionRepository
+public sealed class PresenceSessionRepository(PlatformGovernanceDbContext context) : IPresenceSessionRepository
 {
     public async Task AddAsync(PresenceSession session, CancellationToken ct = default)
         => await context.PresenceSessions.AddAsync(session, ct);
