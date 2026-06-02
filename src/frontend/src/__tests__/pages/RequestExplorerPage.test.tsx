@@ -37,7 +37,7 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
   }),
 }));
 
-import { getRequests, getRequestFacets, getSreTopRequests } from '../../features/operations/api/telemetry';
+import { getRequests, getRequestFacets, getSreTopRequests, getSreTimeSeries } from '../../features/operations/api/telemetry';
 import { RequestExplorerPage } from '../../features/operations/pages/RequestExplorerPage';
 
 function renderPage() {
@@ -101,6 +101,15 @@ const mockResult = {
 beforeEach(() => {
   vi.mocked(getRequests).mockResolvedValue(mockResult);
   vi.mocked(getRequestFacets).mockResolvedValue(mockFacets);
+  vi.mocked(getSreTopRequests).mockResolvedValue([]);
+  vi.mocked(getSreTimeSeries).mockResolvedValue({
+    requests: [],
+    requestLatency: [],
+    requestErrors: [],
+    queries: [],
+    queryLatency: [],
+    queryErrors: [],
+  });
 });
 
 describe('RequestExplorerPage', () => {
@@ -164,11 +173,12 @@ describe('RequestExplorerPage', () => {
   it('renders request table columns', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getAllByText('Start time').length).toBeGreaterThan(0);
+      // In requests mode (default), the aggregated table shows these columns
+      expect(screen.getByText('Total requests')).toBeTruthy();
+      expect(screen.getByText('Error rate')).toBeTruthy();
       expect(screen.getAllByText('Endpoint').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Service').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Duration').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('HTTP').length).toBeGreaterThan(0);
     });
   });
 
@@ -188,11 +198,11 @@ describe('RequestExplorerPage', () => {
     });
   });
 
-  it('renders histogram chart toggle buttons', async () => {
+  it('renders chart section with legend', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Timeseries')).toBeTruthy();
-      expect(screen.getByText('Histogram')).toBeTruthy();
+      expect(screen.getByText('Failed requests')).toBeTruthy();
+      expect(screen.getByText('Successful requests')).toBeTruthy();
     });
   });
 
