@@ -44,7 +44,7 @@ internal sealed class AutomationModuleService(IncidentResponseDbContext context)
 
         var typedId = new Domain.Automation.Entities.AutomationWorkflowRecordId(guid);
 
-        var workflow = await context.Workflows
+        var workflow = await context.AutomationWorkflows
             .AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == typedId, cancellationToken);
 
@@ -55,7 +55,7 @@ internal sealed class AutomationModuleService(IncidentResponseDbContext context)
     public async Task<IReadOnlyList<AutomationWorkflowSummary>> GetActiveWorkflowsAsync(
         string serviceName, CancellationToken cancellationToken = default)
     {
-        var workflows = await context.Workflows
+        var workflows = await context.AutomationWorkflows
             .AsNoTracking()
             .Where(w => w.ServiceId == serviceName && !TerminalStatuses.Contains(w.Status))
             .OrderByDescending(w => w.CreatedAt)
@@ -75,7 +75,7 @@ internal sealed class AutomationModuleService(IncidentResponseDbContext context)
     public async Task<bool> HasBlockingWorkflowsAsync(
         string serviceName, string environment, CancellationToken cancellationToken = default)
     {
-        return await context.Workflows
+        return await context.AutomationWorkflows
             .AsNoTracking()
             .AnyAsync(
                 w => w.ServiceId == serviceName

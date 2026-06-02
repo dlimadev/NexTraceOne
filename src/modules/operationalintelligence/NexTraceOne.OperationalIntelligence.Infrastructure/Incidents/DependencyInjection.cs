@@ -9,7 +9,7 @@ using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.EventHandlers;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Services;
 
