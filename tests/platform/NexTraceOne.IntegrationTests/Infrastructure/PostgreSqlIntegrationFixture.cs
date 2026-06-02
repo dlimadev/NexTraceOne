@@ -11,7 +11,14 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
+using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
@@ -151,6 +158,29 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
     {
         return new ServiceCatalogDbContext(BuildOptions<ServiceCatalogDbContext>(CatalogConnectionString), _tenant, _user, _clock);
     }
+
+    // ── DbContext factories — Catalog sub-contexts (have migrations) ──────────
+
+    public CatalogGraphDbContext CreateCatalogGraphDbContext()
+        => new(BuildOptions<CatalogGraphDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public ContractsDbContext CreateContractsDbContext()
+        => new(BuildOptions<ContractsDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public DependencyGovernanceDbContext CreateDependencyGovernanceDbContext()
+        => new(BuildOptions<DependencyGovernanceDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public DeveloperExperienceDbContext CreateDeveloperExperienceDbContext()
+        => new(BuildOptions<DeveloperExperienceDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public LegacyAssetsDbContext CreateLegacyAssetsDbContext()
+        => new(BuildOptions<LegacyAssetsDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public DeveloperPortalDbContext CreateDeveloperPortalDbContext()
+        => new(BuildOptions<DeveloperPortalDbContext>(CatalogConnectionString), _tenant, _user, _clock);
+
+    public TemplatesDbContext CreateTemplatesDbContext()
+        => new(BuildOptions<TemplatesDbContext>(CatalogConnectionString), _tenant, _user, _clock);
 
     public ChangeGovernanceDbContext CreateChangeGovernanceDbContext()
     {
@@ -317,7 +347,7 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     private async Task<string> CreateDatabaseAsync(string databaseName)
     {
-        var adminConnectionString = new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
+        var adminConnectionString = new NpgsqlConnectionStringBuilder(_container!.GetConnectionString())
         {
             Database = "postgres"
         }.ToString();
@@ -338,7 +368,7 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
             }
         }
 
-        return new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
+        return new NpgsqlConnectionStringBuilder(_container!.GetConnectionString())
         {
             Database = databaseName
         }.ToString();
@@ -346,31 +376,59 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     private async Task ApplyMigrationsAsync()
     {
-        // ── Catalog database ─────────────────────────────────────────────────
-        await using var catalogContext = CreateServiceCatalogDbContext();
-        await catalogContext.Database.MigrateAsync();
+        // ── Catalog database — use sub-contexts that have migrations ──────────
+        await using var graphCtx = CreateCatalogGraphDbContext();
+        await graphCtx.Database.MigrateAsync();
 
-        // ── Change Governance database ───────────────────────────────────────
-        await using var changeGovernanceContext = CreateChangeGovernanceDbContext();
-        await changeGovernanceContext.Database.MigrateAsync();
+        await using var contractsCtx = CreateContractsDbContext();
+        await contractsCtx.Database.MigrateAsync();
+
+        await using var depGovCtx = CreateDependencyGovernanceDbContext();
+        await depGovCtx.Database.MigrateAsync();
+
+        await using var devExpCtx = CreateDeveloperExperienceDbContext();
+        await devExpCtx.Database.MigrateAsync();
+
+        await using var legacyCtx = CreateLegacyAssetsDbContext();
+        await legacyCtx.Database.MigrateAsync();
+
+        await using var portalCtx = CreateDeveloperPortalDbContext();
+        await portalCtx.Database.MigrateAsync();
+
+        await using var templatesCtx = CreateTemplatesDbContext();
+        await templatesCtx.Database.MigrateAsync();
 
         // ── Identity database ────────────────────────────────────────────────
         await using var identityContext = CreateIdentityDbContext();
         await identityContext.Database.MigrateAsync();
 
-        // ── Operations database (ChangeGov + OI + Governance) ────────────────
-        await using var incidentsContext = CreateIncidentResponseDbContext();
-        await incidentsContext.Database.MigrateAsync();
+        await using var auditContext = CreateAuditDbContext();
+        await auditContext.Database.MigrateAsync();
+
+        // ── Operations database — use sub-contexts that have migrations ───────
+        await using var changeIntCtx = CreateChangeIntelligenceDbContext();
+        await changeIntCtx.Database.MigrateAsync();
+
+        await using var workflowCtx = CreateWorkflowDbContext();
+        await workflowCtx.Database.MigrateAsync();
+
+        await using var promotionCtx = CreatePromotionDbContext();
+        await promotionCtx.Database.MigrateAsync();
+
+        await using var rulesetCtx = CreateRulesetGovernanceDbContext();
+        await rulesetCtx.Database.MigrateAsync();
+
+        await using var incidentCtx = CreateIncidentDbContext();
+        await incidentCtx.Database.MigrateAsync();
+
+        await using var runtimeCtx = CreateRuntimeIntelligenceDbContext();
+        await runtimeCtx.Database.MigrateAsync();
 
         await using var costContext = CreateCostIntelligenceDbContext();
         await costContext.Database.MigrateAsync();
 
         await using var governanceContext = CreateGovernanceDbContext();
         await governanceContext.Database.MigrateAsync();
-
-        // ── Identity database (Identity + Audit) ─────────────────────────────
-        await using var auditContext = CreateAuditDbContext();
-        await auditContext.Database.MigrateAsync();
 
         // ── AI database ──────────────────────────────────────────────────────
         await using var aiGovContext = CreateAiGovernanceDbContext();
