@@ -101,7 +101,6 @@ const mockResult = {
 beforeEach(() => {
   vi.mocked(getRequests).mockResolvedValue(mockResult);
   vi.mocked(getRequestFacets).mockResolvedValue(mockFacets);
-  vi.mocked(getSreTopRequests).mockResolvedValue([]);
 });
 
 describe('RequestExplorerPage', () => {
