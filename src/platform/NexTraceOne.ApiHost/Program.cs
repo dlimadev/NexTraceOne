@@ -23,9 +23,7 @@ using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 
 using NexTraceOne.Knowledge.API.Endpoints;
-using NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints;
-using NexTraceOne.AIKnowledge.API.Governance.Endpoints;
-using NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
+using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Catalog.API.Contracts.Endpoints;
@@ -35,18 +33,13 @@ using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 using NexTraceOne.Catalog.API.Portal.Endpoints;
 using NexTraceOne.Catalog.API.Templates;
 using NexTraceOne.Catalog.API.DependencyGovernance;
-using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
+using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.ChangeGovernance.API.GraphQL;
-using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
-using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
-using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.IdentityAccess.API.Endpoints;
 using NexTraceOne.Notifications.API.Endpoints;
-using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
-using NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
-using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
+using NexTraceOne.OperationalIntelligence.API;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Sovereign Change Intelligence Platform
@@ -124,10 +117,7 @@ builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogGraphModule(builder.Configuration);
 builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
-builder.Services.AddChangeIntelligenceModule(builder.Configuration);
-builder.Services.AddRulesetGovernanceModule(builder.Configuration);
-builder.Services.AddWorkflowModule(builder.Configuration);
-builder.Services.AddPromotionModule(builder.Configuration);
+builder.Services.AddChangeGovernanceModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddDeveloperExperienceModule(builder.Configuration);
@@ -140,12 +130,9 @@ builder.Services.AddCatalogGraphQL(
 builder.Services.AddGovernanceModule(builder.Configuration);
 builder.Services.AddIntegrationsModule(builder.Configuration);
 builder.Services.AddProductAnalyticsModule(builder.Configuration);
-builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
-builder.Services.AddReliabilityModule(builder.Configuration);
+builder.Services.AddIncidentResponseModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);
-builder.Services.AddAiGovernanceModule(builder.Configuration);
-builder.Services.AddExternalAiModule(builder.Configuration);
-builder.Services.AddAiOrchestrationModule(builder.Configuration);
+builder.Services.AddAiHubModule(builder.Configuration);
 builder.Services.AddAiRuntimeModule(builder.Configuration);
 builder.Services.AddNotificationsModule(builder.Configuration);
 builder.Services.AddConfigurationModule(builder.Configuration);

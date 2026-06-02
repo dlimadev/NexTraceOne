@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para narrativas de anomalia (AnomalyNarrative).
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class AnomalyNarrativeRepository(RuntimeIntelligenceDbContext context)
+internal sealed class AnomalyNarrativeRepository(IncidentResponseDbContext context)
     : RepositoryBase<AnomalyNarrative, AnomalyNarrativeId>(context), IAnomalyNarrativeRepository
 {
     /// <summary>Persiste uma nova narrativa de anomalia.</summary>

@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiBudgetRepository(AiGovernanceDbContext context) : IAiBudgetRepository
+internal sealed class AiBudgetRepository(AiHubDbContext context) : IAiBudgetRepository
 {
     public async Task<IReadOnlyList<AIBudget>> ListAsync(string? scope, bool? isActive, CancellationToken ct)
     {

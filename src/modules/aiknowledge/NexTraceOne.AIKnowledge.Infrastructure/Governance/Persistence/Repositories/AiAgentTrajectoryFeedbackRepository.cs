@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiAgentTrajectoryFeedbackRepository(AiGovernanceDbContext context)
+internal sealed class AiAgentTrajectoryFeedbackRepository(AiHubDbContext context)
     : IAiAgentTrajectoryFeedbackRepository
 {
     public async Task<AiAgentTrajectoryFeedback?> GetByIdAsync(

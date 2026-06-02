@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.FinOps.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 
-internal sealed class ServiceCostAllocationRepository(RuntimeIntelligenceDbContext context)
+internal sealed class ServiceCostAllocationRepository(IncidentResponseDbContext context)
     : IServiceCostAllocationRepository
 {
     public async Task<ServiceCostAllocationRecord?> GetByIdAsync(ServiceCostAllocationRecordId id, CancellationToken ct = default)

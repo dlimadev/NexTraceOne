@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para SlaDefinition.</summary>
-internal sealed class SlaDefinitionRepository(ReliabilityDbContext context) : ISlaDefinitionRepository
+internal sealed class SlaDefinitionRepository(IncidentResponseDbContext context) : ISlaDefinitionRepository
 {
     public async Task<SlaDefinition?> GetByIdAsync(SlaDefinitionId id, Guid tenantId, CancellationToken ct)
         => await context.SlaDefinitions

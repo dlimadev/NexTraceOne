@@ -4,7 +4,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class ChangeConfidenceRepository(AiGovernanceDbContext context) : IAiChangeConfidenceRepository
+internal sealed class ChangeConfidenceRepository(AiHubDbContext context) : IAiChangeConfidenceRepository
 {
     public async Task<ChangeConfidenceScore?> GetByChangeIdAsync(string changeId, Guid tenantId, CancellationToken ct)
         => await context.ChangeConfidenceScores

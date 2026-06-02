@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiToolDefinitionRepository(AiGovernanceDbContext context) : IAiToolDefinitionRepository
+internal sealed class AiToolDefinitionRepository(AiHubDbContext context) : IAiToolDefinitionRepository
 {
     public async Task<AiToolDefinition?> GetByIdAsync(AiToolDefinitionId id, CancellationToken ct)
         => await context.ToolDefinitions.SingleOrDefaultAsync(t => t.Id == id, ct);

@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para experimentos de chaos engineering.
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class ChaosExperimentRepository(RuntimeIntelligenceDbContext context)
+internal sealed class ChaosExperimentRepository(IncidentResponseDbContext context)
     : RepositoryBase<ChaosExperiment, ChaosExperimentId>(context), IChaosExperimentRepository
 {
     /// <summary>Busca um experimento pelo seu identificador, filtrando por tenant.</summary>

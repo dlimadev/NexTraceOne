@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class OnboardingSessionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IOnboardingSessionRepository
+internal sealed class OnboardingSessionRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IOnboardingSessionRepository
 {
     public async Task AddAsync(OnboardingSession session, CancellationToken ct)
     {

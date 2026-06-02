@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de CommitAssociation — commit pool do módulo ChangeIntelligence.
 /// </summary>
-internal sealed class CommitAssociationRepository(ChangeIntelligenceDbContext context)
+internal sealed class CommitAssociationRepository(ChangeGovernanceDbContext context)
     : ICommitAssociationRepository
 {
     /// <inheritdoc />

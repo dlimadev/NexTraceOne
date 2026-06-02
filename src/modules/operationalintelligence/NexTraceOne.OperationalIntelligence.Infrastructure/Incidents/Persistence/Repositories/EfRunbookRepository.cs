@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 /// Implementação EF Core do repositório de runbooks operacionais.
 /// Persiste e consulta entidades RunbookRecord no IncidentDbContext.
 /// </summary>
-internal sealed class EfRunbookRepository(IncidentDbContext context) : IRunbookRepository
+internal sealed class EfRunbookRepository(IncidentResponseDbContext context) : IRunbookRepository
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<RunbookRecord>> ListAsync(

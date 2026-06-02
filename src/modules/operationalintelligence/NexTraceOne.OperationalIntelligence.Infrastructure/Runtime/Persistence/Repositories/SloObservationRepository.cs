@@ -6,7 +6,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 
 /// <summary>Repositório de observações de SLO. Wave J.2 — SLO Tracking.</summary>
-internal sealed class SloObservationRepository(RuntimeIntelligenceDbContext context) : ISloObservationRepository
+internal sealed class SloObservationRepository(IncidentResponseDbContext context) : ISloObservationRepository
 {
     public async Task<SloObservation?> GetByIdAsync(SloObservationId id, CancellationToken ct = default)
         => await context.SloObservations.FindAsync([id.Value], ct);

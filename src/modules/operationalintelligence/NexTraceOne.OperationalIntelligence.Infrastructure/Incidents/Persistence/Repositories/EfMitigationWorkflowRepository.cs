@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 /// Implementação EF Core do repositório de MitigationWorkflowRecord.
 /// Persiste e lê workflows de mitigação a partir de IncidentDbContext (tabela ops_mitigation_workflows).
 /// </summary>
-public sealed class EfMitigationWorkflowRepository(IncidentDbContext db) : IMitigationWorkflowRepository
+public sealed class EfMitigationWorkflowRepository(IncidentResponseDbContext db) : IMitigationWorkflowRepository
 {
     /// <inheritdoc/>
     public async Task AddAsync(MitigationWorkflowRecord record, CancellationToken cancellationToken = default)

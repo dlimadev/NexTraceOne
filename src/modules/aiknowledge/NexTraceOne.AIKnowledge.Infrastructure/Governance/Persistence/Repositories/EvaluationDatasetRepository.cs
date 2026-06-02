@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class EvaluationDatasetRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IEvaluationDatasetRepository
+internal sealed class EvaluationDatasetRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IEvaluationDatasetRepository
 {
     public void Add(EvaluationDataset dataset)
         => context.EvaluationDatasets.Add(dataset);

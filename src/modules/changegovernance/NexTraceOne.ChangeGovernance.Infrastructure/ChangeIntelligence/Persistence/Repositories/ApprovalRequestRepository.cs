@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de ReleaseApprovalRequest — pedidos de aprovação de releases.
 /// </summary>
-internal sealed class ApprovalRequestRepository(ChangeIntelligenceDbContext context)
+internal sealed class ApprovalRequestRepository(ChangeGovernanceDbContext context)
     : IApprovalRequestRepository
 {
     /// <inheritdoc />

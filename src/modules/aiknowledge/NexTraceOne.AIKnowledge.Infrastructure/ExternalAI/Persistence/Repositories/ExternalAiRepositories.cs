@@ -10,7 +10,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Reposito
 /// Repositório de captures de conhecimento de IA externa.
 /// Implementa IKnowledgeCaptureRepository com operações persistidas no ExternalAiDbContext.
 /// </summary>
-internal sealed class KnowledgeCaptureRepository(ExternalAiDbContext context) : IKnowledgeCaptureRepository
+internal sealed class KnowledgeCaptureRepository(AiHubDbContext context) : IKnowledgeCaptureRepository
 {
     public async Task<KnowledgeCapture?> GetByIdAsync(KnowledgeCaptureId id, CancellationToken ct)
         => await context.KnowledgeCaptures.FirstOrDefaultAsync(c => c.Id == id, ct);
@@ -124,7 +124,7 @@ internal sealed class KnowledgeCaptureRepository(ExternalAiDbContext context) : 
 }
 
 /// <summary>Repositório de consultas enviadas a provedores externos de IA.</summary>
-internal sealed class ExternalAiConsultationRepository(ExternalAiDbContext context) : IExternalAiConsultationRepository
+internal sealed class ExternalAiConsultationRepository(AiHubDbContext context) : IExternalAiConsultationRepository
 {
     public async Task AddAsync(ExternalAiConsultation consultation, CancellationToken ct)
     {
@@ -134,7 +134,7 @@ internal sealed class ExternalAiConsultationRepository(ExternalAiDbContext conte
 }
 
 /// <summary>Repositório de políticas de governança de IA externa.</summary>
-internal sealed class ExternalAiPolicyRepository(ExternalAiDbContext context) : IExternalAiPolicyRepository
+internal sealed class ExternalAiPolicyRepository(AiHubDbContext context) : IExternalAiPolicyRepository
 {
     public async Task<ExternalAiPolicy?> GetByNameAsync(string name, CancellationToken ct)
         => await context.Policies.FirstOrDefaultAsync(p => p.Name == name, ct);
@@ -160,8 +160,8 @@ internal sealed class ExternalAiPolicyRepository(ExternalAiDbContext context) : 
 }
 
 /// <summary>Repositório de provedores externos de IA.</summary>
-internal sealed class ExternalAiProviderRepository(ExternalAiDbContext context) : IExternalAiProviderRepository
+internal sealed class ExternalAiProviderRepository(AiHubDbContext context) : IExternalAiProviderRepository
 {
     public Task<bool> ExistsAsync(ExternalAiProviderId id, CancellationToken ct)
-        => context.Providers.AnyAsync(p => p.Id == id, ct);
+        => context.ExternalAiProviders.AnyAsync(p => p.Id == id, ct);
 }

@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de eventos de mudança na timeline de uma release.
 /// </summary>
-internal sealed class ChangeEventRepository(ChangeIntelligenceDbContext context) : IChangeEventRepository
+internal sealed class ChangeEventRepository(ChangeGovernanceDbContext context) : IChangeEventRepository
 {
     /// <summary>Lista eventos de uma release ordenados por data de ocorrência.</summary>
     public async Task<IReadOnlyList<ChangeEvent>> ListByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

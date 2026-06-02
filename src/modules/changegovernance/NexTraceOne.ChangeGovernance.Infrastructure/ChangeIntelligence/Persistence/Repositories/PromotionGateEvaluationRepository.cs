@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de avaliações de gates de promoção (append-only).
 /// </summary>
-internal sealed class PromotionGateEvaluationRepository(ChangeIntelligenceDbContext context) : IPromotionGateEvaluationRepository
+internal sealed class PromotionGateEvaluationRepository(ChangeGovernanceDbContext context) : IPromotionGateEvaluationRepository
 {
     /// <inheritdoc />
     public async Task<PromotionGateEvaluation?> GetByIdAsync(PromotionGateEvaluationId id, CancellationToken cancellationToken = default)

@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para ErrorBudgetSnapshot.</summary>
-internal sealed class ErrorBudgetSnapshotRepository(ReliabilityDbContext context) : IErrorBudgetSnapshotRepository
+internal sealed class ErrorBudgetSnapshotRepository(IncidentResponseDbContext context) : IErrorBudgetSnapshotRepository
 {
     public async Task<ErrorBudgetSnapshot?> GetLatestAsync(SloDefinitionId sloId, Guid tenantId, CancellationToken ct)
         => await context.ErrorBudgetSnapshots

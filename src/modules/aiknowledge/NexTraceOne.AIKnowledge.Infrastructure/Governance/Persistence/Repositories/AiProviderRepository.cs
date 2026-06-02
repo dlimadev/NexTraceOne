@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiProviderRepository(AiGovernanceDbContext context) : IAiProviderRepository
+internal sealed class AiProviderRepository(AiHubDbContext context) : IAiProviderRepository
 {
     public async Task<AiProvider?> GetByIdAsync(AiProviderId id, CancellationToken ct)
         => await context.Providers.SingleOrDefaultAsync(p => p.Id == id, ct);

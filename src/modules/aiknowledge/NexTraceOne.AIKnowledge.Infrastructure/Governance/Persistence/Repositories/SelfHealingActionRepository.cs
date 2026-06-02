@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class SelfHealingActionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : ISelfHealingActionRepository
+internal sealed class SelfHealingActionRepository(AiHubDbContext context, ICurrentTenant currentTenant) : ISelfHealingActionRepository
 {
     public async Task<SelfHealingAction?> GetByIdAsync(SelfHealingActionId id, CancellationToken ct)
         => await context.SelfHealingActions.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(a => a.Id == id, ct);

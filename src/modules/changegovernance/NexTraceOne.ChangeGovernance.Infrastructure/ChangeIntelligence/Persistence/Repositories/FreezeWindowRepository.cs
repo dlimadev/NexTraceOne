@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de janelas de freeze para restrição de mudanças em períodos críticos.
 /// </summary>
-internal sealed class FreezeWindowRepository(ChangeIntelligenceDbContext context) : IFreezeWindowRepository
+internal sealed class FreezeWindowRepository(ChangeGovernanceDbContext context) : IFreezeWindowRepository
 {
     /// <summary>Busca uma janela de freeze pelo identificador.</summary>
     public async Task<FreezeWindow?> GetByIdAsync(FreezeWindowId id, CancellationToken cancellationToken = default)

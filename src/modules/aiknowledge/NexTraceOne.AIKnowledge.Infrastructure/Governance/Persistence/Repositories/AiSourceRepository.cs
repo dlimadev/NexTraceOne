@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiSourceRepository(AiGovernanceDbContext context) : IAiSourceRepository
+internal sealed class AiSourceRepository(AiHubDbContext context) : IAiSourceRepository
 {
     public async Task<AiSource?> GetByIdAsync(AiSourceId id, CancellationToken ct)
         => await context.Sources.SingleOrDefaultAsync(s => s.Id == id, ct);

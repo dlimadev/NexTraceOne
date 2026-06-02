@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiSkillRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiSkillRepository
+internal sealed class AiSkillRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IAiSkillRepository
 {
     public async Task<AiSkill?> GetByIdAsync(AiSkillId id, CancellationToken ct)
         => await context.Skills.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(s => s.Id == id, ct);

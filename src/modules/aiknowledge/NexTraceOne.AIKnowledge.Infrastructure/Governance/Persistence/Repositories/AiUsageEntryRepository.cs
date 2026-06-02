@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiUsageEntryRepository(AiGovernanceDbContext context) : IAiUsageEntryRepository
+internal sealed class AiUsageEntryRepository(AiHubDbContext context) : IAiUsageEntryRepository
 {
     public async Task<IReadOnlyList<AIUsageEntry>> ListAsync(
         string? userId, Guid? modelId, DateTimeOffset? startDate, DateTimeOffset? endDate,

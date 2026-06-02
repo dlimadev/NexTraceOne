@@ -10,7 +10,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// Repositório EF Core para pedidos de mudança externos.
 /// Implementa consultas por chave natural, estado e serviço afetado.
 /// </summary>
-internal sealed class EfExternalChangeRequestRepository(ChangeIntelligenceDbContext context)
+internal sealed class EfExternalChangeRequestRepository(ChangeGovernanceDbContext context)
     : IExternalChangeRequestRepository
 {
     /// <inheritdoc />

@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de estados de feature flags de releases.
 /// </summary>
-internal sealed class FeatureFlagStateRepository(ChangeIntelligenceDbContext context) : IFeatureFlagStateRepository
+internal sealed class FeatureFlagStateRepository(ChangeGovernanceDbContext context) : IFeatureFlagStateRepository
 {
     /// <summary>Obtém o estado de feature flags mais recente de uma release.</summary>
     public async Task<ReleaseFeatureFlagState?> GetLatestByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

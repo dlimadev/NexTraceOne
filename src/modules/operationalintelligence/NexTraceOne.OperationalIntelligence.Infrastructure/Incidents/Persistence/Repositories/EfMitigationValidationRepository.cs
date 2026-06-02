@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 /// Implementação EF Core do repositório de MitigationValidationLog.
 /// Persiste e lê registos de validação pós-mitigação a partir de IncidentDbContext (tabela ops_mitigation_validations).
 /// </summary>
-public sealed class EfMitigationValidationRepository(IncidentDbContext db) : IMitigationValidationRepository
+public sealed class EfMitigationValidationRepository(IncidentResponseDbContext db) : IMitigationValidationRepository
 {
     /// <inheritdoc/>
     public async Task AddAsync(MitigationValidationLog log, CancellationToken cancellationToken = default)

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
@@ -12,7 +12,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// Suporta listagem por tenant, tipo, estado e intervalo temporal.
 /// Wave F.1 — Release Calendar.
 /// </summary>
-internal sealed class ReleaseCalendarRepository(ChangeIntelligenceDbContext context)
+internal sealed class ReleaseCalendarRepository(ChangeGovernanceDbContext context)
     : IReleaseCalendarRepository
 {
     public Task<ReleaseCalendarEntry?> GetByIdAsync(ReleaseCalendarEntryId id, CancellationToken ct = default)

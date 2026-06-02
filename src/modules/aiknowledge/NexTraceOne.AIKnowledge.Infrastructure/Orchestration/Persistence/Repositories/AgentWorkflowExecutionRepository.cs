@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Orchestration.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repositories;
 
-internal sealed class AgentWorkflowExecutionRepository(AiOrchestrationDbContext context)
+internal sealed class AgentWorkflowExecutionRepository(AiHubDbContext context)
     : IAgentWorkflowExecutionRepository
 {
     public async Task<AgentWorkflowExecution?> GetByIdAsync(AgentWorkflowExecutionId id, CancellationToken ct)

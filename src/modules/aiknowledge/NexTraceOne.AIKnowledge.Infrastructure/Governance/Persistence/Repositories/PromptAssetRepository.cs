@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class PromptAssetRepository(AiGovernanceDbContext context) : IPromptAssetRepository
+internal sealed class PromptAssetRepository(AiHubDbContext context) : IPromptAssetRepository
 {
     public async Task<PromptAsset?> FindByIdAsync(PromptAssetId id, CancellationToken ct = default)
         => await context.PromptAssets

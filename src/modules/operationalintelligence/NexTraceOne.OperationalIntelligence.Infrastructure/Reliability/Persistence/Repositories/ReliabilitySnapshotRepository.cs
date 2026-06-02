@@ -7,7 +7,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
 /// <summary>
 /// Repositório EF Core para ReliabilitySnapshot.
 /// </summary>
-internal sealed class ReliabilitySnapshotRepository(ReliabilityDbContext context)
+internal sealed class ReliabilitySnapshotRepository(IncidentResponseDbContext context)
     : IReliabilitySnapshotRepository
 {
     public async Task<IReadOnlyList<ReliabilitySnapshot>> GetHistoryAsync(

@@ -16,7 +16,7 @@ using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.IdentityAccess.Infrastructure;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
+using NexTraceOne.OperationalIntelligence.API;
 
 // Module infrastructure registrations for cross-module outbox processing
 using NexTraceOne.Catalog.API.Graph.Endpoints;
@@ -25,17 +25,10 @@ using NexTraceOne.Catalog.API.Portal.Endpoints;
 using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 using NexTraceOne.Catalog.API.Templates;
 using NexTraceOne.Catalog.API.DependencyGovernance;
-using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
-using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
-using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
-using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
-using NexTraceOne.AIKnowledge.API.Governance.Endpoints;
-using NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints;
-using NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
+using NexTraceOne.ChangeGovernance.API;
+using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Governance.API;
-using NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
-using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
 using NexTraceOne.Integrations.Infrastructure;
 using NexTraceOne.Knowledge.Infrastructure;
 using NexTraceOne.ProductAnalytics.Infrastructure;
@@ -49,20 +42,12 @@ using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
@@ -99,16 +84,11 @@ builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
 builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
-builder.Services.AddRulesetGovernanceModule(builder.Configuration);
-builder.Services.AddWorkflowModule(builder.Configuration);
-builder.Services.AddPromotionModule(builder.Configuration);
-builder.Services.AddAiGovernanceModule(builder.Configuration);
-builder.Services.AddExternalAiModule(builder.Configuration);
-builder.Services.AddAiOrchestrationModule(builder.Configuration);
+builder.Services.AddChangeGovernanceModule(builder.Configuration);
+builder.Services.AddAiHubModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddGovernanceModule(builder.Configuration);
-builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
-builder.Services.AddReliabilityModule(builder.Configuration);
+builder.Services.AddIncidentResponseModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);
 builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
 builder.Services.AddKnowledgeInfrastructure(builder.Configuration);
@@ -196,43 +176,18 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<DeveloperPortalDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // ChangeGovernance module DbContexts
+    // ChangeGovernance module (consolidated DbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-change-intelligence",
+        "outbox-processor-change-governance",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [ModuleOutboxProcessorJob<ChangeIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+        args: [ModuleOutboxProcessorJob<ChangeGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // AIKnowledge module (consolidated DbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-ruleset-governance",
+        "outbox-processor-ai-hub",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [ModuleOutboxProcessorJob<RulesetGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-workflow",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<WorkflowDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-promotion",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<PromotionDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // AIKnowledge module DbContexts
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-ai-governance",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<AiGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-external-ai",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<ExternalAiDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-ai-orchestration",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<AiOrchestrationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+        args: [ModuleOutboxProcessorJob<AiHubDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     // Governance module
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-governance",
@@ -245,32 +200,17 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<AuditDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // OperationalIntelligence module DbContexts
+    // OperationalIntelligence module (IncidentResponse consolidated DbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-runtime-intelligence",
+        "outbox-processor-incident-response",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [ModuleOutboxProcessorJob<RuntimeIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-reliability",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<ReliabilityDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+        args: [ModuleOutboxProcessorJob<IncidentResponseDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-cost-intelligence",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<CostIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-incidents",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<IncidentDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-automation",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<AutomationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
@@ -361,16 +301,11 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<LegacyAssetsDbContext
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<TemplatesDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<DependencyGovernanceDbContext>>();
 
-// ChangeGovernance (database: nextraceone_catalog — shares with Catalog via separate schemas)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<ChangeIntelligenceDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<RulesetGovernanceDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<WorkflowDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<PromotionDbContext>>();
+// ChangeGovernance (consolidated DbContext)
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<ChangeGovernanceDbContext>>();
 
-// AIKnowledge (database: nextraceone_ai)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<AiGovernanceDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<ExternalAiDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<AiOrchestrationDbContext>>();
+// AIKnowledge (consolidated DbContext)
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<AiHubDbContext>>();
 
 // Governance (database: nextraceone_operations)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<GovernanceDbContext>>();
@@ -378,12 +313,9 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<GovernanceDbContext>>
 // AuditCompliance (database: nextraceone_operations)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<AuditDbContext>>();
 
-// OperationalIntelligence (database: nextraceone_operations)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<RuntimeIntelligenceDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<ReliabilityDbContext>>();
+// OperationalIntelligence — IncidentResponse (consolidated DbContext) + Cost (separate)
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentResponseDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<CostIntelligenceDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<AutomationDbContext>>();
 
 // Integrations / Knowledge / ProductAnalytics / TelemetryStore / Notifications / Configuration
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();

@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
 /// <summary>
 /// Repositorio de resultados de linting.
 /// </summary>
-internal sealed class LintResultRepository(RulesetGovernanceDbContext context)
+internal sealed class LintResultRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<LintResult, LintResultId>(context), ILintResultRepository
 {
     /// <summary>Busca o resultado de linting pelo identificador da release.</summary>

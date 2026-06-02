@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
 
@@ -12,7 +12,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
 /// Usa RuntimeIntelligenceDbContext para consultas de leitura cross-module.
 /// </summary>
 internal sealed class RuntimeIntelligenceModule(
-    RuntimeIntelligenceDbContext context,
+    IncidentResponseDbContext context,
     ILogger<RuntimeIntelligenceModule> logger) : IRuntimeIntelligenceModule
 {
     private const decimal MissingBaselinePenalty = 0.90m;

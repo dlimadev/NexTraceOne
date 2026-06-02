@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class EfModelPredictionRepository(AiGovernanceDbContext context) : IModelPredictionRepository
+internal sealed class EfModelPredictionRepository(AiHubDbContext context) : IModelPredictionRepository
 {
     public async Task AddAsync(ModelPredictionSample sample, CancellationToken ct)
         => await context.ModelPredictionSamples.AddAsync(sample, ct);

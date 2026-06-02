@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiExternalInferenceRecordRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiExternalInferenceRecordRepository
+internal sealed class AiExternalInferenceRecordRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IAiExternalInferenceRecordRepository
 {
     public async Task AddAsync(AiExternalInferenceRecord entity, CancellationToken ct)
         => await context.ExternalInferenceRecords.AddAsync(entity, ct);

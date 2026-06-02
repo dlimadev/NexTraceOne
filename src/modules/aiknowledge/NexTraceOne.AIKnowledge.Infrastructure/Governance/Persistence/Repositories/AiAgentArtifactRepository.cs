@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiAgentArtifactRepository(AiGovernanceDbContext context) : IAiAgentArtifactRepository
+internal sealed class AiAgentArtifactRepository(AiHubDbContext context) : IAiAgentArtifactRepository
 {
     public async Task<AiAgentArtifact?> GetByIdAsync(AiAgentArtifactId id, CancellationToken ct)
         => await context.AgentArtifacts.SingleOrDefaultAsync(a => a.Id == id, ct);

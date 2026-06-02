@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repos
 /// <summary>
 /// Repositório de estágios de workflow, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class WorkflowStageRepository(WorkflowDbContext context)
+internal sealed class WorkflowStageRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<WorkflowStage, WorkflowStageId>(context), IWorkflowStageRepository
 {
     /// <summary>Busca um WorkflowStage pelo seu identificador.</summary>

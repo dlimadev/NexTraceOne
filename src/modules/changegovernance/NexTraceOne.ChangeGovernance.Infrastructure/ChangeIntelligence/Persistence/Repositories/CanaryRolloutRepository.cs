@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de registos de canary rollout de releases.
 /// </summary>
-internal sealed class CanaryRolloutRepository(ChangeIntelligenceDbContext context) : ICanaryRolloutRepository
+internal sealed class CanaryRolloutRepository(ChangeGovernanceDbContext context) : ICanaryRolloutRepository
 {
     /// <summary>Obtém o registo de canary rollout mais recente de uma release.</summary>
     public async Task<CanaryRollout?> GetLatestByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

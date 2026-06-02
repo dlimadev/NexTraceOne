@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório EF Core para consentimentos de benchmark cross-tenant.
 /// </summary>
-internal sealed class TenantBenchmarkConsentRepository(ChangeIntelligenceDbContext context) : ITenantBenchmarkConsentRepository
+internal sealed class TenantBenchmarkConsentRepository(ChangeGovernanceDbContext context) : ITenantBenchmarkConsentRepository
 {
     /// <summary>Obtém o consentimento de benchmark de um tenant específico.</summary>
     public async Task<TenantBenchmarkConsent?> GetByTenantIdAsync(string tenantId, CancellationToken ct = default)

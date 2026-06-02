@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiFeatureModelBindingRepository(AiGovernanceDbContext context)
+internal sealed class AiFeatureModelBindingRepository(AiHubDbContext context)
     : IAiFeatureModelBindingRepository
 {
     public async Task<AiFeatureModelBinding?> GetByFeatureKeyAsync(

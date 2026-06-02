@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de WorkItemAssociation — associações de work items a releases.
 /// </summary>
-internal sealed class WorkItemAssociationRepository(ChangeIntelligenceDbContext context)
+internal sealed class WorkItemAssociationRepository(ChangeGovernanceDbContext context)
     : IWorkItemAssociationRepository
 {
     /// <inheritdoc />

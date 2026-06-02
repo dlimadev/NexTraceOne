@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Compliance.Entities;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// Suporta obtenção do perfil mais recente e listagem ranqueada para Risk Center Report.
 /// Wave F.2 — Risk Center.
 /// </summary>
-internal sealed class ServiceRiskProfileRepository(ChangeIntelligenceDbContext context)
+internal sealed class ServiceRiskProfileRepository(ChangeGovernanceDbContext context)
     : IServiceRiskProfileRepository
 {
     public Task<ServiceRiskProfile?> GetLatestByServiceAsync(

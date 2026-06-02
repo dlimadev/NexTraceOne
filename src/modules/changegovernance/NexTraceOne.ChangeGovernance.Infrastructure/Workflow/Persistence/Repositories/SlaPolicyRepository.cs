@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repos
 /// <summary>
 /// Repositório de políticas de SLA, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class SlaPolicyRepository(WorkflowDbContext context)
+internal sealed class SlaPolicyRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<SlaPolicy, SlaPolicyId>(context), ISlaPolicyRepository
 {
     /// <summary>Busca uma SlaPolicy pelo seu identificador.</summary>

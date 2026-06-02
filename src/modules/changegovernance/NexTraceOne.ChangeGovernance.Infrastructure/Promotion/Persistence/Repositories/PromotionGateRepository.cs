@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repo
 /// <summary>
 /// Repositório de gates de promoção, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class PromotionGateRepository(PromotionDbContext context)
+internal sealed class PromotionGateRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<PromotionGate, PromotionGateId>(context), IPromotionGateRepository
 {
     /// <summary>Busca um gate de promoção pelo identificador.</summary>

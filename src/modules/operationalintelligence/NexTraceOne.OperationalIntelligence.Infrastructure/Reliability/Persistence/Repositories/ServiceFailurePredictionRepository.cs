@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para ServiceFailurePrediction.</summary>
-internal sealed class ServiceFailurePredictionRepository(ReliabilityDbContext context)
+internal sealed class ServiceFailurePredictionRepository(IncidentResponseDbContext context)
     : IServiceFailurePredictionRepository
 {
     public async Task<ServiceFailurePrediction?> GetByServiceAsync(

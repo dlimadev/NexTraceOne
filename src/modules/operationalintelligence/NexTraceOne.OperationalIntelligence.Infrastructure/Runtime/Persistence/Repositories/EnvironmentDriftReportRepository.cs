@@ -11,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para relatórios de drift entre ambientes (EnvironmentDriftReport).
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class EnvironmentDriftReportRepository(RuntimeIntelligenceDbContext context)
+internal sealed class EnvironmentDriftReportRepository(IncidentResponseDbContext context)
     : RepositoryBase<EnvironmentDriftReport, EnvironmentDriftReportId>(context), IEnvironmentDriftReportRepository
 {
     /// <summary>Obtém um relatório pelo identificador.</summary>

@@ -2,17 +2,17 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Services;
 
 internal sealed class AiOrchestrationModule(
-    AiOrchestrationDbContext context,
+    AiHubDbContext context,
     IAiGovernanceModule governanceModule) : IAiOrchestrationModule
 {
     public async Task<ConversationSummaryDto?> GetConversationAsync(Guid conversationId, CancellationToken ct = default)
     {
-        var conversation = await context.Conversations
+        var conversation = await context.OrchestrationConversations
             .AsNoTracking()
             .Where(c => c.Id == Domain.Orchestration.Entities.AiConversationId.From(conversationId))
             .Select(c => new
@@ -52,7 +52,7 @@ internal sealed class AiOrchestrationModule(
     {
         var safeLimit = Math.Clamp(limit, 1, 100);
 
-        var conversations = await context.Conversations
+        var conversations = await context.OrchestrationConversations
             .AsNoTracking()
             .Where(c => c.ServiceName == serviceName)
             .OrderByDescending(c => c.StartedAt)
@@ -116,7 +116,7 @@ internal sealed class AiOrchestrationModule(
         if (artifact is not null)
             return artifact;
 
-        var conversation = await context.Conversations
+        var conversation = await context.OrchestrationConversations
             .AsNoTracking()
             .Where(c => c.Id == Domain.Orchestration.Entities.AiConversationId.From(executionId))
             .Select(c => new AgentExecutionResultDto(

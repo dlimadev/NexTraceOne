@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de avaliações de viabilidade de rollback.
 /// </summary>
-internal sealed class RollbackAssessmentRepository(ChangeIntelligenceDbContext context) : IRollbackAssessmentRepository
+internal sealed class RollbackAssessmentRepository(ChangeGovernanceDbContext context) : IRollbackAssessmentRepository
 {
     /// <summary>Busca a avaliação de rollback de uma release.</summary>
     public async Task<RollbackAssessment?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
 /// <summary>
 /// Repositorio de bindings de ruleset para tipos de ativo.
 /// </summary>
-internal sealed class RulesetBindingRepository(RulesetGovernanceDbContext context)
+internal sealed class RulesetBindingRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<RulesetBinding, RulesetBindingId>(context), IRulesetBindingRepository
 {
     /// <summary>Busca um binding pelo identificador do ruleset e tipo de ativo.</summary>

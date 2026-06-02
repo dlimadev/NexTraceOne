@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Service
 /// Outros módulos consomem esta interface — nunca o DbContext ou repositórios diretamente.
 /// </summary>
 internal sealed class ChangeIntelligenceModule(
-    ChangeIntelligenceDbContext context,
+    ChangeGovernanceDbContext context,
     ILogger<ChangeIntelligenceModule> logger) : IChangeIntelligenceModule
 {
     /// <inheritdoc />

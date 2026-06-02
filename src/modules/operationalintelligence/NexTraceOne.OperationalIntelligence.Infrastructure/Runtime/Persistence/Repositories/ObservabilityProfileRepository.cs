@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório de perfis de maturidade de observabilidade por serviço.
 /// Implementa consulta por serviço+ambiente para unicidade de perfil.
 /// </summary>
-internal sealed class ObservabilityProfileRepository(RuntimeIntelligenceDbContext context)
+internal sealed class ObservabilityProfileRepository(IncidentResponseDbContext context)
     : RepositoryBase<ObservabilityProfile, ObservabilityProfileId>(context), IObservabilityProfileRepository
 {
     /// <summary>Busca um perfil de observabilidade pelo seu identificador.</summary>

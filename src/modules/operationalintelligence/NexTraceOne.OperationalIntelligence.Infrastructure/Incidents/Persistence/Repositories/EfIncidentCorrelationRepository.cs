@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -12,7 +12,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 /// Persiste e consulta entidades IncidentChangeCorrelation no IncidentDbContext.
 /// Cada AddAsync confirma atomicamente a correlação individual para evitar perdas parciais.
 /// </summary>
-internal sealed class EfIncidentCorrelationRepository(IncidentDbContext context)
+internal sealed class EfIncidentCorrelationRepository(IncidentResponseDbContext context)
     : RepositoryBase<IncidentChangeCorrelation, IncidentChangeCorrelationId>(context),
       IIncidentCorrelationRepository
 {

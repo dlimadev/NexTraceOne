@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiMessageRepository(AiGovernanceDbContext context) : IAiMessageRepository
+internal sealed class AiMessageRepository(AiHubDbContext context) : IAiMessageRepository
 {
     public async Task<IReadOnlyList<AiMessage>> ListByConversationAsync(
         Guid conversationId, int pageSize, CancellationToken ct)

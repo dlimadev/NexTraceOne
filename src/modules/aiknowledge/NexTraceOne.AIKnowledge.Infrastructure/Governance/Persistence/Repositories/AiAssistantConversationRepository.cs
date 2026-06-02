@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiAssistantConversationRepository(AiGovernanceDbContext context) : IAiAssistantConversationRepository
+internal sealed class AiAssistantConversationRepository(AiHubDbContext context) : IAiAssistantConversationRepository
 {
     public async Task<IReadOnlyList<AiAssistantConversation>> ListAsync(
         string? userId, bool? isActive, int pageSize, CancellationToken ct)

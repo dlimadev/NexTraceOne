@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiAccessPolicyRepository(AiGovernanceDbContext context) : IAiAccessPolicyRepository
+internal sealed class AiAccessPolicyRepository(AiHubDbContext context) : IAiAccessPolicyRepository
 {
     public async Task<IReadOnlyList<AIAccessPolicy>> ListAsync(string? scope, bool? isActive, CancellationToken ct)
     {

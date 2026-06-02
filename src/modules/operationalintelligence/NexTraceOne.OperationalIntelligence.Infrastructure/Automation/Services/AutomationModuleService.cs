@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Contracts.Automation.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Services;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Services
 /// sem permitir acesso directo ao DbContext ou repositórios internos.
 /// Leituras apenas — sem tracking para melhor performance.
 /// </summary>
-internal sealed class AutomationModuleService(AutomationDbContext context) : IAutomationModule
+internal sealed class AutomationModuleService(IncidentResponseDbContext context) : IAutomationModule
 {
     /// <summary>
     /// Statuses considered as "terminal" — workflows in these states are no longer active.

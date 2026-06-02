@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório EF Core para snapshots de métricas DORA utilizados nos benchmarks cross-tenant.
 /// </summary>
-internal sealed class BenchmarkSnapshotRepository(ChangeIntelligenceDbContext context) : IBenchmarkSnapshotRepository
+internal sealed class BenchmarkSnapshotRepository(ChangeGovernanceDbContext context) : IBenchmarkSnapshotRepository
 {
     /// <summary>Obtém um snapshot pelo identificador.</summary>
     public async Task<BenchmarkSnapshotRecord?> GetByIdAsync(BenchmarkSnapshotRecordId id, CancellationToken ct = default)

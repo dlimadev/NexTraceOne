@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class IdeQuerySessionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IIdeQuerySessionRepository
+internal sealed class IdeQuerySessionRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IIdeQuerySessionRepository
 {
     public async Task AddAsync(IdeQuerySession session, CancellationToken ct)
     {

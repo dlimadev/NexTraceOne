@@ -6,7 +6,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para BurnRateSnapshot.</summary>
-internal sealed class BurnRateSnapshotRepository(ReliabilityDbContext context) : IBurnRateSnapshotRepository
+internal sealed class BurnRateSnapshotRepository(IncidentResponseDbContext context) : IBurnRateSnapshotRepository
 {
     public async Task<BurnRateSnapshot?> GetLatestAsync(SloDefinitionId sloId, BurnRateWindow window, Guid tenantId, CancellationToken ct)
         => await context.BurnRateSnapshots

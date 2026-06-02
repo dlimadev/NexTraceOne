@@ -10,7 +10,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repo
 /// <summary>
 /// Repositório de solicitações de promoção, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class PromotionRequestRepository(PromotionDbContext context)
+internal sealed class PromotionRequestRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<PromotionRequest, PromotionRequestId>(context), IPromotionRequestRepository
 {
     /// <summary>Busca uma solicitação de promoção pelo identificador.</summary>

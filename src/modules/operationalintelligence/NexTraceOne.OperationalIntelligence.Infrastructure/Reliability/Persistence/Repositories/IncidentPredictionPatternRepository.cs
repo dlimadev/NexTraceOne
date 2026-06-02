@@ -9,7 +9,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
 /// <summary>
 /// Repositório EF Core para padrões preditivos de incidentes (IncidentPredictionPattern).
 /// </summary>
-internal sealed class IncidentPredictionPatternRepository(ReliabilityDbContext context)
+internal sealed class IncidentPredictionPatternRepository(IncidentResponseDbContext context)
     : IIncidentPredictionPatternRepository
 {
     public async Task<IncidentPredictionPattern?> GetByIdAsync(IncidentPredictionPatternId id, CancellationToken ct)

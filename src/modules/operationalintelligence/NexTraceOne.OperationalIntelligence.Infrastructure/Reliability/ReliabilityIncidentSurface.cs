@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 
@@ -9,7 +9,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 /// Implementação da surface de incidentes para o subdomínio Reliability.
 /// Acessa IncidentDbContext diretamente — permitido dentro do mesmo módulo OI.
 /// </summary>
-internal sealed class ReliabilityIncidentSurface(IncidentDbContext db) : IReliabilityIncidentSurface
+internal sealed class ReliabilityIncidentSurface(IncidentResponseDbContext db) : IReliabilityIncidentSurface
 {
     /// <summary>Statuses ativos para efeito de scoring de confiabilidade.</summary>
     private static readonly IncidentStatus[] ActiveStatuses =

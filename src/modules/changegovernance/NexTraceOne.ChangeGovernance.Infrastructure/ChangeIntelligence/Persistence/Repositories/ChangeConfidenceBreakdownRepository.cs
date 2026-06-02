@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// Repositório do breakdown de confiança de mudanças (Change Confidence Score 2.0).
 /// Implementa consultas específicas de negócio para ChangeConfidenceBreakdown.
 /// </summary>
-internal sealed class ChangeConfidenceBreakdownRepository(ChangeIntelligenceDbContext context)
+internal sealed class ChangeConfidenceBreakdownRepository(ChangeGovernanceDbContext context)
     : IChangeConfidenceBreakdownRepository
 {
     /// <summary>Busca o breakdown de confiança de uma release, incluindo sub-scores.</summary>

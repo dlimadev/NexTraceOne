@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 /// Consulta releases persistidos via EF Core com filtragem por TenantId, EnvironmentId e ServiceName.
 /// Toda consulta é tenant-isolated por design.
 /// </summary>
-internal sealed class ReleaseContextSurface(ChangeIntelligenceDbContext db) : IReleaseContextSurface
+internal sealed class ReleaseContextSurface(ChangeGovernanceDbContext db) : IReleaseContextSurface
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<ReleaseContextEntry>> ListByContextAsync(

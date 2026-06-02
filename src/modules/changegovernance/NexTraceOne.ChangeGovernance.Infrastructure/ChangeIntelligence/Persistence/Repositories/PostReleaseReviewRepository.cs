@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de reviews automáticas pós-release.
 /// </summary>
-internal sealed class PostReleaseReviewRepository(ChangeIntelligenceDbContext context) : IPostReleaseReviewRepository
+internal sealed class PostReleaseReviewRepository(ChangeGovernanceDbContext context) : IPostReleaseReviewRepository
 {
     /// <summary>Busca a review pós-release de uma release.</summary>
     public async Task<PostReleaseReview?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

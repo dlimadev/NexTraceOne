@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiModelRepository(AiGovernanceDbContext context) : IAiModelRepository
+internal sealed class AiModelRepository(AiHubDbContext context) : IAiModelRepository
 {
     public async Task<IReadOnlyList<AIModel>> ListAsync(
         string? provider, ModelType? modelType, ModelStatus? status, bool? isInternal, CancellationToken ct)

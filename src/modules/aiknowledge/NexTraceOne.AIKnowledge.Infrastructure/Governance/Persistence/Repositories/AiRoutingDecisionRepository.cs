@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiRoutingDecisionRepository(AiGovernanceDbContext context) : IAiRoutingDecisionRepository
+internal sealed class AiRoutingDecisionRepository(AiHubDbContext context) : IAiRoutingDecisionRepository
 {
     public async Task<AIRoutingDecision?> GetByIdAsync(AIRoutingDecisionId id, CancellationToken ct)
         => await context.RoutingDecisions.SingleOrDefaultAsync(d => d.Id == id, ct);

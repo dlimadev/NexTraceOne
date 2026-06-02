@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 /// Implementação EF Core do repositório de Post-Incident Reviews (PIR).
 /// Persiste e consulta entidades PostIncidentReview no IncidentDbContext.
 /// </summary>
-internal sealed class EfPostIncidentReviewRepository(IncidentDbContext context) : IPostIncidentReviewRepository
+internal sealed class EfPostIncidentReviewRepository(IncidentResponseDbContext context) : IPostIncidentReviewRepository
 {
     /// <inheritdoc />
     public async Task<PostIncidentReview?> GetByIncidentIdAsync(Guid incidentId, CancellationToken cancellationToken)

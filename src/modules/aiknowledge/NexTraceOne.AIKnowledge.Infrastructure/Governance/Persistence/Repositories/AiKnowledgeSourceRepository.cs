@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context) : IAiKnowledgeSourceRepository
+internal sealed class AiKnowledgeSourceRepository(AiHubDbContext context) : IAiKnowledgeSourceRepository
 {
     public async Task<IReadOnlyList<AIKnowledgeSource>> ListAsync(
         KnowledgeSourceType? sourceType, bool? isActive, CancellationToken ct)

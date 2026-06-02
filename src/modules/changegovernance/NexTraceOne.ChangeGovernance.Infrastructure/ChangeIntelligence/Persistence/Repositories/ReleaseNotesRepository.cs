@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de release notes geradas por IA.
 /// </summary>
-internal sealed class ReleaseNotesRepository(ChangeIntelligenceDbContext context) : IReleaseNotesRepository
+internal sealed class ReleaseNotesRepository(ChangeGovernanceDbContext context) : IReleaseNotesRepository
 {
     /// <inheritdoc />
     public async Task AddAsync(ReleaseNotes notes, CancellationToken cancellationToken)

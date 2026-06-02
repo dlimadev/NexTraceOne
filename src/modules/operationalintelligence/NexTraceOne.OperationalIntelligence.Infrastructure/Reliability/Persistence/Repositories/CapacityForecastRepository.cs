@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para CapacityForecast.</summary>
-internal sealed class CapacityForecastRepository(ReliabilityDbContext context)
+internal sealed class CapacityForecastRepository(IncidentResponseDbContext context)
     : ICapacityForecastRepository
 {
     public async Task<CapacityForecast?> GetByServiceAndResourceAsync(

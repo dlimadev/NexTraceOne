@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Services;
 
-internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalAiModule
+internal sealed class ExternalAiModule(AiHubDbContext context) : IExternalAiModule
 {
     private static readonly IReadOnlyList<string> DefaultCapabilities =
     [
@@ -19,7 +19,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
 
     public async Task<IReadOnlyList<ProviderSummaryDto>> GetAvailableProvidersAsync(CancellationToken ct = default)
     {
-        var activePolicies = await context.Policies
+        var activePolicies = await context.ExternalAiPolicies
             .AsNoTracking()
             .Where(p => p.IsActive)
             .Select(p => p.AllowedContexts)
@@ -28,7 +28,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
         var policyCapabilities = ExtractCapabilities(activePolicies);
         var resolvedCapabilities = policyCapabilities.Count > 0 ? policyCapabilities : DefaultCapabilities;
 
-        return await context.Providers
+        return await context.ExternalAiProviders
             .AsNoTracking()
             .OrderBy(p => p.Priority)
             .ThenBy(p => p.Name)
@@ -44,7 +44,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
 
     public async Task<ProviderHealthDto?> GetProviderHealthAsync(Guid providerId, CancellationToken ct = default)
     {
-        return await context.Providers
+        return await context.ExternalAiProviders
             .AsNoTracking()
             .Where(p => p.Id == Domain.ExternalAI.Entities.ExternalAiProviderId.From(providerId))
             .Select(p => new ProviderHealthDto(
@@ -62,7 +62,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
         string? environment = null,
         CancellationToken ct = default)
     {
-        var activePolicies = await context.Policies
+        var activePolicies = await context.ExternalAiPolicies
             .AsNoTracking()
             .Where(p => p.IsActive)
             .ToListAsync(ct);
@@ -86,7 +86,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
 
         if (!string.IsNullOrWhiteSpace(preferredProvider))
         {
-            var preferred = await context.Providers
+            var preferred = await context.ExternalAiProviders
                 .AsNoTracking()
                 .Where(p => p.IsActive && p.Name == preferredProvider)
                 .OrderBy(p => p.Priority)
@@ -94,7 +94,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
 
             if (preferred is not null)
             {
-                var fallback = await context.Providers
+                var fallback = await context.ExternalAiProviders
                     .AsNoTracking()
                     .Where(p => p.IsActive && p.Id != preferred.Id)
                     .OrderBy(p => p.Priority)
@@ -109,7 +109,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
             }
         }
 
-        var selected = await context.Providers
+        var selected = await context.ExternalAiProviders
             .AsNoTracking()
             .Where(p => p.IsActive)
             .OrderBy(p => p.Priority)
@@ -118,7 +118,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
         if (selected is null)
             return null;
 
-        var selectedFallback = await context.Providers
+        var selectedFallback = await context.ExternalAiProviders
             .AsNoTracking()
             .Where(p => p.IsActive && p.Id != selected.Id)
             .OrderBy(p => p.Priority)

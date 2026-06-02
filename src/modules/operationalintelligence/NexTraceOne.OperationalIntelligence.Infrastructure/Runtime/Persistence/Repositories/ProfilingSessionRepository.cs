@@ -4,7 +4,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 
-internal sealed class ProfilingSessionRepository(RuntimeIntelligenceDbContext context) : IProfilingSessionRepository
+internal sealed class ProfilingSessionRepository(IncidentResponseDbContext context) : IProfilingSessionRepository
 {
     public async Task<ProfilingSession?> GetByIdAsync(ProfilingSessionId id, CancellationToken ct = default)
         => await context.ProfilingSessions.FindAsync([id.Value], ct);

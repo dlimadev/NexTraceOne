@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de baselines de indicadores pré-release.
 /// </summary>
-internal sealed class ReleaseBaselineRepository(ChangeIntelligenceDbContext context) : IReleaseBaselineRepository
+internal sealed class ReleaseBaselineRepository(ChangeGovernanceDbContext context) : IReleaseBaselineRepository
 {
     /// <summary>Busca o baseline de uma release.</summary>
     public async Task<ReleaseBaseline?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

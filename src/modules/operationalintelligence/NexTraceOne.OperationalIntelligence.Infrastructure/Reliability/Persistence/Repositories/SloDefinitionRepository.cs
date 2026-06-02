@@ -5,7 +5,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para SloDefinition.</summary>
-internal sealed class SloDefinitionRepository(ReliabilityDbContext context) : ISloDefinitionRepository
+internal sealed class SloDefinitionRepository(IncidentResponseDbContext context) : ISloDefinitionRepository
 {
     public async Task<SloDefinition?> GetByIdAsync(SloDefinitionId id, Guid tenantId, CancellationToken ct)
         => await context.SloDefinitions

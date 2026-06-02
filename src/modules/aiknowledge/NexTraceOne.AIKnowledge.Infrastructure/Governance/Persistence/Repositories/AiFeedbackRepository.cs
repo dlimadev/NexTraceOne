@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiFeedbackRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiFeedbackRepository
+internal sealed class AiFeedbackRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IAiFeedbackRepository
 {
     public async Task AddAsync(AiFeedback feedback, CancellationToken ct)
     {

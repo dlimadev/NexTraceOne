@@ -4,7 +4,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class WarRoomRepository(AiGovernanceDbContext context) : IAiWarRoomRepository
+internal sealed class WarRoomRepository(AiHubDbContext context) : IAiWarRoomRepository
 {
     public async Task<WarRoomSession?> GetByIdAsync(WarRoomSessionId id, CancellationToken ct)
         => await context.WarRooms.SingleOrDefaultAsync(w => w.Id == id, ct);

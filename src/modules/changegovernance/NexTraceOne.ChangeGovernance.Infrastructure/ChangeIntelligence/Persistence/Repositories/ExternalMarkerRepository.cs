@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de marcadores externos de ferramentas CI/CD.
 /// </summary>
-internal sealed class ExternalMarkerRepository(ChangeIntelligenceDbContext context) : IExternalMarkerRepository
+internal sealed class ExternalMarkerRepository(ChangeGovernanceDbContext context) : IExternalMarkerRepository
 {
     /// <summary>Lista marcadores de uma release ordenados por data de ocorrência.</summary>
     public async Task<IReadOnlyList<ExternalMarker>> ListByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de ReleaseApprovalPolicy — políticas de aprovação configuráveis.
 /// </summary>
-internal sealed class ReleaseApprovalPolicyRepository(ChangeIntelligenceDbContext context)
+internal sealed class ReleaseApprovalPolicyRepository(ChangeGovernanceDbContext context)
     : IReleaseApprovalPolicyRepository
 {
     /// <inheritdoc />

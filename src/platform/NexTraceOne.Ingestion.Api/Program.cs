@@ -7,7 +7,7 @@ using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
-using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
+using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Ingestion.Api;
@@ -15,8 +15,7 @@ using NexTraceOne.Ingestion.Api.Endpoints;
 using NexTraceOne.Ingestion.Api.Security;
 using NexTraceOne.Integrations.Application;
 using NexTraceOne.Integrations.Infrastructure;
-using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
-using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
+using NexTraceOne.OperationalIntelligence.API;
 using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using Scalar.AspNetCore;
@@ -132,13 +131,11 @@ builder.Services.AddIntegrationsApplication(builder.Configuration);
 builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
 
 // Add ChangeGovernance module — correlação de deploys, Change Intelligence e advisories
-builder.Services.AddChangeIntelligenceModule(builder.Configuration);
+builder.Services.AddChangeGovernanceModule(builder.Configuration);
 
 // Add OperationalIntelligence modules — runtime snapshots, custo e incidentes
-builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.AddIncidentResponseModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);
-builder.Services.AddIncidentsApplication(builder.Configuration);
-builder.Services.AddIncidentsInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

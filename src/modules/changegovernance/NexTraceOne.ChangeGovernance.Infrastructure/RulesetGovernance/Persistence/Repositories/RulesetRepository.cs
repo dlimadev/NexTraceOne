@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
 /// <summary>
 /// Repositorio de rulesets, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class RulesetRepository(RulesetGovernanceDbContext context)
+internal sealed class RulesetRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<Ruleset, RulesetId>(context), IRulesetRepository
 {
     /// <summary>Busca um Ruleset pelo seu identificador.</summary>

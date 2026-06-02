@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para gráficos customizados (CustomChart).
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class CustomChartRepository(RuntimeIntelligenceDbContext context)
+internal sealed class CustomChartRepository(IncidentResponseDbContext context)
     : RepositoryBase<CustomChart, CustomChartId>(context), ICustomChartRepository
 {
     /// <summary>Busca um gráfico customizado pelo seu identificador, filtrando por tenant.</summary>

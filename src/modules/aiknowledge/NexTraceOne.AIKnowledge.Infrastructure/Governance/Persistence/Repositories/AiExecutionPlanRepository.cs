@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiExecutionPlanRepository(AiGovernanceDbContext context) : IAiExecutionPlanRepository
+internal sealed class AiExecutionPlanRepository(AiHubDbContext context) : IAiExecutionPlanRepository
 {
     public async Task AddAsync(AIExecutionPlan plan, CancellationToken ct)
         => await context.ExecutionPlans.AddAsync(plan, ct);

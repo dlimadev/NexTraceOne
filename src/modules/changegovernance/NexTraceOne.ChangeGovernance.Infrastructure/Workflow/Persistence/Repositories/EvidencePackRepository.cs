@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repos
 /// <summary>
 /// Repositório de pacotes de evidência, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class EvidencePackRepository(WorkflowDbContext context)
+internal sealed class EvidencePackRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<EvidencePack, EvidencePackId>(context), IEvidencePackRepository
 {
     /// <summary>Busca um EvidencePack pelo seu identificador.</summary>

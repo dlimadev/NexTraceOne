@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiKnowledgeSourceWeightRepository(AiGovernanceDbContext context) : IAiKnowledgeSourceWeightRepository
+internal sealed class AiKnowledgeSourceWeightRepository(AiHubDbContext context) : IAiKnowledgeSourceWeightRepository
 {
     public async Task<IReadOnlyList<AIKnowledgeSourceWeight>> ListAsync(
         AIUseCaseType? useCaseType,

@@ -10,7 +10,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repos
 /// Repositório de contextos montados para consultas de IA.
 /// Implementa IAiContextRepository com AiOrchestrationDbContext.
 /// </summary>
-internal sealed class AiContextRepository(AiOrchestrationDbContext context)
+internal sealed class AiContextRepository(AiHubDbContext context)
     : IAiContextRepository
 {
     public async Task<AiContext?> GetByIdAsync(AiContextId id, CancellationToken ct)
@@ -42,22 +42,22 @@ internal sealed class AiContextRepository(AiOrchestrationDbContext context)
 /// Repositório de conversas multi-turno de IA do módulo de orquestração.
 /// Implementa IAiOrchestrationConversationRepository com AiOrchestrationDbContext.
 /// </summary>
-internal sealed class AiOrchestrationConversationRepository(AiOrchestrationDbContext context)
+internal sealed class AiOrchestrationConversationRepository(AiHubDbContext context)
     : IAiOrchestrationConversationRepository
 {
     public async Task<AiConversation?> GetByIdAsync(AiConversationId id, CancellationToken ct)
-        => await context.Conversations
+        => await context.OrchestrationConversations
             .FirstOrDefaultAsync(c => c.Id == id, ct);
 
     public async Task AddAsync(AiConversation conversation, CancellationToken ct)
     {
-        await context.Conversations.AddAsync(conversation, ct);
+        await context.OrchestrationConversations.AddAsync(conversation, ct);
         await context.SaveChangesAsync(ct);
     }
 
     public async Task UpdateAsync(AiConversation conversation, CancellationToken ct)
     {
-        context.Conversations.Update(conversation);
+        context.OrchestrationConversations.Update(conversation);
         await context.SaveChangesAsync(ct);
     }
 
@@ -72,7 +72,7 @@ internal sealed class AiOrchestrationConversationRepository(AiOrchestrationDbCon
         int pageSize,
         CancellationToken ct)
     {
-        var query = context.Conversations.AsNoTracking().AsQueryable();
+        var query = context.OrchestrationConversations.AsNoTracking().AsQueryable();
 
         if (releaseId.HasValue)
             query = query.Where(c => c.ReleaseId == releaseId.Value);
@@ -108,7 +108,7 @@ internal sealed class AiOrchestrationConversationRepository(AiOrchestrationDbCon
         int maxCount,
         CancellationToken ct)
     {
-        return await context.Conversations
+        return await context.OrchestrationConversations
             .AsNoTracking()
             .Where(c => c.ReleaseId == releaseId)
             .OrderByDescending(c => c.StartedAt)
@@ -121,7 +121,7 @@ internal sealed class AiOrchestrationConversationRepository(AiOrchestrationDbCon
 /// <summary>
 /// Repositório de entradas sugeridas para base de conhecimento da orquestração de IA.
 /// </summary>
-internal sealed class KnowledgeCaptureEntryRepository(AiOrchestrationDbContext context)
+internal sealed class KnowledgeCaptureEntryRepository(AiHubDbContext context)
     : IKnowledgeCaptureEntryRepository
 {
     public async Task<KnowledgeCaptureEntry?> GetByIdAsync(KnowledgeCaptureEntryId id, CancellationToken ct)
@@ -154,7 +154,7 @@ internal sealed class KnowledgeCaptureEntryRepository(AiOrchestrationDbContext c
 /// <summary>
 /// Repositório de artefatos de teste gerados por IA.
 /// </summary>
-internal sealed class GeneratedTestArtifactRepository(AiOrchestrationDbContext context)
+internal sealed class GeneratedTestArtifactRepository(AiHubDbContext context)
     : IGeneratedTestArtifactRepository
 {
     public async Task AddAsync(GeneratedTestArtifact artifact, CancellationToken ct)

@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiTokenQuotaPolicyRepository(AiGovernanceDbContext context) : IAiTokenQuotaPolicyRepository
+internal sealed class AiTokenQuotaPolicyRepository(AiHubDbContext context) : IAiTokenQuotaPolicyRepository
 {
     public async Task<AiTokenQuotaPolicy?> GetByIdAsync(AiTokenQuotaPolicyId id, CancellationToken ct)
         => await context.TokenQuotaPolicies.SingleOrDefaultAsync(p => p.Id == id, ct);

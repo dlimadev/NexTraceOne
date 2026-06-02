@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiGuardrailRepository(AiGovernanceDbContext context) : IAiGuardrailRepository
+internal sealed class AiGuardrailRepository(AiHubDbContext context) : IAiGuardrailRepository
 {
     public async Task<AiGuardrail?> GetByIdAsync(AiGuardrailId id, CancellationToken ct)
         => await context.Guardrails.SingleOrDefaultAsync(g => g.Id == id, ct);

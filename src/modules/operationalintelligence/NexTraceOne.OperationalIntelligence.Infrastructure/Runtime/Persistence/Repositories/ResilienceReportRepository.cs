@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para relatórios de resiliência (ResilienceReport).
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class ResilienceReportRepository(RuntimeIntelligenceDbContext context)
+internal sealed class ResilienceReportRepository(IncidentResponseDbContext context)
     : RepositoryBase<ResilienceReport, ResilienceReportId>(context), IResilienceReportRepository
 {
     /// <summary>Obtém um relatório pelo identificador.</summary>

@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiIdeClientRegistrationRepository(AiGovernanceDbContext context) : IAiIdeClientRegistrationRepository
+internal sealed class AiIdeClientRegistrationRepository(AiHubDbContext context) : IAiIdeClientRegistrationRepository
 {
     public async Task<AIIDEClientRegistration?> GetByIdAsync(AIIDEClientRegistrationId id, CancellationToken cancellationToken)
         => await context.IdeClientRegistrations.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);

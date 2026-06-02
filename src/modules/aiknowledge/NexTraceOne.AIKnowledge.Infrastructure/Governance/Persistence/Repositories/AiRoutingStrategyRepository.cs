@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiRoutingStrategyRepository(AiGovernanceDbContext context) : IAiRoutingStrategyRepository
+internal sealed class AiRoutingStrategyRepository(AiHubDbContext context) : IAiRoutingStrategyRepository
 {
     public async Task<IReadOnlyList<AIRoutingStrategy>> ListAsync(bool? isActive, CancellationToken ct)
     {

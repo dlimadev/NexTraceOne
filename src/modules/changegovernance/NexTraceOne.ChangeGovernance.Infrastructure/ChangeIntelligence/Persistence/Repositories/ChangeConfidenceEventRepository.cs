@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de eventos de confiança de mudanças (append-only).
 /// </summary>
-internal sealed class ChangeConfidenceEventRepository(ChangeIntelligenceDbContext context) : IChangeConfidenceEventRepository
+internal sealed class ChangeConfidenceEventRepository(ChangeGovernanceDbContext context) : IChangeConfidenceEventRepository
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<ChangeConfidenceEvent>> ListByReleaseAsync(ReleaseId releaseId, CancellationToken cancellationToken)

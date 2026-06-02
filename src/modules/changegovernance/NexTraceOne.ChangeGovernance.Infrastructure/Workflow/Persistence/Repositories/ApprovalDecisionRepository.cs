@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repos
 /// <summary>
 /// Repositório de decisões de aprovação, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class ApprovalDecisionRepository(WorkflowDbContext context)
+internal sealed class ApprovalDecisionRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<ApprovalDecision, ApprovalDecisionId>(context), IApprovalDecisionRepository
 {
     /// <summary>Busca uma ApprovalDecision pelo seu identificador.</summary>

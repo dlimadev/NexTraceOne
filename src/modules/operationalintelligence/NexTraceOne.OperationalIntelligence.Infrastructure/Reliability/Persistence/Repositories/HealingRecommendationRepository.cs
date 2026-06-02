@@ -9,7 +9,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
 /// <summary>
 /// Repositório EF Core para recomendações de self-healing (HealingRecommendation).
 /// </summary>
-internal sealed class HealingRecommendationRepository(ReliabilityDbContext context)
+internal sealed class HealingRecommendationRepository(IncidentResponseDbContext context)
     : IHealingRecommendationRepository
 {
     public async Task<HealingRecommendation?> GetByIdAsync(HealingRecommendationId id, CancellationToken ct)

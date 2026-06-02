@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório de snapshots de runtime, implementando consultas de saúde de serviços.
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class RuntimeSnapshotRepository(RuntimeIntelligenceDbContext context)
+internal sealed class RuntimeSnapshotRepository(IncidentResponseDbContext context)
     : RepositoryBase<RuntimeSnapshot, RuntimeSnapshotId>(context), IRuntimeSnapshotRepository
 {
     /// <summary>Busca um snapshot de runtime pelo seu identificador.</summary>

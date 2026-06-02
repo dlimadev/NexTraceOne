@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de relatórios de blast radius, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class BlastRadiusRepository(ChangeIntelligenceDbContext context) : IBlastRadiusRepository
+internal sealed class BlastRadiusRepository(ChangeGovernanceDbContext context) : IBlastRadiusRepository
 {
     /// <summary>Busca o relatório de blast radius de uma release.</summary>
     public async Task<BlastRadiusReport?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

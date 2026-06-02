@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repo
 /// <summary>
 /// Repositório de ambientes de deployment, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class DeploymentEnvironmentRepository(PromotionDbContext context)
+internal sealed class DeploymentEnvironmentRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<DeploymentEnvironment, DeploymentEnvironmentId>(context), IDeploymentEnvironmentRepository
 {
     /// <summary>Busca um ambiente de deployment pelo identificador.</summary>

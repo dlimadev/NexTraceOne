@@ -6,7 +6,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiAgentPerformanceMetricRepository(AiGovernanceDbContext context)
+internal sealed class AiAgentPerformanceMetricRepository(AiHubDbContext context)
     : IAiAgentPerformanceMetricRepository
 {
     public async Task<IReadOnlyList<AiAgentPerformanceMetric>> ListByTenantAsync(

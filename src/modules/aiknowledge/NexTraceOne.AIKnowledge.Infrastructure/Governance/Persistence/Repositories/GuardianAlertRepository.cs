@@ -5,7 +5,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class GuardianAlertRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IGuardianAlertRepository
+internal sealed class GuardianAlertRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IGuardianAlertRepository
 {
     public async Task<IReadOnlyList<GuardianAlert>> ListOpenAsync(Guid tenantId, CancellationToken ct)
         => await context.GuardianAlerts

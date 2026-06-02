@@ -11,7 +11,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de releases, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
+internal sealed class ReleaseRepository(ChangeGovernanceDbContext context)
     : RepositoryBase<Release, ReleaseId>(context), IReleaseRepository
 {
     /// <summary>Busca uma Release pelo seu identificador.</summary>

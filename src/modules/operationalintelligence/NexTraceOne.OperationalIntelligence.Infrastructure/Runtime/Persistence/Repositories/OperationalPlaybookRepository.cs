@@ -11,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório EF Core para playbooks operacionais.
 /// Isolamento total: acessa apenas RuntimeIntelligenceDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class OperationalPlaybookRepository(RuntimeIntelligenceDbContext context)
+internal sealed class OperationalPlaybookRepository(IncidentResponseDbContext context)
     : RepositoryBase<OperationalPlaybook, OperationalPlaybookId>(context), IOperationalPlaybookRepository
 {
     /// <summary>Obtém um playbook pelo identificador.</summary>

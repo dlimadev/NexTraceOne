@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class ExternalDataSourceRepository(AiGovernanceDbContext context)
+internal sealed class ExternalDataSourceRepository(AiHubDbContext context)
     : IExternalDataSourceRepository
 {
     public async Task<IReadOnlyList<ExternalDataSource>> ListAsync(

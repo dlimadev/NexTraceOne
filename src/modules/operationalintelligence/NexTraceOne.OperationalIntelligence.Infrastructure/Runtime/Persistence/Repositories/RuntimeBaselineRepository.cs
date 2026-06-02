@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório de baselines de runtime para detecção de drift.
 /// Implementa consulta por serviço+ambiente para unicidade de baseline.
 /// </summary>
-internal sealed class RuntimeBaselineRepository(RuntimeIntelligenceDbContext context)
+internal sealed class RuntimeBaselineRepository(IncidentResponseDbContext context)
     : RepositoryBase<RuntimeBaseline, RuntimeBaselineId>(context), IRuntimeBaselineRepository
 {
     /// <summary>Busca uma baseline de runtime pelo seu identificador.</summary>

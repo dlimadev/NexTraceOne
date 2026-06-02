@@ -4,7 +4,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiEvalDatasetRepository(AiGovernanceDbContext context) : IAiEvalDatasetRepository
+internal sealed class AiEvalDatasetRepository(AiHubDbContext context) : IAiEvalDatasetRepository
 {
     public async Task<AiEvalDataset?> GetByIdAsync(AiEvalDatasetId id, CancellationToken ct = default)
         => await context.EvalDatasets.SingleOrDefaultAsync(d => d.Id == id, ct);

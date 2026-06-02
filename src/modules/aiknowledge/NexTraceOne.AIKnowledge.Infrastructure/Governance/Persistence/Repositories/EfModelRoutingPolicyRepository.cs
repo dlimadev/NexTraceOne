@@ -7,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class EfModelRoutingPolicyRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IModelRoutingPolicyRepository
+internal sealed class EfModelRoutingPolicyRepository(AiHubDbContext context, ICurrentTenant currentTenant) : IModelRoutingPolicyRepository
 {
     public async Task<ModelRoutingPolicy?> GetActiveAsync(Guid tenantId, PromptIntent intent, CancellationToken ct)
         => await context.ModelRoutingPolicies

@@ -4,7 +4,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class OrganizationalMemoryRepository(AiGovernanceDbContext context) : IOrganizationalMemoryRepository
+internal sealed class OrganizationalMemoryRepository(AiHubDbContext context) : IOrganizationalMemoryRepository
 {
     public async Task<OrganizationalMemoryNode?> GetByIdAsync(OrganizationalMemoryNodeId id, CancellationToken ct)
         => await context.MemoryNodes.SingleOrDefaultAsync(n => n.Id == id, ct);

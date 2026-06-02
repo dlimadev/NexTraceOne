@@ -8,7 +8,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de scores de risco de mudança, implementando consultas específicas de negócio.
 /// </summary>
-internal sealed class ChangeScoreRepository(ChangeIntelligenceDbContext context) : IChangeScoreRepository
+internal sealed class ChangeScoreRepository(ChangeGovernanceDbContext context) : IChangeScoreRepository
 {
     /// <summary>Busca o score de uma release.</summary>
     public async Task<ChangeIntelligenceScore?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)

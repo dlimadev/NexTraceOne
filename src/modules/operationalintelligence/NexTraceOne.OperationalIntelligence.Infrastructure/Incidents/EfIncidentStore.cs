@@ -16,7 +16,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordM
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
@@ -26,7 +26,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 /// mapeando entidades de domínio para os DTOs esperados pelos handlers.
 /// </summary>
 internal sealed class EfIncidentStore(
-    IncidentDbContext db,
+    IncidentResponseDbContext db,
     IDateTimeProvider clock,
     ICurrentUser currentUser) : IIncidentStore
 {

@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 /// Repositório de findings de drift detectados entre baselines e snapshots.
 /// Suporta listagem por severidade e estado de acknowledgment.
 /// </summary>
-internal sealed class DriftFindingRepository(RuntimeIntelligenceDbContext context)
+internal sealed class DriftFindingRepository(IncidentResponseDbContext context)
     : RepositoryBase<DriftFinding, DriftFindingId>(context), IDriftFindingRepository
 {
     /// <summary>Busca um drift finding pelo seu identificador.</summary>

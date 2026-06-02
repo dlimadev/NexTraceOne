@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Jobs;
 
@@ -63,7 +63,7 @@ internal sealed class EmbeddingIndexJob(
 
         var sourceRepository = scope.ServiceProvider.GetRequiredService<IAiKnowledgeSourceRepository>();
         var embeddingProvider = scope.ServiceProvider.GetRequiredService<IEmbeddingProvider>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<AiGovernanceDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AiHubDbContext>();
 
         var allSources = await sourceRepository.ListAsync(
             sourceType: null,

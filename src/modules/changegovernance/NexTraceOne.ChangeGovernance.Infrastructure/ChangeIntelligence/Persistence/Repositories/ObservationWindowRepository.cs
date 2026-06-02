@@ -9,7 +9,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 /// <summary>
 /// Repositório de janelas de observação pós-release para comparação progressiva com baseline.
 /// </summary>
-internal sealed class ObservationWindowRepository(ChangeIntelligenceDbContext context) : IObservationWindowRepository
+internal sealed class ObservationWindowRepository(ChangeGovernanceDbContext context) : IObservationWindowRepository
 {
     /// <summary>Lista janelas de observação de uma release ordenadas por fase.</summary>
     public async Task<IReadOnlyList<ObservationWindow>> ListByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)
