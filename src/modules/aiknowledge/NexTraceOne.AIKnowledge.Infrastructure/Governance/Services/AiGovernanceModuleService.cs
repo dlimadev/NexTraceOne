@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
-using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 

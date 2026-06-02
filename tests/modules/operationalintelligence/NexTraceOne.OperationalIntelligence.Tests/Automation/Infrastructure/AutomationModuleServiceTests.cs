@@ -4,7 +4,7 @@ using NexTraceOne.OperationalIntelligence.Contracts.Automation.ServiceInterfaces
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Automation.Infrastructure;
@@ -215,20 +215,20 @@ public sealed class AutomationModuleServiceTests
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private static AutomationDbContext CreateDbContext()
+    private static IncidentResponseDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<AutomationDbContext>()
+        var options = new DbContextOptionsBuilder<IncidentResponseDbContext>()
             .UseInMemoryDatabase($"automation-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new AutomationDbContext(
+        return new IncidentResponseDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IAutomationModule CreateSut(AutomationDbContext db) => new AutomationModuleService(db);
+    private static IAutomationModule CreateSut(IncidentResponseDbContext db) => new AutomationModuleService(db);
 
     private sealed class TestCurrentTenant : ICurrentTenant
     {

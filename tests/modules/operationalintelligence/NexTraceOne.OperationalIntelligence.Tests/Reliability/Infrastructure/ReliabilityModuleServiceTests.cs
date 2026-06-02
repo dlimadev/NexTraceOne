@@ -3,7 +3,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Reliability.Infrastructure;
@@ -208,20 +208,20 @@ public sealed class ReliabilityModuleServiceTests
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private static ReliabilityDbContext CreateDbContext()
+    private static IncidentResponseDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ReliabilityDbContext>()
+        var options = new DbContextOptionsBuilder<IncidentResponseDbContext>()
             .UseInMemoryDatabase($"reliability-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new ReliabilityDbContext(
+        return new IncidentResponseDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IReliabilityModule CreateSut(ReliabilityDbContext db) => new ReliabilityModuleService(db);
+    private static IReliabilityModule CreateSut(IncidentResponseDbContext db) => new ReliabilityModuleService(db);
 
     private sealed class TestCurrentTenant : ICurrentTenant
     {
