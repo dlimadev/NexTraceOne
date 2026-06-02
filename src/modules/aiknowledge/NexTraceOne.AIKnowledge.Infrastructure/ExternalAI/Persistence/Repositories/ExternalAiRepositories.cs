@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
@@ -137,10 +139,10 @@ internal sealed class ExternalAiConsultationRepository(AiHubDbContext context) :
 internal sealed class ExternalAiPolicyRepository(AiHubDbContext context) : IExternalAiPolicyRepository
 {
     public async Task<ExternalAiPolicy?> GetByNameAsync(string name, CancellationToken ct)
-        => await context.Policies.FirstOrDefaultAsync(p => p.Name == name, ct);
+        => await context.ExternalAiPolicies.FirstOrDefaultAsync(p => p.Name == name, ct);
 
     public async Task<IReadOnlyList<ExternalAiPolicy>> ListActiveAsync(CancellationToken ct)
-        => await context.Policies
+        => await context.ExternalAiPolicies
             .AsNoTracking()
             .Where(p => p.IsActive)
             .OrderBy(p => p.Name)
@@ -148,13 +150,13 @@ internal sealed class ExternalAiPolicyRepository(AiHubDbContext context) : IExte
 
     public async Task AddAsync(ExternalAiPolicy policy, CancellationToken ct)
     {
-        await context.Policies.AddAsync(policy, ct);
+        await context.ExternalAiPolicies.AddAsync(policy, ct);
         await context.SaveChangesAsync(ct);
     }
 
     public async Task UpdateAsync(ExternalAiPolicy policy, CancellationToken ct)
     {
-        context.Policies.Update(policy);
+        context.ExternalAiPolicies.Update(policy);
         await context.SaveChangesAsync(ct);
     }
 }
