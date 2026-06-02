@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Services;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.ExternalAI.Infrastructure;
@@ -16,8 +16,8 @@ public sealed class ExternalAiModuleTests
     public async Task GetAvailableProvidersAsync_ShouldReturnProvidersOrderedByPriority()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("fallback", "http://fallback", "gpt-4o", 4096, 0.001m, 2, FixedNow));
-        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("fallback", "http://fallback", "gpt-4o", 4096, 0.001m, 2, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -33,8 +33,8 @@ public sealed class ExternalAiModuleTests
     public async Task GetAvailableProvidersAsync_WhenActivePolicyExists_ShouldExposePolicyCapabilities()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("provider", "http://provider", "gpt-4o", 4096, 0.001m, 1, FixedNow));
-        db.Policies.Add(ExternalAiPolicy.Create("policy-1", "desc", 100, 1000, false, "change-analysis,error-diagnosis", FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("provider", "http://provider", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiPolicies.Add(ExternalAiPolicy.Create("policy-1", "desc", 100, 1000, false, "change-analysis,error-diagnosis", FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -50,7 +50,7 @@ public sealed class ExternalAiModuleTests
     {
         await using var db = CreateDbContext();
         var provider = ExternalAiProvider.Register("provider", "http://provider", "gpt-4o", 4096, 0.001m, 1, FixedNow);
-        db.Providers.Add(provider);
+        db.ExternalAiProviders.Add(provider);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -78,8 +78,8 @@ public sealed class ExternalAiModuleTests
     public async Task RouteRequestAsync_WhenPreferredProviderIsActive_ShouldSelectPreferred()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("secondary", "http://secondary", "gpt-4o", 4096, 0.001m, 2, FixedNow));
-        db.Providers.Add(ExternalAiProvider.Register("preferred", "http://preferred", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("secondary", "http://secondary", "gpt-4o", 4096, 0.001m, 2, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("preferred", "http://preferred", "gpt-4o", 4096, 0.001m, 1, FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -96,8 +96,8 @@ public sealed class ExternalAiModuleTests
     public async Task RouteRequestAsync_WhenPreferredProviderUnavailable_ShouldFallbackToHighestPriorityActive()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("secondary", "http://secondary", "gpt-4o", 4096, 0.001m, 2, FixedNow));
-        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("secondary", "http://secondary", "gpt-4o", 4096, 0.001m, 2, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -113,8 +113,8 @@ public sealed class ExternalAiModuleTests
     public async Task RouteRequestAsync_WhenCapabilityRequiresApproval_ShouldReturnNull()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
-        db.Policies.Add(ExternalAiPolicy.Create("approval", "desc", 100, 1000, true, "change-analysis", FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiPolicies.Add(ExternalAiPolicy.Create("approval", "desc", 100, 1000, true, "change-analysis", FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -128,9 +128,9 @@ public sealed class ExternalAiModuleTests
     public async Task RouteRequestAsync_WhenEnvironmentIsProduction_ShouldReturnNull_WhenActivePolicyCoverCapability()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
         // Policy does NOT require approval but covers the capability — production block applies
-        db.Policies.Add(ExternalAiPolicy.Create("prod-guard", "desc", 100, 1000, false, "change-analysis", FixedNow));
+        db.ExternalAiPolicies.Add(ExternalAiPolicy.Create("prod-guard", "desc", 100, 1000, false, "change-analysis", FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -144,9 +144,9 @@ public sealed class ExternalAiModuleTests
     public async Task RouteRequestAsync_WhenEnvironmentIsNotProduction_ShouldProceed_EvenWhenPolicyCoverCapability()
     {
         await using var db = CreateDbContext();
-        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        db.ExternalAiProviders.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
         // Policy covers capability but does not require approval; environment is non-production
-        db.Policies.Add(ExternalAiPolicy.Create("dev-policy", "desc", 100, 1000, false, "change-analysis", FixedNow));
+        db.ExternalAiPolicies.Add(ExternalAiPolicy.Create("dev-policy", "desc", 100, 1000, false, "change-analysis", FixedNow));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -157,20 +157,20 @@ public sealed class ExternalAiModuleTests
         result!.ProviderName.Should().Be("primary");
     }
 
-    private static ExternalAiDbContext CreateDbContext()
+    private static AiHubDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ExternalAiDbContext>()
+        var options = new DbContextOptionsBuilder<AiHubDbContext>()
             .UseInMemoryDatabase($"external-ai-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new ExternalAiDbContext(
+        return new AiHubDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IExternalAiModule CreateSut(ExternalAiDbContext db)
+    private static IExternalAiModule CreateSut(AiHubDbContext db)
         => new ExternalAiModule(db);
 
     private sealed class TestCurrentTenant : ICurrentTenant

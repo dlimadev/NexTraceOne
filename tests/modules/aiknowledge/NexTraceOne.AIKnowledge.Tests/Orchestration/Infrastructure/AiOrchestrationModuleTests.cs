@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Domain.Orchestration.Entities;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Services;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.Orchestration.Infrastructure;
@@ -18,7 +18,7 @@ public sealed class AiOrchestrationModuleTests
     {
         await using var db = CreateDbContext();
         var conversation = AiConversation.Start("orders", "incident diagnosis", "alice", FixedNow);
-        db.Conversations.Add(conversation);
+        db.OrchestrationConversations.Add(conversation);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -50,7 +50,7 @@ public sealed class AiOrchestrationModuleTests
         var oldConversation = AiConversation.Start("orders", "old topic", "alice", FixedNow.AddMinutes(-20));
         var latestConversation = AiConversation.Start("orders", "latest topic", "bob", FixedNow.AddMinutes(-5));
         var otherServiceConversation = AiConversation.Start("billing", "billing topic", "carol", FixedNow);
-        db.Conversations.AddRange(oldConversation, latestConversation, otherServiceConversation);
+        db.OrchestrationConversations.AddRange(oldConversation, latestConversation, otherServiceConversation);
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -67,9 +67,9 @@ public sealed class AiOrchestrationModuleTests
     public async Task GetConversationsByServiceAsync_ShouldRespectLimit()
     {
         await using var db = CreateDbContext();
-        db.Conversations.Add(AiConversation.Start("orders", "topic-1", "alice", FixedNow.AddMinutes(-30)));
-        db.Conversations.Add(AiConversation.Start("orders", "topic-2", "alice", FixedNow.AddMinutes(-20)));
-        db.Conversations.Add(AiConversation.Start("orders", "topic-3", "alice", FixedNow.AddMinutes(-10)));
+        db.OrchestrationConversations.Add(AiConversation.Start("orders", "topic-1", "alice", FixedNow.AddMinutes(-30)));
+        db.OrchestrationConversations.Add(AiConversation.Start("orders", "topic-2", "alice", FixedNow.AddMinutes(-20)));
+        db.OrchestrationConversations.Add(AiConversation.Start("orders", "topic-3", "alice", FixedNow.AddMinutes(-10)));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -137,20 +137,20 @@ public sealed class AiOrchestrationModuleTests
         result.Should().BeNull();
     }
 
-    private static AiOrchestrationDbContext CreateDbContext()
+    private static AiHubDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<AiOrchestrationDbContext>()
+        var options = new DbContextOptionsBuilder<AiHubDbContext>()
             .UseInMemoryDatabase($"ai-orchestration-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new AiOrchestrationDbContext(
+        return new AiHubDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IAiOrchestrationModule CreateSut(AiOrchestrationDbContext db)
+    private static IAiOrchestrationModule CreateSut(AiHubDbContext db)
     {
         var governanceModule = Substitute.For<IAiGovernanceModule>();
         return new AiOrchestrationModule(db, governanceModule);
