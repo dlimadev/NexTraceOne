@@ -275,6 +275,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
                         : 'border-edge bg-surface text-muted hover:border-accent/40'
                     }`}
                     aria-pressed={selected}
+                    data-testid={`ai-mode-${option.id}`}
                   >
                     <span className={`mt-0.5 shrink-0 ${selected ? 'text-accent' : 'text-muted'}`}>
                       {option.icon}

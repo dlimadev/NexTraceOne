@@ -7,7 +7,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SetupWizardPage } from '../../features/platform-admin/pages/SetupWizardPage';
 
 vi.mock('../../api/client', () => ({
-  default: { get: vi.fn(), post: vi.fn() },
+  default: {
+    get: vi.fn().mockResolvedValue({ data: null }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+  },
 }));
 
 const renderPage = () => {
@@ -42,7 +45,7 @@ describe('SetupWizardPage', () => {
 
   it('starts on the welcome step', () => {
     renderPage();
-    expect(screen.getByText(/Welcome to NexTraceOne/i)).toBeDefined();
+    expect(screen.getByText(/Welcome back/i)).toBeDefined();
   });
 
   it('navigates to the next step when clicking Next', async () => {
@@ -64,7 +67,7 @@ describe('SetupWizardPage', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Next/i }));
     await user.click(screen.getByRole('button', { name: /Back/i }));
-    expect(screen.getByText(/Welcome to NexTraceOne/i)).toBeDefined();
+    expect(screen.getByText(/Welcome back/i)).toBeDefined();
   });
 
   it('shows Skip button for optional steps', async () => {
