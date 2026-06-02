@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de regras de matching automático.
 /// </summary>
-internal sealed class DiscoveryMatchRuleRepository(CatalogGraphDbContext dbContext) : IDiscoveryMatchRuleRepository
+internal sealed class DiscoveryMatchRuleRepository(ServiceCatalogDbContext dbContext) : IDiscoveryMatchRuleRepository
 {
     public async Task<DiscoveryMatchRule?> GetByIdAsync(DiscoveryMatchRuleId id, CancellationToken cancellationToken)
         => await dbContext.DiscoveryMatchRules

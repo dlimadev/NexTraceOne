@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -12,7 +12,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementa consultas com filtros por status, serviço e autor, com paginação.
 /// Inclui Include de Examples na consulta por Id para uso em detalhes de draft.
 /// </summary>
-internal sealed class ContractDraftRepository(ContractsDbContext context)
+internal sealed class ContractDraftRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ContractDraft, ContractDraftId>(context), IContractDraftRepository
 {
     /// <summary>Busca um draft pelo Id, incluindo a coleção de exemplos associados.</summary>

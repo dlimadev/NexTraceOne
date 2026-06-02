@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
-using NexTraceOne.Catalog.Domain.DeveloperExperience.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para ProductivitySnapshot.</summary>
-internal sealed class ProductivitySnapshotRepository(CatalogGraphDbContext context)
+internal sealed class ProductivitySnapshotRepository(ServiceCatalogDbContext context)
     : IProductivitySnapshotRepository
 {
     public async Task<IReadOnlyList<ProductivitySnapshot>> ListByTeamAsync(

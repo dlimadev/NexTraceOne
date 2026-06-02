@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de sessões de playground, implementando persistência via EF Core.
 /// Suporta consultas paginadas por utilizador e por API para histórico de execuções.
 /// </summary>
-internal sealed class PlaygroundSessionRepository(DeveloperPortalDbContext context) : IPlaygroundSessionRepository
+internal sealed class PlaygroundSessionRepository(ServiceCatalogDbContext context) : IPlaygroundSessionRepository
 {
     /// <summary>Busca sessão por identificador único.</summary>
     public async Task<PlaygroundSession?> GetByIdAsync(PlaygroundSessionId id, CancellationToken ct = default)

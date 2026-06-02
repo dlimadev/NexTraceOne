@@ -1,16 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
-using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
-internal sealed class ServiceAssetRepository(CatalogGraphDbContext context, ICurrentTenant currentTenant)
+internal sealed class ServiceAssetRepository(ServiceCatalogDbContext context, ICurrentTenant currentTenant)
     : RepositoryBase<ServiceAsset, ServiceAssetId>(context), IServiceAssetRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
     private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public override async Task<ServiceAsset?> GetByIdAsync(ServiceAssetId id, CancellationToken ct = default)

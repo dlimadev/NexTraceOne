@@ -8,9 +8,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.HealthChecks;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -31,15 +29,13 @@ internal static class ApiHostHealthChecks
 
         healthChecks
             .AddCheck<DbContextConnectivityHealthCheck<IdentityDbContext>>("identity-db", HealthStatus.Unhealthy, ["ready", "health"])
-            .AddCheck<DbContextConnectivityHealthCheck<CatalogGraphDbContext>>("catalog-graph-db", HealthStatus.Unhealthy, ["ready", "health"])
-            .AddCheck<DbContextConnectivityHealthCheck<ContractsDbContext>>("contracts-db", HealthStatus.Unhealthy, ["ready", "health"])
+            .AddCheck<DbContextConnectivityHealthCheck<ServiceCatalogDbContext>>("service-catalog-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<ChangeIntelligenceDbContext>>("change-intelligence-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<RuntimeIntelligenceDbContext>>("runtime-intelligence-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<GovernanceDbContext>>("governance-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<RulesetGovernanceDbContext>>("ruleset-governance-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<WorkflowDbContext>>("workflow-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<PromotionDbContext>>("promotion-db", HealthStatus.Unhealthy, ["health"])
-            .AddCheck<DbContextConnectivityHealthCheck<DeveloperPortalDbContext>>("developer-portal-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<IncidentDbContext>>("incident-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<CostIntelligenceDbContext>>("cost-intelligence-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<AuditDbContext>>("audit-db", HealthStatus.Unhealthy, ["health"])

@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
-using NexTraceOne.Catalog.Domain.DeveloperExperience.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para DeveloperSurvey.</summary>
-internal sealed class EfDeveloperSurveyRepository(DeveloperExperienceDbContext context) : IDeveloperSurveyRepository
+internal sealed class EfDeveloperSurveyRepository(ServiceCatalogDbContext context) : IDeveloperSurveyRepository
 {
     public async Task AddAsync(DeveloperSurvey survey, CancellationToken cancellationToken = default)
     {

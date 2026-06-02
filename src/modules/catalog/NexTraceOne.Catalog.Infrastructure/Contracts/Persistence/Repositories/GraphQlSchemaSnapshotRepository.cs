@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório EF Core para snapshots analisados de schemas GraphQL.
 /// Wave G.3 — GraphQL Schema Analysis.
 /// </summary>
-internal sealed class GraphQlSchemaSnapshotRepository(ContractsDbContext context)
+internal sealed class GraphQlSchemaSnapshotRepository(ServiceCatalogDbContext context)
     : IGraphQlSchemaSnapshotRepository
 {
     public void Add(GraphQlSchemaSnapshot snapshot)

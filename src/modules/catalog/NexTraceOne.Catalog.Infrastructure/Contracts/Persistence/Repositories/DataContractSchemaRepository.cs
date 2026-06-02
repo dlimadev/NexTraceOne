@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Repositório EF Core para schemas de Data Contracts. CC-03.
 /// </summary>
-internal sealed class DataContractSchemaRepository(ContractsDbContext context) : IDataContractSchemaRepository
+internal sealed class DataContractSchemaRepository(ServiceCatalogDbContext context) : IDataContractSchemaRepository
 {
     public async Task AddAsync(DataContractSchema schema, CancellationToken ct)
         => await context.DataContractSchemas.AddAsync(schema, ct);

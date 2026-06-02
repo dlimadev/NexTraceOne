@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementação EF Core do repositório de SbomRecord.
 /// Wave AO.1 — Supply Chain &amp; Dependency Provenance.
 /// </summary>
-internal sealed class EfSbomRepository(ContractsDbContext context) : ISbomRepository
+internal sealed class EfSbomRepository(ServiceCatalogDbContext context) : ISbomRepository
 {
     public async Task AddAsync(SbomRecord record, CancellationToken ct)
         => await context.SbomRecords.AddAsync(record, ct);

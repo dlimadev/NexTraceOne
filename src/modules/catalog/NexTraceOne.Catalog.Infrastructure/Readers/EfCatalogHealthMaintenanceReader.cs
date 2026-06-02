@@ -1,9 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Services.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Domain.Graph.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -15,8 +10,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Wave AM.3 — GetCatalogHealthMaintenanceReport.
 /// </summary>
 internal sealed class EfCatalogHealthMaintenanceReader(
-    CatalogGraphDbContext graphDb,
-    ContractsDbContext contractsDb) : ICatalogHealthMaintenanceReader
+    ServiceCatalogDbContext graphDb,
+    ServiceCatalogDbContext contractsDb) : ICatalogHealthMaintenanceReader
 {
     public async Task<IReadOnlyList<ICatalogHealthMaintenanceReader.ServiceMaintenanceEntry>> ListByTenantAsync(
         string tenantId,

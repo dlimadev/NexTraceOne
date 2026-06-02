@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de entradas do Publication Center.
 /// Governa quais contratos estão visíveis no Developer Portal e em que estado de publicação.
 /// </summary>
-internal sealed class ContractPublicationEntryRepository(DeveloperPortalDbContext context)
+internal sealed class ContractPublicationEntryRepository(ServiceCatalogDbContext context)
     : IContractPublicationEntryRepository
 {
     /// <summary>Adiciona uma nova entrada de publicação.</summary>

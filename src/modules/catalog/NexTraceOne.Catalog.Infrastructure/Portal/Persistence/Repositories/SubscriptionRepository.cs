@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de subscrições de API, implementando persistência via EF Core.
 /// Suporta consultas por API, subscritor e combinação única (API + subscritor).
 /// </summary>
-internal sealed class SubscriptionRepository(DeveloperPortalDbContext context) : ISubscriptionRepository
+internal sealed class SubscriptionRepository(ServiceCatalogDbContext context) : ISubscriptionRepository
 {
     /// <summary>Busca subscrição por identificador único.</summary>
     public async Task<Subscription?> GetByIdAsync(SubscriptionId id, CancellationToken ct = default)

@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
-internal sealed class ApiAssetRepository(CatalogGraphDbContext context)
+internal sealed class ApiAssetRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ApiAsset, ApiAssetId>(context), IApiAssetRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<ApiAsset?> GetByIdAsync(ApiAssetId id, CancellationToken ct = default)
         => await IncludeGraph(_context.ApiAssets)

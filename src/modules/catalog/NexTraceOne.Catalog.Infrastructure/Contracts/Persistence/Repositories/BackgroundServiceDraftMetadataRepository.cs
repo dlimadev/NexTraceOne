@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -11,7 +11,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Persiste e consulta BackgroundServiceDraftMetadata vinculados a ContractDraft
 /// com ContractType = BackgroundService.
 /// </summary>
-internal sealed class BackgroundServiceDraftMetadataRepository(ContractsDbContext context)
+internal sealed class BackgroundServiceDraftMetadataRepository(ServiceCatalogDbContext context)
     : RepositoryBase<BackgroundServiceDraftMetadata, BackgroundServiceDraftMetadataId>(context), IBackgroundServiceDraftMetadataRepository
 {
     /// <summary>Busca o BackgroundServiceDraftMetadata associado a um draft de contrato.</summary>

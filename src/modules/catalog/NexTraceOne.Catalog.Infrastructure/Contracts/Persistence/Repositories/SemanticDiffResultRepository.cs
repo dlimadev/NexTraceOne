@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de resultados de diff semântico assistido por IA entre versões de contrato.
 /// Persiste e consulta análises semânticas com classificação, consumidores afetados e mitigação.
 /// </summary>
-internal sealed class SemanticDiffResultRepository(ContractsDbContext context)
+internal sealed class SemanticDiffResultRepository(ServiceCatalogDbContext context)
     : ISemanticDiffResultRepository
 {
     /// <inheritdoc />

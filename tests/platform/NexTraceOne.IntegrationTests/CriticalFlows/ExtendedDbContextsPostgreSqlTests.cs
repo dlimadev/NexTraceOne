@@ -61,7 +61,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateDeveloperPortalDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var subscriptionResult = Subscription.Create(
             apiAssetId: Guid.NewGuid(),
@@ -113,7 +113,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateDeveloperPortalDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var sub1 = Subscription.Create(
             Guid.NewGuid(), "Orders API", Guid.NewGuid(), "dev@nextraceone.io",

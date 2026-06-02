@@ -1,7 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
@@ -9,10 +6,10 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 /// Repositório de snapshots temporais do grafo de engenharia.
 /// Suporta consultas por Id, listagem ordenada e obtenção do mais recente.
 /// </summary>
-internal sealed class GraphSnapshotRepository(CatalogGraphDbContext context)
+internal sealed class GraphSnapshotRepository(ServiceCatalogDbContext context)
     : RepositoryBase<GraphSnapshot, GraphSnapshotId>(context), IGraphSnapshotRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<GraphSnapshot?> GetByIdAsync(GraphSnapshotId id, CancellationToken ct = default)
         => await _context.GraphSnapshots.SingleOrDefaultAsync(s => s.Id == id, ct);

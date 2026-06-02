@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementação EF Core do repositório de DataContractRecord.
 /// Wave AQ.1 — RegisterDataContract / GetDataContractComplianceReport.
 /// </summary>
-internal sealed class EfDataContractRepository(ContractsDbContext context) : IDataContractRepository
+internal sealed class EfDataContractRepository(ServiceCatalogDbContext context) : IDataContractRepository
 {
     public async Task AddAsync(DataContractRecord record, CancellationToken ct)
         => await context.DataContractRecords.AddAsync(record, ct);

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de metadados SOAP/WSDL para drafts de contrato em edição no Contract Studio.
 /// Persiste e consulta SoapDraftMetadata vinculados a ContractDraft com ContractType = Soap.
 /// </summary>
-internal sealed class SoapDraftMetadataRepository(ContractsDbContext context)
+internal sealed class SoapDraftMetadataRepository(ServiceCatalogDbContext context)
     : RepositoryBase<SoapDraftMetadata, SoapDraftMetadataId>(context), ISoapDraftMetadataRepository
 {
     /// <summary>Busca o SoapDraftMetadata associado a um draft de contrato.</summary>

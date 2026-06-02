@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
-using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de serviços descobertos.
 /// </summary>
-internal sealed class DiscoveredServiceRepository(CatalogGraphDbContext dbContext) : IDiscoveredServiceRepository
+internal sealed class DiscoveredServiceRepository(ServiceCatalogDbContext dbContext) : IDiscoveredServiceRepository
 {
     public async Task<DiscoveredService?> GetByIdAsync(DiscoveredServiceId id, CancellationToken cancellationToken)
         => await dbContext.DiscoveredServices

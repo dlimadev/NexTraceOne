@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementação EF Core do repositório de FeatureFlagRecord.
 /// Wave AS.1 — Feature Flag &amp; Experimentation Governance.
 /// </summary>
-internal sealed class EfFeatureFlagRepository(ContractsDbContext context) : IFeatureFlagRepository
+internal sealed class EfFeatureFlagRepository(ServiceCatalogDbContext context) : IFeatureFlagRepository
 {
     public async Task UpsertAsync(FeatureFlagRecord record, CancellationToken ct)
     {

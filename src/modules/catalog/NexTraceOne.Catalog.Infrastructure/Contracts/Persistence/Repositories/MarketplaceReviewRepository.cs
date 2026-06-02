@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de avaliações do marketplace interno de contratos.
 /// Persiste e consulta avaliações com rating e comentário por listagem.
 /// </summary>
-internal sealed class MarketplaceReviewRepository(ContractsDbContext context)
+internal sealed class MarketplaceReviewRepository(ServiceCatalogDbContext context)
     : IMarketplaceReviewRepository
 {
     /// <inheritdoc />

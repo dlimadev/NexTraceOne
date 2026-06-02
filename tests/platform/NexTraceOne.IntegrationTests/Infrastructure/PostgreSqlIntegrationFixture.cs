@@ -11,9 +11,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -148,14 +146,9 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     // ── DbContext factories — Core ────────────────────────────────────────────
 
-    public CatalogGraphDbContext CreateCatalogGraphDbContext()
+    public ServiceCatalogDbContext CreateServiceCatalogDbContext()
     {
-        return new CatalogGraphDbContext(BuildOptions<CatalogGraphDbContext>(CatalogConnectionString), _tenant, _user, _clock);
-    }
-
-    public ContractsDbContext CreateContractsDbContext()
-    {
-        return new ContractsDbContext(BuildOptions<ContractsDbContext>(ContractsConnectionString), _tenant, _user, _clock);
+        return new ServiceCatalogDbContext(BuildOptions<ServiceCatalogDbContext>(CatalogConnectionString), _tenant, _user, _clock);
     }
 
     public ChangeIntelligenceDbContext CreateChangeIntelligenceDbContext()
@@ -190,12 +183,6 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         return new RulesetGovernanceDbContext(BuildOptions<RulesetGovernanceDbContext>(RulesetGovernanceConnectionString), _tenant, _user, _clock);
     }
 
-    // ── DbContext factories — Catalog extensions ─────────────────────────────
-
-    public DeveloperPortalDbContext CreateDeveloperPortalDbContext()
-    {
-        return new DeveloperPortalDbContext(BuildOptions<DeveloperPortalDbContext>(DeveloperPortalConnectionString), _tenant, _user, _clock);
-    }
 
     // ── DbContext factories — OperationalIntelligence extensions ─────────────
 
@@ -360,14 +347,8 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
     private async Task ApplyMigrationsAsync()
     {
         // ── Catalog database ─────────────────────────────────────────────────
-        await using var catalogContext = CreateCatalogGraphDbContext();
+        await using var catalogContext = CreateServiceCatalogDbContext();
         await catalogContext.Database.MigrateAsync();
-
-        await using var contractsContext = CreateContractsDbContext();
-        await contractsContext.Database.MigrateAsync();
-
-        await using var portalContext = CreateDeveloperPortalDbContext();
-        await portalContext.Database.MigrateAsync();
 
         // ── Change Governance database ───────────────────────────────────────
         await using var changeIntelligenceContext = CreateChangeIntelligenceDbContext();

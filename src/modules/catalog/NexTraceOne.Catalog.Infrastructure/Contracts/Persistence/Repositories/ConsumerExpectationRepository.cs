@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// <summary>
 /// Repositório de expectativas de consumidores para Consumer-Driven Contract Testing.
 /// </summary>
-internal sealed class ConsumerExpectationRepository(ContractsDbContext context)
+internal sealed class ConsumerExpectationRepository(ServiceCatalogDbContext context)
     : IConsumerExpectationRepository
 {
     public void Add(ConsumerExpectation expectation) => context.ConsumerExpectations.Add(expectation);

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de eventos de analytics do portal, implementando persistência via EF Core.
 /// Suporta agregação por tipo de evento e consulta de pesquisas mais frequentes.
 /// </summary>
-internal sealed class PortalAnalyticsRepository(DeveloperPortalDbContext context) : IPortalAnalyticsRepository
+internal sealed class PortalAnalyticsRepository(ServiceCatalogDbContext context) : IPortalAnalyticsRepository
 {
     /// <summary>Adiciona novo evento de analytics ao contexto.</summary>
     public void Add(PortalAnalyticsEvent analyticsEvent)

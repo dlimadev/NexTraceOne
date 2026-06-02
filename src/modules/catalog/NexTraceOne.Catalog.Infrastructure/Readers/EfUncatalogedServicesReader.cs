@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Services.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -11,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Substitui o NullUncatalogedServicesReader (honest-null pattern).
 /// Wave AM.1 — GetUncatalogedServicesReport.
 /// </summary>
-internal sealed class EfUncatalogedServicesReader(CatalogGraphDbContext graphDb) : IUncatalogedServicesReader
+internal sealed class EfUncatalogedServicesReader(ServiceCatalogDbContext graphDb) : IUncatalogedServicesReader
 {
     public async Task<IUncatalogedServicesReader.UncatalogedServicesSummary> GetSummaryAsync(
         string tenantId,

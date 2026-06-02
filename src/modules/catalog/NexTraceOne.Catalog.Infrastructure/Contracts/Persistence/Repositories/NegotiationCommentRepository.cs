@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de comentários de negociações de contratos.
 /// Persiste e consulta comentários para rastreabilidade da revisão colaborativa.
 /// </summary>
-internal sealed class NegotiationCommentRepository(ContractsDbContext context)
+internal sealed class NegotiationCommentRepository(ServiceCatalogDbContext context)
     : INegotiationCommentRepository
 {
     /// <inheritdoc />

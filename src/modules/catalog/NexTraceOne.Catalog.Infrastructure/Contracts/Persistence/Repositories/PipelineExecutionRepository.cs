@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de execuções de pipeline de geração de código a partir de contratos.
 /// Persiste e consulta execuções para rastreabilidade do Contract-to-Code Pipeline.
 /// </summary>
-internal sealed class PipelineExecutionRepository(ContractsDbContext context)
+internal sealed class PipelineExecutionRepository(ServiceCatalogDbContext context)
     : IPipelineExecutionRepository
 {
     /// <inheritdoc />

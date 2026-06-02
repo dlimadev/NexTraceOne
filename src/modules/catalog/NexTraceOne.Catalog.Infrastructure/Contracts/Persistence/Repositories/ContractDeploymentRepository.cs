@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de deployments de versões de contrato.
 /// Implementa consultas específicas de rastreabilidade de mudanças por ambiente.
 /// </summary>
-internal sealed class ContractDeploymentRepository(ContractsDbContext context)
+internal sealed class ContractDeploymentRepository(ServiceCatalogDbContext context)
     : IContractDeploymentRepository
 {
     /// <summary>Busca um deployment pelo seu identificador.</summary>

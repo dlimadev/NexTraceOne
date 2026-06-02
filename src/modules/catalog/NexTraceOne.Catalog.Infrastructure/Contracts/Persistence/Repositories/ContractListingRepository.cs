@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de listagens do marketplace interno de contratos.
 /// Persiste e consulta publicações com metadados de descoberta e classificação.
 /// </summary>
-internal sealed class ContractListingRepository(ContractsDbContext context)
+internal sealed class ContractListingRepository(ServiceCatalogDbContext context)
     : IContractListingRepository
 {
     /// <inheritdoc />

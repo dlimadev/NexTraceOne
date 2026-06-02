@@ -1,12 +1,10 @@
-using NexTraceOne.Catalog.Application.DependencyGovernance.Ports;
-using NexTraceOne.Catalog.Domain.DependencyGovernance.Entities;
-using NexTraceOne.Catalog.Domain.DependencyGovernance.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 
-internal sealed class ServiceDependencyProfileRepository(DependencyGovernanceDbContext context) : IServiceDependencyProfileRepository
+internal sealed class ServiceDependencyProfileRepository(ServiceCatalogDbContext context) : IServiceDependencyProfileRepository
 {
     public async Task<ServiceDependencyProfile?> FindByServiceIdAsync(Guid serviceId, CancellationToken ct)
         => await context.ServiceDependencyProfiles

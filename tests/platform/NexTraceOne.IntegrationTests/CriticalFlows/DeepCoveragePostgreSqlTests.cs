@@ -29,7 +29,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateCatalogGraphDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var serviceA = ServiceAsset.Create("payments-service", "finance", "team-payments", Guid.NewGuid());
         serviceA.UpdateDetails(
@@ -88,7 +88,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateCatalogGraphDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var ownerService = ServiceAsset.Create("orders-api-service", "commerce", "team-commerce", Guid.NewGuid());
         var api = ApiAsset.Register("Orders API", "/api/v1/orders", "1.0.0", "internal", ownerService);
@@ -123,7 +123,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateContractsDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var versionResult = ContractVersion.Import(
             apiAssetId: Guid.NewGuid(),
@@ -183,7 +183,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateContractsDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var versionResult = ContractVersion.Import(
             apiAssetId: Guid.NewGuid(),

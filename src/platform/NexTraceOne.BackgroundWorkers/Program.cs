@@ -19,12 +19,7 @@ using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.API;
 
 // Module infrastructure registrations for cross-module outbox processing
-using NexTraceOne.Catalog.API.Graph.Endpoints;
-using NexTraceOne.Catalog.API.Contracts.Endpoints;
-using NexTraceOne.Catalog.API.Portal.Endpoints;
-using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
-using NexTraceOne.Catalog.API.Templates;
-using NexTraceOne.Catalog.API.DependencyGovernance;
+using NexTraceOne.Catalog.API;
 using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AuditCompliance.API.Endpoints;
@@ -36,12 +31,7 @@ using NexTraceOne.Notifications.Infrastructure;
 using NexTraceOne.Configuration.Infrastructure;
 
 // DbContext types for outbox processor registration
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
-using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
@@ -78,12 +68,7 @@ builder.Services.AddIngestionMetrics(builder.Configuration);
 // Cada módulo registra seu DbContext, repositórios e serviços necessários
 // para que o outbox processor possa acessar as mensagens pendentes.
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
-builder.Services.AddCatalogGraphModule(builder.Configuration);
-builder.Services.AddContractsModule(builder.Configuration);
-builder.Services.AddDeveloperPortalModule(builder.Configuration);
-builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
-builder.Services.AddCatalogTemplatesModule(builder.Configuration);
-builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
+builder.Services.AddServiceCatalogModule(builder.Configuration);
 builder.Services.AddChangeGovernanceModule(builder.Configuration);
 builder.Services.AddAiHubModule(builder.Configuration);
 builder.Services.AddPlatformGovernanceModule(builder.Configuration);
@@ -130,21 +115,6 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<ProductAnalyticsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-legacy-assets",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<LegacyAssetsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-templates",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<TemplatesDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-dependency-governance",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<DependencyGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-telemetry-store",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
@@ -159,22 +129,12 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<ConfigurationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    // Catalog module DbContexts
+    // Catalog module (consolidated ServiceCatalogDbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-catalog-graph",
+        "outbox-processor-service-catalog",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [ModuleOutboxProcessorJob<CatalogGraphDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-contracts",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<ContractsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-developer-portal",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<DeveloperPortalDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+        args: [ModuleOutboxProcessorJob<ServiceCatalogDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     // ChangeGovernance module (consolidated DbContext)
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-change-governance",
@@ -292,13 +252,8 @@ builder.Services.AddSingleton<IExpirationHandler, EnvironmentAccessExpirationHan
 // Identity (database: nextraceone_identity)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IdentityDbContext>>();
 
-// Catalog (database: nextraceone_catalog)
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<CatalogGraphDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<ContractsDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<DeveloperPortalDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<LegacyAssetsDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<TemplatesDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<DependencyGovernanceDbContext>>();
+// Catalog (consolidated ServiceCatalogDbContext)
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<ServiceCatalogDbContext>>();
 
 // ChangeGovernance (consolidated DbContext)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ChangeGovernanceDbContext>>();

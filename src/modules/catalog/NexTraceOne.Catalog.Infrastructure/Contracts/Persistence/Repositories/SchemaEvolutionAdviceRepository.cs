@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de análises de evolução de schema de contratos.
 /// Persiste e consulta análises de compatibilidade entre versões de API Assets.
 /// </summary>
-internal sealed class SchemaEvolutionAdviceRepository(ContractsDbContext context)
+internal sealed class SchemaEvolutionAdviceRepository(ServiceCatalogDbContext context)
     : ISchemaEvolutionAdviceRepository
 {
     /// <inheritdoc />

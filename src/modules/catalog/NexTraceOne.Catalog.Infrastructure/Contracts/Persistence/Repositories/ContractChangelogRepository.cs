@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Implementação do repositório de ContractChangelog usando EF Core.
 /// </summary>
-internal sealed class ContractChangelogRepository(ContractsDbContext context)
+internal sealed class ContractChangelogRepository(ServiceCatalogDbContext context)
     : IContractChangelogRepository
 {
     public async Task<ContractChangelog?> GetByIdAsync(

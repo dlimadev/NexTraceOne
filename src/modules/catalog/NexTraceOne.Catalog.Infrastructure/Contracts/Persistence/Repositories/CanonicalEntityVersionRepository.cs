@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// <summary>
 /// Repositório de versões de entidades canónicas para histórico e diff.
 /// </summary>
-internal sealed class CanonicalEntityVersionRepository(ContractsDbContext context)
+internal sealed class CanonicalEntityVersionRepository(ServiceCatalogDbContext context)
     : ICanonicalEntityVersionRepository
 {
     /// <inheritdoc />

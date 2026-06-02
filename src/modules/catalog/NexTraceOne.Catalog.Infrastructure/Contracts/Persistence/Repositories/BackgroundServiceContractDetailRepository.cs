@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -11,7 +11,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Persiste e consulta BackgroundServiceContractDetail vinculados a ContractVersion
 /// com ContractType = BackgroundService.
 /// </summary>
-internal sealed class BackgroundServiceContractDetailRepository(ContractsDbContext context)
+internal sealed class BackgroundServiceContractDetailRepository(ServiceCatalogDbContext context)
     : RepositoryBase<BackgroundServiceContractDetail, BackgroundServiceContractDetailId>(context), IBackgroundServiceContractDetailRepository
 {
     /// <summary>Busca o BackgroundServiceContractDetail associado a uma versão de contrato.</summary>

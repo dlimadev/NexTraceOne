@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
-using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 
-internal sealed class CopybookRepository(LegacyAssetsDbContext context)
+internal sealed class CopybookRepository(ServiceCatalogDbContext context)
     : RepositoryBase<Copybook, CopybookId>(context), ICopybookRepository
 {
-    private readonly LegacyAssetsDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<Copybook?> GetByIdAsync(CopybookId id, CancellationToken ct = default)
         => await _context.Copybooks.SingleOrDefaultAsync(c => c.Id == id, ct);

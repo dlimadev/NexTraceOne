@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
@@ -11,7 +11,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Usa ServiceAssets, ApiAssets e ConsumerRelationships para mapear nós e arestas da topologia.
 /// Wave AR.1 — GetServiceTopologyHealthReport.
 /// </summary>
-internal sealed class EfServiceTopologyReader(CatalogGraphDbContext graphDb) : IServiceTopologyReader
+internal sealed class EfServiceTopologyReader(ServiceCatalogDbContext graphDb) : IServiceTopologyReader
 {
     public async Task<IReadOnlyList<IServiceTopologyReader.ServiceNodeEntry>> ListServiceNodesByTenantAsync(
         string tenantId, CancellationToken ct)

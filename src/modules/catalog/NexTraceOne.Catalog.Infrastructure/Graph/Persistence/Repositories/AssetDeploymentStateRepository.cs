@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de estados de deployment.
 /// </summary>
-internal sealed class AssetDeploymentStateRepository(CatalogGraphDbContext dbContext)
+internal sealed class AssetDeploymentStateRepository(ServiceCatalogDbContext dbContext)
     : IAssetDeploymentStateRepository
 {
     public Task<AssetDeploymentState?> GetByServiceAndEnvironmentAsync(

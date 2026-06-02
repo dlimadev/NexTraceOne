@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Implementação do repositório de ContractVerification usando EF Core.
 /// </summary>
-internal sealed class ContractVerificationRepository(ContractsDbContext context)
+internal sealed class ContractVerificationRepository(ServiceCatalogDbContext context)
     : IContractVerificationRepository
 {
     public async Task<ContractVerification?> GetByIdAsync(

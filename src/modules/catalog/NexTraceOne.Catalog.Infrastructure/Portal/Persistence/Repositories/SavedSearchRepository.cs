@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de pesquisas salvas, implementando persistência via EF Core.
 /// Suporta consultas por utilizador para gestão de pesquisas favoritas do catálogo.
 /// </summary>
-internal sealed class SavedSearchRepository(DeveloperPortalDbContext context) : ISavedSearchRepository
+internal sealed class SavedSearchRepository(ServiceCatalogDbContext context) : ISavedSearchRepository
 {
     /// <summary>Busca pesquisa salva por identificador único.</summary>
     public async Task<SavedSearch?> GetByIdAsync(SavedSearchId id, CancellationToken ct = default)

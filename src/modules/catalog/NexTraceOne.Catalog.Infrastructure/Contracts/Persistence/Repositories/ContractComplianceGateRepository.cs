@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
-using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Implementação do repositório de ContractComplianceGate usando EF Core.
 /// </summary>
-internal sealed class ContractComplianceGateRepository(ContractsDbContext context)
+internal sealed class ContractComplianceGateRepository(ServiceCatalogDbContext context)
     : IContractComplianceGateRepository
 {
     public async Task<ContractComplianceGate?> GetByIdAsync(

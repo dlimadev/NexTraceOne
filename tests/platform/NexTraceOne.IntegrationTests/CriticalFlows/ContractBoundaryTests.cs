@@ -58,7 +58,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await ResetStateAsync();
 
         // Arrange — criar serviço no Catalog
-        await using var catalogContext = Fixture.CreateCatalogGraphDbContext();
+        await using var catalogContext = Fixture.CreateServiceCatalogDbContext();
 
         var service = ServiceAsset.Create("reliability-boundary-svc", "platform", "team-platform", Guid.NewGuid());
         service.UpdateDetails(
@@ -207,7 +207,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await ResetStateAsync();
 
         // Arrange — criar serviço no Catalog
-        await using var catalogContext = Fixture.CreateCatalogGraphDbContext();
+        await using var catalogContext = Fixture.CreateServiceCatalogDbContext();
 
         var service = ServiceAsset.Create("ai-boundary-svc", "platform", "team-platform", Guid.NewGuid());
         service.UpdateDetails(
@@ -362,7 +362,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await governanceContext.SaveChangesAsync();
 
         // Arrange — criar ServiceAsset em Catalog referenciando o mesmo TeamName
-        await using var catalogContext = Fixture.CreateCatalogGraphDbContext();
+        await using var catalogContext = Fixture.CreateServiceCatalogDbContext();
 
         var service = ServiceAsset.Create(
             name: "payments-api-v3",

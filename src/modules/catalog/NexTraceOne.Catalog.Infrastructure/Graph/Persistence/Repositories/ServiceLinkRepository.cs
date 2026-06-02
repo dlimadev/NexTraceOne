@@ -1,12 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
-internal sealed class ServiceLinkRepository(CatalogGraphDbContext context) : IServiceLinkRepository
+internal sealed class ServiceLinkRepository(ServiceCatalogDbContext context) : IServiceLinkRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public async Task<ServiceLink?> GetByIdAsync(ServiceLinkId id, CancellationToken cancellationToken)
         => await _context.ServiceLinks.SingleOrDefaultAsync(l => l.Id == id, cancellationToken);

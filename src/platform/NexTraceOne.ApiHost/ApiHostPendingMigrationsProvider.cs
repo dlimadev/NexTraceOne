@@ -5,13 +5,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -34,7 +28,7 @@ using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 namespace NexTraceOne.ApiHost;
 
 /// <summary>
-/// Implementação de IPendingMigrationsProvider que consulta todos os 27 DbContexts
+/// Implementação de IPendingMigrationsProvider que consulta todos os 21 DbContexts
 /// registados no ApiHost para obter a lista de migrations pendentes.
 ///
 /// Esta classe reside no ApiHost (e não nos módulos) porque é o único ponto
@@ -55,13 +49,7 @@ internal sealed class ApiHostPendingMigrationsProvider(IServiceScopeFactory scop
         await CollectPendingAsync<BuildingBlocksDbContext>(sp, "BuildingBlocks", allPending, cancellationToken);
         await CollectPendingAsync<ConfigurationDbContext>(sp, "Configuration", allPending, cancellationToken);
         await CollectPendingAsync<IdentityDbContext>(sp, "Identity", allPending, cancellationToken);
-        await CollectPendingAsync<CatalogGraphDbContext>(sp, "CatalogGraph", allPending, cancellationToken);
-        await CollectPendingAsync<DeveloperPortalDbContext>(sp, "DeveloperPortal", allPending, cancellationToken);
-        await CollectPendingAsync<ContractsDbContext>(sp, "Contracts", allPending, cancellationToken);
-        await CollectPendingAsync<DeveloperExperienceDbContext>(sp, "DeveloperExperience", allPending, cancellationToken);
-        await CollectPendingAsync<LegacyAssetsDbContext>(sp, "LegacyAssets", allPending, cancellationToken);
-        await CollectPendingAsync<TemplatesDbContext>(sp, "Templates", allPending, cancellationToken);
-        await CollectPendingAsync<DependencyGovernanceDbContext>(sp, "DependencyGovernance", allPending, cancellationToken);
+        await CollectPendingAsync<ServiceCatalogDbContext>(sp, "ServiceCatalog", allPending, cancellationToken);
         await CollectPendingAsync<ChangeIntelligenceDbContext>(sp, "ChangeIntelligence", allPending, cancellationToken);
         await CollectPendingAsync<RulesetGovernanceDbContext>(sp, "RulesetGovernance", allPending, cancellationToken);
         await CollectPendingAsync<WorkflowDbContext>(sp, "Workflow", allPending, cancellationToken);

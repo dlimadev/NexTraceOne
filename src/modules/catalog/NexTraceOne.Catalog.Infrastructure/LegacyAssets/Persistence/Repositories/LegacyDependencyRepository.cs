@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
 using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositori
 /// <summary>
 /// Implementação EF Core do repositório de LegacyDependency.
 /// </summary>
-internal sealed class LegacyDependencyRepository(LegacyAssetsDbContext dbContext) : ILegacyDependencyRepository
+internal sealed class LegacyDependencyRepository(ServiceCatalogDbContext dbContext) : ILegacyDependencyRepository
 {
     public async Task<IReadOnlyList<LegacyDependency>> ListBySourceAsync(Guid sourceAssetId, CancellationToken ct)
         => await dbContext.LegacyDependencies

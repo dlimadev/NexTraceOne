@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de detalhes AsyncAPI de versões de contrato publicadas.
 /// Persiste e consulta EventContractDetail vinculados a ContractVersion com Protocol = AsyncApi.
 /// </summary>
-internal sealed class EventContractDetailRepository(ContractsDbContext context)
+internal sealed class EventContractDetailRepository(ServiceCatalogDbContext context)
     : RepositoryBase<EventContractDetail, EventContractDetailId>(context), IEventContractDetailRepository
 {
     /// <summary>Busca o EventContractDetail associado a uma versão de contrato.</summary>

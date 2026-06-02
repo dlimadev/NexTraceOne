@@ -5,7 +5,7 @@ using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Models;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
@@ -73,7 +73,7 @@ public sealed class ContractConsumerIngestionJob(
 
         try
         {
-            var graphDb = scope.ServiceProvider.GetRequiredService<CatalogGraphDbContext>();
+            var graphDb = scope.ServiceProvider.GetRequiredService<ServiceCatalogDbContext>();
             var consumerRepo = scope.ServiceProvider.GetRequiredService<IContractConsumerInventoryRepository>();
             var contractsUow = scope.ServiceProvider.GetRequiredService<IContractsUnitOfWork>();
             var observability = scope.ServiceProvider.GetRequiredService<IObservabilityProvider>();
@@ -125,7 +125,7 @@ public sealed class ContractConsumerIngestionJob(
     }
 
     private static async Task<List<AssetRouteEntry>> BuildAssetRouteTableAsync(
-        CatalogGraphDbContext graphDb, CancellationToken cancellationToken)
+        ServiceCatalogDbContext graphDb, CancellationToken cancellationToken)
     {
         return await graphDb.ApiAssets
             .AsNoTracking()

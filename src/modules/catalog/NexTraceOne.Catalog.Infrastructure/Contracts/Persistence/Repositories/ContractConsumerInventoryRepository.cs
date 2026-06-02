@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Repositório EF Core para inventário de consumidores reais de contratos. CC-04.
 /// </summary>
-internal sealed class ContractConsumerInventoryRepository(ContractsDbContext context)
+internal sealed class ContractConsumerInventoryRepository(ServiceCatalogDbContext context)
     : IContractConsumerInventoryRepository
 {
     public async Task<IReadOnlyList<ContractConsumerInventory>> ListByContractAsync(

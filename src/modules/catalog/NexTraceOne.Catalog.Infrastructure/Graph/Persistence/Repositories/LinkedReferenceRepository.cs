@@ -1,15 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
-using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
-using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
-internal sealed class LinkedReferenceRepository(CatalogGraphDbContext context)
+internal sealed class LinkedReferenceRepository(ServiceCatalogDbContext context)
     : RepositoryBase<LinkedReference, LinkedReferenceId>(context), ILinkedReferenceRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<LinkedReference?> GetByIdAsync(LinkedReferenceId id, CancellationToken ct = default)
         => await _context.LinkedReferences

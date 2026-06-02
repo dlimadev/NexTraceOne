@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 /// Repositório de registos de geração de código, implementando persistência via EF Core.
 /// Suporta consultas por API e por utilizador para trilha de auditoria de artefactos gerados.
 /// </summary>
-internal sealed class CodeGenerationRepository(DeveloperPortalDbContext context) : ICodeGenerationRepository
+internal sealed class CodeGenerationRepository(ServiceCatalogDbContext context) : ICodeGenerationRepository
 {
     /// <summary>Busca registo de geração por identificador único.</summary>
     public async Task<CodeGenerationRecord?> GetByIdAsync(CodeGenerationRecordId id, CancellationToken ct = default)

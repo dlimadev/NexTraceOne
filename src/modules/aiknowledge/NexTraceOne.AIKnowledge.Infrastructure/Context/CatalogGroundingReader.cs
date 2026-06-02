@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
 /// Implementação do leitor de contexto de serviços do Catálogo para grounding de IA.
-/// Acesso somente-leitura ao CatalogGraphDbContext.
+/// Acesso somente-leitura ao ServiceCatalogDbContext.
 /// </summary>
-public sealed class CatalogGroundingReader(CatalogGraphDbContext catalogDb) : ICatalogGroundingReader
+public sealed class CatalogGroundingReader(ServiceCatalogDbContext catalogDb) : ICatalogGroundingReader
 {
     public async Task<IReadOnlyList<ServiceGroundingContext>> FindServicesAsync(
         string? serviceId,

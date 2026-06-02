@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Repositório EF Core para propostas de breaking change. CC-06.
 /// </summary>
-internal sealed class BreakingChangeProposalRepository(ContractsDbContext context)
+internal sealed class BreakingChangeProposalRepository(ServiceCatalogDbContext context)
     : IBreakingChangeProposalRepository
 {
     public async Task AddAsync(BreakingChangeProposal proposal, CancellationToken ct)

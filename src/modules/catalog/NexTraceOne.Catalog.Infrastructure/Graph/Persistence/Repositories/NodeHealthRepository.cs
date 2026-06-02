@@ -1,8 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
-using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
@@ -10,10 +6,10 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 /// Repositório de registros de saúde/métricas de nós do grafo.
 /// Suporta consultas por overlay e por nó individual para alimentar overlays explicáveis.
 /// </summary>
-internal sealed class NodeHealthRepository(CatalogGraphDbContext context)
+internal sealed class NodeHealthRepository(ServiceCatalogDbContext context)
     : RepositoryBase<NodeHealthRecord, NodeHealthRecordId>(context), INodeHealthRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public async Task<IReadOnlyList<NodeHealthRecord>> GetLatestByOverlayAsync(
         OverlayMode overlayMode, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Services.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
@@ -12,14 +12,14 @@ namespace NexTraceOne.Catalog.Infrastructure.Services;
 /// Implementação EF Core de <see cref="IRetirementReadinessReader"/>.
 ///
 /// Agrega dados de prontidão para retirada de um serviço a partir de:
-/// - <see cref="CatalogGraphDbContext"/>: ServiceAssets, ApiAssets, ConsumerRelationships
-/// - <see cref="ContractsDbContext"/>: ContractVersions (por ApiAssetId)
+/// - <see cref="ServiceCatalogDbContext"/>: ServiceAssets, ApiAssets, ConsumerRelationships
+/// - <see cref="ServiceCatalogDbContext"/>: ContractVersions (por ApiAssetId)
 ///
 /// Wave AF.2 — GetServiceRetirementReadinessReport.
 /// </summary>
 internal sealed class EfRetirementReadinessReader(
-    CatalogGraphDbContext graphDbContext,
-    ContractsDbContext contractsDbContext) : IRetirementReadinessReader
+    ServiceCatalogDbContext graphDbContext,
+    ServiceCatalogDbContext contractsDbContext) : IRetirementReadinessReader
 {
     public async Task<RetirementReadinessData?> GetByServiceAsync(
         string tenantId, string serviceId, CancellationToken ct)

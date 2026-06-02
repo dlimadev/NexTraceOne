@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// <summary>
 /// Repositório de entidades canónicas com pesquisa por filtros e paginação.
 /// </summary>
-internal sealed class CanonicalEntityRepository(ContractsDbContext context)
+internal sealed class CanonicalEntityRepository(ServiceCatalogDbContext context)
     : ICanonicalEntityRepository
 {
     /// <inheritdoc />

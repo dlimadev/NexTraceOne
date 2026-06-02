@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório EF Core para snapshots analisados de schemas Protobuf.
 /// Wave H.1 — Protobuf Schema Analysis.
 /// </summary>
-internal sealed class ProtobufSchemaSnapshotRepository(ContractsDbContext context)
+internal sealed class ProtobufSchemaSnapshotRepository(ServiceCatalogDbContext context)
     : IProtobufSchemaSnapshotRepository
 {
     public void Add(ProtobufSchemaSnapshot snapshot)

@@ -4,19 +4,15 @@ using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
 /// Implementação do leitor de versões de contrato para grounding de IA.
-/// Acesso somente-leitura ao ContractsDbContext do módulo Catalog.
-/// Também acede ao CatalogGraphDbContext para navegar ServiceInterface → ContractBinding → ContractVersion.
+/// Acesso somente-leitura ao ServiceCatalogDbContext (consolidado: contracts + graph).
 /// </summary>
-public sealed class ContractGroundingReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext catalogDb) : IContractGroundingReader
+public sealed class ContractGroundingReader(ServiceCatalogDbContext catalogDb) : IContractGroundingReader
 {
     public async Task<IReadOnlyList<ContractGroundingContext>> FindContractVersionsAsync(
         Guid? contractVersionId,
@@ -25,7 +21,7 @@ public sealed class ContractGroundingReader(
         int maxResults,
         CancellationToken ct = default)
     {
-        var query = contractsDb.ContractVersions.AsNoTracking();
+        var query = catalogDb.ContractVersions.AsNoTracking();
 
         if (contractVersionId.HasValue)
             query = query.Where(cv => cv.Id == ContractVersionId.From(contractVersionId.Value));
@@ -72,7 +68,7 @@ public sealed class ContractGroundingReader(
         if (contractVersionIds.Count == 0)
             return [];
 
-        var versions = await contractsDb.ContractVersions
+        var versions = await catalogDb.ContractVersions
             .AsNoTracking()
             .Where(cv => contractVersionIds.Contains(cv.Id.Value))
             .OrderByDescending(cv => cv.CreatedAt)

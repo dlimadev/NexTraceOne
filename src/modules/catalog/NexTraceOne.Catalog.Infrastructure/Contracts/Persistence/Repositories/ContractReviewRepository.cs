@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de revisões de contrato do Contract Studio.
 /// Armazena o histórico de decisões de aprovação e rejeição para auditoria completa.
 /// </summary>
-internal sealed class ContractReviewRepository(ContractsDbContext context)
+internal sealed class ContractReviewRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ContractReview, ContractReviewId>(context), IContractReviewRepository
 {
     /// <summary>Lista revisões vinculadas a um draft, ordenadas por data de revisão.</summary>

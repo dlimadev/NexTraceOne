@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementação EF Core do repositório de DeprecationScheduleRecord.
 /// Wave AV.3 — ScheduleContractDeprecation.
 /// </summary>
-internal sealed class EfDeprecationScheduleRepository(ContractsDbContext context) : IDeprecationScheduleRepository
+internal sealed class EfDeprecationScheduleRepository(ServiceCatalogDbContext context) : IDeprecationScheduleRepository
 {
     public async Task<DeprecationScheduleRecord?> GetByContractIdAsync(
         Guid contractId, string tenantId, CancellationToken ct)

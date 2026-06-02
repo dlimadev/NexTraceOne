@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de scores de saúde de contratos.
 /// Persiste e consulta o score de saúde contínuo por API Asset.
 /// </summary>
-internal sealed class ContractHealthScoreRepository(ContractsDbContext context)
+internal sealed class ContractHealthScoreRepository(ServiceCatalogDbContext context)
     : IContractHealthScoreRepository
 {
     /// <inheritdoc />

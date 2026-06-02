@@ -1,4 +1,4 @@
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
@@ -10,12 +10,6 @@ using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
-using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -51,7 +45,7 @@ public static class WebApplicationExtensions
     /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
     /// and by independent DbContext per module (or sub-domain).
     ///
-    /// All 27 DbContexts are registered across 7 waves ordered by dependency priority.
+    /// All 21 DbContexts are registered across 7 waves ordered by dependency priority.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -97,20 +91,14 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations for all 27 DbContexts...");
+                "Applying pending database migrations for all 21 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
 
-            // Wave 2 — Catalog & Contracts (includes sub-domain contexts)
-            await MigrateContextAsync<CatalogGraphDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<ContractsDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<DeveloperExperienceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<LegacyAssetsDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<TemplatesDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<DependencyGovernanceDbContext>(migrationScope, pendingContexts);
+            // Wave 2 — Service Catalog (consolidated: graph, contracts, portal, dx, legacy, templates, dep-gov)
+            await MigrateContextAsync<ServiceCatalogDbContext>(migrationScope, pendingContexts);
 
             // Wave 3 — Change Governance & Operational Intelligence (includes sub-domain contexts)
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);
@@ -153,7 +141,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 27 DbContexts are up-to-date.");
+                    "No pending migrations found. All 21 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

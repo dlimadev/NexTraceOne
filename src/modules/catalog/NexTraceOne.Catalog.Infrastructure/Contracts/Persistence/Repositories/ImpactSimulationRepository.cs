@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de simulações de impacto de dependências entre serviços.
 /// Persiste e consulta cenários what-if com serviços afetados, consumidores, risco e mitigação.
 /// </summary>
-internal sealed class ImpactSimulationRepository(ContractsDbContext context)
+internal sealed class ImpactSimulationRepository(ServiceCatalogDbContext context)
     : IImpactSimulationRepository
 {
     /// <inheritdoc />

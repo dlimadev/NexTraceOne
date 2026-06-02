@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
-using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 
-internal sealed class ZosConnectBindingRepository(LegacyAssetsDbContext context)
+internal sealed class ZosConnectBindingRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ZosConnectBinding, ZosConnectBindingId>(context), IZosConnectBindingRepository
 {
-    private readonly LegacyAssetsDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<ZosConnectBinding?> GetByIdAsync(ZosConnectBindingId id, CancellationToken ct = default)
         => await _context.ZosConnectBindings.SingleOrDefaultAsync(b => b.Id == id, ct);

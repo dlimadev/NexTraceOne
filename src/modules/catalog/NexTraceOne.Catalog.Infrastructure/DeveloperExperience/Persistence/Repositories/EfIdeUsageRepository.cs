@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Rep
 /// Implementação EF Core do repositório de registos de uso IDE.
 /// Wave AK.1 — IDE Context API.
 /// </summary>
-internal sealed class EfIdeUsageRepository(DeveloperExperienceDbContext context) : IIDEUsageRepository
+internal sealed class EfIdeUsageRepository(ServiceCatalogDbContext context) : IIDEUsageRepository
 {
     public async Task AddAsync(IdeUsageRecord record, CancellationToken ct = default)
         => await context.IdeUsageRecords.AddAsync(record, ct);

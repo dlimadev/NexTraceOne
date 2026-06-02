@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
-using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 
-internal sealed class CobolProgramRepository(LegacyAssetsDbContext context)
+internal sealed class CobolProgramRepository(ServiceCatalogDbContext context)
     : RepositoryBase<CobolProgram, CobolProgramId>(context), ICobolProgramRepository
 {
-    private readonly LegacyAssetsDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<CobolProgram?> GetByIdAsync(CobolProgramId id, CancellationToken ct = default)
         => await _context.CobolPrograms.SingleOrDefaultAsync(p => p.Id == id, ct);

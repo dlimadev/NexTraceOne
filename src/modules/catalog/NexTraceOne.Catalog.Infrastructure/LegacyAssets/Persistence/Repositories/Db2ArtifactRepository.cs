@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
-using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 
-internal sealed class Db2ArtifactRepository(LegacyAssetsDbContext context)
+internal sealed class Db2ArtifactRepository(ServiceCatalogDbContext context)
     : RepositoryBase<Db2Artifact, Db2ArtifactId>(context), IDb2ArtifactRepository
 {
-    private readonly LegacyAssetsDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<Db2Artifact?> GetByIdAsync(Db2ArtifactId id, CancellationToken ct = default)
         => await _context.Db2Artifacts.SingleOrDefaultAsync(a => a.Id == id, ct);

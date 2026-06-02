@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Repositório de detalhes SOAP/WSDL de versões de contrato publicadas.
 /// Persiste e consulta SoapContractDetail vinculados a ContractVersion com Protocol = Wsdl.
 /// </summary>
-internal sealed class SoapContractDetailRepository(ContractsDbContext context)
+internal sealed class SoapContractDetailRepository(ServiceCatalogDbContext context)
     : RepositoryBase<SoapContractDetail, SoapContractDetailId>(context), ISoapContractDetailRepository
 {
     /// <summary>Busca o SoapContractDetail associado a uma versão de contrato.</summary>

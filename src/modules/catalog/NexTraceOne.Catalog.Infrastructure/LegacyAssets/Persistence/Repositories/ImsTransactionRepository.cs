@@ -1,14 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.LegacyAssets.Abstractions;
-using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 
-internal sealed class ImsTransactionRepository(LegacyAssetsDbContext context)
+internal sealed class ImsTransactionRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ImsTransaction, ImsTransactionId>(context), IImsTransactionRepository
 {
-    private readonly LegacyAssetsDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<ImsTransaction?> GetByIdAsync(ImsTransactionId id, CancellationToken ct = default)
         => await _context.ImsTransactions.SingleOrDefaultAsync(t => t.Id == id, ct);

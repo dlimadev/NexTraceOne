@@ -1,17 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>
-/// Implementação do repositório de vínculos de contrato usando CatalogGraphDbContext.
+/// Implementação do repositório de vínculos de contrato usando ServiceCatalogDbContext.
 /// </summary>
-internal sealed class ContractBindingRepository(CatalogGraphDbContext context)
+internal sealed class ContractBindingRepository(ServiceCatalogDbContext context)
     : RepositoryBase<ContractBinding, ContractBindingId>(context), IContractBindingRepository
 {
-    private readonly CatalogGraphDbContext _context = context;
+    private readonly ServiceCatalogDbContext _context = context;
 
     public override async Task<ContractBinding?> GetByIdAsync(ContractBindingId id, CancellationToken ct = default)
         => await _context.ContractBindings.SingleOrDefaultAsync(b => b.Id == id, ct);

@@ -11,7 +11,7 @@ using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.IdentityAccess.Infrastructure.Middleware;
 using NexTraceOne.ApiHost;
 using NexTraceOne.ApiHost.Options;
-using NexTraceOne.Catalog.API.Graph;
+using NexTraceOne.Catalog.API;
 using NexTraceOne.Catalog.API.GraphQL;
 using NexTraceOne.Governance.API;
 using NexTraceOne.Integrations.API.Endpoints;
@@ -26,13 +26,6 @@ using NexTraceOne.Knowledge.API.Endpoints;
 using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;
-using NexTraceOne.Catalog.API.Contracts.Endpoints;
-using NexTraceOne.Catalog.API.DeveloperExperience.Endpoints;
-using NexTraceOne.Catalog.API.Graph.Endpoints;
-using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
-using NexTraceOne.Catalog.API.Portal.Endpoints;
-using NexTraceOne.Catalog.API.Templates;
-using NexTraceOne.Catalog.API.DependencyGovernance;
 using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.ChangeGovernance.API.GraphQL;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
@@ -114,14 +107,8 @@ builder.Services.AddSingleton<NexTraceOne.ApiHost.OnPrem.DatabaseHealthService>(
 
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddCatalogGraphModule(builder.Configuration);
-builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
-builder.Services.AddContractsModule(builder.Configuration);
+builder.Services.AddServiceCatalogModule(builder.Configuration);
 builder.Services.AddChangeGovernanceModule(builder.Configuration);
-builder.Services.AddDeveloperPortalModule(builder.Configuration);
-builder.Services.AddDeveloperExperienceModule(builder.Configuration);
-builder.Services.AddCatalogTemplatesModule(builder.Configuration);
-builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
 builder.Services.AddCatalogGraphQL(
         includeExceptionDetails: builder.Environment.IsDevelopment(),
         enableIntrospection: !builder.Environment.IsProduction())

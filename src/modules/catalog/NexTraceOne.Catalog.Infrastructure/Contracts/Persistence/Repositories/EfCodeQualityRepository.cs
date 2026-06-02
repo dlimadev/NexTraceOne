@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 /// Implementação EF Core do repositório de CodeQualityRecord.
 /// Wave AQ.2 — Code Quality &amp; Static Analysis Intelligence.
 /// </summary>
-internal sealed class EfCodeQualityRepository(ContractsDbContext context) : ICodeQualityRepository
+internal sealed class EfCodeQualityRepository(ServiceCatalogDbContext context) : ICodeQualityRepository
 {
     public async Task AddAsync(CodeQualityRecord record, CancellationToken ct)
         => await context.CodeQualityRecords.AddAsync(record, ct);

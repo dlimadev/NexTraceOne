@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
-using NexTraceOne.Catalog.Domain.DeveloperExperience.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para DxScore.</summary>
-internal sealed class DxScoreRepository(CatalogGraphDbContext context) : IDxScoreRepository
+internal sealed class DxScoreRepository(ServiceCatalogDbContext context) : IDxScoreRepository
 {
     public async Task<DxScore?> GetByTeamAsync(string teamId, string period, CancellationToken ct)
         => await context.DxScores

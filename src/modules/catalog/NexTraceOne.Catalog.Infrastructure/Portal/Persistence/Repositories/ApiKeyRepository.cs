@@ -1,10 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Portal.Abstractions;
-using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 
-internal sealed class ApiKeyRepository(DeveloperPortalDbContext context) : IApiKeyRepository
+internal sealed class ApiKeyRepository(ServiceCatalogDbContext context) : IApiKeyRepository
 {
     public async Task<ApiKey?> GetByIdAsync(ApiKeyId id, CancellationToken ct = default)
         => await context.ApiKeys.SingleOrDefaultAsync(k => k.Id == id, ct);

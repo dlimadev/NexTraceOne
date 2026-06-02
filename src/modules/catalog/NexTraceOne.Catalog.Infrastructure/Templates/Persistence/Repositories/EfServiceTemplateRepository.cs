@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.Catalog.Application.Templates.Abstractions;
 using NexTraceOne.Catalog.Domain.Templates.Entities;
@@ -12,7 +12,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Repositories;
 /// Cada método de escrita chama SaveChangesAsync — padrão de repositório auto-commit
 /// utilizado quando o handler não injeta IUnitOfWork explicitamente.
 /// </summary>
-internal sealed class EfServiceTemplateRepository(TemplatesDbContext context) : IServiceTemplateRepository
+internal sealed class EfServiceTemplateRepository(ServiceCatalogDbContext context) : IServiceTemplateRepository
 {
     /// <inheritdoc />
     public async Task<ServiceTemplate?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

@@ -1,13 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de execuções de discovery.
 /// </summary>
-internal sealed class DiscoveryRunRepository(CatalogGraphDbContext dbContext) : IDiscoveryRunRepository
+internal sealed class DiscoveryRunRepository(ServiceCatalogDbContext dbContext) : IDiscoveryRunRepository
 {
     public async Task<DiscoveryRun?> GetByIdAsync(DiscoveryRunId id, CancellationToken cancellationToken)
         => await dbContext.DiscoveryRuns

@@ -1,22 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
 /// <summary>
 /// Implementação real de IDependencyVersionAlignmentReader.
-/// Cruza SbomRecords (ContractsDbContext) com ServiceAssets (CatalogGraphDbContext) para reportar
+/// Cruza SbomRecords (ServiceCatalogDbContext) com ServiceAssets (ServiceCatalogDbContext) para reportar
 /// alinhamento de versões de componentes por serviço. Quando não há SbomRecords, usa
-/// DependencyGovernanceDbContext como fallback.
+/// ServiceCatalogDbContext como fallback.
 /// Substitui o NullDependencyVersionAlignmentReader (honest-null pattern).
 /// </summary>
 internal sealed class EfDependencyVersionAlignmentReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb,
-    DependencyGovernanceDbContext depDb) : IDependencyVersionAlignmentReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb,
+    ServiceCatalogDbContext depDb) : IDependencyVersionAlignmentReader
 {
     public async Task<IReadOnlyList<IDependencyVersionAlignmentReader.ComponentVersionEntry>> ListComponentVersionsByTenantAsync(
         string tenantId,
@@ -70,7 +66,7 @@ internal sealed class EfDependencyVersionAlignmentReader(
             return result;
         }
 
-        // Fallback: DependencyGovernanceDbContext
+        // Fallback: ServiceCatalogDbContext
         var serviceGuids = services.Select(s => s.Id.Value).ToHashSet();
 
         var profiles = await depDb.ServiceDependencyProfiles
