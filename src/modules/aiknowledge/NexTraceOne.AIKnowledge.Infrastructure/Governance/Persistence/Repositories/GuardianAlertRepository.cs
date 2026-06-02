@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
