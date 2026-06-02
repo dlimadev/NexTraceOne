@@ -296,6 +296,9 @@ jobs:
       - name: Restore
         run: dotnet restore NexTraceOne.sln
 
+      - name: Build ApiHost
+        run: dotnet build --configuration Release --no-restore src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj
+
       - name: Start ApiHost in background
         run: |
           nohup dotnet run --configuration Release --no-restore \

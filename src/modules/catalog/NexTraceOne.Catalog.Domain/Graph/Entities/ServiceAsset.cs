@@ -169,8 +169,8 @@ public sealed class ServiceAsset : AuditableEntity<ServiceAssetId>
         Criticality criticality,
         LifecycleStatus lifecycleStatus,
         ExposureType exposureType,
-        string documentationUrl,
-        string repositoryUrl)
+        string? documentationUrl,
+        string? repositoryUrl)
     {
         DisplayName = displayName ?? string.Empty;
         Description = description ?? string.Empty;
