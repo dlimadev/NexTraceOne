@@ -44,6 +44,12 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         ("ai-orchestration", "rh6_it_ai_orchestration"),
         ("governance", "rh6_it_governance"),
         ("audit", "rh6_it_audit"),
+        ("integrations", "rh6_it_integrations"),
+        ("product-analytics", "rh6_it_product_analytics"),
+        ("configuration", "rh6_it_configuration"),
+        ("knowledge", "rh6_it_knowledge"),
+        ("notifications", "rh6_it_notifications"),
+        ("telemetry", "rh6_it_telemetry"),
     ];
 
     public const string SeedAdminEmail = "admin@nextraceone.dev";
@@ -164,11 +170,18 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         var aiOrchestration = _connectionStrings["ai-orchestration"];
         var governance = _connectionStrings["governance"];
         var audit = _connectionStrings["audit"];
+        var integrations = _connectionStrings["integrations"];
+        var productAnalytics = _connectionStrings["product-analytics"];
+        var configuration = _connectionStrings["configuration"];
+        var knowledge = _connectionStrings["knowledge"];
+        var notifications = _connectionStrings["notifications"];
+        var telemetry = _connectionStrings["telemetry"];
 
         return new Dictionary<string, string?>
         {
             ["ConnectionStrings:NexTraceOne"] = catalog,
             ["ConnectionStrings:IdentityDatabase"] = identity,
+            ["ConnectionStrings:ServiceCatalogDatabase"] = catalog,
             ["ConnectionStrings:CatalogDatabase"] = catalog,
             ["ConnectionStrings:ContractsDatabase"] = catalog,
             ["ConnectionStrings:DeveloperPortalDatabase"] = catalog,
@@ -181,6 +194,8 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
             // Consolidated Phase 3 key (replaces Incident/Reliability/Automation/RuntimeIntelligence)
             ["ConnectionStrings:IncidentResponseDatabase"] = incidents,
             ["ConnectionStrings:IncidentDatabase"] = incidents,
+            ["ConnectionStrings:ReliabilityDatabase"] = incidents,
+            ["ConnectionStrings:AutomationDatabase"] = incidents,
             ["ConnectionStrings:CostIntelligenceDatabase"] = cost,
             ["ConnectionStrings:RuntimeIntelligenceDatabase"] = runtime,
             ["ConnectionStrings:AuditDatabase"] = audit,
@@ -190,6 +205,12 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
             ["ConnectionStrings:ExternalAiDatabase"] = externalAi,
             ["ConnectionStrings:AiOrchestrationDatabase"] = aiOrchestration,
             ["ConnectionStrings:GovernanceDatabase"] = governance,
+            ["ConnectionStrings:IntegrationsDatabase"] = integrations,
+            ["ConnectionStrings:ProductAnalyticsDatabase"] = productAnalytics,
+            ["ConnectionStrings:ConfigurationDatabase"] = configuration,
+            ["ConnectionStrings:KnowledgeDatabase"] = knowledge,
+            ["ConnectionStrings:NotificationsDatabase"] = notifications,
+            ["ConnectionStrings:TelemetryStoreDatabase"] = telemetry,
         };
     }
 
