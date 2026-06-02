@@ -29,6 +29,7 @@ using NexTraceOne.Catalog.Infrastructure.Contracts.EventHandlers;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Services;
 using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.External;
+using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Graph.EventHandlers;

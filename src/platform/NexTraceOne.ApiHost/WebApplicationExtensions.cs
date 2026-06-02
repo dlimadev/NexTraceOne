@@ -1,7 +1,6 @@
 using NexTraceOne.Catalog.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Diagnostics;
@@ -10,10 +9,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
@@ -21,9 +17,7 @@ using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using System.Diagnostics;
 
@@ -45,7 +39,7 @@ public static class WebApplicationExtensions
     /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
     /// and by independent DbContext per module (or sub-domain).
     ///
-    /// All 21 DbContexts are registered across 7 waves ordered by dependency priority.
+    /// All 16 DbContexts are registered across 7 waves ordered by dependency priority.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -91,7 +85,7 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations for all 21 DbContexts...");
+                "Applying pending database migrations for all 16 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
@@ -100,16 +94,10 @@ public static class WebApplicationExtensions
             // Wave 2 — Service Catalog (consolidated: graph, contracts, portal, dx, legacy, templates, dep-gov)
             await MigrateContextAsync<ServiceCatalogDbContext>(migrationScope, pendingContexts);
 
-            // Wave 3 — Change Governance & Operational Intelligence (includes sub-domain contexts)
-            await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<RulesetGovernanceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<WorkflowDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<PromotionDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<RuntimeIntelligenceDbContext>(migrationScope, pendingContexts);
+            // Wave 3 — Change Governance & Operational Intelligence (consolidated)
+            await MigrateContextAsync<ChangeGovernanceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<IncidentResponseDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<ReliabilityDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<AutomationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<TelemetryStoreDbContext>(migrationScope, pendingContexts);
 
             // Wave 4 — Audit & Governance
@@ -141,7 +129,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 21 DbContexts are up-to-date.");
+                    "No pending migrations found. All 16 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

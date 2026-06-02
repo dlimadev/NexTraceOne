@@ -13,6 +13,7 @@ using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
@@ -20,6 +21,7 @@ using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 
 namespace NexTraceOne.IntegrationTests.Infrastructure;
@@ -33,9 +35,8 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// Fallback: Se Docker não estiver disponível, os testes são automaticamente ignorados com Skip.
 ///
 /// nextrace_it_identity   → IdentityDbContext, AuditDbContext
-/// nextrace_it_catalog    → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext
-/// nextrace_it_operations → ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext,
-///                          RulesetGovernanceDbContext, IncidentDbContext, RuntimeIntelligenceDbContext,
+/// nextrace_it_catalog    → ServiceCatalogDbContext
+/// nextrace_it_operations → ChangeGovernanceDbContext, IncidentResponseDbContext,
 ///                          CostIntelligenceDbContext, GovernanceDbContext
 /// nextrace_it_ai         → AiGovernanceDbContext, ExternalAiDbContext, AiOrchestrationDbContext
 /// </summary>
@@ -151,9 +152,9 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         return new ServiceCatalogDbContext(BuildOptions<ServiceCatalogDbContext>(CatalogConnectionString), _tenant, _user, _clock);
     }
 
-    public ChangeIntelligenceDbContext CreateChangeIntelligenceDbContext()
+    public ChangeGovernanceDbContext CreateChangeGovernanceDbContext()
     {
-        return new ChangeIntelligenceDbContext(BuildOptions<ChangeIntelligenceDbContext>(ChangeGovernanceConnectionString), _tenant, _user, _clock);
+        return new ChangeGovernanceDbContext(BuildOptions<ChangeGovernanceDbContext>(ChangeGovernanceConnectionString), _tenant, _user, _clock);
     }
 
     public IdentityDbContext CreateIdentityDbContext()
@@ -161,35 +162,34 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         return new IdentityDbContext(BuildOptions<IdentityDbContext>(IdentityConnectionString), _tenant, _user, _clock);
     }
 
-    public IncidentDbContext CreateIncidentDbContext()
+    public IncidentResponseDbContext CreateIncidentResponseDbContext()
     {
-        return new IncidentDbContext(BuildOptions<IncidentDbContext>(IncidentsConnectionString), _tenant, _user, _clock);
+        return new IncidentResponseDbContext(BuildOptions<IncidentResponseDbContext>(IncidentsConnectionString), _tenant, _user, _clock);
     }
 
-    // ── DbContext factories — Change Governance extensions ───────────────────
+    // ── DbContext factories — Change Governance sub-contexts (backward-compat aliases) ──
+
+    public ChangeIntelligenceDbContext CreateChangeIntelligenceDbContext()
+        => new(BuildOptions<ChangeIntelligenceDbContext>(ChangeGovernanceConnectionString), _tenant, _user, _clock);
 
     public WorkflowDbContext CreateWorkflowDbContext()
-    {
-        return new WorkflowDbContext(BuildOptions<WorkflowDbContext>(WorkflowConnectionString), _tenant, _user, _clock);
-    }
+        => new(BuildOptions<WorkflowDbContext>(WorkflowConnectionString), _tenant, _user, _clock);
 
     public PromotionDbContext CreatePromotionDbContext()
-    {
-        return new PromotionDbContext(BuildOptions<PromotionDbContext>(PromotionConnectionString), _tenant, _user, _clock);
-    }
+        => new(BuildOptions<PromotionDbContext>(PromotionConnectionString), _tenant, _user, _clock);
 
     public RulesetGovernanceDbContext CreateRulesetGovernanceDbContext()
-    {
-        return new RulesetGovernanceDbContext(BuildOptions<RulesetGovernanceDbContext>(RulesetGovernanceConnectionString), _tenant, _user, _clock);
-    }
+        => new(BuildOptions<RulesetGovernanceDbContext>(RulesetGovernanceConnectionString), _tenant, _user, _clock);
 
+    // ── DbContext factories — OperationalIntelligence sub-contexts (backward-compat aliases) ──
 
-    // ── DbContext factories — OperationalIntelligence extensions ─────────────
+    public IncidentDbContext CreateIncidentDbContext()
+        => new(BuildOptions<IncidentDbContext>(IncidentsConnectionString), _tenant, _user, _clock);
 
     public RuntimeIntelligenceDbContext CreateRuntimeIntelligenceDbContext()
-    {
-        return new RuntimeIntelligenceDbContext(BuildOptions<RuntimeIntelligenceDbContext>(RuntimeIntelligenceConnectionString), _tenant, _user, _clock);
-    }
+        => new(BuildOptions<RuntimeIntelligenceDbContext>(RuntimeIntelligenceConnectionString), _tenant, _user, _clock);
+
+    // ── DbContext factories — OperationalIntelligence extensions ─────────────
 
     public CostIntelligenceDbContext CreateCostIntelligenceDbContext()
     {
@@ -351,28 +351,16 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         await catalogContext.Database.MigrateAsync();
 
         // ── Change Governance database ───────────────────────────────────────
-        await using var changeIntelligenceContext = CreateChangeIntelligenceDbContext();
-        await changeIntelligenceContext.Database.MigrateAsync();
-
-        await using var workflowContext = CreateWorkflowDbContext();
-        await workflowContext.Database.MigrateAsync();
-
-        await using var promotionContext = CreatePromotionDbContext();
-        await promotionContext.Database.MigrateAsync();
-
-        await using var rulesetContext = CreateRulesetGovernanceDbContext();
-        await rulesetContext.Database.MigrateAsync();
+        await using var changeGovernanceContext = CreateChangeGovernanceDbContext();
+        await changeGovernanceContext.Database.MigrateAsync();
 
         // ── Identity database ────────────────────────────────────────────────
         await using var identityContext = CreateIdentityDbContext();
         await identityContext.Database.MigrateAsync();
 
         // ── Operations database (ChangeGov + OI + Governance) ────────────────
-        await using var incidentsContext = CreateIncidentDbContext();
+        await using var incidentsContext = CreateIncidentResponseDbContext();
         await incidentsContext.Database.MigrateAsync();
-
-        await using var runtimeContext = CreateRuntimeIntelligenceDbContext();
-        await runtimeContext.Database.MigrateAsync();
 
         await using var costContext = CreateCostIntelligenceDbContext();
         await costContext.Database.MigrateAsync();

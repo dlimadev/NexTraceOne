@@ -20,9 +20,9 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.SemanticKernel;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.VectorStore;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 
@@ -182,10 +182,10 @@ public static class DependencyInjection
         // using the same connection string as the owning module.
         RegisterCrossModuleContextIfNeeded<ServiceCatalogDbContext>(
             services, configuration, "ServiceCatalogDatabase");
-        RegisterCrossModuleContextIfNeeded<ChangeIntelligenceDbContext>(
-            services, configuration, "ChangeIntelligenceDatabase");
-        RegisterCrossModuleContextIfNeeded<IncidentDbContext>(
-            services, configuration, "IncidentDatabase");
+        RegisterCrossModuleContextIfNeeded<ChangeGovernanceDbContext>(
+            services, configuration, "ChangeGovernanceDatabase");
+        RegisterCrossModuleContextIfNeeded<IncidentResponseDbContext>(
+            services, configuration, "IncidentResponseDatabase");
         RegisterCrossModuleContextIfNeeded<KnowledgeDbContext>(
             services, configuration, "KnowledgeDatabase");
 
