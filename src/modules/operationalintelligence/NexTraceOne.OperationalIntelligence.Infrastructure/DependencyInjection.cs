@@ -12,7 +12,6 @@ using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
-using NexTraceOne.OperationalIntelligence.Application.FinOps.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Services;
@@ -127,7 +126,6 @@ public static class DependencyInjection
         services.AddScoped<IPlaybookExecutionRepository, PlaybookExecutionRepository>();
         services.AddScoped<IResilienceReportRepository, ResilienceReportRepository>();
         services.AddScoped<IProfilingSessionRepository, ProfilingSessionRepository>();
-        services.AddScoped<IServiceCostAllocationRepository, ServiceCostAllocationRepository>();
         services.AddScoped<ISloObservationRepository, SloObservationRepository>();
         services.AddScoped<IActiveServiceNamesReader, NullActiveServiceNamesReader>();
         services.AddScoped<ITeamOperationalMetricsReader, NullTeamOperationalMetricsReader>();

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 
 namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Infrastructure;
@@ -179,20 +179,20 @@ public sealed class ChangeIntelligenceModuleTests
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static ChangeIntelligenceDbContext CreateDbContext()
+    private static ChangeGovernanceDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ChangeIntelligenceDbContext>()
+        var options = new DbContextOptionsBuilder<ChangeGovernanceDbContext>()
             .UseInMemoryDatabase($"chg-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new ChangeIntelligenceDbContext(
+        return new ChangeGovernanceDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IChangeIntelligenceModule CreateSut(ChangeIntelligenceDbContext db)
+    private static IChangeIntelligenceModule CreateSut(ChangeGovernanceDbContext db)
         => new ChangeIntelligenceModule(db, NullLogger<ChangeIntelligenceModule>.Instance);
 
     private sealed class TestCurrentTenant : ICurrentTenant

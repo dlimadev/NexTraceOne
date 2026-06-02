@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
-using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Services;
 
 namespace NexTraceOne.ChangeGovernance.Tests.RulesetGovernance.Infrastructure;
@@ -127,20 +127,20 @@ public sealed class RulesetGovernanceModuleServiceTests
 
     // ── Helpers ─────────────────────────────────────────────────────────────
 
-    private static RulesetGovernanceDbContext CreateDbContext()
+    private static ChangeGovernanceDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<RulesetGovernanceDbContext>()
+        var options = new DbContextOptionsBuilder<ChangeGovernanceDbContext>()
             .UseInMemoryDatabase($"rg-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new RulesetGovernanceDbContext(
+        return new ChangeGovernanceDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IRulesetGovernanceModule CreateSut(RulesetGovernanceDbContext db)
+    private static IRulesetGovernanceModule CreateSut(ChangeGovernanceDbContext db)
         => new RulesetGovernanceModuleService(db, NullLogger<RulesetGovernanceModuleService>.Instance);
 
     private sealed class TestCurrentTenant : ICurrentTenant

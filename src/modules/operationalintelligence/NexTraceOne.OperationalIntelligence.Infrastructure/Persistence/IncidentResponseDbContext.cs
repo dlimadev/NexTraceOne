@@ -6,7 +6,6 @@ using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
-using NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
@@ -70,7 +69,6 @@ public sealed class IncidentResponseDbContext(
     public DbSet<PlaybookExecution> PlaybookExecutions => Set<PlaybookExecution>();
     public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
     public DbSet<ProfilingSession> ProfilingSessions => Set<ProfilingSession>();
-    public DbSet<ServiceCostAllocationRecord> ServiceCostAllocations => Set<ServiceCostAllocationRecord>();
     public DbSet<SloObservation> SloObservations => Set<SloObservation>();
 
     /// <inheritdoc />
