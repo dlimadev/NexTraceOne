@@ -20,6 +20,7 @@ using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterface
 using NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.Workflow.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;

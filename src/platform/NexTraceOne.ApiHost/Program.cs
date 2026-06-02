@@ -118,7 +118,6 @@ builder.Services.AddCatalogGraphModule(builder.Configuration);
 builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
 builder.Services.AddChangeGovernanceModule(builder.Configuration);
-builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddDeveloperExperienceModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
@@ -127,7 +126,7 @@ builder.Services.AddCatalogGraphQL(
         includeExceptionDetails: builder.Environment.IsDevelopment(),
         enableIntrospection: !builder.Environment.IsProduction())
     .AddChangeGovernanceQueryExtension();
-builder.Services.AddGovernanceModule(builder.Configuration);
+builder.Services.AddPlatformGovernanceModule(builder.Configuration);
 builder.Services.AddIntegrationsModule(builder.Configuration);
 builder.Services.AddProductAnalyticsModule(builder.Configuration);
 builder.Services.AddIncidentResponseModule(builder.Configuration);
