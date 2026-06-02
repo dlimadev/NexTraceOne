@@ -172,14 +172,20 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
             ["ConnectionStrings:CatalogDatabase"] = catalog,
             ["ConnectionStrings:ContractsDatabase"] = catalog,
             ["ConnectionStrings:DeveloperPortalDatabase"] = catalog,
+            // Consolidated Phase 2 key (replaces ChangeIntelligence/Workflow/Ruleset/Promotion)
+            ["ConnectionStrings:ChangeGovernanceDatabase"] = changeGov,
             ["ConnectionStrings:ChangeIntelligenceDatabase"] = changeGov,
             ["ConnectionStrings:WorkflowDatabase"] = changeGov,
             ["ConnectionStrings:RulesetGovernanceDatabase"] = changeGov,
             ["ConnectionStrings:PromotionDatabase"] = changeGov,
+            // Consolidated Phase 3 key (replaces Incident/Reliability/Automation/RuntimeIntelligence)
+            ["ConnectionStrings:IncidentResponseDatabase"] = incidents,
             ["ConnectionStrings:IncidentDatabase"] = incidents,
             ["ConnectionStrings:CostIntelligenceDatabase"] = cost,
             ["ConnectionStrings:RuntimeIntelligenceDatabase"] = runtime,
             ["ConnectionStrings:AuditDatabase"] = audit,
+            // Consolidated Phase 1 key (replaces AiGovernance/ExternalAi/AiOrchestration)
+            ["ConnectionStrings:AiHubDatabase"] = aiKnowledge,
             ["ConnectionStrings:AiGovernanceDatabase"] = aiKnowledge,
             ["ConnectionStrings:ExternalAiDatabase"] = externalAi,
             ["ConnectionStrings:AiOrchestrationDatabase"] = aiOrchestration,
