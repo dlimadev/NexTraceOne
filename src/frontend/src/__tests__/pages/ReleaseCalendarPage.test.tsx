@@ -49,14 +49,14 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
 describe('ReleaseCalendarPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(changeIntelligenceApi.getReleaseCalendar).mockResolvedValue({ releases: [], totalCount: 0 });
+    vi.mocked(changeIntelligenceApi.getReleaseCalendar).mockResolvedValue({ releases: [], freezeWindows: [], dailySummary: [] });
     vi.mocked(changeIntelligenceApi.listFreezeWindows).mockResolvedValue({ windows: [], totalCount: 0 });
   });
 
   it('renders page title', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Release Calendar')).toBeDefined();
+      expect(screen.getByText('Release Calendar & Window Gate')).toBeDefined();
     });
   });
 
@@ -80,7 +80,8 @@ describe('ReleaseCalendarPage', () => {
           changeCount: 3,
         },
       ],
-      totalCount: 1,
+      freezeWindows: [],
+      dailySummary: [],
     });
     renderPage();
     await waitFor(() => {
