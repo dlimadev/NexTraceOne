@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para SetupWizardStep (F-04).</summary>
-internal sealed class SetupWizardRepository(GovernanceDbContext db) : ISetupWizardRepository
+internal sealed class SetupWizardRepository(PlatformGovernanceDbContext db) : ISetupWizardRepository
 {
     public async Task<IReadOnlyList<SetupWizardStep>> ListByTenantAsync(
         string tenantId, CancellationToken ct = default)

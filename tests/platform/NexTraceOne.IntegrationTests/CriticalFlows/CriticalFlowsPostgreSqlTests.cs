@@ -44,7 +44,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateCatalogGraphDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var service = ServiceAsset.Create("orders-service", "sales", "team-orders", Guid.NewGuid());
         service.UpdateDetails(
@@ -85,7 +85,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateContractsDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var versionResult = ContractVersion.Import(
             apiAssetId: Guid.NewGuid(),

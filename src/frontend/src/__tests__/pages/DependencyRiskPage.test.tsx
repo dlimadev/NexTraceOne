@@ -87,7 +87,7 @@ describe('DependencyRiskPage', () => {
   it('renders page title', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Dependency Risk Scoring')).toBeTruthy();
+      expect(screen.getByText('Dependency Risk Report')).toBeTruthy();
     });
   });
 

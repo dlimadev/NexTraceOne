@@ -151,8 +151,8 @@ export function IngestionFreshnessPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={t('integrations.ingestion.freshness.title')}
-        subtitle={t('integrations.ingestion.freshness.subtitle')}
+        title={t('integrations.freshnessTitle')}
+        subtitle={t('integrations.freshnessSubtitle')}
         icon={<RefreshCw />}
       />
 

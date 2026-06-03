@@ -4,7 +4,7 @@ using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
-internal sealed class ChangeCostImpactRepository(GovernanceDbContext context)
+internal sealed class ChangeCostImpactRepository(PlatformGovernanceDbContext context)
     : IChangeCostImpactRepository
 {
     public async Task<ChangeCostImpact?> GetByIdAsync(

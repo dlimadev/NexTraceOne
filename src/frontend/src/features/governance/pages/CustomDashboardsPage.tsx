@@ -637,6 +637,7 @@ export function CustomDashboardsPage() {
             {(['name', 'persona', 'widgetCount', 'createdAt'] as const).map((field) => (
               <button
                 key={field}
+                aria-pressed={sortBy === field}
                 onClick={() => {
                   if (sortBy === field) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
                   else { setSortBy(field); setSortDir('asc'); }

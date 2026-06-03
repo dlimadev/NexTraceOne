@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Contracts.Automation.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Services;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Services
 /// sem permitir acesso directo ao DbContext ou repositórios internos.
 /// Leituras apenas — sem tracking para melhor performance.
 /// </summary>
-internal sealed class AutomationModuleService(AutomationDbContext context) : IAutomationModule
+internal sealed class AutomationModuleService(IncidentResponseDbContext context) : IAutomationModule
 {
     /// <summary>
     /// Statuses considered as "terminal" — workflows in these states are no longer active.
@@ -44,7 +44,7 @@ internal sealed class AutomationModuleService(AutomationDbContext context) : IAu
 
         var typedId = new Domain.Automation.Entities.AutomationWorkflowRecordId(guid);
 
-        var workflow = await context.Workflows
+        var workflow = await context.AutomationWorkflows
             .AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == typedId, cancellationToken);
 
@@ -55,7 +55,7 @@ internal sealed class AutomationModuleService(AutomationDbContext context) : IAu
     public async Task<IReadOnlyList<AutomationWorkflowSummary>> GetActiveWorkflowsAsync(
         string serviceName, CancellationToken cancellationToken = default)
     {
-        var workflows = await context.Workflows
+        var workflows = await context.AutomationWorkflows
             .AsNoTracking()
             .Where(w => w.ServiceId == serviceName && !TerminalStatuses.Contains(w.Status))
             .OrderByDescending(w => w.CreatedAt)
@@ -75,7 +75,7 @@ internal sealed class AutomationModuleService(AutomationDbContext context) : IAu
     public async Task<bool> HasBlockingWorkflowsAsync(
         string serviceName, string environment, CancellationToken cancellationToken = default)
     {
-        return await context.Workflows
+        return await context.AutomationWorkflows
             .AsNoTracking()
             .AnyAsync(
                 w => w.ServiceId == serviceName

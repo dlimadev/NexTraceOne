@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Services;
 
@@ -21,11 +21,11 @@ public sealed class TelemetryAggregationService : ITelemetryAggregationService
     /// <summary>Weight of reliability component (no errors) in confidence score (30%).</summary>
     private const double ConfidenceReliabilityWeight = 0.3;
 
-    private readonly TelemetryStoreDbContext _dbContext;
+    private readonly IncidentResponseDbContext _dbContext;
     private readonly ILogger<TelemetryAggregationService> _logger;
 
     public TelemetryAggregationService(
-        TelemetryStoreDbContext dbContext,
+        IncidentResponseDbContext dbContext,
         ILogger<TelemetryAggregationService> logger)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));

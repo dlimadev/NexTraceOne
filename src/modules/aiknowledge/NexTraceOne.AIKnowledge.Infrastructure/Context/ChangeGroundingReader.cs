@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
-/// Implementação do leitor de releases do ChangeIntelligence para grounding de IA.
-/// Acesso somente-leitura ao ChangeIntelligenceDbContext.
+/// Implementação do leitor de releases do ChangeGovernance para grounding de IA.
+/// Acesso somente-leitura ao ChangeGovernanceDbContext.
 /// </summary>
-public sealed class ChangeGroundingReader(ChangeIntelligenceDbContext changeDb) : IChangeGroundingReader
+public sealed class ChangeGroundingReader(ChangeGovernanceDbContext changeDb) : IChangeGroundingReader
 {
     public async Task<IReadOnlyList<ReleaseGroundingContext>> FindRecentReleasesAsync(
         DateTimeOffset from,

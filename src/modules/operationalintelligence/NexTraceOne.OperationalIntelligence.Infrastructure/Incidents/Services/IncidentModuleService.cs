@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Services;
 
@@ -13,7 +13,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Services;
 /// Outros módulos consomem este serviço via IIncidentModule — nunca acessam o DbContext.
 /// </summary>
 internal sealed class IncidentModuleService(
-    IncidentDbContext context,
+    IncidentResponseDbContext context,
     ILogger<IncidentModuleService> logger) : IIncidentModule
 {
     /// <summary>When open incidents exceed this multiplier × resolved, the trend is declining.</summary>

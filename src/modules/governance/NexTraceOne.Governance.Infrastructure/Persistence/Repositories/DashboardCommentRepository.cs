@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para DashboardComment (V3.7).</summary>
-public sealed class DashboardCommentRepository(GovernanceDbContext db) : IDashboardCommentRepository
+public sealed class DashboardCommentRepository(PlatformGovernanceDbContext db) : IDashboardCommentRepository
 {
     public async Task<DashboardComment?> GetByIdAsync(DashboardCommentId id, string tenantId, CancellationToken ct = default)
         => await db.DashboardComments.FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId, ct);

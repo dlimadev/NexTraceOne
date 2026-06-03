@@ -15,7 +15,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// quando o volume de métricas requerer melhor performance analítica.
 /// </summary>
 public sealed class OtelMetricRepository(
-    GovernanceDbContext context,
+    PlatformGovernanceDbContext context,
     ILogger<OtelMetricRepository> logger) : IOtelMetricRepository
 {
     private static readonly JsonSerializerOptions JsonOptions = new()

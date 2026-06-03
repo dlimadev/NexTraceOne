@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -14,8 +13,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Wave AB.1 — GetKnowledgeRelationGraph.
 /// </summary>
 internal sealed class EfKnowledgeRelationReader(
-    CatalogGraphDbContext graphDb,
-    ContractsDbContext contractsDb) : IKnowledgeRelationReader
+    ServiceCatalogDbContext graphDb,
+    ServiceCatalogDbContext contractsDb) : IKnowledgeRelationReader
 {
     public async Task<IReadOnlyList<ServiceRelationEntry>> ListServiceRelationsAsync(
         string tenantId,

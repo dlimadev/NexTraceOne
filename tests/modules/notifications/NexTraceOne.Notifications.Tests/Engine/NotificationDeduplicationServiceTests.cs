@@ -6,7 +6,7 @@ using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.Engine;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Tests.Engine;
 
@@ -220,14 +220,14 @@ public sealed class NotificationDeduplicationServiceTests
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    private static NotificationsDbContext CreateContext()
+    private static ConfigurationDbContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<NotificationsDbContext>()
+        var options = new DbContextOptionsBuilder<ConfigurationDbContext>()
             .UseInMemoryDatabase($"ntf-dedup-tests-{Guid.NewGuid():N}")
             .Options;
 
         var now = DateTimeOffset.UtcNow;
-        return new NotificationsDbContext(
+        return new ConfigurationDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),

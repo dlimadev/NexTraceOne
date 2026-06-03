@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Implementação EF Core do repositório de jobs de recovery.</summary>
-internal sealed class RecoveryJobRepository(GovernanceDbContext context) : IRecoveryJobRepository
+internal sealed class RecoveryJobRepository(PlatformGovernanceDbContext context) : IRecoveryJobRepository
 {
     public async Task<IReadOnlyList<RecoveryJob>> ListAsync(int limit, CancellationToken ct)
         => await context.RecoveryJobs

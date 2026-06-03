@@ -9,7 +9,7 @@
 ## Contexto
 
 O NexTraceOne usa actualmente:
-- **PostgreSQL 16** com pgvector — base de dados única para todos os 28 DbContexts
+- **PostgreSQL 16** com pgvector — base de dados única para todos os 9 DbContexts consolidados
 - **Elasticsearch 8.17** — provider de observabilidade (logs, métricas, traces)
 - **OpenTelemetry Collector** — pipeline de ingestão de telemetria
 

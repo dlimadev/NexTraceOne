@@ -10,7 +10,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// Implementação EF Core do repositório de analytics para Governance Trends.
 /// Fornece consultas agregadas para indicadores executivos.
 /// </summary>
-internal sealed class GovernanceAnalyticsRepository(GovernanceDbContext context) : IGovernanceAnalyticsRepository
+internal sealed class GovernanceAnalyticsRepository(PlatformGovernanceDbContext context) : IGovernanceAnalyticsRepository
 {
     public async Task<IReadOnlyList<MonthlyCount>> GetWaiverCountsByMonthAsync(int months, CancellationToken ct)
     {

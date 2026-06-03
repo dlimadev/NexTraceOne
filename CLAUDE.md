@@ -206,7 +206,7 @@ design/      ← tokens de design system, variáveis CSS
 src/platform/
 ├── NexTraceOne.ApiHost/          ← REST + GraphQL (porta 5000)
 │   ├── Program.cs                   # registro de serviços + pipeline
-│   ├── appsettings*.json            # 28 connection strings (por DbContext)
+│   ├── appsettings*.json            # 9 connection strings (uma por DbContext ativo)
 │   └── Preflight/Checks/            # 10 verificações pré-startup
 │       ├── PostgreSqlPreflightCheck
 │       ├── JwtSecretPreflightCheck
@@ -434,20 +434,14 @@ Todos os DbContexts de módulo estendem `NexTraceDbContextBase`. Esta base:
 - Aplica `[EncryptedField]` convention (AES-256-GCM via `EncryptedStringConverter`)
 - Tabelas com prefixo de módulo para evitar colisões (ex.: `iam_roles`, `aud_audit_events`)
 
-### 28 Connection Strings
+### 9 Connection Strings (uma por DbContext ativo)
 
-Cada DbContext tem sua própria connection string em `appsettings.json`. Em desenvolvimento local, todas apontam para o mesmo servidor PostgreSQL com diferentes pools. Em produção, podem ser bancos separados:
+Cada DbContext consolidado tem sua própria connection string em `appsettings.json`. Em desenvolvimento local, todas apontam para o mesmo servidor PostgreSQL. Em produção, podem ser bancos separados:
 
 ```
-NexTraceOne (shared), IdentityDatabase, CatalogDatabase, ContractsDatabase,
-DependencyGovernanceDatabase, DeveloperExperienceDatabase, LegacyAssetsDatabase,
-TemplatesDatabase, DeveloperPortalDatabase, ChangeIntelligenceDatabase,
-WorkflowDatabase, RulesetGovernanceDatabase, PromotionDatabase, IncidentDatabase,
-CostIntelligenceDatabase, RuntimeIntelligenceDatabase, ReliabilityDatabase,
-AuditDatabase, AiGovernanceDatabase, GovernanceDatabase, IntegrationsDatabase,
-ProductAnalyticsDatabase, ExternalAiDatabase, AiOrchestrationDatabase,
-AutomationDatabase, ConfigurationDatabase, KnowledgeDatabase, NotificationsDatabase,
-TelemetryStoreDatabase
+NexTraceOne (shared/base), IdentityDatabase, ServiceCatalogDatabase,
+ChangeGovernanceDatabase, IncidentResponseDatabase, GovernanceDatabase,
+AiHubDatabase, IntegrationsDatabase, ConfigurationDatabase
 ```
 
 ### Isolamento de Tenant (duas camadas)
@@ -943,7 +937,7 @@ const form = useForm<FormValues>({
 
 | Feature | Status |
 |---------|--------|
-| 28 PostgreSQL DbContexts (um por contexto) | ✅ Operacional |
+| 9 PostgreSQL DbContexts consolidados (DDD bounded-context alignment) | ✅ Operacional |
 | Outbox + pg_advisory_lock | ✅ Operacional |
 | Row-Level Security via TenantRlsInterceptor | ✅ Operacional |
 | JWT multi-tenant auth + capability claims | ✅ Operacional |

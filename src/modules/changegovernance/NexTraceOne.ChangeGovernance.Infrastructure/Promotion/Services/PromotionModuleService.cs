@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
-using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Services;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Services;
 /// Outros módulos consomem esta interface — nunca o DbContext ou repositórios diretamente.
 /// </summary>
 internal sealed class PromotionModuleService(
-    PromotionDbContext context,
+    ChangeGovernanceDbContext context,
     ILogger<PromotionModuleService> logger) : IPromotionModule
 {
     /// <inheritdoc />

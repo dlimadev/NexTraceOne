@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -13,7 +14,7 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 /// Aplica filtro de TenantId em defense-in-depth (além do RLS do PostgreSQL).
 /// </summary>
 internal sealed class AnalyticsEventRepository(
-    ProductAnalyticsDbContext context,
+    ServiceCatalogDbContext context,
     ICurrentTenant currentTenant) : IAnalyticsEventRepository
 {
     public async Task AddAsync(AnalyticsEvent analyticsEvent, CancellationToken ct)

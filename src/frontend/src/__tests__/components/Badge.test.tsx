@@ -11,31 +11,31 @@ describe('Badge', () => {
   it('aplica a variante default quando nenhuma variante é fornecida', () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText('Default');
-    expect(badge).toHaveClass('bg-elevated', 'text-body');
+    expect(badge).toHaveClass('bg-elevated', 'text-muted');
   });
 
   it('aplica a variante success', () => {
     render(<Badge variant="success">OK</Badge>);
     const badge = screen.getByText('OK');
-    expect(badge).toHaveClass('bg-success/12', 'text-success');
+    expect(badge).toHaveClass('bg-success/15', 'text-success');
   });
 
   it('aplica a variante warning', () => {
     render(<Badge variant="warning">Warning</Badge>);
     const badge = screen.getByText('Warning');
-    expect(badge).toHaveClass('bg-warning/12', 'text-warning');
+    expect(badge).toHaveClass('bg-warning/15', 'text-warning');
   });
 
   it('aplica a variante danger', () => {
     render(<Badge variant="danger">Critical</Badge>);
     const badge = screen.getByText('Critical');
-    expect(badge).toHaveClass('bg-critical/12', 'text-critical');
+    expect(badge).toHaveClass('bg-critical/15', 'text-critical');
   });
 
   it('aplica a variante info', () => {
     render(<Badge variant="info">Info</Badge>);
     const badge = screen.getByText('Info');
-    expect(badge).toHaveClass('bg-info/12', 'text-info');
+    expect(badge).toHaveClass('bg-info/15', 'text-info');
   });
 
   it('renderiza como um span inline', () => {

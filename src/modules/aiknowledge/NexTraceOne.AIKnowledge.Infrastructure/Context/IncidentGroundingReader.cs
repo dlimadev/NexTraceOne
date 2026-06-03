@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
 /// Implementação do leitor de incidentes operacionais para grounding de IA.
-/// Acesso somente-leitura ao IncidentDbContext.
+/// Acesso somente-leitura ao IncidentResponseDbContext.
 /// </summary>
-public sealed class IncidentGroundingReader(IncidentDbContext incidentDb) : IIncidentGroundingReader
+public sealed class IncidentGroundingReader(IncidentResponseDbContext incidentDb) : IIncidentGroundingReader
 {
     public async Task<IReadOnlyList<IncidentGroundingContext>> FindRecentIncidentsAsync(
         DateTimeOffset from,

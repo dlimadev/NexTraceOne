@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de Teams usando EF Core.
 /// </summary>
-internal sealed class TeamRepository(GovernanceDbContext context) : ITeamRepository
+internal sealed class TeamRepository(PlatformGovernanceDbContext context) : ITeamRepository
 {
     public async Task<IReadOnlyList<Team>> ListAsync(TeamStatus? status, CancellationToken ct)
     {

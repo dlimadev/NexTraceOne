@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
@@ -5,7 +6,7 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 
-internal sealed class InvestigationContextRepository(TelemetryStoreDbContext context)
+internal sealed class InvestigationContextRepository(IncidentResponseDbContext context)
     : IInvestigationContextWriter, IInvestigationContextReader
 {
     public async Task UpsertAsync(InvestigationContext investigationContext, CancellationToken cancellationToken = default)

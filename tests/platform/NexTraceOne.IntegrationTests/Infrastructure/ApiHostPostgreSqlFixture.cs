@@ -44,6 +44,12 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         ("ai-orchestration", "rh6_it_ai_orchestration"),
         ("governance", "rh6_it_governance"),
         ("audit", "rh6_it_audit"),
+        ("integrations", "rh6_it_integrations"),
+        ("product-analytics", "rh6_it_product_analytics"),
+        ("configuration", "rh6_it_configuration"),
+        ("knowledge", "rh6_it_knowledge"),
+        ("notifications", "rh6_it_notifications"),
+        ("telemetry", "rh6_it_telemetry"),
     ];
 
     public const string SeedAdminEmail = "admin@nextraceone.dev";
@@ -164,26 +170,47 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         var aiOrchestration = _connectionStrings["ai-orchestration"];
         var governance = _connectionStrings["governance"];
         var audit = _connectionStrings["audit"];
+        var integrations = _connectionStrings["integrations"];
+        var productAnalytics = _connectionStrings["product-analytics"];
+        var configuration = _connectionStrings["configuration"];
+        var knowledge = _connectionStrings["knowledge"];
+        var notifications = _connectionStrings["notifications"];
+        var telemetry = _connectionStrings["telemetry"];
 
         return new Dictionary<string, string?>
         {
             ["ConnectionStrings:NexTraceOne"] = catalog,
             ["ConnectionStrings:IdentityDatabase"] = identity,
+            ["ConnectionStrings:ServiceCatalogDatabase"] = catalog,
             ["ConnectionStrings:CatalogDatabase"] = catalog,
             ["ConnectionStrings:ContractsDatabase"] = catalog,
             ["ConnectionStrings:DeveloperPortalDatabase"] = catalog,
+            // Consolidated Phase 2 key (replaces ChangeIntelligence/Workflow/Ruleset/Promotion)
+            ["ConnectionStrings:ChangeGovernanceDatabase"] = changeGov,
             ["ConnectionStrings:ChangeIntelligenceDatabase"] = changeGov,
             ["ConnectionStrings:WorkflowDatabase"] = changeGov,
             ["ConnectionStrings:RulesetGovernanceDatabase"] = changeGov,
             ["ConnectionStrings:PromotionDatabase"] = changeGov,
+            // Consolidated Phase 3 key (replaces Incident/Reliability/Automation/RuntimeIntelligence)
+            ["ConnectionStrings:IncidentResponseDatabase"] = incidents,
             ["ConnectionStrings:IncidentDatabase"] = incidents,
+            ["ConnectionStrings:ReliabilityDatabase"] = incidents,
+            ["ConnectionStrings:AutomationDatabase"] = incidents,
             ["ConnectionStrings:CostIntelligenceDatabase"] = cost,
             ["ConnectionStrings:RuntimeIntelligenceDatabase"] = runtime,
             ["ConnectionStrings:AuditDatabase"] = audit,
+            // Consolidated Phase 1 key (replaces AiGovernance/ExternalAi/AiOrchestration)
+            ["ConnectionStrings:AiHubDatabase"] = aiKnowledge,
             ["ConnectionStrings:AiGovernanceDatabase"] = aiKnowledge,
             ["ConnectionStrings:ExternalAiDatabase"] = externalAi,
             ["ConnectionStrings:AiOrchestrationDatabase"] = aiOrchestration,
             ["ConnectionStrings:GovernanceDatabase"] = governance,
+            ["ConnectionStrings:IntegrationsDatabase"] = integrations,
+            ["ConnectionStrings:ProductAnalyticsDatabase"] = productAnalytics,
+            ["ConnectionStrings:ConfigurationDatabase"] = configuration,
+            ["ConnectionStrings:KnowledgeDatabase"] = knowledge,
+            ["ConnectionStrings:NotificationsDatabase"] = notifications,
+            ["ConnectionStrings:TelemetryStoreDatabase"] = telemetry,
         };
     }
 
@@ -300,7 +327,7 @@ public sealed class ApiHostPostgreSqlFixture : IAsyncLifetime
         await connection.OpenAsync();
 
         const string sql = """
-                           INSERT INTO identity_tenant_memberships ("Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
+                           INSERT INTO iam_tenant_memberships ("Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
                            VALUES (
                                'e0000000-0000-0000-0000-000000000099',
                                'b0000000-0000-0000-0000-000000000001',

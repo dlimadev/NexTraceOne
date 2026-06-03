@@ -1,20 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
 /// <summary>
 /// Implementação real de ISchemaQualityReader.
-/// Usa ContractScorecard (ContractsDbContext) e ApiAssets/ServiceAssets (CatalogGraphDbContext)
+/// Usa ContractScorecard (ServiceCatalogDbContext) e ApiAssets/ServiceAssets (ServiceCatalogDbContext)
 /// para reportar qualidade de schema por contrato publicado no tenant.
 /// Wave AQ.2 — GetSchemaQualityIndexReport.
 /// </summary>
 internal sealed class EfSchemaQualityReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : ISchemaQualityReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : ISchemaQualityReader
 {
     public async Task<IReadOnlyList<ISchemaQualityReader.ContractSchemaEntry>> ListByTenantAsync(
         string tenantId, CancellationToken ct)

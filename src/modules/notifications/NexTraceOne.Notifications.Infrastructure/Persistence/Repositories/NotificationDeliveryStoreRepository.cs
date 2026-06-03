@@ -1,3 +1,4 @@
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Notifications.Application.ExternalDelivery;
@@ -11,7 +12,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 /// Implementação de persistência para delivery logs de notificações externas.
 /// </summary>
 internal sealed class NotificationDeliveryStoreRepository(
-    NotificationsDbContext context) : INotificationDeliveryStore
+    ConfigurationDbContext context) : INotificationDeliveryStore
 {
     /// <inheritdoc/>
     public async Task AddAsync(NotificationDelivery delivery, CancellationToken cancellationToken = default)

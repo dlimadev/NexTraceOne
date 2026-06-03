@@ -2,9 +2,8 @@ using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Services;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -111,26 +110,26 @@ public sealed class ContractsModuleServiceTests
         result.Should().BeTrue();
     }
 
-    private static ContractsDbContext CreateDbContext()
+    private static ServiceCatalogDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ContractsDbContext>()
+        var options = new DbContextOptionsBuilder<ServiceCatalogDbContext>()
             .UseInMemoryDatabase($"contracts-module-service-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new ContractsDbContext(
+        return new ServiceCatalogDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static CatalogGraphDbContext CreateGraphDbContext()
+    private static ServiceCatalogDbContext CreateGraphDbContext()
     {
-        var options = new DbContextOptionsBuilder<CatalogGraphDbContext>()
+        var options = new DbContextOptionsBuilder<ServiceCatalogDbContext>()
             .UseInMemoryDatabase($"catalog-graph-service-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new CatalogGraphDbContext(
+        return new ServiceCatalogDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),

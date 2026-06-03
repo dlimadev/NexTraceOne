@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -6,7 +7,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 
-internal sealed class EfficiencyRecommendationRepository(CostIntelligenceDbContext context)
+internal sealed class EfficiencyRecommendationRepository(IncidentResponseDbContext context)
     : RepositoryBase<EfficiencyRecommendation, EfficiencyRecommendationId>(context), IEfficiencyRecommendationRepository
 {
     public async Task<IReadOnlyList<EfficiencyRecommendation>> ListByServiceAsync(

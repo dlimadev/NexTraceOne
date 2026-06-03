@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de ComplianceGaps usando EF Core.
 /// </summary>
-internal sealed class ComplianceGapRepository(GovernanceDbContext context) : IComplianceGapRepository
+internal sealed class ComplianceGapRepository(PlatformGovernanceDbContext context) : IComplianceGapRepository
 {
     public async Task<IReadOnlyList<ComplianceGap>> ListAsync(
         string? teamId,

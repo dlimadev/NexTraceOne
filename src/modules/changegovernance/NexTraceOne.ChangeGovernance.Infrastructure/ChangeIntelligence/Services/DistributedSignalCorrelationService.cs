@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.BuildingBlocks.Application.Correlation;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 
@@ -16,7 +16,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Service
 /// ISOLAMENTO: Toda correlação filtra por TenantId — nunca cruza tenants.
 /// </summary>
 internal sealed class DistributedSignalCorrelationService(
-    ChangeIntelligenceDbContext context,
+    ChangeGovernanceDbContext context,
     ILogger<DistributedSignalCorrelationService> logger) : IDistributedSignalCorrelationService
 {
     private const string IncidentCreatedEventType = "incident_created";

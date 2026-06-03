@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de CostAttribution usando EF Core.
 /// </summary>
-internal sealed class CostAttributionRepository(GovernanceDbContext context)
+internal sealed class CostAttributionRepository(PlatformGovernanceDbContext context)
     : ICostAttributionRepository
 {
     public async Task<CostAttribution?> GetByIdAsync(

@@ -9,7 +9,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordM
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Integration;
 
@@ -21,7 +21,7 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Integration;
 /// </summary>
 public sealed class MitigationPersistenceIntegrationTests : IDisposable
 {
-    private readonly IncidentDbContext _db;
+    private readonly IncidentResponseDbContext _db;
     private readonly EfIncidentStore _store;
     private readonly ICurrentUser _currentUser;
     private readonly ICurrentTenant _currentTenant;
@@ -30,7 +30,7 @@ public sealed class MitigationPersistenceIntegrationTests : IDisposable
     public MitigationPersistenceIntegrationTests()
     {
         var dbName = $"MitigationTest_{Guid.NewGuid()}";
-        var options = new DbContextOptionsBuilder<IncidentDbContext>()
+        var options = new DbContextOptionsBuilder<IncidentResponseDbContext>()
             .UseInMemoryDatabase(dbName)
             .Options;
 
@@ -49,7 +49,7 @@ public sealed class MitigationPersistenceIntegrationTests : IDisposable
         _clock = Substitute.For<IDateTimeProvider>();
         _clock.UtcNow.Returns(DateTimeOffset.UtcNow);
 
-        _db = new IncidentDbContext(options, _currentTenant, _currentUser, _clock);
+        _db = new IncidentResponseDbContext(options, _currentTenant, _currentUser, _clock);
         _db.Database.EnsureCreated();
 
         _store = new EfIncidentStore(_db, _clock, _currentUser);

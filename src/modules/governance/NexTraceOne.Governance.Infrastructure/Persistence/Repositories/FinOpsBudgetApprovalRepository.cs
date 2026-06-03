@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
-internal sealed class FinOpsBudgetApprovalRepository(GovernanceDbContext context)
+internal sealed class FinOpsBudgetApprovalRepository(PlatformGovernanceDbContext context)
     : IFinOpsBudgetApprovalRepository
 {
     public async Task<FinOpsBudgetApproval?> GetByIdAsync(Guid id, CancellationToken ct)

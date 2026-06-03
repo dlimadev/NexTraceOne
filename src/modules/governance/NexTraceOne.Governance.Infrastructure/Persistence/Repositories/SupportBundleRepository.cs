@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Implementação EF Core do repositório de bundles de suporte.</summary>
-internal sealed class SupportBundleRepository(GovernanceDbContext context) : ISupportBundleRepository
+internal sealed class SupportBundleRepository(PlatformGovernanceDbContext context) : ISupportBundleRepository
 {
     public async Task<IReadOnlyList<SupportBundle>> ListAsync(Guid? tenantId, CancellationToken ct)
     {

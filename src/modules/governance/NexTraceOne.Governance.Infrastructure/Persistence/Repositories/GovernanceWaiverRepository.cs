@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de GovernanceWaivers usando EF Core.
 /// </summary>
-internal sealed class GovernanceWaiverRepository(GovernanceDbContext context) : IGovernanceWaiverRepository
+internal sealed class GovernanceWaiverRepository(PlatformGovernanceDbContext context) : IGovernanceWaiverRepository
 {
     public async Task<IReadOnlyList<GovernanceWaiver>> ListAsync(
         GovernancePackId? packId,

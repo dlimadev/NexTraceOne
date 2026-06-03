@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Runtime.Infrastructure;
@@ -110,20 +110,20 @@ public sealed class RuntimeIntelligenceModuleTests
         result.Should().Be(0.70m);
     }
 
-    private static RuntimeIntelligenceDbContext CreateDbContext()
+    private static IncidentResponseDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<RuntimeIntelligenceDbContext>()
+        var options = new DbContextOptionsBuilder<IncidentResponseDbContext>()
             .UseInMemoryDatabase($"runtime-intelligence-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new RuntimeIntelligenceDbContext(
+        return new IncidentResponseDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IRuntimeIntelligenceModule CreateSut(RuntimeIntelligenceDbContext db)
+    private static IRuntimeIntelligenceModule CreateSut(IncidentResponseDbContext db)
         => new RuntimeIntelligenceModule(db, NullLogger<RuntimeIntelligenceModule>.Instance);
 
     private sealed class TestCurrentTenant : ICurrentTenant

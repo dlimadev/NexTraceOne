@@ -173,11 +173,35 @@ public sealed class ElasticsearchIndexManagerServiceTests
         private readonly List<HttpRequestMessage> _requests = [];
         public IReadOnlyList<HttpRequestMessage> Requests => _requests;
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            _requests.Add(request);
-            return Task.FromResult(new HttpResponseMessage(status));
+            // Snapshot body bytes now, before the caller's `using var content` disposes
+            // the original StringContent (disposing the buffer too). ByteArrayContent is
+            // independent and survives the original content's disposal.
+            if (request.Content is not null)
+            {
+                var body = await request.Content.ReadAsByteArrayAsync(cancellationToken);
+                var snapshot = new HttpRequestMessage(request.Method, request.RequestUri)
+                {
+                    Content = new ByteArrayContent(body)
+                };
+                if (request.Content.Headers.ContentType is { } ct)
+                    snapshot.Content.Headers.ContentType = ct;
+                _requests.Add(snapshot);
+            }
+            else
+            {
+                _requests.Add(new HttpRequestMessage(request.Method, request.RequestUri));
+            }
+            return new HttpResponseMessage(status);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                foreach (var r in _requests) r.Dispose();
+            base.Dispose(disposing);
         }
     }
 
@@ -192,9 +216,14 @@ public sealed class ElasticsearchIndexManagerServiceTests
             {
                 PutCount++;
                 if (PutCount == 1)
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+                {
+                    var firstFailureResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                    return Task.FromResult(firstFailureResponse);
+                }
             }
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var okResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            return Task.FromResult(okResponse);
         }
     }
 }

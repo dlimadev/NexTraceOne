@@ -75,8 +75,10 @@ public sealed class SessionInactivityMiddlewareTests
     {
         // Actividade há 10 minutos — dentro do timeout de 480 minutos
         var recentActivity = DateTimeOffset.UtcNow.AddMinutes(-10).ToString("O");
-        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("session-activity:")), Arg.Any<CancellationToken>())
             .Returns(System.Text.Encoding.UTF8.GetBytes(recentActivity));
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns(default(byte[]));
 
         var nextCalled = false;
         var middleware = CreateMiddleware(_ => { nextCalled = true; return Task.CompletedTask; });
@@ -93,8 +95,10 @@ public sealed class SessionInactivityMiddlewareTests
     {
         // Actividade há 600 minutos — superior ao timeout de 480 minutos
         var expiredActivity = DateTimeOffset.UtcNow.AddMinutes(-600).ToString("O");
-        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("session-activity:")), Arg.Any<CancellationToken>())
             .Returns(System.Text.Encoding.UTF8.GetBytes(expiredActivity));
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns(default(byte[]));
 
         var nextCalled = false;
         var middleware = CreateMiddleware(
@@ -130,6 +134,8 @@ public sealed class SessionInactivityMiddlewareTests
     public async Task AuthenticatedRequest_MismatchedIp_PassesThroughButLogsWarning()
     {
         // IP guardado diferente do actual — deve passar mas registar warning
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns(default(byte[]));
         _cache.GetAsync(
             Arg.Is<string>(k => k.Contains("session-activity")),
             Arg.Any<CancellationToken>()).Returns((byte[]?)null);
@@ -152,6 +158,8 @@ public sealed class SessionInactivityMiddlewareTests
     public async Task AuthenticatedRequest_SameIp_PassesThrough()
     {
         // IP actual igual ao guardado — deve passar normalmente
+        _cache.GetAsync(Arg.Is<string>(k => k.StartsWith("user-sessions:")), Arg.Any<CancellationToken>())
+            .Returns(default(byte[]));
         _cache.GetAsync(
             Arg.Is<string>(k => k.Contains("session-activity")),
             Arg.Any<CancellationToken>()).Returns((byte[]?)null);

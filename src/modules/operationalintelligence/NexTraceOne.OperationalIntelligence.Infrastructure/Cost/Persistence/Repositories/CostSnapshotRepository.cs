@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -8,9 +9,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 
 /// <summary>
 /// Repositório de snapshots de custo, implementando consultas específicas de negócio.
-/// Isolamento total: acessa apenas CostIntelligenceDbContext — sem acesso cross-module.
+/// Isolamento total: acessa apenas IncidentResponseDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class CostSnapshotRepository(CostIntelligenceDbContext context)
+internal sealed class CostSnapshotRepository(IncidentResponseDbContext context)
     : RepositoryBase<CostSnapshot, CostSnapshotId>(context), ICostSnapshotRepository
 {
     /// <summary>Busca um snapshot de custo pelo seu identificador.</summary>

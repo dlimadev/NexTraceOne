@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de EvidencePackages usando EF Core.
 /// </summary>
-internal sealed class EvidencePackageRepository(GovernanceDbContext context) : IEvidencePackageRepository
+internal sealed class EvidencePackageRepository(PlatformGovernanceDbContext context) : IEvidencePackageRepository
 {
     public async Task<IReadOnlyList<EvidencePackage>> ListAsync(
         string? scope,

@@ -1,20 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
 /// <summary>
 /// Implementação real de ISchemaEvolutionSafetyReader.
-/// Cruza ContractDiff (ContractsDbContext) com ApiAssets e ServiceAssets (CatalogGraphDbContext)
+/// Cruza ContractDiff (ServiceCatalogDbContext) com ApiAssets e ServiceAssets (ServiceCatalogDbContext)
 /// para reportar evolução de schema com riscos de breaking changes por equipa.
 /// Wave AQ.3 — GetSchemaEvolutionSafetyReport.
 /// </summary>
 internal sealed class EfSchemaEvolutionSafetyReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : ISchemaEvolutionSafetyReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : ISchemaEvolutionSafetyReader
 {
     public async Task<IReadOnlyList<ISchemaEvolutionSafetyReader.TeamSchemaEvolutionEntry>> ListByTenantAsync(
         string tenantId, int lookbackDays, CancellationToken ct)

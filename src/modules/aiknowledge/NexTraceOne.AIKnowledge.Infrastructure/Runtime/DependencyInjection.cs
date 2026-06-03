@@ -19,11 +19,9 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.SemanticKernel;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.VectorStore;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 
@@ -181,16 +179,13 @@ public static class DependencyInjection
         // These DbContexts are already registered by their owning modules.
         // We register them conditionally here only if not already registered,
         // using the same connection string as the owning module.
-        RegisterCrossModuleContextIfNeeded<CatalogGraphDbContext>(
-            services, configuration, "CatalogDatabase");
-        RegisterCrossModuleContextIfNeeded<ChangeIntelligenceDbContext>(
-            services, configuration, "ChangeIntelligenceDatabase");
-        RegisterCrossModuleContextIfNeeded<IncidentDbContext>(
-            services, configuration, "IncidentDatabase");
-        RegisterCrossModuleContextIfNeeded<KnowledgeDbContext>(
-            services, configuration, "KnowledgeDatabase");
-        RegisterCrossModuleContextIfNeeded<ContractsDbContext>(
-            services, configuration, "ContractsDatabase");
+        RegisterCrossModuleContextIfNeeded<ServiceCatalogDbContext>(
+            services, configuration, "ServiceCatalogDatabase");
+        RegisterCrossModuleContextIfNeeded<ChangeGovernanceDbContext>(
+            services, configuration, "ChangeGovernanceDatabase");
+        RegisterCrossModuleContextIfNeeded<IncidentResponseDbContext>(
+            services, configuration, "IncidentResponseDatabase");
+
 
         // Cross-module grounding readers — thin abstractions over read-only DbContext access
         services.AddScoped<ICatalogGroundingReader, CatalogGroundingReader>();

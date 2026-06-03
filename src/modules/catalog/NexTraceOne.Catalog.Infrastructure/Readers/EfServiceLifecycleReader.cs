@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Application.Services.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Substitui o NullServiceLifecycleReader (honest-null pattern).
 /// Wave AF.1 — GetServiceLifecycleTransitionReport.
 /// </summary>
-internal sealed class EfServiceLifecycleReader(CatalogGraphDbContext graphDb) : IServiceLifecycleReader
+internal sealed class EfServiceLifecycleReader(ServiceCatalogDbContext graphDb) : IServiceLifecycleReader
 {
     public async Task<IReadOnlyList<ServiceLifecycleEntry>> ListByTenantAsync(
         string tenantId,

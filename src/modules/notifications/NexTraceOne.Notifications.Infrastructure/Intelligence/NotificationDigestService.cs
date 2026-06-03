@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 
@@ -19,7 +19,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 ///   - O digest agrupa por categoria e gera contagem
 /// </summary>
 internal sealed class NotificationDigestService(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     ILogger<NotificationDigestService> logger) : INotificationDigestService
 {
     private const int DigestWindowHours = 24;

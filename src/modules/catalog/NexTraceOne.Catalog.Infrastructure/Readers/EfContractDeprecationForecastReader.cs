@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -13,8 +12,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Substitui o NullContractDeprecationForecastReader (honest-null pattern).
 /// </summary>
 internal sealed class EfContractDeprecationForecastReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : IContractDeprecationForecastReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : IContractDeprecationForecastReader
 {
     public async Task<IReadOnlyList<IContractDeprecationForecastReader.ActiveContractForecastEntry>> ListActiveContractsByTenantAsync(
         string tenantId,

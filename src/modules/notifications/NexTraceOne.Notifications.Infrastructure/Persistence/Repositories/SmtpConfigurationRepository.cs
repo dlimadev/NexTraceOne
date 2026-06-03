@@ -1,3 +1,4 @@
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Notifications.Application.Abstractions;
@@ -6,7 +7,7 @@ using NexTraceOne.Notifications.Domain.StronglyTypedIds;
 
 namespace NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 
-internal sealed class SmtpConfigurationRepository(NotificationsDbContext context)
+internal sealed class SmtpConfigurationRepository(ConfigurationDbContext context)
     : ISmtpConfigurationStore
 {
     public async Task AddAsync(SmtpConfiguration config, CancellationToken cancellationToken)

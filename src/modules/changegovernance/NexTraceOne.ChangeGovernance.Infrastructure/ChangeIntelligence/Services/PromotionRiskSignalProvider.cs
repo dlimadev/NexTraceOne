@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Correlation;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 
@@ -20,7 +20,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Service
 /// ISOLAMENTO: Toda consulta filtra por TenantId — nunca cruza tenants.
 /// </summary>
 internal sealed class PromotionRiskSignalProvider(
-    ChangeIntelligenceDbContext context,
+    ChangeGovernanceDbContext context,
     IDateTimeProvider clock,
     ILogger<PromotionRiskSignalProvider> logger) : IPromotionRiskSignalProvider
 {

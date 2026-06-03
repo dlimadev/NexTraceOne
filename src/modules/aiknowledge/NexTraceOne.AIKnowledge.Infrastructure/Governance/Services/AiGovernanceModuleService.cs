@@ -1,17 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 
 /// <summary>
 /// Implementação do contrato <see cref="IAiGovernanceModule"/> que expõe métricas de tokens
 /// e atribuição de modelo para consumo cross-module.
-/// Consulta o <see cref="AiGovernanceDbContext"/> de forma read-only (AsNoTracking).
+/// Consulta o <see cref="AiHubDbContext"/> de forma read-only (AsNoTracking).
 /// </summary>
 internal sealed class AiGovernanceModuleService(
-    AiGovernanceDbContext context) : IAiGovernanceModule
+    AiHubDbContext context) : IAiGovernanceModule
 {
     public async Task<TokenUsageSummaryDto?> GetTokenUsageByExecutionIdAsync(
         string executionId,

@@ -143,7 +143,7 @@ describe('ServiceDetailPage', () => {
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
     await waitFor(() => {
-      expect(screen.getByText('Payments Service')).toBeInTheDocument();
+      expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument();
     });
   });
 
@@ -164,7 +164,7 @@ describe('ServiceDetailPage', () => {
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
     // Wait for data to load, then navigate to APIs tab
-    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument());
     const apisTab = screen.getAllByRole('tab').find(el => el.textContent?.includes('APIs') || el.textContent?.match(/api/i));
     if (apisTab) fireEvent.click(apisTab);
     await waitFor(() => {
@@ -177,7 +177,7 @@ describe('ServiceDetailPage', () => {
     vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
-    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument());
     const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
     if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
@@ -190,7 +190,7 @@ describe('ServiceDetailPage', () => {
     vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
-    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument());
     const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
     if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
@@ -207,7 +207,7 @@ describe('ServiceDetailPage', () => {
       totalCount: 0,
     });
     renderServiceDetail();
-    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument());
     const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
     if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {

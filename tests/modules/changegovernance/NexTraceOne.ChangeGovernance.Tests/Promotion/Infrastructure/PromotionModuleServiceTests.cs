@@ -5,7 +5,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
-using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Services;
 
 namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Infrastructure;
@@ -110,20 +110,20 @@ public sealed class PromotionModuleServiceTests
 
     // ── Helpers ─────────────────────────────────────────────────────────────
 
-    private static PromotionDbContext CreateDbContext()
+    private static ChangeGovernanceDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<PromotionDbContext>()
+        var options = new DbContextOptionsBuilder<ChangeGovernanceDbContext>()
             .UseInMemoryDatabase($"prm-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new PromotionDbContext(
+        return new ChangeGovernanceDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static IPromotionModule CreateSut(PromotionDbContext db)
+    private static IPromotionModule CreateSut(ChangeGovernanceDbContext db)
         => new PromotionModuleService(db, NullLogger<PromotionModuleService>.Instance);
 
     private sealed class TestCurrentTenant : ICurrentTenant

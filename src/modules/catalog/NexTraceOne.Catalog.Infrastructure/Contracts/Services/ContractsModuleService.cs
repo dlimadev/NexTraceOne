@@ -2,8 +2,7 @@ using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Services;
@@ -14,8 +13,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Services;
 /// </summary>
 internal sealed class ContractsModuleService(
     IContractVersionRepository contractVersionRepository,
-    ContractsDbContext contractsDbContext,
-    CatalogGraphDbContext graphDbContext) : IContractsModule
+    ServiceCatalogDbContext contractsDbContext,
+    ServiceCatalogDbContext graphDbContext) : IContractsModule
 {
     /// <inheritdoc />
     public async Task<ChangeLevel?> GetLatestChangeLevelAsync(Guid apiAssetId, CancellationToken ct = default)

@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.AuditCompliance.Domain.Enums;
+using NexTraceOne.Governance.Infrastructure.Persistence;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
 
-internal sealed class CompliancePolicyRepository(AuditDbContext context) : ICompliancePolicyRepository
+internal sealed class CompliancePolicyRepository(PlatformGovernanceDbContext context) : ICompliancePolicyRepository
 {
     public async Task<CompliancePolicy?> GetByIdAsync(CompliancePolicyId id, CancellationToken cancellationToken)
         => await context.CompliancePolicies
@@ -32,7 +33,7 @@ internal sealed class CompliancePolicyRepository(AuditDbContext context) : IComp
     public void Update(CompliancePolicy policy) => context.CompliancePolicies.Update(policy);
 }
 
-internal sealed class AuditCampaignRepository(AuditDbContext context) : IAuditCampaignRepository
+internal sealed class AuditCampaignRepository(PlatformGovernanceDbContext context) : IAuditCampaignRepository
 {
     public async Task<AuditCampaign?> GetByIdAsync(AuditCampaignId id, CancellationToken cancellationToken)
         => await context.AuditCampaigns
@@ -55,7 +56,7 @@ internal sealed class AuditCampaignRepository(AuditDbContext context) : IAuditCa
     public void Update(AuditCampaign campaign) => context.AuditCampaigns.Update(campaign);
 }
 
-internal sealed class ComplianceResultRepository(AuditDbContext context) : IComplianceResultRepository
+internal sealed class ComplianceResultRepository(PlatformGovernanceDbContext context) : IComplianceResultRepository
 {
     public async Task<ComplianceResult?> GetByIdAsync(ComplianceResultId id, CancellationToken cancellationToken)
         => await context.ComplianceResults
@@ -100,7 +101,7 @@ internal sealed class ComplianceResultRepository(AuditDbContext context) : IComp
 /// Repositório de políticas de retenção de eventos de auditoria.
 /// P7.4 — implementa IRetentionPolicyRepository para tornar RetentionPolicy funcionalmente real.
 /// </summary>
-internal sealed class RetentionPolicyRepository(AuditDbContext context) : IRetentionPolicyRepository
+internal sealed class RetentionPolicyRepository(PlatformGovernanceDbContext context) : IRetentionPolicyRepository
 {
     public async Task<IReadOnlyList<RetentionPolicy>> ListActiveAsync(CancellationToken cancellationToken)
         => await context.RetentionPolicies

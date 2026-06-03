@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using static NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
@@ -12,7 +12,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// (Nome, Registo, Licença) para análise de proveniência, aprovação de registo e risco de SPOF.
 /// Wave AO.2 — GetDependencyProvenanceReport.
 /// </summary>
-internal sealed class EfDependencyProvenanceReader(ContractsDbContext contractsDb) : IDependencyProvenanceReader
+internal sealed class EfDependencyProvenanceReader(ServiceCatalogDbContext contractsDb) : IDependencyProvenanceReader
 {
     public async Task<IReadOnlyList<ComponentProvenanceEntry>> ListComponentsByTenantAsync(
         string tenantId,

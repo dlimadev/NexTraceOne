@@ -102,7 +102,7 @@ public sealed class AppSettingsSecurityTests
         var json = ReadJson(BaseAppSettings);
         var connStrings = json.GetProperty("ConnectionStrings");
 
-        connStrings.EnumerateObject().Count().Should().Be(24, "expected 24 connection strings: 1 (NexTraceOne base) + 19 original module-specific + 1 IntegrationsDatabase + 1 ProductAnalyticsDatabase + 1 KnowledgeDatabase + 1 NotificationsDatabase = 24");
+        connStrings.EnumerateObject().Count().Should().Be(29, "expected 29 connection strings: 1 shared + 4 new consolidated (ServiceCatalog, ChangeGovernance, IncidentResponse, AiHub) + 24 module/sub-context specific");
     }
 
     [Fact]

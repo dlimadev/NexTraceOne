@@ -240,7 +240,7 @@ export function RequestExplorerPage() {
 
   const PAGE_SIZE = 20;
 
-  const { from, until } = timeRangeToInterval(timeRange);
+  const { from, until } = useMemo(() => timeRangeToInterval(timeRange), [timeRange]);
   const environment = activeEnvironmentId ?? 'production';
 
   // ── Queries ────────────────────────────────────────────────────────────────

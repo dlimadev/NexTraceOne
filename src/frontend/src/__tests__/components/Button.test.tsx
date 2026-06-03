@@ -36,7 +36,7 @@ describe('Button', () => {
   it('aplica a variante primary por padrão', () => {
     render(<Button>Primary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('cta-gradient', 'text-on-accent');
+    expect(btn).toHaveClass('bg-accent', 'text-on-accent');
   });
 
   it('aplica a variante secondary', () => {
@@ -54,13 +54,13 @@ describe('Button', () => {
   it('aplica o tamanho sm', () => {
     render(<Button size="sm">Small</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('h-9', 'px-4');
+    expect(btn).toHaveClass('h-8', 'px-3');
   });
 
   it('aplica o tamanho lg', () => {
     render(<Button size="lg">Large</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('h-14', 'px-7');
+    expect(btn).toHaveClass('h-11', 'px-6');
   });
 
   it('mostra o spinner de loading', () => {

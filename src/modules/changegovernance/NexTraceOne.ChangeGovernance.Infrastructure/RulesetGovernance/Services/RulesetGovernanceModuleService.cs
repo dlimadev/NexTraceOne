@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
-using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Services;
 
@@ -11,7 +11,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Services
 /// Outros módulos consomem esta interface — nunca o DbContext ou repositórios diretamente.
 /// </summary>
 internal sealed class RulesetGovernanceModuleService(
-    RulesetGovernanceDbContext context,
+    ChangeGovernanceDbContext context,
     ILogger<RulesetGovernanceModuleService> logger) : IRulesetGovernanceModule
 {
     /// <inheritdoc />

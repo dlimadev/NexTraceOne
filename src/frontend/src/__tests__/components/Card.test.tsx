@@ -64,7 +64,7 @@ describe('CardBody', () => {
 
   it('possui padding padrão', () => {
     render(<CardBody data-testid="body">Conteúdo</CardBody>);
-    expect(screen.getByTestId('body')).toHaveClass('px-5', 'py-5');
+    expect(screen.getByTestId('body')).toHaveClass('px-4', 'py-4');
   });
 
   it('aplica className customizada substituindo padding', () => {

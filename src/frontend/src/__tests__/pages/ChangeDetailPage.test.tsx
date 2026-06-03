@@ -175,7 +175,7 @@ describe('ChangeDetailPage', () => {
     vi.mocked(changeConfidenceApi.getDecisionHistory).mockResolvedValue(mockDecisionHistory);
     renderChangeDetail();
     await waitFor(() => {
-      expect(screen.getByText(/advisory/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/advisory/i).length).toBeGreaterThanOrEqual(1);
     });
     await waitFor(() => {
       expect(screen.getByText(/all factors pass/i)).toBeInTheDocument();

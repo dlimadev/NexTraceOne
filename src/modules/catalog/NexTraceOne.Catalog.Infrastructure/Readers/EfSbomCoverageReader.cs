@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -11,8 +10,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Substitui o NullSbomCoverageReader (honest-null pattern).
 /// </summary>
 internal sealed class EfSbomCoverageReader(
-    CatalogGraphDbContext graphDb,
-    ContractsDbContext contractsDb) : ISbomCoverageReader
+    ServiceCatalogDbContext graphDb,
+    ServiceCatalogDbContext contractsDb) : ISbomCoverageReader
 {
     public async Task<IReadOnlyList<ISbomCoverageReader.ServiceSbomEntry>> ListByTenantAsync(
         string tenantId,

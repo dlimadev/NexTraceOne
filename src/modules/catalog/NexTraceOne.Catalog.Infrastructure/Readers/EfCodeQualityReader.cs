@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Retorna o registo de qualidade mais recente por serviço dentro do tenant.
 /// Wave AQ.2 — Code Quality &amp; Static Analysis Intelligence.
 /// </summary>
-internal sealed class EfCodeQualityReader(ContractsDbContext contractsDbContext) : ICodeQualityReader
+internal sealed class EfCodeQualityReader(ServiceCatalogDbContext contractsDbContext) : ICodeQualityReader
 {
     public async Task<IReadOnlyList<CodeQualityEntry>> ListLatestByTenantAsync(
         string tenantId, CancellationToken ct)

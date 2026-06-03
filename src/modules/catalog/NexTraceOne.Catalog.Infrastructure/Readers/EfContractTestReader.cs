@@ -2,8 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -14,8 +13,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Wave AE.1 — GetContractTestCoverageReport.
 /// </summary>
 internal sealed class EfContractTestReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : IContractTestReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : IContractTestReader
 {
     public async Task<IReadOnlyList<ContractTestEntry>> ListByTenantAsync(
         string tenantId, int lookbackDays, CancellationToken ct)

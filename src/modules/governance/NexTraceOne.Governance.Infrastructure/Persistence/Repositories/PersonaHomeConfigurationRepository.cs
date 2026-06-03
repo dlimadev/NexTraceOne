@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para PersonaHomeConfiguration (V3.10).</summary>
-public sealed class PersonaHomeConfigurationRepository(GovernanceDbContext db)
+public sealed class PersonaHomeConfigurationRepository(PlatformGovernanceDbContext db)
     : IPersonaHomeConfigurationRepository
 {
     public async Task<PersonaHomeConfiguration?> GetByUserPersonaAsync(

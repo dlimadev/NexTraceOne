@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\notifications\NexTraceOne.Notifications.Domain\NexTraceOne.Notifications.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

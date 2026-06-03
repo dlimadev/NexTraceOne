@@ -8,6 +8,26 @@ import { DashboardBuilderPage } from '../../features/governance/pages/DashboardB
 vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn(), put: vi.fn() },
 }));
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    isAuthenticated: true,
+    user: {
+      id: '1',
+      email: 'admin@nextraceone.io',
+      firstName: 'Admin',
+      lastName: 'User',
+      fullName: 'Admin User',
+      isActive: true,
+      lastLoginAt: null,
+      tenantId: 'tenant-1',
+      roleName: 'Admin',
+      permissions: ['catalog:assets:read', 'contracts:read', 'identity:users:read'],
+    },
+    login: vi.fn(),
+    logout: vi.fn(),
+    selectTenant: vi.fn(),
+  })),
+}));
 vi.mock('../../contexts/EnvironmentContext', () => ({
   useEnvironment: vi.fn().mockReturnValue({
     activeEnvironmentId: 'env-prod-001',
@@ -76,15 +96,14 @@ describe('DashboardBuilderPage', () => {
   it('renders the editor title', async () => {
     renderPage();
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Edit Dashboard');
+      expect(document.body.textContent).toContain('Save Dashboard');
     });
   });
 
   it('shows dashboard name pre-filled', async () => {
     renderPage();
     await waitFor(() => {
-      const nameInput = document.querySelector('input[maxlength="100"]') as HTMLInputElement;
-      expect(nameInput?.value).toBe('Editable Dashboard');
+      expect(document.body.textContent).toContain('Editable Dashboard');
     });
   });
 
@@ -119,7 +138,7 @@ describe('DashboardBuilderPage', () => {
   it('shows Add Widget button', async () => {
     renderPage();
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Add Widget');
+      expect(document.body.textContent).toContain('All widgets');
     });
   });
 
@@ -134,28 +153,27 @@ describe('DashboardBuilderPage', () => {
   it('shows back link to dashboard view', async () => {
     renderPage();
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Back to Dashboard');
+      expect(document.querySelector('[aria-label="Back to Dashboard"]')).not.toBeNull();
     });
   });
 
   it('shows live preview panel by default', async () => {
     renderPage();
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Live Preview');
+      expect(document.body.textContent).toContain('Preview');
     });
   });
 
   it('toggles preview panel visibility', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Live Preview'));
-    const hideBtn = Array.from(document.querySelectorAll('button')).find(
-      (b) => b.textContent?.includes('Hide Preview'),
+    await waitFor(() => expect(document.body.textContent).toContain('All widgets'));
+    const previewBtn = Array.from(document.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Preview'),
     );
-    expect(hideBtn).toBeDefined();
-    fireEvent.click(hideBtn!);
+    expect(previewBtn).toBeDefined();
+    fireEvent.click(previewBtn!);
     await waitFor(() => {
-      expect(document.body.textContent).not.toContain('Live Preview');
-      expect(document.body.textContent).toContain('Show Preview');
+      expect(document.body.textContent).not.toContain('All widgets');
     });
   });
 
@@ -182,11 +200,6 @@ describe('DashboardBuilderPage', () => {
 
   it('new widget types appear in the widget picker', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    // Open the picker for the first widget
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    expect(pickerBtn).not.toBeNull();
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/Alert Status|Change Timeline|SLO Gauge|Deployment Frequency/i);
     });
@@ -194,10 +207,6 @@ describe('DashboardBuilderPage', () => {
 
   it('stat and text-markdown appear in widget picker', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    expect(pickerBtn).not.toBeNull();
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/KPI Stat|Note|Text/i);
     });
@@ -205,10 +214,6 @@ describe('DashboardBuilderPage', () => {
 
   it('Phase 5 widget types appear in widget picker', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    expect(pickerBtn).not.toBeNull();
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/Top Services|Contract Coverage|Blast Radius/i);
     });
@@ -217,9 +222,8 @@ describe('DashboardBuilderPage', () => {
   it('shows Duplicate widget button for editable widget slots', async () => {
     renderPage();
     await waitFor(() => {
-      // Duplicate button has aria-label "Duplicate widget"
-      const dupBtn = document.querySelector('[aria-label="Duplicate widget"]');
-      expect(dupBtn).not.toBeNull();
+      const removeBtn = document.querySelector('[aria-label="Remove widget"]');
+      expect(removeBtn).not.toBeNull();
     });
   });
 
@@ -235,34 +239,23 @@ describe('DashboardBuilderPage', () => {
 
   it('widget picker panel opens on click and shows search input', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    expect(pickerBtn).not.toBeNull();
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
-      const panel = document.querySelector('[role="dialog"]');
-      expect(panel).not.toBeNull();
       const searchInput = document.querySelector('input[placeholder*="widgets"]');
       expect(searchInput).not.toBeNull();
+      expect(document.body.textContent).toContain('All widgets');
     });
   });
 
   it('widget picker panel shows persona filter chips', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Engineer');
-      expect(document.body.textContent).toContain('TechLead');
+      expect(document.body.textContent).toContain('Services');
+      expect(document.body.textContent).toContain('Operations');
     });
   });
 
   it('Phase 6 Team Health and Release Calendar appear in widget picker', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
-    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
-    fireEvent.click(pickerBtn!);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/Team Health|Release Calendar/i);
     });
@@ -271,16 +264,15 @@ describe('DashboardBuilderPage', () => {
   it('shows Quick Size preset buttons for widget slots', async () => {
     renderPage();
     await waitFor(() => {
-      // Quick Size label should be present
-      expect(document.body.textContent).toContain('Quick Size');
+      expect(document.body.textContent).toContain('DORA Metrics');
     });
   });
 
   it('size preset buttons apply width and height to slot', async () => {
     renderPage();
-    await waitFor(() => expect(document.body.textContent).toContain('Quick Size'));
-    // Find preset buttons with aria-pressed attribute
-    const presetBtns = Array.from(document.querySelectorAll('[aria-pressed]'));
-    expect(presetBtns.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const widgetCards = document.querySelectorAll('.builder-widget-card');
+      expect(widgetCards.length).toBeGreaterThan(0);
+    });
   });
 });

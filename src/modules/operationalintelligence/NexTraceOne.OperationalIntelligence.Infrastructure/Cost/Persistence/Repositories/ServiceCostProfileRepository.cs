@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -10,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 /// Repositório de perfis de custo de serviços com orçamento e alertas.
 /// Implementa consulta por serviço+ambiente para unicidade de perfil.
 /// </summary>
-internal sealed class ServiceCostProfileRepository(CostIntelligenceDbContext context)
+internal sealed class ServiceCostProfileRepository(IncidentResponseDbContext context)
     : RepositoryBase<ServiceCostProfile, ServiceCostProfileId>(context), IServiceCostProfileRepository
 {
     /// <summary>Busca um perfil de custo pelo seu identificador.</summary>

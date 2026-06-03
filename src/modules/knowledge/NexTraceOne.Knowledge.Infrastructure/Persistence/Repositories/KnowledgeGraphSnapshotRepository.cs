@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Domain.Entities;
 using NexTraceOne.Knowledge.Domain.Enums;
@@ -9,7 +10,7 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Repositório EF Core para snapshots do knowledge graph (KnowledgeGraphSnapshot).
 /// </summary>
-internal sealed class KnowledgeGraphSnapshotRepository(KnowledgeDbContext context)
+internal sealed class KnowledgeGraphSnapshotRepository(ServiceCatalogDbContext context)
     : IKnowledgeGraphSnapshotRepository
 {
     public async Task<KnowledgeGraphSnapshot?> GetByIdAsync(KnowledgeGraphSnapshotId id, CancellationToken ct)

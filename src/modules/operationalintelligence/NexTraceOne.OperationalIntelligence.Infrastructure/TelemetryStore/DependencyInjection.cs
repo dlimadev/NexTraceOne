@@ -1,20 +1,15 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore;
 
 /// <summary>
-/// Registra serviços de infraestrutura do sub-módulo TelemetryStore (Product Store).
-/// Inclui: DbContext com connection string isolada e repositórios de métricas,
-/// topologia, anomalias, referências de telemetria, correlações e investigações.
+/// Registra serviços de infraestrutura do sub-módulo TelemetryStore.
+/// O DbContext é fornecido pelo IncidentResponseDbContext — consolidado em Phase 8.
 /// </summary>
 public static class TelemetryStoreDependencyInjection
 {
@@ -23,14 +18,6 @@ public static class TelemetryStoreDependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetRequiredConnectionString("TelemetryStoreDatabase", "NexTraceOne");
-
-        services.AddDbContext<TelemetryStoreDbContext>((sp, options) =>
-            options.UseNpgsql(connectionString)
-                .AddInterceptors(
-                    sp.GetRequiredService<AuditInterceptor>(),
-                    sp.GetRequiredService<TenantRlsInterceptor>()));
-
         // ── Metrics Store ────────────────────────────────────────────────────
         services.AddScoped<IServiceMetricsWriter, ServiceMetricsRepository>();
         services.AddScoped<IServiceMetricsReader, ServiceMetricsRepository>();

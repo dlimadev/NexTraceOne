@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de TeamHealthSnapshot usando EF Core.
 /// </summary>
-internal sealed class TeamHealthSnapshotRepository(GovernanceDbContext context)
+internal sealed class TeamHealthSnapshotRepository(PlatformGovernanceDbContext context)
     : ITeamHealthSnapshotRepository
 {
     public async Task<TeamHealthSnapshot?> GetByIdAsync(

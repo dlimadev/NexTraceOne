@@ -35,9 +35,7 @@ NexTraceOne.Catalog.Domain/
 └── Contracts/          → 13 entidades (temporário, OI-01)
 
 NexTraceOne.Catalog.Infrastructure/
-├── Graph/Persistence/  → CatalogGraphDbContext (9 DbSets)
-├── Portal/Persistence/ → DeveloperPortalDbContext (5 DbSets)
-└── Contracts/Persistence/ → ContractsDbContext (11 DbSets)
+└── Persistence/ → ServiceCatalogDbContext (todos os sub-domínios consolidados)
 
 NexTraceOne.Catalog.API/
 ├── Graph/Endpoints/           → ServiceCatalogEndpointModule
@@ -69,22 +67,25 @@ NexTraceOne.Catalog.API/
 ## Base de Dados
 
 ### Tabelas (prefixo cat_)
-| Tabela | Entidade | DbContext |
-|--------|---------|-----------|
-| `cat_service_assets` | ServiceAsset | CatalogGraphDbContext |
-| `cat_api_assets` | ApiAsset | CatalogGraphDbContext |
-| `cat_consumer_assets` | ConsumerAsset | CatalogGraphDbContext |
-| `cat_consumer_relationships` | ConsumerRelationship | CatalogGraphDbContext |
-| `cat_discovery_sources` | DiscoverySource | CatalogGraphDbContext |
-| `cat_graph_snapshots` | GraphSnapshot | CatalogGraphDbContext |
-| `cat_node_health_records` | NodeHealthRecord | CatalogGraphDbContext |
-| `cat_saved_graph_views` | SavedGraphView | CatalogGraphDbContext |
-| `cat_linked_references` | LinkedReference | CatalogGraphDbContext |
-| `cat_subscriptions` | Subscription | DeveloperPortalDbContext |
-| `cat_playground_sessions` | PlaygroundSession | DeveloperPortalDbContext |
-| `cat_code_generation_records` | CodeGenerationRecord | DeveloperPortalDbContext |
-| `cat_portal_analytics_events` | PortalAnalyticsEvent | DeveloperPortalDbContext |
-| `cat_saved_searches` | SavedSearch | DeveloperPortalDbContext |
+
+Todas as tabelas do Catalog são geridas pelo `ServiceCatalogDbContext`.
+
+| Tabela | Entidade |
+|--------|---------|
+| `cat_service_assets` | ServiceAsset |
+| `cat_api_assets` | ApiAsset |
+| `cat_consumer_assets` | ConsumerAsset |
+| `cat_consumer_relationships` | ConsumerRelationship |
+| `cat_discovery_sources` | DiscoverySource |
+| `cat_graph_snapshots` | GraphSnapshot |
+| `cat_node_health_records` | NodeHealthRecord |
+| `cat_saved_graph_views` | SavedGraphView |
+| `cat_linked_references` | LinkedReference |
+| `cat_subscriptions` | Subscription |
+| `cat_playground_sessions` | PlaygroundSession |
+| `cat_code_generation_records` | CodeGenerationRecord |
+| `cat_portal_analytics_events` | PortalAnalyticsEvent |
+| `cat_saved_searches` | SavedSearch |
 
 ### Concorrência Otimista
 PostgreSQL xmin via `RowVersion` em: ServiceAsset, ApiAsset.

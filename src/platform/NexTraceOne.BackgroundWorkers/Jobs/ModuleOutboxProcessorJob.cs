@@ -89,15 +89,20 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
         // Acquire a PostgreSQL advisory lock for this module's outbox.
         // pg_try_advisory_lock is non-blocking: if another instance holds the lock, we skip this cycle.
         // This prevents duplicate event delivery in multi-instance (horizontal scale) deployments.
-        var connection = dbContext.Database.GetDbConnection();
-        if (connection.State != System.Data.ConnectionState.Open)
-            await connection.OpenAsync(cancellationToken);
-
-        bool lockAcquired = await TryAcquireAdvisoryLockAsync(connection, cancellationToken);
-        if (!lockAcquired)
+        // Non-relational providers (e.g. InMemory in tests) skip the advisory lock entirely.
+        DbConnection? connection = null;
+        if (dbContext.Database.IsRelational())
         {
-            logger.LogDebug("Outbox cycle skipped for {Module} — lock held by another instance", ModuleName);
-            return;
+            connection = dbContext.Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync(cancellationToken);
+
+            bool lockAcquired = await TryAcquireAdvisoryLockAsync(connection, cancellationToken);
+            if (!lockAcquired)
+            {
+                logger.LogDebug("Outbox cycle skipped for {Module} — lock held by another instance", ModuleName);
+                return;
+            }
         }
 
         try
@@ -218,7 +223,8 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
         } // end of advisory lock try
         finally
         {
-            await ReleaseAdvisoryLockAsync(connection);
+            if (connection is not null)
+                await ReleaseAdvisoryLockAsync(connection);
         }
     }
 

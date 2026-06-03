@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 /// Consulta incidentes persistidos via EF Core com filtragem por TenantId e EnvironmentId.
 /// Toda consulta é tenant-isolated por design.
 /// </summary>
-internal sealed class IncidentContextSurface(IncidentDbContext db) : IIncidentContextSurface
+internal sealed class IncidentContextSurface(IncidentResponseDbContext db) : IIncidentContextSurface
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<ListIncidents.IncidentListItem>> ListByContextAsync(

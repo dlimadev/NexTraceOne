@@ -151,7 +151,7 @@ describe('CapacityForecastPage', () => {
     vi.mocked(platformAdminApi.getCapacityForecast).mockResolvedValue(mockForecastAllGood);
     render(<CapacityForecastPage />, { wrapper: Wrapper });
     await waitFor(() =>
-      expect(screen.getByText('💡 Plan storage expansion before July 15.')).toBeDefined()
+      expect(screen.getByText('Plan storage expansion before July 15.')).toBeDefined()
     );
   });
 

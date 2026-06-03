@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -10,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 /// Repositório de atribuições de custo a serviços/APIs.
 /// Implementa consultas de negócio para análise de custo por serviço e período.
 /// </summary>
-internal sealed class CostAttributionRepository(CostIntelligenceDbContext context)
+internal sealed class CostAttributionRepository(IncidentResponseDbContext context)
     : RepositoryBase<CostAttribution, CostAttributionId>(context), ICostAttributionRepository
 {
     /// <summary>Busca uma atribuição de custo pelo seu identificador.</summary>

@@ -9,7 +9,7 @@ using NexTraceOne.Knowledge.Application.Features.CreateKnowledgeRelation;
 using NexTraceOne.Knowledge.Application.Features.GetKnowledgeByRelationTarget;
 using NexTraceOne.Knowledge.Domain.Entities;
 using NexTraceOne.Knowledge.Domain.Enums;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.Knowledge.Tests.Infrastructure;
@@ -22,7 +22,7 @@ public sealed class KnowledgePersistenceAndSearchIntegrationTests : IAsyncLifeti
         .WithPassword("postgres")
         .Build();
 
-    private DbContextOptions<KnowledgeDbContext>? _dbOptions;
+    private DbContextOptions<ServiceCatalogDbContext>? _dbOptions;
     private readonly ICurrentTenant _tenant = new TestCurrentTenant();
     private readonly ICurrentUser _user = new TestCurrentUser();
     private readonly IDateTimeProvider _clock = new TestDateTimeProvider(new DateTimeOffset(2026, 3, 28, 17, 0, 0, TimeSpan.Zero));
@@ -30,7 +30,7 @@ public sealed class KnowledgePersistenceAndSearchIntegrationTests : IAsyncLifeti
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
-        _dbOptions = new DbContextOptionsBuilder<KnowledgeDbContext>()
+        _dbOptions = new DbContextOptionsBuilder<ServiceCatalogDbContext>()
             .UseNpgsql(_container.GetConnectionString())
             .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
             .Options;
@@ -159,10 +159,10 @@ public sealed class KnowledgePersistenceAndSearchIntegrationTests : IAsyncLifeti
         count.Should().Be(3);
     }
 
-    private KnowledgeDbContext CreateContext()
+    private ServiceCatalogDbContext CreateContext()
     {
         _dbOptions.Should().NotBeNull();
-        return new KnowledgeDbContext(_dbOptions!, _tenant, _user, _clock);
+        return new ServiceCatalogDbContext(_dbOptions!, _tenant, _user, _clock);
     }
 
     private sealed class TestCurrentTenant : ICurrentTenant

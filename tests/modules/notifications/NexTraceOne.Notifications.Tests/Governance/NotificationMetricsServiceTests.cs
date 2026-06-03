@@ -6,7 +6,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.Governance;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Tests.Governance;
 
@@ -399,20 +399,20 @@ public sealed class NotificationMetricsServiceTests
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    private NotificationsDbContext CreateContext()
+    private ConfigurationDbContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<NotificationsDbContext>()
+        var options = new DbContextOptionsBuilder<ConfigurationDbContext>()
             .UseInMemoryDatabase($"ntf-metrics-{Guid.NewGuid():N}")
             .Options;
 
-        return new NotificationsDbContext(
+        return new ConfigurationDbContext(
             options,
             new TestCurrentTenant(_tenantId),
             new TestCurrentUser(),
             new TestDateTimeProvider(BaseTime));
     }
 
-    private static NotificationMetricsService CreateService(NotificationsDbContext context) =>
+    private static NotificationMetricsService CreateService(ConfigurationDbContext context) =>
         new(context, NullLogger<NotificationMetricsService>.Instance);
 
     /// <summary>

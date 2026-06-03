@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação EF Core do repositório de DashboardRevision (V3.1).
 /// </summary>
-internal sealed class DashboardRevisionRepository(GovernanceDbContext context) : IDashboardRevisionRepository
+internal sealed class DashboardRevisionRepository(PlatformGovernanceDbContext context) : IDashboardRevisionRepository
 {
     public async Task<IReadOnlyList<DashboardRevision>> ListByDashboardIdAsync(
         CustomDashboardId dashboardId,

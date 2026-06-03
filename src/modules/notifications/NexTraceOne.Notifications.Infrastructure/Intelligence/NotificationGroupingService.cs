@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 
@@ -12,7 +12,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 /// com base em notificações existentes na mesma janela temporal.
 /// </summary>
 internal sealed class NotificationGroupingService(
-    NotificationsDbContext context) : INotificationGroupingService
+    ConfigurationDbContext context) : INotificationGroupingService
 {
     /// <inheritdoc/>
     public string GenerateCorrelationKey(

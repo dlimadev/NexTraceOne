@@ -13,7 +13,7 @@ namespace NexTraceOne.IntegrationTests.CriticalFlows;
 
 /// <summary>
 /// Testes de integração para DbContexts de cobertura estendida contra PostgreSQL real.
-/// Cobre DeveloperPortalDbContext, RuntimeIntelligenceDbContext, CostIntelligenceDbContext
+/// Cobre DeveloperPortalDbContext, IncidentResponseDbContext (Cost entities consolidados)
 /// e AuditDbContext — contextos antes sem cobertura de integração real.
 /// </summary>
 [Collection(PostgreSqlIntegrationCollection.Name)]
@@ -61,7 +61,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateDeveloperPortalDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var subscriptionResult = Subscription.Create(
             apiAssetId: Guid.NewGuid(),
@@ -113,7 +113,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateDeveloperPortalDbContext();
+        await using var context = Fixture.CreateServiceCatalogDbContext();
 
         var sub1 = Subscription.Create(
             Guid.NewGuid(), "Orders API", Guid.NewGuid(), "dev@nextraceone.io",
@@ -228,14 +228,14 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         unhealthyServices[0].ServiceName.Should().Be("auth-service");
     }
 
-    // ── CostIntelligenceDbContext ─────────────────────────────────────────────
+    // ── CostIntelligence (consolidated into IncidentResponseDbContext) ───────
 
     [RequiresDockerFact]
     public async Task CostIntelligence_Should_Persist_CostSnapshot_And_Validate_Shares()
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateCostIntelligenceDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var snapshotResult = CostSnapshot.Create(
             serviceName: "orders-service",
@@ -274,7 +274,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateCostIntelligenceDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var normalSnapshotResult = CostSnapshot.Create(
             "payments-service", "production",
@@ -382,7 +382,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         await ResetStateAsync();
 
         var runtimeCtx = Fixture.CreateRuntimeIntelligenceDbContext();
-        var costCtx = Fixture.CreateCostIntelligenceDbContext();
+        var costCtx = Fixture.CreateIncidentResponseDbContext();
 
         await using (runtimeCtx)
         await using (costCtx)
@@ -414,6 +414,6 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         runtimeMigrations.Should().BeGreaterThan(0,
             "RuntimeIntelligenceDbContext deve ter migrations aplicadas na sua base isolada");
         costMigrations.Should().BeGreaterThan(0,
-            "CostIntelligenceDbContext deve ter migrations aplicadas na sua base isolada");
+            "IncidentResponseDbContext deve ter migrations aplicadas (Cost + TelemetryStore consolidados)");
     }
 }

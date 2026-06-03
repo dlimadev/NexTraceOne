@@ -1,40 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
-using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
-using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
-using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
-using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.ApiHost;
 
 /// <summary>
-/// Implementação de IPendingMigrationsProvider que consulta todos os 27 DbContexts
+/// Implementação de IPendingMigrationsProvider que consulta todos os 10 DbContexts
 /// registados no ApiHost para obter a lista de migrations pendentes.
 ///
 /// Esta classe reside no ApiHost (e não nos módulos) porque é o único ponto
@@ -55,32 +35,12 @@ internal sealed class ApiHostPendingMigrationsProvider(IServiceScopeFactory scop
         await CollectPendingAsync<BuildingBlocksDbContext>(sp, "BuildingBlocks", allPending, cancellationToken);
         await CollectPendingAsync<ConfigurationDbContext>(sp, "Configuration", allPending, cancellationToken);
         await CollectPendingAsync<IdentityDbContext>(sp, "Identity", allPending, cancellationToken);
-        await CollectPendingAsync<CatalogGraphDbContext>(sp, "CatalogGraph", allPending, cancellationToken);
-        await CollectPendingAsync<DeveloperPortalDbContext>(sp, "DeveloperPortal", allPending, cancellationToken);
-        await CollectPendingAsync<ContractsDbContext>(sp, "Contracts", allPending, cancellationToken);
-        await CollectPendingAsync<DeveloperExperienceDbContext>(sp, "DeveloperExperience", allPending, cancellationToken);
-        await CollectPendingAsync<LegacyAssetsDbContext>(sp, "LegacyAssets", allPending, cancellationToken);
-        await CollectPendingAsync<TemplatesDbContext>(sp, "Templates", allPending, cancellationToken);
-        await CollectPendingAsync<DependencyGovernanceDbContext>(sp, "DependencyGovernance", allPending, cancellationToken);
-        await CollectPendingAsync<ChangeIntelligenceDbContext>(sp, "ChangeIntelligence", allPending, cancellationToken);
-        await CollectPendingAsync<RulesetGovernanceDbContext>(sp, "RulesetGovernance", allPending, cancellationToken);
-        await CollectPendingAsync<WorkflowDbContext>(sp, "Workflow", allPending, cancellationToken);
-        await CollectPendingAsync<PromotionDbContext>(sp, "Promotion", allPending, cancellationToken);
-        await CollectPendingAsync<IncidentDbContext>(sp, "Incident", allPending, cancellationToken);
-        await CollectPendingAsync<RuntimeIntelligenceDbContext>(sp, "RuntimeIntelligence", allPending, cancellationToken);
-        await CollectPendingAsync<CostIntelligenceDbContext>(sp, "CostIntelligence", allPending, cancellationToken);
-        await CollectPendingAsync<ReliabilityDbContext>(sp, "Reliability", allPending, cancellationToken);
-        await CollectPendingAsync<AutomationDbContext>(sp, "Automation", allPending, cancellationToken);
-        await CollectPendingAsync<TelemetryStoreDbContext>(sp, "TelemetryStore", allPending, cancellationToken);
-        await CollectPendingAsync<AuditDbContext>(sp, "Audit", allPending, cancellationToken);
-        await CollectPendingAsync<GovernanceDbContext>(sp, "Governance", allPending, cancellationToken);
+        await CollectPendingAsync<ServiceCatalogDbContext>(sp, "ServiceCatalog", allPending, cancellationToken);
+        await CollectPendingAsync<ChangeGovernanceDbContext>(sp, "ChangeGovernance", allPending, cancellationToken);
+        await CollectPendingAsync<IncidentResponseDbContext>(sp, "IncidentResponse", allPending, cancellationToken);
+        await CollectPendingAsync<PlatformGovernanceDbContext>(sp, "PlatformGovernance", allPending, cancellationToken);
         await CollectPendingAsync<IntegrationsDbContext>(sp, "Integrations", allPending, cancellationToken);
-        await CollectPendingAsync<ProductAnalyticsDbContext>(sp, "ProductAnalytics", allPending, cancellationToken);
-        await CollectPendingAsync<NotificationsDbContext>(sp, "Notifications", allPending, cancellationToken);
-        await CollectPendingAsync<KnowledgeDbContext>(sp, "Knowledge", allPending, cancellationToken);
-        await CollectPendingAsync<AiGovernanceDbContext>(sp, "AiGovernance", allPending, cancellationToken);
-        await CollectPendingAsync<ExternalAiDbContext>(sp, "ExternalAi", allPending, cancellationToken);
-        await CollectPendingAsync<AiOrchestrationDbContext>(sp, "AiOrchestration", allPending, cancellationToken);
+        await CollectPendingAsync<AiHubDbContext>(sp, "AiHub", allPending, cancellationToken);
 
         return allPending;
     }

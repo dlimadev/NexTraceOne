@@ -8,7 +8,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de Custom Dashboards usando EF Core.
 /// </summary>
-internal sealed class CustomDashboardRepository(GovernanceDbContext context) : ICustomDashboardRepository
+internal sealed class CustomDashboardRepository(PlatformGovernanceDbContext context) : ICustomDashboardRepository
 {
     public async Task<IReadOnlyList<CustomDashboard>> ListAsync(string? persona, CancellationToken ct)
     {

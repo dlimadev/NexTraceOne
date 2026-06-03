@@ -3,18 +3,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SetupWizardPage } from '../../features/platform-admin/pages/SetupWizardPage';
 
 vi.mock('../../api/client', () => ({
-  default: { get: vi.fn(), post: vi.fn() },
+  default: {
+    get: vi.fn().mockResolvedValue({ data: null }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+  },
 }));
 
-const renderPage = () =>
-  render(
-    <MemoryRouter>
-      <SetupWizardPage />
-    </MemoryRouter>,
+const renderPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <SetupWizardPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
+};
 
 /** Navigate forward N steps from the start. */
 async function advanceSteps(user: ReturnType<typeof userEvent.setup>, n: number) {
@@ -35,7 +45,7 @@ describe('SetupWizardPage', () => {
 
   it('starts on the welcome step', () => {
     renderPage();
-    expect(screen.getByText(/Welcome to NexTraceOne/i)).toBeDefined();
+    expect(screen.getByText(/Welcome back/i)).toBeDefined();
   });
 
   it('navigates to the next step when clicking Next', async () => {
@@ -57,7 +67,7 @@ describe('SetupWizardPage', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Next/i }));
     await user.click(screen.getByRole('button', { name: /Back/i }));
-    expect(screen.getByText(/Welcome to NexTraceOne/i)).toBeDefined();
+    expect(screen.getByText(/Welcome back/i)).toBeDefined();
   });
 
   it('shows Skip button for optional steps', async () => {

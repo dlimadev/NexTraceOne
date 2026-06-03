@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de DelegatedAdministrations usando EF Core.
 /// </summary>
-internal sealed class DelegatedAdministrationRepository(GovernanceDbContext context) : IDelegatedAdministrationRepository
+internal sealed class DelegatedAdministrationRepository(PlatformGovernanceDbContext context) : IDelegatedAdministrationRepository
 {
     public async Task<IReadOnlyList<DelegatedAdministration>> ListAsync(
         DelegationScope? scope,

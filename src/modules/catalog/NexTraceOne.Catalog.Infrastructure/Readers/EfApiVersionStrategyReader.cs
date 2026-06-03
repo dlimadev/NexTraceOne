@@ -2,8 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
@@ -14,8 +13,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Readers;
 /// Substitui o NullApiVersionStrategyReader (honest-null pattern).
 /// </summary>
 internal sealed class EfApiVersionStrategyReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : IApiVersionStrategyReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : IApiVersionStrategyReader
 {
     private static readonly Regex SemverRegex = new(@"^\d+\.\d+\.\d+", RegexOptions.Compiled);
 

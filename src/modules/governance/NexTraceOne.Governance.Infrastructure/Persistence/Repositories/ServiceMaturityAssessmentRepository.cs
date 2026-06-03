@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de ServiceMaturityAssessment usando EF Core.
 /// </summary>
-internal sealed class ServiceMaturityAssessmentRepository(GovernanceDbContext context)
+internal sealed class ServiceMaturityAssessmentRepository(PlatformGovernanceDbContext context)
     : IServiceMaturityAssessmentRepository
 {
     public async Task<ServiceMaturityAssessment?> GetByIdAsync(

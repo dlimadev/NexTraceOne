@@ -4,7 +4,7 @@ using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
-public sealed class DashboardMonitorRepository(GovernanceDbContext context) : IDashboardMonitorRepository
+public sealed class DashboardMonitorRepository(PlatformGovernanceDbContext context) : IDashboardMonitorRepository
 {
     public async Task AddAsync(DashboardMonitorDefinition monitor, CancellationToken ct = default)
         => await context.DashboardMonitors.AddAsync(monitor, ct);

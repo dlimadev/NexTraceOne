@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
@@ -5,7 +6,7 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 
-internal sealed class DependencyMetricsRepository(TelemetryStoreDbContext context)
+internal sealed class DependencyMetricsRepository(IncidentResponseDbContext context)
     : IDependencyMetricsWriter, IDependencyMetricsReader
 {
     public async Task WriteAsync(DependencyMetricsSnapshot snapshot, CancellationToken cancellationToken = default)

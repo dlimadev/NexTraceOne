@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
@@ -5,7 +6,7 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 
-internal sealed class ReleaseCorrelationRepository(TelemetryStoreDbContext context)
+internal sealed class ReleaseCorrelationRepository(IncidentResponseDbContext context)
     : IReleaseCorrelationWriter, IReleaseCorrelationReader
 {
     public async Task WriteAsync(ReleaseRuntimeCorrelation correlation, CancellationToken cancellationToken = default)

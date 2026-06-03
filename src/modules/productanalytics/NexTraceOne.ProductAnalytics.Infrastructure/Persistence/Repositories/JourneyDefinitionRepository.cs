@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 
@@ -11,7 +12,7 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 /// Aplica filtro de TenantId em defense-in-depth.
 /// </summary>
 internal sealed class JourneyDefinitionRepository(
-    ProductAnalyticsDbContext context,
+    ServiceCatalogDbContext context,
     ICurrentTenant currentTenant) : IJourneyDefinitionRepository
 {
     public async Task<IReadOnlyList<JourneyDefinition>> ListActiveAsync(Guid? tenantId, CancellationToken ct)

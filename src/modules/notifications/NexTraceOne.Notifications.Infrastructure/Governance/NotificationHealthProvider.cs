@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Governance;
 
@@ -18,7 +18,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Governance;
 ///   - TeamsChannel: se há falhas recentes no canal Teams
 /// </summary>
 internal sealed class NotificationHealthProvider(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     ILogger<NotificationHealthProvider> logger) : INotificationHealthProvider
 {
     private const int MaxPendingBacklog = 100;

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Services;
 
@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Service
 /// sem permitir acesso directo ao DbContext ou repositórios internos.
 /// Leituras apenas — sem tracking para melhor performance.
 /// </summary>
-internal sealed class ReliabilityModuleService(ReliabilityDbContext context) : IReliabilityModule
+internal sealed class ReliabilityModuleService(IncidentResponseDbContext context) : IReliabilityModule
 {
     /// <inheritdoc />
     public async Task<string?> GetCurrentReliabilityStatusAsync(

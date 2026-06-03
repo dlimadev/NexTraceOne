@@ -1,17 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 
 /// <summary>
 /// Implementação da surface de runtime para o subdomínio Reliability.
-/// Acessa RuntimeIntelligenceDbContext diretamente — permitido dentro do mesmo módulo OI.
+/// Acessa IncidentResponseDbContext diretamente — permitido dentro do mesmo módulo OI.
 /// RuntimeSnapshot usa RLS via variável de sessão — sem filtro explícito de TenantId.
 /// </summary>
 internal sealed class ReliabilityRuntimeSurface(
-    RuntimeIntelligenceDbContext db,
+    IncidentResponseDbContext db,
     ICurrentTenant tenant) : IReliabilityRuntimeSurface
 {
     public async Task<RuntimeServiceSignal?> GetLatestSignalAsync(

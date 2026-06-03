@@ -9,7 +9,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação do repositório de ExecutiveBriefing usando EF Core.
 /// </summary>
-internal sealed class ExecutiveBriefingRepository(GovernanceDbContext context)
+internal sealed class ExecutiveBriefingRepository(PlatformGovernanceDbContext context)
     : IExecutiveBriefingRepository
 {
     public async Task<ExecutiveBriefing?> GetByIdAsync(

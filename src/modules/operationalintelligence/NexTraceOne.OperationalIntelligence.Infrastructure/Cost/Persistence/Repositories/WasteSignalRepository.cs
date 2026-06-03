@@ -1,10 +1,11 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 
-internal sealed class WasteSignalRepository(CostIntelligenceDbContext db) : IWasteSignalRepository
+internal sealed class WasteSignalRepository(IncidentResponseDbContext db) : IWasteSignalRepository
 {
     public async Task<IReadOnlyList<WasteSignal>> ListByServiceAsync(string serviceName, string? environment = null, CancellationToken ct = default)
     {

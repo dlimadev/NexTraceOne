@@ -1,14 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Contracts;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 using NexTraceOne.ProductAnalytics.Infrastructure.Services;
 
@@ -18,7 +14,8 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Product Analytics.
-/// Inclui: DbContext, Repositórios.
+/// Inclui: Repositórios.
+/// DbContext consolidado em ServiceCatalogDbContext (Phase 7).
 ///
 /// P2.3: AnalyticsEvent extraído de GovernanceDbContext para cá.
 /// </summary>
@@ -29,14 +26,6 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetRequiredConnectionString("ProductAnalyticsDatabase", "NexTraceOne");
-
-        services.AddDbContext<ProductAnalyticsDbContext>((serviceProvider, options) =>
-            options.UseNpgsql(connectionString)
-                .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
-
         // Repositories — P2.3
         // Provider-aware: ClickHouse for high-cardinality analytic reads, PostgreSQL as default, Elastic as primary.
         services.AddScoped<AnalyticsEventRepository>();

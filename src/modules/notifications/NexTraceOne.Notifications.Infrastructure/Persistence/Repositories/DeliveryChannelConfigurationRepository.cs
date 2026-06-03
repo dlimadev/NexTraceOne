@@ -1,3 +1,4 @@
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Notifications.Application.Abstractions;
@@ -7,7 +8,7 @@ using NexTraceOne.Notifications.Domain.StronglyTypedIds;
 
 namespace NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 
-internal sealed class DeliveryChannelConfigurationRepository(NotificationsDbContext context)
+internal sealed class DeliveryChannelConfigurationRepository(ConfigurationDbContext context)
     : IDeliveryChannelConfigurationStore
 {
     public async Task AddAsync(DeliveryChannelConfiguration config, CancellationToken cancellationToken)

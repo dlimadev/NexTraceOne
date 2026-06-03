@@ -2,20 +2,19 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
-using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.Catalog.Infrastructure.Readers;
 
 /// <summary>
 /// Implementação real de ISupplyChainRiskReader.
-/// Cruza SbomRecord (ContractsDbContext) com ServiceAsset (CatalogGraphDbContext)
+/// Cruza SbomRecord (ServiceCatalogDbContext) com ServiceAsset (ServiceCatalogDbContext)
 /// para identificar componentes vulneráveis e os serviços afectados no tenant.
 /// Wave AO.3 — GetSupplyChainRiskReport.
 /// </summary>
 internal sealed class EfSupplyChainRiskReader(
-    ContractsDbContext contractsDb,
-    CatalogGraphDbContext graphDb) : ISupplyChainRiskReader
+    ServiceCatalogDbContext contractsDb,
+    ServiceCatalogDbContext graphDb) : ISupplyChainRiskReader
 {
     public async Task<IReadOnlyList<ISupplyChainRiskReader.VulnerableComponentEntry>> ListVulnerableComponentsByTenantAsync(
         string tenantId,

@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
 /// Implementação do leitor de interfaces de serviço do Catálogo para grounding de IA.
-/// Acesso somente-leitura ao CatalogGraphDbContext para ServiceInterface + ServiceAsset.
+/// Acesso somente-leitura ao ServiceCatalogDbContext para ServiceInterface + ServiceAsset.
 /// </summary>
-public sealed class ServiceInterfaceGroundingReader(CatalogGraphDbContext catalogDb) : IServiceInterfaceGroundingReader
+public sealed class ServiceInterfaceGroundingReader(ServiceCatalogDbContext catalogDb) : IServiceInterfaceGroundingReader
 {
     public async Task<IReadOnlyList<ServiceInterfaceGroundingContext>> FindInterfacesByServiceAsync(
         string serviceIdentifier,

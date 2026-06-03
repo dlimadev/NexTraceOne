@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Infrastructure.Persistence;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
 
-internal sealed class AuditEventRepository(AuditDbContext context, ICurrentTenant currentTenant) : IAuditEventRepository
+internal sealed class AuditEventRepository(PlatformGovernanceDbContext context, ICurrentTenant currentTenant) : IAuditEventRepository
 {
     public async Task<AuditEvent?> GetByIdAsync(AuditEventId id, CancellationToken cancellationToken)
         => await context.AuditEvents
@@ -174,7 +175,7 @@ internal sealed class AuditEventRepository(AuditDbContext context, ICurrentTenan
     public void Add(AuditEvent auditEvent) => context.AuditEvents.Add(auditEvent);
 }
 
-internal sealed class AuditChainRepository(AuditDbContext context) : IAuditChainRepository
+internal sealed class AuditChainRepository(PlatformGovernanceDbContext context) : IAuditChainRepository
 {
     public async Task<AuditChainLink?> GetLatestLinkAsync(CancellationToken cancellationToken)
         => await context.AuditChainLinks

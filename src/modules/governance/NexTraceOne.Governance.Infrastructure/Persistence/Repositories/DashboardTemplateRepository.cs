@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Repositório EF Core para DashboardTemplate (V3.8).</summary>
-public sealed class DashboardTemplateRepository(GovernanceDbContext db) : IDashboardTemplateRepository
+public sealed class DashboardTemplateRepository(PlatformGovernanceDbContext db) : IDashboardTemplateRepository
 {
     public async Task<DashboardTemplate?> GetByIdAsync(DashboardTemplateId id, string? tenantId, CancellationToken ct = default)
         => await db.DashboardTemplates

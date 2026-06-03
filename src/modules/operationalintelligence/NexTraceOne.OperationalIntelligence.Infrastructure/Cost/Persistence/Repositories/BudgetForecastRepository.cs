@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
@@ -6,7 +7,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 
-internal sealed class BudgetForecastRepository(CostIntelligenceDbContext context)
+internal sealed class BudgetForecastRepository(IncidentResponseDbContext context)
     : RepositoryBase<BudgetForecast, BudgetForecastId>(context), IBudgetForecastRepository
 {
     public async Task<BudgetForecast?> GetLatestByServiceAsync(

@@ -5,7 +5,7 @@ using NexTraceOne.Governance.Domain.Entities;
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 /// <summary>Implementação EF Core do repositório de configuração SAML SSO.</summary>
-internal sealed class SamlSsoConfigurationRepository(GovernanceDbContext context) : ISamlSsoConfigurationRepository
+internal sealed class SamlSsoConfigurationRepository(PlatformGovernanceDbContext context) : ISamlSsoConfigurationRepository
 {
     public async Task<SamlSsoConfiguration?> GetActiveAsync(Guid? tenantId, CancellationToken ct)
         => await context.SamlSsoConfigurations

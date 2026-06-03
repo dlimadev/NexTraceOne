@@ -1637,6 +1637,112 @@
     "title": "Catalog, Contracts & Change Governance Configuration"
   },
   "changeConfidence": {
+    "title": "Change Confidence",
+    "subtitle": "Track and validate changes across deployments",
+    "filters": {
+      "searchPlaceholder": "Search changes...",
+      "serviceName": "Service name",
+      "allEnvironments": "All environments",
+      "allTypes": "All types",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "service": "Service",
+      "version": "Version",
+      "team": "Team",
+      "changeType": "Type",
+      "environment": "Environment",
+      "status": "Status",
+      "score": "Score",
+      "createdAt": "Created",
+      "noChanges": "No changes found",
+      "noChangesDescription": "Adjust your filters or wait for new deployments"
+    },
+    "summary": {
+      "totalChanges": "Total Changes",
+      "validatedChanges": "Validated",
+      "changesNeedingAttention": "Needs Attention",
+      "suspectedRegressions": "Suspected Regressions",
+      "changesCorrelatedWithIncidents": "Correlated with Incidents"
+    },
+    "changeType": {
+      "Deployment": "Deployment",
+      "ContractChange": "Contract Change",
+      "ConfigChange": "Config Change",
+      "SchemaChange": "Schema Change"
+    },
+    "confidenceStatus": {
+      "Validated": "Validated",
+      "NeedsAttention": "Needs Attention",
+      "Investigating": "Investigating",
+      "Pending": "Pending"
+    },
+    "detail": {
+      "backToCatalog": "Back to Catalog",
+      "overview": "Overview",
+      "description": "Description",
+      "changeType": "Change Type",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Pipeline Source",
+      "workItem": "Work Item",
+      "riskAndConfidence": "Risk & Confidence",
+      "changeScore": "Change Score",
+      "confidenceStatus": "Confidence Status",
+      "validationStatus": "Validation Status",
+      "blastRadius": "Blast Radius",
+      "totalAffected": "Total Affected",
+      "directConsumers": "Direct Consumers",
+      "transitiveConsumers": "Transitive Consumers",
+      "noBlastRadius": "No blast radius data available",
+      "evidenceReadiness": "Evidence Readiness",
+      "evidenceReadinessSubtitle": "Percentage of evidence factors passing",
+      "evidenceComplete": "All evidence complete",
+      "evidencePartial": "Evidence partially complete",
+      "evidenceNone": "No evidence available",
+      "advisory": "Advisory",
+      "advisorySubtitle": "Recommendation based on evidence assessment",
+      "recommendation": "Recommendation",
+      "overallConfidence": "Overall Confidence",
+      "rationale": "Rationale",
+      "advisoryFactors": "Contributing Factors",
+      "noAdvisory": "No advisory data available",
+      "decisionActions": "Decision Actions",
+      "decisionSubtitle": "Record your governance decision for this change",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approveConditionally": "Approve Conditionally",
+      "decisionRationale": "Rationale",
+      "decisionRationalePlaceholder": "Explain the reason for your decision...",
+      "decisionConditions": "Conditions",
+      "decisionConditionsPlaceholder": "List conditions for conditional approval...",
+      "submitDecision": "Submit Decision",
+      "decisionSuccess": "Decision recorded successfully",
+      "decisionError": "Failed to record decision",
+      "decisionHistory": "Decision History",
+      "decisionHistorySubtitle": "Past governance decisions for this change",
+      "decidedBy": "Decided by",
+      "noDecisions": "No decisions recorded",
+      "noDecisionsDescription": "No governance decisions have been made for this change yet",
+      "validation": "Validation & Evidence",
+      "factorName": {
+        "EvidenceCompleteness": "Evidence Completeness",
+        "BlastRadiusScope": "Blast Radius Scope",
+        "ChangeScore": "Change Score",
+        "RollbackReadiness": "Rollback Readiness"
+      },
+      "factorStatus": {
+        "Pass": "Pass",
+        "Warning": "Warning",
+        "Fail": "Fail",
+        "Unknown": "Unknown"
+      },
+      "recommendationType": {
+        "Approve": "Approve",
+        "Reject": "Reject",
+        "ApproveConditionally": "Approve Conditionally",
+        "NeedsMoreEvidence": "Needs More Evidence"
+      }
+    },
     "breakdown": {
       "title": "Change Confidence Breakdown",
       "aggregatedScore": "Aggregated Score",
@@ -11480,6 +11586,13 @@
     "riskScore": "Risk Score",
     "apiCount": "APIs Exposed",
     "riskFactors": "Risk Factors",
+    "loadError": "Failed to load dependency risks. Please try again.",
+    "riskLevel": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
     "errors": {
       "noServices": "No services found for the specified filter.",
       "tenantRequired": "Tenant ID is required."

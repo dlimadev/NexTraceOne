@@ -1,3 +1,4 @@
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -9,7 +10,7 @@ using NexTraceOne.Notifications.Domain.StronglyTypedIds;
 namespace NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 
 internal sealed class NotificationStoreRepository(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     IDateTimeProvider clock) : INotificationStore
 {
     public async Task AddAsync(Notification notification, CancellationToken cancellationToken)
