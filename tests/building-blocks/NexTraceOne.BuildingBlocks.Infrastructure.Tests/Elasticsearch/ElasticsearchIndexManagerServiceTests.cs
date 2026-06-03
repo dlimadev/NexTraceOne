@@ -216,9 +216,14 @@ public sealed class ElasticsearchIndexManagerServiceTests
             {
                 PutCount++;
                 if (PutCount == 1)
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+                {
+                    var firstFailureResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                    return Task.FromResult(firstFailureResponse);
+                }
             }
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var okResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            return Task.FromResult(okResponse);
         }
     }
 }
