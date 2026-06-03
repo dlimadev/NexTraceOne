@@ -37,7 +37,6 @@ using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -98,11 +97,6 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<IntegrationsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-notifications",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<NotificationsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-configuration",
         failureStatus: HealthStatus.Unhealthy,
@@ -235,9 +229,8 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<PlatformGovernanceDbC
 // OperationalIntelligence (fully consolidated: incidents, reliability, automation, runtime, cost, telemetry)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentResponseDbContext>>();
 
-// Integrations / Notifications / Configuration
+// Integrations / Configuration (Notifications consolidated into ConfigurationDbContext)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<NotificationsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ConfigurationDbContext>>();
 
 builder.Services.AddHostedService<IdentityExpirationJob>();

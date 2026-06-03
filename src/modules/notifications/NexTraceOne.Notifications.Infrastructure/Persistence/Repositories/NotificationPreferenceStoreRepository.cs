@@ -1,3 +1,4 @@
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Notifications.Application.Abstractions;
@@ -10,7 +11,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 /// Repositório EF Core para persistência de preferências de notificação.
 /// </summary>
 internal sealed class NotificationPreferenceStoreRepository(
-    NotificationsDbContext context) : INotificationPreferenceStore
+    ConfigurationDbContext context) : INotificationPreferenceStore
 {
     public async Task<IReadOnlyList<NotificationPreference>> GetByUserIdAsync(
         Guid userId,

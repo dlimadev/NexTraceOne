@@ -10,7 +10,6 @@ using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using System.Diagnostics;
 
@@ -32,7 +31,7 @@ public static class WebApplicationExtensions
     /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
     /// and by independent DbContext per module (or sub-domain).
     ///
-    /// All 15 DbContexts are registered across 7 waves ordered by dependency priority.
+    /// All 10 DbContexts are registered across 7 waves ordered by dependency priority.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -78,7 +77,7 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations for all 11 DbContexts...");
+                "Applying pending database migrations for all 10 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
@@ -97,9 +96,6 @@ public static class WebApplicationExtensions
             // Wave 5 — Integrations
             await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
 
-            // Wave 6 — Notifications & Messaging
-            await MigrateContextAsync<NotificationsDbContext>(migrationScope, pendingContexts);
-
             // Wave 7 — AI Hub (consolidated: AiGovernance + ExternalAi + AiOrchestration)
             await MigrateContextAsync<AiHubDbContext>(migrationScope, pendingContexts);
 
@@ -115,7 +111,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 11 DbContexts are up-to-date.");
+                    "No pending migrations found. All 10 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

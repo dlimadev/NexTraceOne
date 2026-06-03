@@ -8,7 +8,7 @@ using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.Intelligence;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
 
 namespace NexTraceOne.Notifications.Tests.Intelligence;
@@ -188,7 +188,7 @@ public sealed class NotificationSuppressionServiceTests
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    private static NotificationSuppressionService CreateSut(NotificationsDbContext context)
+    private static NotificationSuppressionService CreateSut(ConfigurationDbContext context)
     {
         var configResolution = Substitute.For<IConfigurationResolutionService>();
         configResolution.ResolveEffectiveValueAsync(
@@ -200,14 +200,14 @@ public sealed class NotificationSuppressionServiceTests
         return new NotificationSuppressionService(context, new MandatoryNotificationPolicy(), configResolution);
     }
 
-    private static NotificationsDbContext CreateContext()
+    private static ConfigurationDbContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<NotificationsDbContext>()
+        var options = new DbContextOptionsBuilder<ConfigurationDbContext>()
             .UseInMemoryDatabase($"ntf-suppress-tests-{Guid.NewGuid():N}")
             .Options;
 
         var now = DateTimeOffset.UtcNow;
-        return new NotificationsDbContext(
+        return new ConfigurationDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),

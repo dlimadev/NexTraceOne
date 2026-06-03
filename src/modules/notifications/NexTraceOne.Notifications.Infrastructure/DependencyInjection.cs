@@ -1,13 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.Governance.Contracts;
@@ -20,7 +17,6 @@ using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Governance;
 using NexTraceOne.Notifications.Infrastructure.Intelligence;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
 using NexTraceOne.Notifications.Infrastructure.Routing;
@@ -41,15 +37,6 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetRequiredConnectionString("NotificationsDatabase", "NexTraceOne");
-
-        services.AddDbContext<NotificationsDbContext>((serviceProvider, options) =>
-            options.UseNpgsql(connectionString)
-                .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<NotificationsDbContext>());
         services.AddScoped<INotificationStore, NotificationStoreRepository>();
 
         // ── P7.1: Templates, Channels e SMTP persistidos ──
@@ -176,7 +163,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationEffectivenessReader, NullNotificationEffectivenessReader>();
 
         // ── Domain Event Handlers (via Notifications Outbox → IEventBus) ─────────────
-        // O outbox do módulo Notifications é processado por ModuleOutboxProcessorJob<NotificationsDbContext>,
+        // O outbox do módulo Notifications é processado por ModuleOutboxProcessorJob<ConfigurationDbContext>,
         // registado no BackgroundWorkers. Estes handlers são invocados automaticamente
         // via IEventBus.PublishAsync<T> para cada evento pendente no outbox.
         services.AddScoped<IIntegrationEventHandler<NotificationCreatedEvent>, NotificationCreatedDomainEventHandler>();

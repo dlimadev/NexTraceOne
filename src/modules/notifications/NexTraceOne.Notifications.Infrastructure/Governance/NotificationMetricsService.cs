@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Governance;
 
@@ -13,7 +13,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Governance;
 /// métricas operacionais, de interação e de qualidade.
 /// </summary>
 internal sealed class NotificationMetricsService(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     ILogger<NotificationMetricsService> logger) : INotificationMetricsService
 {
     /// <inheritdoc/>

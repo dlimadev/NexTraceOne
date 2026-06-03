@@ -4,7 +4,7 @@ using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Engine;
 
@@ -18,7 +18,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Engine;
 /// <see cref="IConfigurationResolutionService"/>.
 /// </summary>
 internal sealed class NotificationDeduplicationService(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     IConfigurationResolutionService configResolution) : INotificationDeduplicationService
 {
     /// <inheritdoc/>

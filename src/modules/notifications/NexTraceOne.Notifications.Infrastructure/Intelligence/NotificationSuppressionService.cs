@@ -5,7 +5,7 @@ using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Enums;
-using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 
@@ -26,7 +26,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 /// de <see cref="IConfigurationResolutionService"/> com fallback para 30 minutos.
 /// </summary>
 internal sealed class NotificationSuppressionService(
-    NotificationsDbContext context,
+    ConfigurationDbContext context,
     IMandatoryNotificationPolicy mandatoryPolicy,
     IConfigurationResolutionService configResolution) : INotificationSuppressionService
 {
