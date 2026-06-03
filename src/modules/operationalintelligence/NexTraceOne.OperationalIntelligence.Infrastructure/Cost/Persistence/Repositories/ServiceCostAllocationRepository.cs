@@ -11,7 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 /// Repositório de registos de alocação de custo por serviço (FinOps Contextual).
 /// Wave I.2 — FinOps Contextual por Serviço.
 /// </summary>
-internal sealed class ServiceCostAllocationRepository(CostIntelligenceDbContext context)
+internal sealed class ServiceCostAllocationRepository(IncidentResponseDbContext context)
     : RepositoryBase<ServiceCostAllocationRecord, ServiceCostAllocationRecordId>(context),
       IServiceCostAllocationRepository
 {

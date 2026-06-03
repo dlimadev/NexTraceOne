@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Services;
 
@@ -19,11 +19,11 @@ public sealed class TelemetryRetentionService : ITelemetryRetentionService
     private const int TelemetryReferenceRetentionDays = 30;
     private const int TopologyStaleDays = 30;
 
-    private readonly TelemetryStoreDbContext _dbContext;
+    private readonly IncidentResponseDbContext _dbContext;
     private readonly ILogger<TelemetryRetentionService> _logger;
 
     public TelemetryRetentionService(
-        TelemetryStoreDbContext dbContext,
+        IncidentResponseDbContext dbContext,
         ILogger<TelemetryRetentionService> logger)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));

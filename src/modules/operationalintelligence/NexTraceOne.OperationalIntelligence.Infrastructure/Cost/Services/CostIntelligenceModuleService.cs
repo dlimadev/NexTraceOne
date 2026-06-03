@@ -2,17 +2,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Services;
 
 /// <summary>
 /// Implementação do contrato público do módulo CostIntelligence.
-/// Usa CostIntelligenceDbContext diretamente para consultas de leitura otimizadas.
+/// Usa IncidentResponseDbContext diretamente para consultas de leitura otimizadas.
 /// Outros módulos consomem este serviço via ICostIntelligenceModule — nunca acessam o DbContext.
 /// </summary>
 internal sealed class CostIntelligenceModuleService(
-    CostIntelligenceDbContext context,
+    IncidentResponseDbContext context,
     ILogger<CostIntelligenceModuleService> logger) : ICostIntelligenceModule
 {
     /// <inheritdoc />

@@ -8,9 +8,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 
 /// <summary>
 /// Repositório de batches de importação de custo, implementando consultas específicas de negócio.
-/// Isolamento total: acessa apenas CostIntelligenceDbContext — sem acesso cross-module.
+/// Isolamento total: acessa apenas IncidentResponseDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class CostImportBatchRepository(CostIntelligenceDbContext context)
+internal sealed class CostImportBatchRepository(IncidentResponseDbContext context)
     : RepositoryBase<CostImportBatch, CostImportBatchId>(context), ICostImportBatchRepository
 {
     /// <summary>Busca um batch de importação pelo seu identificador.</summary>

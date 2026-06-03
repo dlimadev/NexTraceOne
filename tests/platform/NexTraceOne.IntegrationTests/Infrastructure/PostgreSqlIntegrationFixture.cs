@@ -26,7 +26,6 @@ using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
@@ -44,7 +43,7 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// nextrace_it_identity   → IdentityDbContext, AuditDbContext
 /// nextrace_it_catalog    → ServiceCatalogDbContext
 /// nextrace_it_operations → ChangeGovernanceDbContext, IncidentResponseDbContext,
-///                          CostIntelligenceDbContext, GovernanceDbContext
+///                          GovernanceDbContext
 /// nextrace_it_ai         → AiGovernanceDbContext, ExternalAiDbContext, AiOrchestrationDbContext
 /// </summary>
 public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
@@ -218,13 +217,6 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     public RuntimeIntelligenceDbContext CreateRuntimeIntelligenceDbContext()
         => new(BuildOptions<RuntimeIntelligenceDbContext>(RuntimeIntelligenceConnectionString), _tenant, _user, _clock);
-
-    // ── DbContext factories — OperationalIntelligence extensions ─────────────
-
-    public CostIntelligenceDbContext CreateCostIntelligenceDbContext()
-    {
-        return new CostIntelligenceDbContext(BuildOptions<CostIntelligenceDbContext>(CostIntelligenceConnectionString), _tenant, _user, _clock);
-    }
 
     // ── DbContext factories — AIKnowledge ─────────────────────────────────────
 
@@ -415,8 +407,8 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         await using var runtimeCtx = CreateRuntimeIntelligenceDbContext();
         await runtimeCtx.Database.MigrateAsync();
 
-        await using var costContext = CreateCostIntelligenceDbContext();
-        await costContext.Database.MigrateAsync();
+        await using var incidentResponseCtx = CreateIncidentResponseDbContext();
+        await incidentResponseCtx.Database.MigrateAsync();
 
         await using var governanceContext = CreateGovernanceDbContext();
         await governanceContext.Database.MigrateAsync();

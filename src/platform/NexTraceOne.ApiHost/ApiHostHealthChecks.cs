@@ -8,7 +8,6 @@ using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.ApiHost;
@@ -25,7 +24,6 @@ internal static class ApiHostHealthChecks
             .AddCheck<DbContextConnectivityHealthCheck<ChangeGovernanceDbContext>>("change-governance-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<IncidentResponseDbContext>>("incident-response-db", HealthStatus.Unhealthy, ["ready", "health"])
             .AddCheck<DbContextConnectivityHealthCheck<PlatformGovernanceDbContext>>("governance-db", HealthStatus.Unhealthy, ["ready", "health"])
-            .AddCheck<DbContextConnectivityHealthCheck<CostIntelligenceDbContext>>("cost-intelligence-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<AiHubDbContext>>("ai-hub-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<AiProvidersHealthCheck>("ai-providers", HealthStatus.Degraded, ["health"]);
 

@@ -8,9 +8,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Re
 
 /// <summary>
 /// Repositório de registos de custo, implementando consultas específicas de negócio.
-/// Isolamento total: acessa apenas CostIntelligenceDbContext — sem acesso cross-module.
+/// Isolamento total: acessa apenas IncidentResponseDbContext — sem acesso cross-module.
 /// </summary>
-internal sealed class CostRecordRepository(CostIntelligenceDbContext context)
+internal sealed class CostRecordRepository(IncidentResponseDbContext context)
     : RepositoryBase<CostRecord, CostRecordId>(context), ICostRecordRepository
 {
     /// <summary>Busca um registo de custo pelo seu identificador.</summary>

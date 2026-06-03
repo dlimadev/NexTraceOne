@@ -5,7 +5,7 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 
-internal sealed class AnomalySnapshotRepository(TelemetryStoreDbContext context)
+internal sealed class AnomalySnapshotRepository(IncidentResponseDbContext context)
     : IAnomalySnapshotWriter, IAnomalySnapshotReader
 {
     public async Task WriteAsync(AnomalySnapshot snapshot, CancellationToken cancellationToken = default)

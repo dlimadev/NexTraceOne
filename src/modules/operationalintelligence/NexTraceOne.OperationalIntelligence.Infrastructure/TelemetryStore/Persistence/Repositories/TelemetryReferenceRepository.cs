@@ -5,7 +5,7 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
 
-internal sealed class TelemetryReferenceRepository(TelemetryStoreDbContext context)
+internal sealed class TelemetryReferenceRepository(IncidentResponseDbContext context)
     : ITelemetryReferenceWriter, ITelemetryReferenceReader
 {
     public async Task WriteAsync(TelemetryReference reference, CancellationToken cancellationToken = default)

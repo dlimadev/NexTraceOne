@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 
 /// <summary>Repositório EF Core de CarbonScoreRecord.</summary>
-internal sealed class CarbonScoreRepository(CostIntelligenceDbContext db) : ICarbonScoreRepository
+internal sealed class CarbonScoreRepository(IncidentResponseDbContext db) : ICarbonScoreRepository
 {
     public async Task<IReadOnlyList<CarbonScoreRecord>> ListByTenantAndPeriodAsync(
         Guid tenantId, DateOnly from, DateOnly to, CancellationToken cancellationToken)

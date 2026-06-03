@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Services;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Cost.Infrastructure;
 
@@ -299,20 +299,20 @@ public sealed class CostIntelligenceModuleServiceTests
         return result.Value;
     }
 
-    private static CostIntelligenceDbContext CreateDbContext()
+    private static IncidentResponseDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<CostIntelligenceDbContext>()
+        var options = new DbContextOptionsBuilder<IncidentResponseDbContext>()
             .UseInMemoryDatabase($"cost-intelligence-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new CostIntelligenceDbContext(
+        return new IncidentResponseDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
             new TestDateTimeProvider());
     }
 
-    private static ICostIntelligenceModule CreateSut(CostIntelligenceDbContext db)
+    private static ICostIntelligenceModule CreateSut(IncidentResponseDbContext db)
         => new CostIntelligenceModuleService(db, NullLogger<CostIntelligenceModuleService>.Instance);
 
     private sealed class TestCurrentTenant : ICurrentTenant

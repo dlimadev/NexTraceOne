@@ -2,10 +2,14 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
@@ -13,8 +17,8 @@ using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 /// <summary>
-/// DbContext consolidado do módulo OperationalIntelligence (IncidentResponse).
-/// Unifica IncidentDbContext + ReliabilityDbContext + AutomationDbContext + RuntimeIntelligenceDbContext.
+/// DbContext consolidado do módulo OperationalIntelligence.
+/// Unifica Incidents + Reliability + Automation + RuntimeIntelligence + CostIntelligence + TelemetryStore.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
@@ -27,7 +31,8 @@ public sealed class IncidentResponseDbContext(
       IUnitOfWork,
       IReliabilityUnitOfWork,
       IAutomationUnitOfWork,
-      IRuntimeIntelligenceUnitOfWork
+      IRuntimeIntelligenceUnitOfWork,
+      ICostIntelligenceUnitOfWork
 {
     // ── Incidents ─────────────────────────────────────────────────────────────
     public DbSet<IncidentRecord> Incidents => Set<IncidentRecord>();
@@ -70,6 +75,28 @@ public sealed class IncidentResponseDbContext(
     public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
     public DbSet<ProfilingSession> ProfilingSessions => Set<ProfilingSession>();
     public DbSet<SloObservation> SloObservations => Set<SloObservation>();
+
+    // ── Cost Intelligence (consolidated from CostIntelligenceDbContext) ───
+    public DbSet<CostSnapshot> CostSnapshots => Set<CostSnapshot>();
+    public DbSet<CostAttribution> CostAttributions => Set<CostAttribution>();
+    public DbSet<CostTrend> CostTrends => Set<CostTrend>();
+    public DbSet<ServiceCostProfile> ServiceCostProfiles => Set<ServiceCostProfile>();
+    public DbSet<CostImportBatch> CostImportBatches => Set<CostImportBatch>();
+    public DbSet<CostRecord> CostRecords => Set<CostRecord>();
+    public DbSet<BudgetForecast> BudgetForecasts => Set<BudgetForecast>();
+    public DbSet<EfficiencyRecommendation> EfficiencyRecommendations => Set<EfficiencyRecommendation>();
+    public DbSet<WasteSignal> WasteSignals => Set<WasteSignal>();
+    public DbSet<CarbonScoreRecord> CarbonScoreRecords => Set<CarbonScoreRecord>();
+    public DbSet<ServiceCostAllocationRecord> ServiceCostAllocations => Set<ServiceCostAllocationRecord>();
+
+    // ── TelemetryStore (consolidated from TelemetryStoreDbContext) ────────
+    public DbSet<ServiceMetricsSnapshot> ServiceMetricsSnapshots => Set<ServiceMetricsSnapshot>();
+    public DbSet<DependencyMetricsSnapshot> DependencyMetricsSnapshots => Set<DependencyMetricsSnapshot>();
+    public DbSet<ObservedTopologyEntry> ObservedTopologyEntries => Set<ObservedTopologyEntry>();
+    public DbSet<AnomalySnapshot> AnomalySnapshots => Set<AnomalySnapshot>();
+    public DbSet<TelemetryReference> TelemetryReferences => Set<TelemetryReference>();
+    public DbSet<ReleaseRuntimeCorrelation> ReleaseRuntimeCorrelations => Set<ReleaseRuntimeCorrelation>();
+    public DbSet<InvestigationContext> InvestigationContexts => Set<InvestigationContext>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

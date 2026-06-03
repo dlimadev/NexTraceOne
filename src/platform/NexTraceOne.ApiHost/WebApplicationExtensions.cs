@@ -1,6 +1,4 @@
 using NexTraceOne.Catalog.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Diagnostics;
@@ -80,20 +78,18 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations for all 15 DbContexts...");
+                "Applying pending database migrations for all 11 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
 
-            // Wave 2 — Service Catalog (consolidated: graph, contracts, portal, dx, legacy, templates, dep-gov)
+            // Wave 2 — Service Catalog (consolidated: graph, contracts, portal, dx, legacy, templates, dep-gov, knowledge, productanalytics)
             await MigrateContextAsync<ServiceCatalogDbContext>(migrationScope, pendingContexts);
 
-            // Wave 3 — Change Governance & Operational Intelligence (consolidated)
+            // Wave 3 — Change Governance & Operational Intelligence (consolidated: incidents, reliability, automation, runtime, cost, telemetry)
             await MigrateContextAsync<ChangeGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IncidentResponseDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<TelemetryStoreDbContext>(migrationScope, pendingContexts);
 
             // Wave 4 — PlatformGovernance (consolidated: Governance + AuditCompliance)
             await MigrateContextAsync<PlatformGovernanceDbContext>(migrationScope, pendingContexts);
@@ -119,7 +115,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 13 DbContexts are up-to-date.");
+                    "No pending migrations found. All 11 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

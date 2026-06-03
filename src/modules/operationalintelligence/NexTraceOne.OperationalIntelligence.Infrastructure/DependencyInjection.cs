@@ -12,6 +12,7 @@ using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Services;
@@ -75,6 +76,7 @@ public static class DependencyInjection
         services.AddScoped<IReliabilityUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IAutomationUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IRuntimeIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
+        services.AddScoped<ICostIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
 
         // ── Incidents ─────────────────────────────────────────────────────────
         services.AddScoped<IIncidentStore, EfIncidentStore>();

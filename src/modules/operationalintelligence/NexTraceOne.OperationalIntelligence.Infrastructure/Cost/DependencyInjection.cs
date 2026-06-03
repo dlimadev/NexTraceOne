@@ -1,16 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Infrastructure;
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.FinOps.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Services;
 
@@ -18,8 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo CostIntelligence.
-/// Inclui: DbContext com connection string isolada, repositórios e UnitOfWork.
-/// Cada módulo possui sua própria base de dados — sem compartilhamento.
+/// O DbContext é fornecido pelo IncidentResponseDbContext — consolidado em Phase 8.
 /// </summary>
 public static class DependencyInjection
 {
@@ -28,19 +20,6 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddBuildingBlocksInfrastructure(configuration);
-
-        var connectionString = configuration.GetRequiredConnectionString("CostIntelligenceDatabase", "NexTraceOne");
-
-        services.AddDbContext<CostIntelligenceDbContext>((serviceProvider, options) =>
-            options.UseNpgsql(connectionString)
-                .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
-                .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CostIntelligenceDbContext>());
-        services.AddScoped<ICostIntelligenceUnitOfWork>(sp => sp.GetRequiredService<CostIntelligenceDbContext>());
         services.AddScoped<ICostSnapshotRepository, CostSnapshotRepository>();
         services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
         services.AddScoped<IServiceCostProfileRepository, ServiceCostProfileRepository>();

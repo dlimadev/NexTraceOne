@@ -35,9 +35,7 @@ using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
@@ -70,7 +68,6 @@ builder.Services.AddChangeGovernanceModule(builder.Configuration);
 builder.Services.AddAiHubModule(builder.Configuration);
 builder.Services.AddPlatformGovernanceModule(builder.Configuration);
 builder.Services.AddIncidentResponseModule(builder.Configuration);
-builder.Services.AddCostIntelligenceModule(builder.Configuration);
 builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
 builder.Services.AddKnowledgeInfrastructure(builder.Configuration);
 builder.Services.AddProductAnalyticsInfrastructure(builder.Configuration);
@@ -101,11 +98,6 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<IntegrationsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-telemetry-store",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<TelemetryStoreDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-notifications",
         failureStatus: HealthStatus.Unhealthy,
@@ -146,11 +138,6 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<IncidentResponseDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-cost-intelligence",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<CostIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
@@ -245,13 +232,11 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<AiHubDbContext>>();
 // PlatformGovernance consolidated (Governance + AuditCompliance)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<PlatformGovernanceDbContext>>();
 
-// OperationalIntelligence — IncidentResponse (consolidated DbContext) + Cost (separate)
+// OperationalIntelligence (fully consolidated: incidents, reliability, automation, runtime, cost, telemetry)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentResponseDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<CostIntelligenceDbContext>>();
 
-// Integrations / TelemetryStore / Notifications / Configuration
+// Integrations / Notifications / Configuration
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<TelemetryStoreDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<NotificationsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ConfigurationDbContext>>();
 
