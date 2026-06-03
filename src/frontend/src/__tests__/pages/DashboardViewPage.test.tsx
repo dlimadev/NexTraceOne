@@ -95,6 +95,10 @@ describe('DashboardViewPage', () => {
     vi.mocked(client.get).mockImplementation((url: string) => {
       if (url.includes('dora-metrics')) return Promise.resolve({ data: mockDoraData });
       if (url.includes('incidents')) return Promise.resolve({ data: mockIncidentData });
+      if (url.includes('variables')) return Promise.resolve({ data: { variables: [
+        { key: 'service', label: '$service', type: 'query', defaultValue: null, values: [], allowMultiple: false },
+        { key: 'team', label: '$team', type: 'query', defaultValue: null, values: [], allowMultiple: false },
+      ] } });
       return Promise.resolve({ data: mockRenderData });
     });
     vi.mocked(client.put).mockResolvedValue({ data: {} });
