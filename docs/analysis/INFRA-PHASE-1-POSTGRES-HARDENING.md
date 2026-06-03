@@ -11,7 +11,7 @@
 ### Problema
 
 O `Maximum Pool Size=20` configurado no `.env.example` (linha 34) é partilhado por
-28 DbContexts e 3 processos (ApiHost, Workers, Ingestion). Em carga, isto cria
+9 DbContexts consolidados e 3 processos (ApiHost, Workers, Ingestion). Em carga, isto cria
 contenção severa no PostgreSQL.
 
 ### Solução

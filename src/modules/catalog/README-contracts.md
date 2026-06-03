@@ -116,7 +116,7 @@ Draft → InReview → Approved → Locked → Deprecated → Sunset → Retired
 
 ## Base de Dados
 
-- **DbContext**: `ContractsDbContext`
+- **DbContext**: `ServiceCatalogDbContext`
 - **Prefixo de tabelas**: `ctr_` (atualizado de `ct_`)
 - **11 tabelas**: contract_versions, contract_diffs, contract_rule_violations, contract_artifacts, contract_drafts, contract_reviews, contract_examples, spectral_rulesets, canonical_entities, contract_scorecards, contract_evidence_packs
 - **Outbox**: `ctr_outbox_messages`

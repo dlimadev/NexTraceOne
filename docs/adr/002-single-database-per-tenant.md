@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-With 12 bounded context modules and 27 DbContexts, we needed a data isolation strategy that balances:
+With 12 bounded context modules and 9 DbContexts (consolidated from 27), we needed a data isolation strategy that balances:
 
 - **Tenant isolation** for multi-tenant SaaS and self-hosted deployments.
 - **Module isolation** to prevent one module from accessing another's data directly.
@@ -30,7 +30,7 @@ We chose **single PostgreSQL database (`nextraceone`)** with:
 
 - **Table-prefix isolation** per module (e.g., `iam_users`, `cat_services`, `cg_changes`).
 - **Row-Level Security (RLS)** policies on all tenant-scoped tables for defence-in-depth.
-- **27 separate EF Core DbContexts** — each module only sees its own tables.
+- **9 consolidated EF Core DbContexts** — each bounded context owns its tables, sub-domains share the context.
 - **Automated RLS application** after migrations via `apply-rls.sql` script.
 - **All connection strings** point to the same physical database with different pool configurations.
 

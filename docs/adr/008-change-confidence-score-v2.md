@@ -67,7 +67,7 @@ Se uma fonte não estiver configurada (ex.: `ICanaryProvider` é `NullCanaryProv
 
 - Novo agregado `ChangeConfidenceBreakdown` em `ChangeGovernance.Domain.ChangeIntelligence`.
 - Tabela `chg_confidence_breakdowns` + `chg_confidence_sub_scores` (1:N).
-- Migração EF Core em `ChangeIntelligenceDbContext`.
+- Migração EF Core em `ChangeGovernanceDbContext`.
 - Retenção mínima: `Value` e `Citations` mantidos imutáveis por release; re-cálculo cria nova versão (não mutação).
 
 ### API
@@ -129,7 +129,7 @@ A soma dos pesos é normalizada — não é preciso garantir 1.0 na config.
 
 ## Critérios de aceite
 
-- [ ] `ChangeConfidenceBreakdown` persistido via EF Core em `ChangeIntelligenceDbContext`.
+- [ ] `ChangeConfidenceBreakdown` persistido via EF Core em `ChangeGovernanceDbContext`.
 - [ ] Todos os sub-scores com citações verificáveis (URIs resolvíveis no backend).
 - [ ] Cálculo respeita `CancellationToken`, retorna `Result<T>`.
 - [ ] Degradação graciosa quando provider opcional não está configurado.

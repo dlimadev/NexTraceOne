@@ -47,7 +47,7 @@ O produto nasce como monólito modular deliberado, sem microserviços prematuros
 │                     │                                                     │
 │                     ▼                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────┐ │
-│  │                      PostgreSQL (28 DbContexts)                     │ │
+│  │                       PostgreSQL (9 DbContexts)                     │ │
 │  └─────────────────────────────────────────────────────────────────────┘ │
 │                                                                          │
 │  ┌────────────────────┐   ┌───────────┐   ┌──────────────────────────┐  │
@@ -81,50 +81,21 @@ O NexTraceOne possui **12 bounded contexts** organizados em `src/modules/`. Cada
 | **Configuration** | `configuration/` | Parametrização da plataforma, feature flags, políticas por tenant/ambiente |
 | **ProductAnalytics** | `productanalytics/` | Métricas de adoção, journeys, friction indicators, Value Score, TTFV |
 
-### 3.2 Sub-contextos com DbContexts próprios
+### 3.2 DbContexts Consolidados (9 total)
 
-Alguns módulos possuem múltiplos sub-contextos internos com DbContexts independentes. O módulo **Catalog** é o mais complexo:
+Após a consolidação DDD (Fases 1-9), cada bounded context possui um único DbContext que centraliza todos os seus sub-domínios:
 
-| Sub-contexto | DbContext |
-|---|---|
-| Catalog Core | `CatalogDbContext` |
-| Contracts | `ContractsDbContext` |
-| Developer Portal | `DeveloperPortalDbContext` |
-| Templates | `TemplatesDbContext` |
-| Developer Experience | `DeveloperExperienceDbContext` |
-| Legacy Assets | `LegacyAssetsDbContext` |
-| Graph | `CatalogGraphDbContext` |
-| Dependency Governance | `DependencyGovernanceDbContext` |
-
-O módulo **ChangeGovernance** também possui múltiplos sub-contextos:
-
-| Sub-contexto | DbContext |
-|---|---|
-| Change Intelligence | `ChangeIntelligenceDbContext` |
-| Workflow | `WorkflowDbContext` |
-| Promotion | `PromotionDbContext` |
-| Ruleset Governance | `RulesetGovernanceDbContext` |
-
-E o módulo **OperationalIntelligence**:
-
-| Sub-contexto | DbContext |
-|---|---|
-| Incidents | `IncidentDbContext` |
-| Reliability | `ReliabilityDbContext` |
-| Automation | `AutomationDbContext` |
-| Runtime Intelligence | `RuntimeIntelligenceDbContext` |
-| Telemetry Store | `TelemetryStoreDbContext` |
-| Cost Intelligence | `CostIntelligenceDbContext` |
-
-O módulo **AIKnowledge** possui três sub-contextos:
-
-| Sub-contexto | DbContext |
-|---|---|
-| Governance | `AiGovernanceDbContext` |
-| External AI | `ExternalAiDbContext` |
-| Orchestration | `AiOrchestrationDbContext` |
-
-**Total: 28 DbContexts** distribuídos pelos 12 módulos.
+| DbContext | Módulos / Sub-domínios incluídos | Connection String |
+|---|---|---|
+| `BuildingBlocksDbContext` | Infraestrutura base transversal | `NexTraceOne` |
+| `IdentityDbContext` | Identity & Access (IAM completo) | `IdentityDatabase` |
+| `ServiceCatalogDbContext` | Catalog Core, Contracts, Developer Portal, Templates, Developer Experience, Legacy Assets, Graph, Dependency Governance, Knowledge, ProductAnalytics | `ServiceCatalogDatabase` |
+| `ChangeGovernanceDbContext` | Change Intelligence, Workflow, Promotion, Ruleset Governance | `ChangeGovernanceDatabase` |
+| `IncidentResponseDbContext` | Incidents, Reliability, Automation, Runtime Intelligence, Telemetry Store, Cost Intelligence | `IncidentResponseDatabase` |
+| `PlatformGovernanceDbContext` | Governance (reports, risk, policies), AuditCompliance | `GovernanceDatabase` |
+| `AiHubDbContext` | AI Governance, External AI, Orchestration, AI Knowledge | `AiHubDatabase` |
+| `IntegrationsDbContext` | ConnectorHub, Webhooks, Dead Letter Queue | `IntegrationsDatabase` |
+| `ConfigurationDbContext` | Platform Configuration, Feature Flags, Notifications | `ConfigurationDatabase` |
 
 ---
 

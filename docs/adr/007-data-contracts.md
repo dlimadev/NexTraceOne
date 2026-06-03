@@ -49,7 +49,7 @@ Adicionar **Data Contracts** como novo tipo de contrato first-class dentro do bo
    - Data Contracts **não** substituem Event Contracts (AsyncAPI). Um tópico Kafka pode ter ambos: o Event Contract descreve a forma da mensagem; o Data Contract pode descrever o *stream agregado* consumido para analítica.
    - Data Contracts **não** substituem REST contracts. Uma vista exposta por API continua modelada como REST; o Data Contract modela a tabela/vista física.
    - Regra: se o consumidor primário é **outro sistema de dados** (warehouse, lakehouse, feature store, dashboard), é Data Contract. Se é **outro serviço aplicacional via protocolo**, é o contrato de protocolo.
-5. **Persistência**: nova migração em `ContractsDbContext` (mesmo DbContext dos outros contratos, não separar) — `ct_data_contracts`, `ct_data_contract_versions`, `ct_data_contract_quality_checks`, `ct_data_contract_lineage_edges`.
+5. **Persistência**: nova migração em `ServiceCatalogDbContext` (DbContext consolidado que unifica todos os sub-domínios do Catalog) — `ct_data_contracts`, `ct_data_contract_versions`, `ct_data_contract_quality_checks`, `ct_data_contract_lineage_edges`.
 6. **Features CQRS** espelhando o padrão existente: `CreateDataContract`, `PublishDataContractVersion`, `DeprecateDataContract`, `ListDataContracts`, `GetDataContractHealth`, `ComputeDataContractDiff`, `EvaluateDataContractCompatibility`.
 7. **Integração com outros módulos** (sem quebrar fronteira):
    - `ChangeGovernance` passa a considerar Data Contracts em BlastRadius e PromotionGates.
