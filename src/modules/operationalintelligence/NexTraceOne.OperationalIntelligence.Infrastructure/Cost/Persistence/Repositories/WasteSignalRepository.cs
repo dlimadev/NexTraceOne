@@ -1,3 +1,4 @@
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
