@@ -12,10 +12,8 @@ using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using System.Diagnostics;
 
 namespace NexTraceOne.ApiHost;
@@ -100,13 +98,11 @@ public static class WebApplicationExtensions
             // Wave 4 — PlatformGovernance (consolidated: Governance + AuditCompliance)
             await MigrateContextAsync<PlatformGovernanceDbContext>(migrationScope, pendingContexts);
 
-            // Wave 5 — Integrations & Product Analytics
+            // Wave 5 — Integrations
             await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<ProductAnalyticsDbContext>(migrationScope, pendingContexts);
 
-            // Wave 6 — Notifications, Messaging & Knowledge
+            // Wave 6 — Notifications & Messaging
             await MigrateContextAsync<NotificationsDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<KnowledgeDbContext>(migrationScope, pendingContexts);
 
             // Wave 7 — AI Hub (consolidated: AiGovernance + ExternalAi + AiOrchestration)
             await MigrateContextAsync<AiHubDbContext>(migrationScope, pendingContexts);
@@ -123,7 +119,7 @@ public static class WebApplicationExtensions
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. All 15 DbContexts are up-to-date.");
+                    "No pending migrations found. All 13 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)

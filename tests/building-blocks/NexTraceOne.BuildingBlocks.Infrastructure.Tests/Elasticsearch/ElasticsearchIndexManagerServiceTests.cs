@@ -196,6 +196,13 @@ public sealed class ElasticsearchIndexManagerServiceTests
             }
             return new HttpResponseMessage(status);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                foreach (var r in _requests) r.Dispose();
+            base.Dispose(disposing);
+        }
     }
 
     private sealed class FailFirstPutHandler : HttpMessageHandler

@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using NexTraceOne.Knowledge.Domain.Entities;
 
-namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Catalog.Infrastructure.Persistence.Configurations.Knowledge;
 
 internal sealed class ProposedRunbookConfiguration : IEntityTypeConfiguration<ProposedRunbook>
 {

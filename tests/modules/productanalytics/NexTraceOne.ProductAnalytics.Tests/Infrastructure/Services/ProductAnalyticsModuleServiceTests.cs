@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Contracts;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Services;
 
 namespace NexTraceOne.ProductAnalytics.Tests.Infrastructure.Services;
@@ -254,23 +254,23 @@ public sealed class ProductAnalyticsModuleServiceTests
             occurredAt: FixedNow);
 
     private static async Task SeedEventsAsync(
-        ProductAnalyticsDbContext db,
+        ServiceCatalogDbContext db,
         params AnalyticsEvent[] events)
     {
         db.AnalyticsEvents.AddRange(events);
         await db.SaveChangesAsync();
     }
 
-    private static IProductAnalyticsModule CreateSut(ProductAnalyticsDbContext db)
+    private static IProductAnalyticsModule CreateSut(ServiceCatalogDbContext db)
         => new ProductAnalyticsModuleService(db, new TestCurrentTenant());
 
-    private static ProductAnalyticsDbContext CreateDbContext()
+    private static ServiceCatalogDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ProductAnalyticsDbContext>()
+        var options = new DbContextOptionsBuilder<ServiceCatalogDbContext>()
             .UseInMemoryDatabase($"product-analytics-module-tests-{Guid.NewGuid():N}")
             .Options;
 
-        return new ProductAnalyticsDbContext(
+        return new ServiceCatalogDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),

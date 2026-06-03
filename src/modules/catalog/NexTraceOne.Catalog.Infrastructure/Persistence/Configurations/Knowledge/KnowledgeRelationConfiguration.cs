@@ -2,15 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using NexTraceOne.Knowledge.Domain.Entities;
-using NexTraceOne.Knowledge.Domain.Enums;
 
-namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Catalog.Infrastructure.Persistence.Configurations.Knowledge;
 
-/// <summary>
-/// Configuração EF Core para a entidade KnowledgeRelation.
-/// Define mapeamento de tabela, typed ID, enums e índices.
-/// Prefixo: knw_
-/// </summary>
 internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<KnowledgeRelation>
 {
     public void Configure(EntityTypeBuilder<KnowledgeRelation> builder)
@@ -27,36 +21,15 @@ internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new KnowledgeRelationId(value));
 
-        builder.Property(x => x.SourceEntityId)
-            .IsRequired();
+        builder.Property(x => x.SourceEntityId).IsRequired();
+        builder.Property(x => x.SourceEntityType).HasConversion<string>().HasMaxLength(100).IsRequired();
+        builder.Property(x => x.TargetEntityId).IsRequired();
+        builder.Property(x => x.TargetType).HasConversion<string>().HasMaxLength(50).IsRequired();
+        builder.Property(x => x.Description).HasMaxLength(1000);
+        builder.Property(x => x.Context).HasMaxLength(100);
+        builder.Property(x => x.CreatedById).IsRequired();
+        builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
 
-        builder.Property(x => x.SourceEntityType)
-            .HasConversion<string>()
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.TargetEntityId)
-            .IsRequired();
-
-        builder.Property(x => x.TargetType)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
-        builder.Property(x => x.Description)
-            .HasMaxLength(1000);
-
-        builder.Property(x => x.Context)
-            .HasMaxLength(100);
-
-        builder.Property(x => x.CreatedById)
-            .IsRequired();
-
-        builder.Property(x => x.CreatedAt)
-            .HasColumnType("timestamp with time zone")
-            .IsRequired();
-
-        // Índices para consultas frequentes
         builder.HasIndex(x => x.SourceEntityId);
         builder.HasIndex(x => x.TargetEntityId);
         builder.HasIndex(x => x.TargetType);

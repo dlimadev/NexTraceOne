@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Context;
 
 /// <summary>
 /// Implementação do leitor de documentos do Knowledge Hub para grounding de IA.
-/// Acesso somente-leitura ao KnowledgeDbContext.
+/// Acesso somente-leitura ao ServiceCatalogDbContext (Knowledge consolidado).
 /// </summary>
-public sealed class KnowledgeDocumentGroundingReader(KnowledgeDbContext knowledgeDb) : IKnowledgeDocumentGroundingReader
+public sealed class KnowledgeDocumentGroundingReader(ServiceCatalogDbContext knowledgeDb) : IKnowledgeDocumentGroundingReader
 {
     public async Task<IReadOnlyList<KnowledgeDocumentGroundingContext>> SearchDocumentsAsync(
         string searchTerm,

@@ -1,14 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Contracts;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Knowledge.Infrastructure.Search;
 
@@ -16,7 +10,8 @@ namespace NexTraceOne.Knowledge.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Knowledge.
-/// Inclui: DbContext, Repositórios, UnitOfWork, Search Provider.
+/// Inclui: Repositórios, Search Provider.
+/// DbContext consolidado em ServiceCatalogDbContext (Phase 7).
 ///
 /// P10.1: Criação do módulo backend dedicado de Knowledge Hub.
 /// P10.2: Adição do KnowledgeSearchProvider para search cross-module.
@@ -28,18 +23,6 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetRequiredConnectionString("KnowledgeDatabase", "NexTraceOne");
-
-        services.AddDbContext<KnowledgeDbContext>((serviceProvider, options) =>
-            options.UseNpgsql(connectionString)
-                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
-                .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
-
-        // Unit of Work
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<KnowledgeDbContext>());
-
         // Repositories
         services.AddScoped<IKnowledgeDocumentRepository, KnowledgeDocumentRepository>();
         services.AddScoped<IOperationalNoteRepository, OperationalNoteRepository>();

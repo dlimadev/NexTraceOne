@@ -1,9 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Entities;
 using NexTraceOne.Knowledge.Domain.Enums;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.Knowledge.Infrastructure.Search;
 
@@ -15,7 +15,7 @@ namespace NexTraceOne.Knowledge.Infrastructure.Search;
 internal sealed class RunbookKnowledgeLinkingService(
     IOperationalNoteRepository noteRepository,
     IKnowledgeRelationRepository relationRepository,
-    KnowledgeDbContext unitOfWork,
+    ServiceCatalogDbContext unitOfWork,
     IDateTimeProvider clock) : IRunbookKnowledgeLinkingService
 {
     private static readonly Guid SystemAuthorId = Guid.Parse("00000000-0000-0000-0000-000000000001");

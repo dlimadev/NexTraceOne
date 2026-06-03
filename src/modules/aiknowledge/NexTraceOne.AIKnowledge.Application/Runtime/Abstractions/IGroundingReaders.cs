@@ -110,7 +110,7 @@ public sealed record KnowledgeDocumentGroundingContext(
 
 /// <summary>
 /// Leitor somente-leitura de documentos do Knowledge Hub para grounding de IA.
-/// Abstrai o acesso cross-módulo ao KnowledgeDbContext.
+/// Abstrai o acesso cross-módulo ao ServiceCatalogDbContext (Knowledge consolidado).
 /// </summary>
 public interface IKnowledgeDocumentGroundingReader
 {

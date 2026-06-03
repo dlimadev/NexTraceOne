@@ -39,8 +39,6 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 
@@ -103,16 +101,6 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<IntegrationsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-knowledge",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<KnowledgeDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "outbox-processor-product-analytics",
-        failureStatus: HealthStatus.Unhealthy,
-        tags: ["health"],
-        args: [ModuleOutboxProcessorJob<ProductAnalyticsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-telemetry-store",
         failureStatus: HealthStatus.Unhealthy,
@@ -261,10 +249,8 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<PlatformGovernanceDbC
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentResponseDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<CostIntelligenceDbContext>>();
 
-// Integrations / Knowledge / ProductAnalytics / TelemetryStore / Notifications / Configuration
+// Integrations / TelemetryStore / Notifications / Configuration
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<KnowledgeDbContext>>();
-builder.Services.AddHostedService<ModuleOutboxProcessorJob<ProductAnalyticsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<TelemetryStoreDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<NotificationsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ConfigurationDbContext>>();

@@ -1,18 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Contracts;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.Knowledge.Infrastructure.Services;
 
 /// <summary>
 /// Implementação do contrato público do módulo Knowledge.
-/// Usa KnowledgeDbContext diretamente para consultas de leitura otimizadas.
+/// Usa ServiceCatalogDbContext diretamente para consultas de leitura otimizadas.
 /// Outros módulos consomem este serviço via IKnowledgeModule — nunca acessam o DbContext.
 /// </summary>
 internal sealed class KnowledgeModuleService(
-    KnowledgeDbContext context,
+    ServiceCatalogDbContext context,
     ILogger<KnowledgeModuleService> logger) : IKnowledgeModule
 {
     /// <inheritdoc />

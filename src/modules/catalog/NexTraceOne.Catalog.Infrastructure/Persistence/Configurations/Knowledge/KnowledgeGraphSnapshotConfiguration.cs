@@ -2,11 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using NexTraceOne.Knowledge.Domain.Entities;
-using NexTraceOne.Knowledge.Domain.Enums;
 
-namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Catalog.Infrastructure.Persistence.Configurations.Knowledge;
 
-/// <summary>EF Core configuration for <see cref="KnowledgeGraphSnapshot"/>.</summary>
 internal sealed class KnowledgeGraphSnapshotConfiguration : IEntityTypeConfiguration<KnowledgeGraphSnapshot>
 {
     public void Configure(EntityTypeBuilder<KnowledgeGraphSnapshot> builder)
@@ -29,11 +27,7 @@ internal sealed class KnowledgeGraphSnapshotConfiguration : IEntityTypeConfigura
         builder.Property(x => x.OrphanEntities).HasColumnType("jsonb");
         builder.Property(x => x.Recommendations).HasColumnType("jsonb");
 
-        builder.Property(x => x.Status)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
+        builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(50).IsRequired();
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.ReviewedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.ReviewComment).HasMaxLength(2000);

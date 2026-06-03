@@ -1,16 +1,18 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.Catalog.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddKnowledgeAndProductAnalyticsEntities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // ── Knowledge tables ─────────────────────────────────────────────────
+
             migrationBuilder.CreateTable(
                 name: "knw_documents",
                 columns: table => new
@@ -100,25 +102,6 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "knw_outbox_messages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    EventType = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    Payload = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    RetryCount = table.Column<int>(type: "integer", nullable: false),
-                    LastError = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IdempotencyKey = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_knw_outbox_messages", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "knw_proposed_runbooks",
                 columns: table => new
                 {
@@ -160,161 +143,113 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                     table.CheckConstraint("CK_knw_relations_target_type", "\"TargetType\" IN ('Service','Contract','Change','Incident','KnowledgeDocument','Runbook','Other')");
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_documents_AuthorId",
-                table: "knw_documents",
-                column: "AuthorId");
+            // ── ProductAnalytics tables ──────────────────────────────────────────
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_documents_Category",
-                table: "knw_documents",
-                column: "Category");
+            migrationBuilder.CreateTable(
+                name: "pan_analytics_events",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Persona = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Module = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    EventType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Feature = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    EntityType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Outcome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Route = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    TeamId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    DomainId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    SessionId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    ClientType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    MetadataJson = table.Column<string>(type: "text", nullable: true),
+                    OccurredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_pan_analytics_events", x => x.Id);
+                    table.CheckConstraint("CK_pan_analytics_events_event_type", "\"EventType\" IN ('ModuleViewed','EntityViewed','SearchExecuted','SearchResultClicked','ZeroResultSearch','QuickActionTriggered','AssistantPromptSubmitted','AssistantResponseUsed','ContractDraftCreated','ContractPublished','ChangeViewed','IncidentInvestigated','MitigationWorkflowStarted','MitigationWorkflowCompleted','EvidencePackageExported','PolicyViewed','ExecutiveOverviewViewed','RunbookViewed','SourceOfTruthQueried','ReportGenerated','OnboardingStepCompleted','JourneyAbandoned','EmptyStateEncountered','ReliabilityDashboardViewed','AutomationWorkflowManaged','ServiceCreated')");
+                    table.CheckConstraint("CK_pan_analytics_events_module", "\"Module\" IN ('Dashboard','ServiceCatalog','SourceOfTruth','ContractStudio','ChangeIntelligence','Incidents','Reliability','Runbooks','AiAssistant','Governance','ExecutiveViews','FinOps','IntegrationHub','DeveloperPortal','Admin','Automation','Search')");
+                });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_documents_CreatedAt",
-                table: "knw_documents",
-                column: "CreatedAt");
+            migrationBuilder.CreateTable(
+                name: "pan_journey_definitions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Key = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    StepsJson = table.Column<string>(type: "jsonb", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_pan_journey_definitions", x => x.Id);
+                });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_documents_Slug",
-                table: "knw_documents",
-                column: "Slug",
-                unique: true);
+            // ── Knowledge indexes ────────────────────────────────────────────────
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_documents_Status",
-                table: "knw_documents",
-                column: "Status");
+            migrationBuilder.CreateIndex("IX_knw_documents_AuthorId", "knw_documents", "AuthorId");
+            migrationBuilder.CreateIndex("IX_knw_documents_Category", "knw_documents", "Category");
+            migrationBuilder.CreateIndex("IX_knw_documents_CreatedAt", "knw_documents", "CreatedAt");
+            migrationBuilder.CreateIndex("IX_knw_documents_Slug", "knw_documents", "Slug", unique: true);
+            migrationBuilder.CreateIndex("IX_knw_documents_Status", "knw_documents", "Status");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_knowledge_graph_snapshots_GeneratedAt",
-                table: "knw_knowledge_graph_snapshots",
-                column: "GeneratedAt");
+            migrationBuilder.CreateIndex("IX_knw_knowledge_graph_snapshots_GeneratedAt", "knw_knowledge_graph_snapshots", "GeneratedAt");
+            migrationBuilder.CreateIndex("IX_knw_knowledge_graph_snapshots_Status", "knw_knowledge_graph_snapshots", "Status");
+            migrationBuilder.CreateIndex("ix_knw_knowledge_graph_snapshots_tenant_id", "knw_knowledge_graph_snapshots", "TenantId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_knowledge_graph_snapshots_Status",
-                table: "knw_knowledge_graph_snapshots",
-                column: "Status");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_AuthorId", "knw_operational_notes", "AuthorId");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_ContextEntityId", "knw_operational_notes", "ContextEntityId");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_ContextType", "knw_operational_notes", "ContextType");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_ContextType_ContextEntityId", "knw_operational_notes", new[] { "ContextType", "ContextEntityId" });
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_CreatedAt", "knw_operational_notes", "CreatedAt");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_IsResolved", "knw_operational_notes", "IsResolved");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_NoteType", "knw_operational_notes", "NoteType");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_Origin", "knw_operational_notes", "Origin");
+            migrationBuilder.CreateIndex("IX_knw_operational_notes_Severity", "knw_operational_notes", "Severity");
 
-            migrationBuilder.CreateIndex(
-                name: "ix_knw_knowledge_graph_snapshots_tenant_id",
-                table: "knw_knowledge_graph_snapshots",
-                column: "TenantId");
+            migrationBuilder.CreateIndex("uix_knw_proposed_runbooks_incident", "knw_proposed_runbooks", "source_incident_id", unique: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_AuthorId",
-                table: "knw_operational_notes",
-                column: "AuthorId");
+            migrationBuilder.CreateIndex("IX_knw_relations_SourceEntityId", "knw_relations", "SourceEntityId");
+            migrationBuilder.CreateIndex("IX_knw_relations_SourceEntityId_TargetEntityId", "knw_relations", new[] { "SourceEntityId", "TargetEntityId" }, unique: true);
+            migrationBuilder.CreateIndex("IX_knw_relations_TargetEntityId", "knw_relations", "TargetEntityId");
+            migrationBuilder.CreateIndex("IX_knw_relations_TargetType", "knw_relations", "TargetType");
+            migrationBuilder.CreateIndex("IX_knw_relations_TargetType_TargetEntityId", "knw_relations", new[] { "TargetType", "TargetEntityId" });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_ContextEntityId",
-                table: "knw_operational_notes",
-                column: "ContextEntityId");
+            // ── ProductAnalytics indexes ─────────────────────────────────────────
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_ContextType",
-                table: "knw_operational_notes",
-                column: "ContextType");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_CreatedAt", "pan_analytics_events", "CreatedAt");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_EventType", "pan_analytics_events", "EventType");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_Module", "pan_analytics_events", "Module");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_Module_EventType", "pan_analytics_events", new[] { "Module", "EventType" });
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_OccurredAt", "pan_analytics_events", "OccurredAt");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_Persona", "pan_analytics_events", "Persona");
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_SessionId_OccurredAt", "pan_analytics_events", new[] { "SessionId", "OccurredAt" });
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_TenantId_Module_OccurredAt", "pan_analytics_events", new[] { "TenantId", "Module", "OccurredAt" });
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_TenantId_OccurredAt", "pan_analytics_events", new[] { "TenantId", "OccurredAt" });
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_TenantId_UserId_OccurredAt", "pan_analytics_events", new[] { "TenantId", "UserId", "OccurredAt" });
+            migrationBuilder.CreateIndex("IX_pan_analytics_events_UserId", "pan_analytics_events", "UserId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_ContextType_ContextEntityId",
-                table: "knw_operational_notes",
-                columns: new[] { "ContextType", "ContextEntityId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_CreatedAt",
-                table: "knw_operational_notes",
-                column: "CreatedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_IsResolved",
-                table: "knw_operational_notes",
-                column: "IsResolved");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_NoteType",
-                table: "knw_operational_notes",
-                column: "NoteType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_Origin",
-                table: "knw_operational_notes",
-                column: "Origin");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_operational_notes_Severity",
-                table: "knw_operational_notes",
-                column: "Severity");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_outbox_messages_CreatedAt",
-                table: "knw_outbox_messages",
-                column: "CreatedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_outbox_messages_IdempotencyKey",
-                table: "knw_outbox_messages",
-                column: "IdempotencyKey",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_outbox_messages_ProcessedAt",
-                table: "knw_outbox_messages",
-                column: "ProcessedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "uix_knw_proposed_runbooks_incident",
-                table: "knw_proposed_runbooks",
-                column: "source_incident_id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_relations_SourceEntityId",
-                table: "knw_relations",
-                column: "SourceEntityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_relations_SourceEntityId_TargetEntityId",
-                table: "knw_relations",
-                columns: new[] { "SourceEntityId", "TargetEntityId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_relations_TargetEntityId",
-                table: "knw_relations",
-                column: "TargetEntityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_relations_TargetType",
-                table: "knw_relations",
-                column: "TargetType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knw_relations_TargetType_TargetEntityId",
-                table: "knw_relations",
-                columns: new[] { "TargetType", "TargetEntityId" });
+            migrationBuilder.CreateIndex("IX_pan_journey_definitions_TenantId_IsActive", "pan_journey_definitions", new[] { "TenantId", "IsActive" });
+            migrationBuilder.CreateIndex("UX_pan_journey_definitions_TenantId_Key", "pan_journey_definitions", new[] { "TenantId", "Key" }, unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "knw_documents");
-
-            migrationBuilder.DropTable(
-                name: "knw_knowledge_graph_snapshots");
-
-            migrationBuilder.DropTable(
-                name: "knw_operational_notes");
-
-            migrationBuilder.DropTable(
-                name: "knw_outbox_messages");
-
-            migrationBuilder.DropTable(
-                name: "knw_proposed_runbooks");
-
-            migrationBuilder.DropTable(
-                name: "knw_relations");
+            migrationBuilder.DropTable(name: "knw_documents");
+            migrationBuilder.DropTable(name: "knw_knowledge_graph_snapshots");
+            migrationBuilder.DropTable(name: "knw_operational_notes");
+            migrationBuilder.DropTable(name: "knw_proposed_runbooks");
+            migrationBuilder.DropTable(name: "knw_relations");
+            migrationBuilder.DropTable(name: "pan_analytics_events");
+            migrationBuilder.DropTable(name: "pan_journey_definitions");
         }
     }
 }

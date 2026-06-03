@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Contracts;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
-using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 
 namespace NexTraceOne.ProductAnalytics.Infrastructure.Services;
 
@@ -11,11 +11,11 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Services;
 /// Implementação do contrato cross-module <see cref="IProductAnalyticsModule"/>.
 /// Expõe métricas de uso do produto para outros bounded contexts
 /// (ex: Governance para métricas de adoção, AIOps para correlação de uso).
-/// Acede ao <see cref="ProductAnalyticsDbContext"/> em modo read-only.
+/// Acede ao <see cref="ServiceCatalogDbContext"/> em modo read-only.
 /// Aplica filtro de TenantId em defense-in-depth.
 /// </summary>
 internal sealed class ProductAnalyticsModuleService(
-    ProductAnalyticsDbContext context,
+    ServiceCatalogDbContext context,
     ICurrentTenant currentTenant) : IProductAnalyticsModule
 {
     public async Task<long> GetModuleEventCountAsync(

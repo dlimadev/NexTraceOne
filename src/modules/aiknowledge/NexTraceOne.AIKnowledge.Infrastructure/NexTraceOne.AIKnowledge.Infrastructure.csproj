@@ -22,7 +22,6 @@
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
     <ProjectReference Include="..\..\operationalintelligence\NexTraceOne.OperationalIntelligence.Infrastructure\NexTraceOne.OperationalIntelligence.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\knowledge\NexTraceOne.Knowledge.Infrastructure\NexTraceOne.Knowledge.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

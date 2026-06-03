@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Domain.Entities;
 using NexTraceOne.Knowledge.Domain.Enums;
@@ -9,7 +10,7 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Repositório EF Core para KnowledgeRelation.
 /// </summary>
-internal sealed class KnowledgeRelationRepository(KnowledgeDbContext context) : IKnowledgeRelationRepository
+internal sealed class KnowledgeRelationRepository(ServiceCatalogDbContext context) : IKnowledgeRelationRepository
 {
     public async Task<KnowledgeRelation?> GetByIdAsync(KnowledgeRelationId id, CancellationToken cancellationToken = default)
         => await context.KnowledgeRelations.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);

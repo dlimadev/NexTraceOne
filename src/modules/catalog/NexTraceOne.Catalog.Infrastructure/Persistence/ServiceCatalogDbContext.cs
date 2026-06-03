@@ -19,6 +19,8 @@ using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.Templates.Entities;
+using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.ProductAnalytics.Domain.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Persistence;
 
@@ -148,6 +150,17 @@ public sealed class ServiceCatalogDbContext(
     public DbSet<DeveloperSurvey> DeveloperSurveys => Set<DeveloperSurvey>();
     public DbSet<IIDEUsageRepository.IdeUsageRecord> IdeUsageRecords
         => Set<IIDEUsageRepository.IdeUsageRecord>();
+
+    // ── Knowledge (consolidated from KnowledgeDbContext) ─────────────────────
+    public DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
+    public DbSet<OperationalNote> OperationalNotes => Set<OperationalNote>();
+    public DbSet<KnowledgeRelation> KnowledgeRelations => Set<KnowledgeRelation>();
+    public DbSet<KnowledgeGraphSnapshot> KnowledgeGraphSnapshots => Set<KnowledgeGraphSnapshot>();
+    public DbSet<ProposedRunbook> ProposedRunbooks => Set<ProposedRunbook>();
+
+    // ── ProductAnalytics (consolidated from ProductAnalyticsDbContext) ────────
+    public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
+    public DbSet<JourneyDefinition> JourneyDefinitions => Set<JourneyDefinition>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

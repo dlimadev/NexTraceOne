@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Domain.Enums;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Knowledge.Infrastructure.Search;
 
@@ -92,13 +92,13 @@ public sealed class RunbookKnowledgeLinkingServiceTests
         context.KnowledgeRelations.Should().BeEmpty();
     }
 
-    private static KnowledgeDbContext CreateContext(string dbName, IDateTimeProvider clock)
+    private static ServiceCatalogDbContext CreateContext(string dbName, IDateTimeProvider clock)
     {
-        var options = new DbContextOptionsBuilder<KnowledgeDbContext>()
+        var options = new DbContextOptionsBuilder<ServiceCatalogDbContext>()
             .UseInMemoryDatabase(dbName)
             .Options;
 
-        return new KnowledgeDbContext(options, new TestCurrentTenant(), new TestCurrentUser(), clock);
+        return new ServiceCatalogDbContext(options, new TestCurrentTenant(), new TestCurrentUser(), clock);
     }
 
     private sealed class TestCurrentTenant : ICurrentTenant

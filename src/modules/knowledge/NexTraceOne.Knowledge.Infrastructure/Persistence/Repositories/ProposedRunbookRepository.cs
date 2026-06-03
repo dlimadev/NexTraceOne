@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Domain.Entities;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 
 namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 
-internal sealed class ProposedRunbookRepository(KnowledgeDbContext db) : IProposedRunbookRepository
+internal sealed class ProposedRunbookRepository(ServiceCatalogDbContext db) : IProposedRunbookRepository
 {
     public async Task AddAsync(ProposedRunbook runbook, CancellationToken ct = default)
         => await db.ProposedRunbooks.AddAsync(runbook, ct);

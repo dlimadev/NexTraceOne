@@ -21,7 +21,6 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.VectorStore;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
-using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
@@ -186,8 +185,7 @@ public static class DependencyInjection
             services, configuration, "ChangeGovernanceDatabase");
         RegisterCrossModuleContextIfNeeded<IncidentResponseDbContext>(
             services, configuration, "IncidentResponseDatabase");
-        RegisterCrossModuleContextIfNeeded<KnowledgeDbContext>(
-            services, configuration, "KnowledgeDatabase");
+
 
         // Cross-module grounding readers — thin abstractions over read-only DbContext access
         services.AddScoped<ICatalogGroundingReader, CatalogGroundingReader>();
