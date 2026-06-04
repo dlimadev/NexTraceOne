@@ -22,7 +22,6 @@
 
     <ProjectReference Include="..\..\modules\notifications\NexTraceOne.Notifications.API\NexTraceOne.Notifications.API.csproj" />
     <ProjectReference Include="..\..\modules\configuration\NexTraceOne.Configuration.API\NexTraceOne.Configuration.API.csproj" />
-    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
   </ItemGroup>
   <ItemGroup Label="Seed Data">
     <Content Include="SeedData\**" CopyToOutputDirectory="PreserveNewest" />

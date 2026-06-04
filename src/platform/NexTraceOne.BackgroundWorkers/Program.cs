@@ -22,7 +22,6 @@ using NexTraceOne.OperationalIntelligence.API;
 using NexTraceOne.Catalog.API;
 using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.AIKnowledge.API;
-using NexTraceOne.Governance.API.AuditCompliance.Endpoints;
 using NexTraceOne.Governance.API;
 using NexTraceOne.Integrations.Infrastructure;
 using NexTraceOne.Catalog.Infrastructure.Knowledge;
