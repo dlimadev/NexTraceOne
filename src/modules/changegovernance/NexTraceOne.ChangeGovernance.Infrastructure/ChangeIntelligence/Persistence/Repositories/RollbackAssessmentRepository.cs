@@ -1,0 +1,22 @@
+using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
+
+/// <summary>
+/// Repositório de avaliações de viabilidade de rollback.
+/// </summary>
+internal sealed class RollbackAssessmentRepository(ChangeGovernanceDbContext context) : IRollbackAssessmentRepository
+{
+    /// <summary>Busca a avaliação de rollback de uma release.</summary>
+    public async Task<RollbackAssessment?> GetByReleaseIdAsync(ReleaseId releaseId, CancellationToken cancellationToken = default)
+        => await context.RollbackAssessments
+            .SingleOrDefaultAsync(a => a.ReleaseId == releaseId, cancellationToken);
+
+    /// <summary>Adiciona uma avaliação de rollback.</summary>
+    public void Add(RollbackAssessment assessment)
+        => context.RollbackAssessments.Add(assessment);
+}

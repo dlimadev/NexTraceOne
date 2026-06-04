@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.ProductAnalytics.Domain.Entities;
+using NexTraceOne.Catalog.Domain.ProductAnalytics.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Persistence.Configurations.ProductAnalytics;
 

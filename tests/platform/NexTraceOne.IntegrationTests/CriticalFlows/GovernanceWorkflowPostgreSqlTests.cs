@@ -121,7 +121,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var workflowContext = Fixture.CreateWorkflowDbContext();
+        await using var workflowContext = Fixture.CreateChangeGovernanceDbContext();
 
         var template = WorkflowTemplate.Create(
             name: "API Breaking Change Approval",
@@ -170,7 +170,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateWorkflowDbContext();
+        await using var context = Fixture.CreateChangeGovernanceDbContext();
 
         var prodTemplate = WorkflowTemplate.Create(
             "Production Deploy Approval", "Full approval workflow for production",
@@ -200,7 +200,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var promotionContext = Fixture.CreatePromotionDbContext();
+        await using var promotionContext = Fixture.CreateChangeGovernanceDbContext();
 
         var stagingEnv = DeploymentEnvironment.Create(
             name: "Staging",
@@ -260,7 +260,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var rulesetContext = Fixture.CreateRulesetGovernanceDbContext();
+        await using var rulesetContext = Fixture.CreateChangeGovernanceDbContext();
 
         var ruleset = Ruleset.Create(
             name: "Breaking Change Prevention",
@@ -282,7 +282,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
         persisted.Content.Should().Contain("no-field-removal");
 
         // Now archive it
-        await using var context2 = Fixture.CreateRulesetGovernanceDbContext();
+        await using var context2 = Fixture.CreateChangeGovernanceDbContext();
         var toArchive = await context2.Rulesets.SingleAsync(r => r.Id == ruleset.Id);
         toArchive.Archive();
         await context2.SaveChangesAsync();
@@ -299,7 +299,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateRulesetGovernanceDbContext();
+        await using var context = Fixture.CreateChangeGovernanceDbContext();
 
         var activeRuleset1 = Ruleset.Create(
             "OpenAPI Standards", "Enforces OpenAPI spec standards",

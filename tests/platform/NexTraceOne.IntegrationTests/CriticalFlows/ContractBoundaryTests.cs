@@ -76,7 +76,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await catalogContext.SaveChangesAsync();
 
         // Act — criar RuntimeSnapshot referenciando o ServiceName do Catalog
-        await using var runtimeContext = Fixture.CreateRuntimeIntelligenceDbContext();
+        await using var runtimeContext = Fixture.CreateIncidentResponseDbContext();
 
         var snapshot = RuntimeSnapshot.Create(
             serviceName: "reliability-boundary-svc",
@@ -129,7 +129,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await ResetStateAsync();
 
         // Arrange + Act — persistir Release
-        await using var changeContext = Fixture.CreateChangeIntelligenceDbContext();
+        await using var changeContext = Fixture.CreateChangeGovernanceDbContext();
 
         var apiAssetId = Guid.NewGuid();
         var release = Release.Create(
@@ -146,7 +146,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await changeContext.SaveChangesAsync();
 
         // Act — persistir IncidentRecord no mesmo banco (operations)
-        await using var incidentContext = Fixture.CreateIncidentDbContext();
+        await using var incidentContext = Fixture.CreateIncidentResponseDbContext();
 
         var incident = IncidentRecord.Create(
             id: IncidentRecordId.New(),
@@ -226,7 +226,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await catalogContext.SaveChangesAsync();
 
         // Act — criar conversa AI com referência ao ServiceId do Catalog
-        await using var aiContext = Fixture.CreateAiGovernanceDbContext();
+        await using var aiContext = Fixture.CreateAiHubDbContext();
 
         var conversation = AiAssistantConversation.Start(
             title: "Análise do AI Boundary Service",
@@ -419,7 +419,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await ResetStateAsync();
 
         // Act — persistir RuntimeSnapshot em OI
-        await using var runtimeContext = Fixture.CreateRuntimeIntelligenceDbContext();
+        await using var runtimeContext = Fixture.CreateIncidentResponseDbContext();
 
         var snapshot = RuntimeSnapshot.Create(
             serviceName: "coexistence-test-svc",
@@ -438,7 +438,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         await runtimeContext.SaveChangesAsync();
 
         // Act — persistir IncidentRecord no mesmo banco (operations)
-        await using var incidentContext = Fixture.CreateIncidentDbContext();
+        await using var incidentContext = Fixture.CreateIncidentResponseDbContext();
 
         var incident = IncidentRecord.Create(
             id: IncidentRecordId.New(),

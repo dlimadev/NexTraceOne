@@ -12,7 +12,7 @@ using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
-using NexTraceOne.Knowledge.Contracts;
+using NexTraceOne.Catalog.Contracts;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 
 namespace NexTraceOne.Catalog.Application.SourceOfTruth.Features.ComputeServiceScorecard;

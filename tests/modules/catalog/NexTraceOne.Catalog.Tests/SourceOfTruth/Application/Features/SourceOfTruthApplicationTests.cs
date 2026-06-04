@@ -15,7 +15,7 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
-using NexTraceOne.Knowledge.Contracts;
+using NexTraceOne.Catalog.Contracts;
 
 namespace NexTraceOne.Catalog.Tests.SourceOfTruth.Application.Features;
 

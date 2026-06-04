@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Knowledge.Contracts;
+using NexTraceOne.Catalog.Contracts;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;

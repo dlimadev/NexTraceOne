@@ -151,7 +151,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateRuntimeIntelligenceDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var healthySnapshot = RuntimeSnapshot.Create(
             serviceName: "orders-service",
@@ -206,7 +206,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateRuntimeIntelligenceDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var healthy = RuntimeSnapshot.Create(
             "catalog-service", "production", 32.0m, 85.0m, 0.001m, 1200.0m, 20.0m, 256.0m, 4,
@@ -381,7 +381,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     {
         await ResetStateAsync();
 
-        var runtimeCtx = Fixture.CreateRuntimeIntelligenceDbContext();
+        var runtimeCtx = Fixture.CreateIncidentResponseDbContext();
         var costCtx = Fixture.CreateIncidentResponseDbContext();
 
         await using (runtimeCtx)

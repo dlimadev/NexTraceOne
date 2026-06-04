@@ -25,8 +25,8 @@ using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Governance.API;
 using NexTraceOne.Integrations.Infrastructure;
-using NexTraceOne.Knowledge.Infrastructure;
-using NexTraceOne.ProductAnalytics.Infrastructure;
+using NexTraceOne.Catalog.Infrastructure.Knowledge;
+using NexTraceOne.Catalog.Infrastructure.ProductAnalytics;
 using NexTraceOne.Notifications.Infrastructure;
 using NexTraceOne.Configuration.Infrastructure;
 

@@ -48,3 +48,4 @@ src/**/obj*/
 
 # Superpowers visual brainstorming sessions
 .superpowers/
+*.lscache

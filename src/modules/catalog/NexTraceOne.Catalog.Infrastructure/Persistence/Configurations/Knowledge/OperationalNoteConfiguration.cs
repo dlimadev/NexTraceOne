@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Knowledge.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Persistence.Configurations.Knowledge;
 

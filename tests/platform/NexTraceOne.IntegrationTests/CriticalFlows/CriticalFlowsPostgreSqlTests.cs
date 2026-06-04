@@ -128,7 +128,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateChangeIntelligenceDbContext();
+        await using var context = Fixture.CreateChangeGovernanceDbContext();
 
         var release = Release.Create(
             tenantId: Guid.NewGuid(),
@@ -213,7 +213,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateIncidentDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var incident = IncidentRecord.Create(
             id: IncidentRecordId.New(),

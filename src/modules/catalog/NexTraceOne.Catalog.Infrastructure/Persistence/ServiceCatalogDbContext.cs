@@ -19,8 +19,8 @@ using NexTraceOne.Catalog.Domain.LegacyAssets.Entities;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.Templates.Entities;
-using NexTraceOne.Knowledge.Domain.Entities;
-using NexTraceOne.ProductAnalytics.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Knowledge.Entities;
+using NexTraceOne.Catalog.Domain.ProductAnalytics.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Persistence;
 

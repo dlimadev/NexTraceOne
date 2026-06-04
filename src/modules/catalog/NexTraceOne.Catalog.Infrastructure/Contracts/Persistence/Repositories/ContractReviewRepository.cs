@@ -1,0 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.Catalog.Infrastructure.Persistence;
+
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+
+namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
+
+/// <summary>
+/// Repositório de revisões de contrato do Contract Studio.
+/// Armazena o histórico de decisões de aprovação e rejeição para auditoria completa.
+/// </summary>
+internal sealed class ContractReviewRepository(ServiceCatalogDbContext context)
+    : RepositoryBase<ContractReview, ContractReviewId>(context), IContractReviewRepository
+{
+    /// <summary>Lista revisões vinculadas a um draft, ordenadas por data de revisão.</summary>
+    public async Task<IReadOnlyList<ContractReview>> ListByDraftAsync(ContractDraftId draftId, CancellationToken ct = default)
+        => await context.Reviews
+            .Where(r => r.DraftId == draftId)
+            .OrderByDescending(r => r.ReviewedAt)
+            .ToListAsync(ct);
+}

@@ -16,8 +16,6 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\..\aiknowledge\NexTraceOne.AIKnowledge.Application\NexTraceOne.AIKnowledge.Application.csproj" />
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
-    <ProjectReference Include="..\..\knowledge\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
-    <ProjectReference Include="..\..\productanalytics\NexTraceOne.ProductAnalytics.Domain\NexTraceOne.ProductAnalytics.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

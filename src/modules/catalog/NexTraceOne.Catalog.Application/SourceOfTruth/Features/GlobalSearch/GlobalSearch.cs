@@ -6,7 +6,7 @@ using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
-using NexTraceOne.Knowledge.Contracts;
+using NexTraceOne.Catalog.Contracts;
 
 namespace NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch;
 

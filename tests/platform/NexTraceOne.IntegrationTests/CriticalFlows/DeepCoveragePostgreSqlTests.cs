@@ -245,7 +245,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateChangeIntelligenceDbContext();
+        await using var context = Fixture.CreateChangeGovernanceDbContext();
 
         var release = Release.Create(
             tenantId: Guid.NewGuid(),
@@ -296,7 +296,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateChangeIntelligenceDbContext();
+        await using var context = Fixture.CreateChangeGovernanceDbContext();
 
         var apiId = Guid.NewGuid();
         var prodRelease = Release.Create(Guid.NewGuid(), apiId, "auth-service", "2026.1", "production", "pipeline", "sha1", DateTimeOffset.UtcNow);
@@ -405,7 +405,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateIncidentDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var runbook = RunbookRecord.Create(
             id: RunbookRecordId.New(),
@@ -445,7 +445,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateIncidentDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var runbook1 = RunbookRecord.Create(RunbookRecordId.New(), "Orders Rollback", "desc1", "orders-service", null,
             "[{\"step\":\"validate\"}]", null, null, "oncall", DateTimeOffset.UtcNow);
@@ -474,7 +474,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateIncidentDbContext();
+        await using var context = Fixture.CreateIncidentResponseDbContext();
 
         var highConfidenceIncident = IncidentRecord.Create(
             id: IncidentRecordId.New(),

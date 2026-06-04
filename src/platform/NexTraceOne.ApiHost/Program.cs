@@ -15,14 +15,14 @@ using NexTraceOne.Catalog.API;
 using NexTraceOne.Catalog.API.GraphQL;
 using NexTraceOne.Governance.API;
 using NexTraceOne.Integrations.API.Endpoints;
-using NexTraceOne.ProductAnalytics.API;
+using NexTraceOne.Catalog.API.ProductAnalytics;
 using NexTraceOne.Configuration.API;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 
-using NexTraceOne.Knowledge.API.Endpoints;
+using NexTraceOne.Catalog.API.Knowledge.Endpoints;
 using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;

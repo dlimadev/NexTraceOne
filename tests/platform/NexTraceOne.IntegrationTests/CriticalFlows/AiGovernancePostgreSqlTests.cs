@@ -49,7 +49,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateAiGovernanceDbContext();
+        await using var context = Fixture.CreateAiHubDbContext();
 
         var conversation = AiAssistantConversation.Start(
             title: "Investigação de Incidente — Orders API",
@@ -120,7 +120,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateAiGovernanceDbContext();
+        await using var context = Fixture.CreateAiHubDbContext();
 
         var eng1Conv = AiAssistantConversation.Start(
             title: "Debug Orders Latency",
@@ -165,7 +165,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateExternalAiDbContext();
+        await using var context = Fixture.CreateAiHubDbContext();
 
         var primaryProvider = ExternalAiProvider.Register(
             name: "OpenAI GPT-4o",
@@ -211,7 +211,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        await using var context = Fixture.CreateAiOrchestrationDbContext();
+        await using var context = Fixture.CreateAiHubDbContext();
 
         var releaseId = Guid.NewGuid();
 
@@ -244,9 +244,9 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     {
         await ResetStateAsync();
 
-        var aiGovCtx = Fixture.CreateAiGovernanceDbContext();
-        var extAiCtx = Fixture.CreateExternalAiDbContext();
-        var orchCtx = Fixture.CreateAiOrchestrationDbContext();
+        var aiGovCtx = Fixture.CreateAiHubDbContext();
+        var extAiCtx = Fixture.CreateAiHubDbContext();
+        var orchCtx = Fixture.CreateAiHubDbContext();
 
         await using (aiGovCtx)
         await using (extAiCtx)

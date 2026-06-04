@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\..\modules\identityaccess\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
     <ProjectReference Include="..\..\..\modules\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
-    <ProjectReference Include="..\..\..\modules\knowledge\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
+    <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Domain\NexTraceOne.OperationalIntelligence.Domain.csproj" />
     <!-- Cross-module read-only references for AI grounding data retrieval (P01.10) -->
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
