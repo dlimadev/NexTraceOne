@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.Governance.Contracts.AuditCompliance.ServiceInterfaces;
 using NexTraceOne.Notifications.Application.Abstractions;
 
 namespace NexTraceOne.Notifications.Infrastructure.Governance;

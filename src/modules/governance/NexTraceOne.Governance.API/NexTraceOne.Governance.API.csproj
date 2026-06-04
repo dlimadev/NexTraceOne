@@ -9,7 +9,6 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Application\NexTraceOne.Governance.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Infrastructure\NexTraceOne.Governance.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Application\NexTraceOne.AuditCompliance.Application.csproj" />
-    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Infrastructure\NexTraceOne.AuditCompliance.Infrastructure.csproj" />
+
   </ItemGroup>
 </Project>

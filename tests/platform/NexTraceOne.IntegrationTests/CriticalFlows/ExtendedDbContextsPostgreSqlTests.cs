@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.Governance.Domain.AuditCompliance.Entities;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
 using NexTraceOne.Catalog.Domain.Portal.Enums;
 using NexTraceOne.IntegrationTests.Infrastructure;

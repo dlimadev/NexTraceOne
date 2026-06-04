@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
-using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.Governance.Domain.AuditCompliance.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;

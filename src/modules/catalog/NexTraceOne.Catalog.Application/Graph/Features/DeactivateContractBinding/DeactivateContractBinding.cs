@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
-using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.Governance.Contracts.AuditCompliance.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;

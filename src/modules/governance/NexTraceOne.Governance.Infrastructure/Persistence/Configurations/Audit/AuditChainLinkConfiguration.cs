@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.Governance.Domain.AuditCompliance.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations.Audit;
 

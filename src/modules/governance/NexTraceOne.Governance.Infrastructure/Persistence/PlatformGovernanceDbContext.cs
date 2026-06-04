@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
-using NexTraceOne.AuditCompliance.Application.Abstractions;
-using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.Governance.Application.AuditCompliance.Abstractions;
+using NexTraceOne.Governance.Domain.AuditCompliance.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Governance.Application.Abstractions;

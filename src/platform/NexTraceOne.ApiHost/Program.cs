@@ -25,7 +25,7 @@ using System.Threading.RateLimiting;
 using NexTraceOne.Catalog.API.Knowledge.Endpoints;
 using NexTraceOne.AIKnowledge.API;
 using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
-using NexTraceOne.AuditCompliance.API.Endpoints;
+using NexTraceOne.Governance.API.AuditCompliance.Endpoints;
 using NexTraceOne.ChangeGovernance.API;
 using NexTraceOne.ChangeGovernance.API.GraphQL;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;

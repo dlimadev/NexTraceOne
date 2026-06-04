@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.Governance.Domain.AuditCompliance.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations.Audit;
 
@@ -44,7 +44,7 @@ internal sealed class ComplianceResultConfiguration : IEntityTypeConfiguration<C
 
         // FK: ComplianceResult.PolicyId → CompliancePolicy.Id
         // Garante integridade referencial — sem resultados órfãos.
-        builder.HasOne<NexTraceOne.AuditCompliance.Domain.Entities.CompliancePolicy>()
+        builder.HasOne<NexTraceOne.Governance.Domain.AuditCompliance.Entities.CompliancePolicy>()
             .WithMany()
             .HasForeignKey(x => x.PolicyId)
             .HasConstraintName("FK_aud_compliance_results_aud_compliance_policies_PolicyId")

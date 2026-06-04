@@ -12,13 +12,17 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Application\NexTraceOne.Governance.Application.csproj" />
     <ProjectReference Include="..\..\aiknowledge\NexTraceOne.AIKnowledge.Application\NexTraceOne.AIKnowledge.Application.csproj" />
-    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Application\NexTraceOne.AuditCompliance.Application.csproj" />
-    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Domain\NexTraceOne.AuditCompliance.Domain.csproj" />
+
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="PdfSharpCore" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Persistence\Migrations\" />

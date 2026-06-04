@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NexTraceOne.AuditCompliance.Application;
-using NexTraceOne.AuditCompliance.Infrastructure;
+using NexTraceOne.Governance.Application.AuditCompliance;
+using NexTraceOne.Governance.Infrastructure.AuditCompliance;
 using NexTraceOne.Governance.Application;
 using NexTraceOne.Governance.Infrastructure;
 

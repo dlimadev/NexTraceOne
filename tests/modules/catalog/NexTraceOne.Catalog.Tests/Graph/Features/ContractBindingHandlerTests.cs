@@ -1,4 +1,4 @@
-using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.Governance.Contracts.AuditCompliance.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.Governance.Contracts.AuditCompliance.ServiceInterfaces;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Infrastructure.Governance;
 
