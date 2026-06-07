@@ -12901,6 +12901,13 @@
     "riskScore": "Score de Risco",
     "apiCount": "APIs Expostas",
     "riskFactors": "Fatores de Risco",
+    "loadError": "Falha ao carregar riscos de dependência. Tente novamente.",
+    "riskLevel": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
     "errors": {
       "noServices": "Nenhum serviço encontrado para o filtro especificado.",
       "tenantRequired": "O ID de tenant é obrigatório."
