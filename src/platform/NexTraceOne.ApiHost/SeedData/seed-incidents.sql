@@ -1,13 +1,13 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- NEXTRACEONE — Seed data: Incidents Module (IncidentDatabase)
--- Tables: ops_incidents, ops_runbooks
+-- Tables: ops_incidents, Runbooks
 -- Replicates the 3 development runbooks and sample incidents for local development.
 -- All INSERT statements are idempotent: ON CONFLICT DO NOTHING.
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- ═══ RUNBOOKS ════════════════════════════════════════════════════════════════
 
-INSERT INTO ops_runbooks (
+INSERT INTO "Runbooks" (
   "Id", "Title", "Description",
   "LinkedService", "LinkedIncidentType",
   "StepsJson", "PrerequisitesJson", "PostNotes",

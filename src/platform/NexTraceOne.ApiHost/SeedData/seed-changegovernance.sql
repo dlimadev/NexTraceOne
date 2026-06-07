@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- NEXTRACEONE — Seed data: Change Governance Module (ChangeIntelligenceDatabase)
 -- DbContexts: ChangeIntelligenceDbContext (chg_ tables),
---             PromotionDbContext (chg_deployment_environments, chg_promotion_*),
---             RulesetGovernanceDbContext (chg_rulesets, chg_ruleset_bindings, chg_lint_results)
+--             PromotionDbContext (DeploymentEnvironments, chg_promotion_*),
+--             RulesetGovernanceDbContext (Rulesets, RulesetBindings, LintResults)
 -- All INSERT statements are idempotent: ON CONFLICT DO NOTHING.
 -- Enum values (stored as integers):
 --   ChangeLevel: Operational=0, NonBreaking=1, Additive=2, Breaking=3
@@ -16,16 +16,16 @@
 
 -- ═══ RELEASES (ChangeIntelligenceDbContext) ════════════════════════════════════
 
-INSERT INTO chg_releases (
+INSERT INTO "Releases" (
   "Id", "ApiAssetId", "ServiceName", "Version",
   "ReleaseName",
   "Environment", "PipelineSource", "CommitSha",
   "ChangeLevel", "Status", "ChangeScore",
-  "WorkItemReference", "RolledBackFromReleaseId",
+  "WorkItemReference",
   "ChangeType", "ConfidenceStatus", "ValidationStatus",
   "TeamName", "Domain", "Description",
   "HasBreakingChanges",
-  "CreatedAt", tenant_id
+  "CreatedAt", "TenantId", "RowVersion"
 ) VALUES
 (
   'c9000001-0001-0000-0000-000000000001',
@@ -34,11 +34,11 @@ INSERT INTO chg_releases (
   'payment-service 1.2.0',
   'production', 'gitlab/payments-team/payment-service', 'abc123def456',
   1, 2, 0.8500,
-  'PAY-1234', NULL,
+  'PAY-1234',
   0, 1, 2,
   'payments-team', 'payments', 'Minor release: adds support for new payment gateway with zero breaking changes.',
   false,
-  NOW() - INTERVAL '7 days', 'a0000000-0000-0000-0000-000000000001'
+  NOW() - INTERVAL '7 days', 'a0000000-0000-0000-0000-000000000001', 1
 ),
 (
   'c9000002-0001-0000-0000-000000000001',
@@ -47,11 +47,11 @@ INSERT INTO chg_releases (
   'catalog-service 2.0.0',
   'production', 'gitlab/platform-team/catalog-service', 'def789abc012',
   3, 2, 0.6200,
-  'CAT-567', NULL,
+  'CAT-567',
   2, 0, 2,
   'platform-team', 'platform', 'Major release: contract changes in service registration endpoint (breaking).',
   true,
-  NOW() - INTERVAL '14 days', 'a0000000-0000-0000-0000-000000000001'
+  NOW() - INTERVAL '14 days', 'a0000000-0000-0000-0000-000000000001', 1
 ),
 (
   'c9000003-0001-0000-0000-000000000001',
@@ -60,17 +60,17 @@ INSERT INTO chg_releases (
   'identity-service 1.0.5',
   'staging', 'gitlab/platform-team/identity-service', 'fed321cba654',
   1, 0, 0.0000,
-  'PLAT-89', NULL,
+  'PLAT-89',
   0, 0, 0,
   'platform-team', 'security', 'Patch: dependency updates and security hardening.',
   false,
-  NOW() - INTERVAL '1 day', 'a0000000-0000-0000-0000-000000000001'
+  NOW() - INTERVAL '1 day', 'a0000000-0000-0000-0000-000000000001', 1
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ DEPLOYMENT ENVIRONMENTS (PromotionDbContext) ══════════════════════════════
 
-INSERT INTO chg_deployment_environments (
+INSERT INTO "DeploymentEnvironments" (
   "Id", "Name", "Description", "Order",
   "RequiresApproval", "RequiresEvidencePack", "IsActive",
   "CreatedAt"
@@ -97,10 +97,11 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ RULESETS (RulesetGovernanceDbContext) ════════════════════════════════════
 
-INSERT INTO chg_rulesets (
+INSERT INTO "Rulesets" (
   "Id", "Name", "Description",
   "Content", "RulesetType", "IsActive", "RulesetCreatedAt",
-  "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+  "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted",
+  "RowVersion"
 ) VALUES
 (
   'c9020001-0001-0000-0000-000000000001',
@@ -108,7 +109,8 @@ INSERT INTO chg_rulesets (
   'Default NexTraceOne change governance ruleset. Validates release metadata, change level classification and evidence completeness.',
   '{"rules":{"require-work-item-reference":{"severity":"warn","description":"Releases should reference a work item"},"breaking-change-requires-approval":{"severity":"error","description":"Breaking changes require explicit promotion approval"},"evidence-pack-for-production":{"severity":"error","description":"Production deployments require evidence pack"}}}',
   0, true, NOW() - INTERVAL '90 days',
-  NOW() - INTERVAL '90 days', 'system', NOW(), 'system', false
+  NOW() - INTERVAL '90 days', 'system', NOW(), 'system', false,
+  1
 ),
 (
   'c9020002-0001-0000-0000-000000000001',
@@ -116,13 +118,14 @@ INSERT INTO chg_rulesets (
   'Security baseline ruleset. Validates that releases include security approval markers for critical services.',
   '{"rules":{"critical-service-security-approval":{"severity":"error","description":"Critical services require SecurityApproval marker before production"},"commit-sha-required":{"severity":"error","description":"All releases must have a commit SHA for traceability"}}}',
   0, true, NOW() - INTERVAL '60 days',
-  NOW() - INTERVAL '60 days', 'system', NOW(), 'system', false
+  NOW() - INTERVAL '60 days', 'system', NOW(), 'system', false,
+  1
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ RULESET BINDINGS (RulesetGovernanceDbContext) ════════════════════════════
 
-INSERT INTO chg_ruleset_bindings (
+INSERT INTO "RulesetBindings" (
   "Id", "RulesetId", "AssetType",
   "BindingCreatedAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
@@ -145,7 +148,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ LINT RESULTS (RulesetGovernanceDbContext) ════════════════════════════════
 
-INSERT INTO chg_lint_results (
+INSERT INTO "LintResults" (
   "Id", "RulesetId", "ReleaseId", "ApiAssetId",
   "Score", "TotalFindings", "Findings", "ExecutedAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"

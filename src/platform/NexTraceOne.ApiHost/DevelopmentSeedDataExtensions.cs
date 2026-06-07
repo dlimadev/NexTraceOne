@@ -21,11 +21,11 @@ public static class DevelopmentSeedDataExtensions
     private static readonly (string ConnectionStringName, string SqlFileName)[] SeedTargets =
     [
         ("IdentityDatabase", "seed-identity.sql"),
-        ("CatalogDatabase", "seed-catalog.sql"),
-        ("ChangeIntelligenceDatabase", "seed-changegovernance.sql"),
+        // ("CatalogDatabase", "seed-catalog.sql"),        -- desativado: schema desatualizado (28P01 follow-up)
+        // ("ChangeIntelligenceDatabase", "seed-changegovernance.sql"), -- desativado: schema desatualizado
         ("AuditDatabase", "seed-audit.sql"),
         ("IncidentDatabase", "seed-incidents.sql"),
-        ("AiGovernanceDatabase", "seed-aiknowledge.sql"),
+        // ("AiGovernanceDatabase", "seed-aiknowledge.sql"), -- desativado: schema desatualizado
         ("GovernanceDatabase", "seed-governance.sql"),
     ];
 

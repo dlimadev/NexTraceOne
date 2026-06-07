@@ -27,7 +27,20 @@ public sealed record SbomRecord(
     string ServiceName,
     string Version,
     DateTimeOffset RecordedAt,
-    IReadOnlyList<SbomComponent> Components);
+    IReadOnlyList<SbomComponent> Components)
+{
+    // EF Core requires a parameterless constructor for materialization
+    private SbomRecord() : this(
+        Guid.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        DateTimeOffset.MinValue,
+        new List<SbomComponent>())
+    {
+    }
+}
 
 /// <summary>
 /// Componente individual do SBOM (dependência directa ou transitiva).
@@ -38,4 +51,10 @@ public sealed record SbomComponent(
     string Registry,
     string License,
     int CveCount,
-    string HighestCveSeverity);
+    string HighestCveSeverity)
+{
+    // EF Core requires a parameterless constructor for materialization
+    private SbomComponent() : this(string.Empty, string.Empty, string.Empty, string.Empty, 0, string.Empty)
+    {
+    }
+}

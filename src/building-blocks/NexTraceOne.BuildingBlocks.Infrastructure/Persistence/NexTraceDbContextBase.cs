@@ -1,7 +1,9 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Attributes;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.BuildingBlocks.Infrastructure.Converters;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
@@ -77,6 +79,8 @@ public abstract class NexTraceDbContextBase(
 
         ApplyGlobalSoftDeleteFilter(modelBuilder);
         ApplyEncryptedFieldConvention(modelBuilder);
+        ApplyTypedIdConventions(modelBuilder);
+        ApplyValueObjectConventions(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }
@@ -146,6 +150,102 @@ public abstract class NexTraceDbContextBase(
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Aplica automaticamente ValueConverters para todas as propriedades do tipo ITypedId
+    /// e define HasKey para entidades que herdam de Entity&lt;TId&gt;.
+    /// </summary>
+    private static void ApplyTypedIdConventions(ModelBuilder modelBuilder)
+    {
+        var typedIdTypes = new HashSet<Type>();
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes().ToList())
+        {
+            var clrType = entityType.ClrType;
+
+            // Find if type inherits from Entity<TId> where TId : ITypedId
+            var currentType = clrType;
+            while (currentType != null && currentType != typeof(object))
+            {
+                if (currentType.IsGenericType && currentType.GetGenericTypeDefinition() == typeof(Entity<>))
+                {
+                    var idType = currentType.GetGenericArguments()[0];
+                    if (typeof(ITypedId).IsAssignableFrom(idType))
+                    {
+                        var entityBuilder = modelBuilder.Entity(clrType);
+                        entityBuilder.HasKey("Id");
+
+                        var idProperty = entityBuilder.Property("Id").Metadata;
+                        var converterType = typeof(TypedIdValueConverter<>).MakeGenericType(idType);
+                        var converter = (ValueConverter?)Activator.CreateInstance(converterType);
+                        if (converter != null)
+                        {
+                            idProperty.SetValueConverter(converter);
+                        }
+                    }
+                    break;
+                }
+                currentType = currentType.BaseType;
+            }
+
+            // Apply converters to all ITypedId properties and collect the types
+            foreach (var property in entityType.GetProperties().ToList())
+            {
+                if (typeof(ITypedId).IsAssignableFrom(property.ClrType) && property.ClrType != typeof(ITypedId))
+                {
+                    typedIdTypes.Add(property.ClrType);
+
+                    var converterType = typeof(TypedIdValueConverter<>).MakeGenericType(property.ClrType);
+                    var converter = (ValueConverter?)Activator.CreateInstance(converterType);
+                    if (converter != null)
+                    {
+                        property.SetValueConverter(converter);
+                    }
+                }
+            }
+        }
+
+        // Ensure ITypedId value types are NOT mapped as separate entity types
+        foreach (var typedIdType in typedIdTypes)
+        {
+            // Only ignore if it's not already configured as an entity with a key
+            var entityType = modelBuilder.Model.FindEntityType(typedIdType);
+            if (entityType is not null && entityType.FindPrimaryKey() is null)
+            {
+                modelBuilder.Ignore(typedIdType);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Ignora automaticamente no modelo EF Core todos os tipos descobertos implicitamente
+    /// que não herdam de Entity&lt;&gt; e não têm chave primária configurada.
+    /// Isso evita erros de validação para value objects e records usados como propriedades
+    /// em entidades — esses tipos devem ser mapeados via ValueConverter nas configurações
+    /// das entidades que os contêm, e não como entidades separadas.
+    /// </summary>
+    private static void ApplyValueObjectConventions(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes().ToList())
+        {
+            var clrType = entityType.ClrType;
+
+            // Skip OutboxMessage (it has explicit configuration)
+            if (clrType == typeof(OutboxMessage))
+                continue;
+
+            // Skip types that already have a primary key
+            if (entityType.FindPrimaryKey() is not null)
+                continue;
+
+            // Skip types that inherit from Entity<> (these should have a key)
+            if (IsAssignableToGenericType(clrType, typeof(Entity<>)))
+                continue;
+
+            // Ignore the type so EF Core does not try to map it as a separate entity
+            modelBuilder.Ignore(clrType);
+        }
     }
 
     private static void ApplyGlobalSoftDeleteFilter(ModelBuilder modelBuilder)

@@ -8,92 +8,133 @@
 
 -- ═══ SERVICE ASSETS (CatalogGraphDbContext) ═══════════════════════════════════
 
-INSERT INTO cat_service_assets (
+INSERT INTO "ServiceAssets" (
   "Id", "Name", "DisplayName", "Description",
   "ServiceType", "Domain", "SystemArea",
   "TeamName", "TechnicalOwner", "BusinessOwner",
   "Criticality", "LifecycleStatus", "ExposureType",
-  "DocumentationUrl", "RepositoryUrl"
+  "DocumentationUrl", "RepositoryUrl",
+  "TenantId", "SearchVector",
+  "GitRepository", "CiPipelineUrl", "InfrastructureProvider", "HostingPlatform",
+  "RuntimeLanguage", "RuntimeVersion", "SloTarget", "DataClassification",
+  "RegulatoryScope", "ChangeFrequency", "ProductOwner", "ContactChannel",
+  "OnCallRotationId", "Tier", "RowVersion",
+  "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'ca000001-0001-0000-0000-000000000001',
   'payment-service', 'Payment Service',
   'Core payment processing service. Handles authorisation, capture, refund and settlement for all payment instruments.',
-  'RestApi', 'payments', 'core-platform',
+  0, 'payments', 'core-platform',
   'payments-team', 'techlead@nextraceone.dev', 'product@nextraceone.dev',
-  'Critical', 'Active', 'Internal',
-  '', ''
+  3, 3, 0,
+  '', '',
+  'a0000000-0000-0000-0000-000000000001',
+  to_tsvector('english', 'payment-service Payment Service core-platform payments'),
+  '', '', '', '',
+  '', '', '', '',
+  '', '', '', '',
+  '', 0, 1,
+  NOW(), 'system', NOW(), 'system', false
 ),
 (
   'ca000002-0001-0000-0000-000000000001',
   'catalog-service', 'Catalog Service',
   'Service catalogue and API contract governance service. Source of truth for service ownership, dependencies and API definitions.',
-  'RestApi', 'platform', 'core-platform',
+  0, 'platform', 'core-platform',
   'platform-team', 'techlead@nextraceone.dev', 'product@nextraceone.dev',
-  'High', 'Active', 'Internal',
-  '', ''
+  2, 3, 0,
+  '', '',
+  'a0000000-0000-0000-0000-000000000001',
+  to_tsvector('english', 'catalog-service Catalog Service core-platform platform'),
+  '', '', '', '',
+  '', '', '', '',
+  '', '', '', '',
+  '', 0, 1,
+  NOW(), 'system', NOW(), 'system', false
 ),
 (
   'ca000003-0001-0000-0000-000000000001',
   'notification-service', 'Notification Service',
   'Centralised notification delivery service supporting email, SMS and in-app channels.',
-  'BackgroundService', 'platform', 'core-platform',
+  4, 'platform', 'core-platform',
   'platform-team', 'techlead@nextraceone.dev', '',
-  'Medium', 'Active', 'Internal',
-  '', ''
+  1, 3, 0,
+  '', '',
+  'a0000000-0000-0000-0000-000000000001',
+  to_tsvector('english', 'notification-service Notification Service core-platform platform'),
+  '', '', '', '',
+  '', '', '', '',
+  '', '', '', '',
+  '', 0, 1,
+  NOW(), 'system', NOW(), 'system', false
 ),
 (
   'ca000004-0001-0000-0000-000000000001',
   'identity-service', 'Identity Service',
   'Authentication, authorisation and user profile management service.',
-  'RestApi', 'security', 'core-platform',
+  0, 'security', 'core-platform',
   'platform-team', 'techlead@nextraceone.dev', '',
-  'Critical', 'Active', 'Internal',
-  '', ''
+  3, 3, 0,
+  '', '',
+  'a0000000-0000-0000-0000-000000000001',
+  to_tsvector('english', 'identity-service Identity Service core-platform security'),
+  '', '', '', '',
+  '', '', '', '',
+  '', '', '', '',
+  '', 0, 1,
+  NOW(), 'system', NOW(), 'system', false
 ),
 (
   'ca000005-0001-0000-0000-000000000001',
   'analytics-gateway', 'Analytics Gateway',
   'API gateway for product analytics events ingestion and aggregation.',
-  'Gateway', 'analytics', 'data-platform',
+  11, 'analytics', 'data-platform',
   'data-team', 'admin@nextraceone.dev', '',
-  'Medium', 'Active', 'Internal',
-  '', ''
+  1, 3, 0,
+  '', '',
+  'a0000000-0000-0000-0000-000000000001',
+  to_tsvector('english', 'analytics-gateway Analytics Gateway data-platform analytics'),
+  '', '', '', '',
+  '', '', '', '',
+  '', '', '', '',
+  '', 0, 1,
+  NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ API ASSETS (CatalogGraphDbContext) ═══════════════════════════════════════
 
-INSERT INTO cat_api_assets (
+INSERT INTO "ApiAssets" (
   "Id", "Name", "RoutePattern", "Version",
   "Visibility", "OwnerServiceId", "IsDecommissioned"
 ) VALUES
 (
   'ca010001-0001-0000-0000-000000000001',
   'payment-service-v1', '/api/v1/payments', 'v1',
-  'Internal',
-  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'payment-service'),
+  0,
+  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'payment-service'),
   false
 ),
 (
   'ca010002-0001-0000-0000-000000000001',
   'catalog-service-v1', '/api/v1', 'v1',
-  'Internal',
-  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'catalog-service'),
+  0,
+  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'catalog-service'),
   false
 ),
 (
   'ca010003-0001-0000-0000-000000000001',
   'identity-service-v1', '/api/v1/identity', 'v1',
-  'Internal',
-  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'identity-service'),
+  0,
+  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'identity-service'),
   false
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ SPECTRAL RULESETS (ContractsDbContext) ═══════════════════════════════════
 
-INSERT INTO ctr_spectral_rulesets (
+INSERT INTO "ContractLintRulesets" (
   "Id", "Name", "Description", "Version",
   "Content", "Origin", "DefaultExecutionMode", "EnforcementBehavior",
   "OrganizationId", "Owner", "Domain", "ApplicableServiceType", "ApplicableProtocols",
@@ -114,7 +155,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ CANONICAL ENTITIES (ContractsDbContext) ══════════════════════════════════
 
-INSERT INTO ctr_canonical_entities (
+INSERT INTO "CanonicalEntities" (
   "Id", "Name", "Description",
   "Domain", "Category", "Owner", "Version",
   "State", "SchemaContent", "SchemaFormat",
@@ -129,7 +170,7 @@ INSERT INTO ctr_canonical_entities (
   'Published',
   '{"type":"object","required":["amount","currency","paymentMethod"],"properties":{"amount":{"type":"number","minimum":0},"currency":{"type":"string","maxLength":3},"paymentMethod":{"type":"string","enum":["card","bank_transfer","wallet"]},"reference":{"type":"string","maxLength":100}}}',
   'JsonSchema',
-  '{}', '{"payments","canonical"}', 'High', 'recommended',
+  '{}', '{"payments","canonical"}', 2, 'recommended',
   NULL,
   NOW(), 'system', NOW(), 'system', false
 ),
@@ -140,7 +181,7 @@ INSERT INTO ctr_canonical_entities (
   'Published',
   '{"type":"object","required":["name","domain","teamName"],"properties":{"name":{"type":"string","maxLength":200},"domain":{"type":"string","maxLength":200},"teamName":{"type":"string","maxLength":200},"serviceType":{"type":"string","enum":["RestApi","GraphqlApi","GrpcService","KafkaProducer","KafkaConsumer","BackgroundService","LegacySystem","Gateway","ThirdParty"]},"criticality":{"type":"string","enum":["Critical","High","Medium","Low"]}}}',
   'JsonSchema',
-  '{}', '{"platform","catalog","canonical"}', 'Medium', 'recommended',
+  '{}', '{"platform","catalog","canonical"}', 1, 'recommended',
   NULL,
   NOW(), 'system', NOW(), 'system', false
 )
@@ -148,7 +189,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ CONTRACT DRAFTS (ContractsDbContext) ════════════════════════════════════
 
-INSERT INTO ctr_contract_drafts (
+INSERT INTO "Drafts" (
   "Id", "Title", "Description",
   "ServiceId", "ContractType", "Protocol",
   "SpecContent", "Format",

@@ -1,64 +1,67 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- NEXTRACEONE — Seed data: AI Knowledge Module (AiGovernanceDatabase)
--- Tables: aik_models, aik_providers, aik_routing_strategies, aik_knowledge_sources,
---         aik_source_weights, aik_agents, aik_access_policies, aik_budgets
+-- Tables: Models, Providers, RoutingStrategies, KnowledgeSources,
+--         SourceWeights, Agents, AccessPolicies, Budgets
 -- All INSERT statements are idempotent: ON CONFLICT DO NOTHING.
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- ═══ PROVIDERS ═══════════════════════════════════════════════════════════════
 
-INSERT INTO aik_providers (
+INSERT INTO "Providers" (
   "Id", "Name", "Slug", "DisplayName", "Description",
   "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled",
   "AuthenticationMode", "SupportedCapabilities",
   "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput",
   "HealthStatus", "Priority", "TimeoutSeconds", "RegisteredAt",
-  "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+  "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted",
+  "RowVersion"
 ) VALUES
 (
   'cc000001-0001-0000-0000-000000000001',
   'ollama-local', 'ollama', 'Ollama (Local)', 'Local AI provider via Ollama runtime.',
   'Ollama', 'http://localhost:11434', true, false, true,
-  'None', 'chat,reasoning,code,embeddings',
+  0, 'chat,reasoning,code,embeddings',
   true, true, true, false, true,
-  'Unknown', 1, 30, NOW(),
-  NOW(), 'system', NOW(), 'system', false
+  0, 1, 30, NOW(),
+  NOW(), 'system', NOW(), 'system', false,
+  1
 ),
 (
   'cc000002-0001-0000-0000-000000000001',
   'openai', 'openai', 'OpenAI', 'OpenAI external AI provider (requires API key).',
   'OpenAI', 'https://api.openai.com', false, true, false,
-  'ApiKey', 'chat,reasoning,code,vision,embeddings,tools,structured-output',
+  1, 'chat,reasoning,code,vision,embeddings,tools,structured-output',
   true, true, true, true, true,
-  'Unknown', 10, 30, NOW(),
-  NOW(), 'system', NOW(), 'system', false
+  0, 10, 30, NOW(),
+  NOW(), 'system', NOW(), 'system', false,
+  1
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ MODELS ══════════════════════════════════════════════════════════════════
 
 -- Fix existing model rows to match the actual Ollama models installed locally
-UPDATE aik_models SET "Name" = 'qwen3.5:9b', "Slug" = 'qwen3.5-9b', "DisplayName" = 'Qwen 3.5 9B (Chat)', "ExternalModelId" = 'qwen3.5:9b'
+UPDATE "Models" SET "Name" = 'qwen3.5:9b', "Slug" = 'qwen3.5-9b', "DisplayName" = 'Qwen 3.5 9B (Chat)', "ExternalModelId" = 'qwen3.5:9b'
 WHERE "Id" = 'aa000001-0001-0000-0000-000000000001';
 
-UPDATE aik_models SET "Name" = 'deepseek-r1:14b', "Slug" = 'deepseek-r1-14b', "DisplayName" = 'DeepSeek R1 14B (Analysis)',
+UPDATE "Models" SET "Name" = 'deepseek-r1:14b', "Slug" = 'deepseek-r1-14b', "DisplayName" = 'DeepSeek R1 14B (Analysis)',
   "ExternalModelId" = 'deepseek-r1:14b', "ModelType" = 'Analysis', "Category" = 'Reasoning',
   "Capabilities" = 'reasoning,analysis,code,chain-of-thought', "DefaultUseCases" = 'contract-generation,code-analysis,change-analysis',
   "SensitivityLevel" = 2, "ContextWindow" = 131072, "RequiresGpu" = true, "RecommendedRamGb" = 16.0
 WHERE "Id" = 'aa000002-0001-0000-0000-000000000001';
 
-UPDATE aik_models SET "Name" = 'deepseek-r1:671b', "Slug" = 'deepseek-r1-671b', "DisplayName" = 'DeepSeek R1 671B (Heavy Reasoning)',
+UPDATE "Models" SET "Name" = 'deepseek-r1:671b', "Slug" = 'deepseek-r1-671b', "DisplayName" = 'DeepSeek R1 671B (Heavy Reasoning)',
   "ExternalModelId" = 'deepseek-r1:671b', "Capabilities" = 'reasoning,analysis,chain-of-thought,deep-analysis',
   "DefaultUseCases" = 'change-analysis,incident-explanation,blast-radius',
   "SensitivityLevel" = 3, "ContextWindow" = 131072, "RequiresGpu" = true, "RecommendedRamGb" = 128.0
 WHERE "Id" = 'aa000003-0001-0000-0000-000000000001';
 
-UPDATE aik_models SET "Name" = 'llama3.1:8b', "Slug" = 'llama3.1-8b', "DisplayName" = 'Llama 3.1 8B (Completion)',
+UPDATE "Models" SET "Name" = 'llama3.1:8b', "Slug" = 'llama3.1-8b', "DisplayName" = 'Llama 3.1 8B (Completion)',
   "ExternalModelId" = 'llama3.1:8b', "Capabilities" = 'completion,summarisation,concise,multilingual',
   "ContextWindow" = 131072, "RecommendedRamGb" = 8.0
 WHERE "Id" = 'aa000004-0001-0000-0000-000000000001';
 
-INSERT INTO aik_models (
+INSERT INTO "Models" (
   "Id", "Name", "Slug", "DisplayName",
   "Provider", "ProviderId", "ExternalModelId",
   "ModelType", "Category",
@@ -151,7 +154,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ ACCESS POLICIES ═════════════════════════════════════════════════════════
 
-INSERT INTO aik_access_policies (
+INSERT INTO "AccessPolicies" (
   "Id", "Name", "Description", "Scope", "ScopeValue",
   "AllowedModelIds", "BlockedModelIds",
   "AllowExternalAI", "InternalOnly", "MaxTokensPerRequest",
@@ -183,7 +186,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ BUDGETS ═════════════════════════════════════════════════════════════════
 
-INSERT INTO aik_budgets (
+INSERT INTO "Budgets" (
   "Id", "Name", "Scope", "ScopeValue",
   "Period", "MaxTokens", "MaxRequests",
   "CurrentTokensUsed", "CurrentRequestCount",
@@ -202,7 +205,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ ROUTING STRATEGIES ══════════════════════════════════════════════════════
 
-INSERT INTO aik_routing_strategies (
+INSERT INTO "RoutingStrategies" (
   "Id", "Name", "Description",
   "TargetPersona", "TargetUseCase", "TargetClientType",
   "PreferredPath", "MaxSensitivityLevel", "AllowExternalEscalation",
@@ -229,7 +232,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ KNOWLEDGE SOURCES ═══════════════════════════════════════════════════════
 
-INSERT INTO aik_knowledge_sources (
+INSERT INTO "KnowledgeSources" (
   "Id", "Name", "Description",
   "SourceType", "EndpointOrPath",
   "Priority", "IsActive", "RegisteredAt",
@@ -297,7 +300,7 @@ ON CONFLICT DO NOTHING;
 -- Pesos padrão de fontes por caso de uso. Configúraveis por administradores.
 -- TrustLevel: 1-5 (5 = máxima confiança). Weight: 0-100 (percentual de relevância).
 
-INSERT INTO aik_source_weights (
+INSERT INTO "SourceWeights" (
   "Id", "SourceType", "UseCaseType", "Relevance",
   "Weight", "TrustLevel", "IsActive", "ConfiguredAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
@@ -356,15 +359,15 @@ ON CONFLICT DO NOTHING;
 -- ═══ AGENTS ══════════════════════════════════════════════════════════════════
 
 -- Fix existing rows that were seeded with invalid enum values
-UPDATE aik_agents
+UPDATE "Agents"
 SET "OwnershipType" = 'System'
 WHERE "OwnershipType" = 'Platform';
 
-UPDATE aik_agents
+UPDATE "Agents"
 SET "Visibility" = 'Tenant'
 WHERE "Visibility" = 'Public';
 
-INSERT INTO aik_agents (
+INSERT INTO "Agents" (
   "Id", "Name", "DisplayName", "Slug", "Description",
   "Category", "SystemPrompt", "Capabilities", "TargetPersona",
   "Icon", "PreferredModelId",
