@@ -187,10 +187,10 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
         fallbackProvider.Deactivate(); // Returns Result<Unit> — side effect on entity state is what matters
 
-        context.Providers.AddRange(primaryProvider, fallbackProvider);
+        context.ExternalAiProviders.AddRange(primaryProvider, fallbackProvider);
         await context.SaveChangesAsync();
 
-        var activeProviders = await context.Providers
+        var activeProviders = await context.ExternalAiProviders
             .AsNoTracking()
             .Where(p => p.IsActive)
             .OrderBy(p => p.Priority)
@@ -222,10 +222,10 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
             startedAt: DateTimeOffset.UtcNow,
             releaseId: releaseId);
 
-        context.Conversations.Add(conversation);
+        context.OrchestrationConversations.Add(conversation);
         await context.SaveChangesAsync();
 
-        var serviceConversations = await context.Conversations
+        var serviceConversations = await context.OrchestrationConversations
             .AsNoTracking()
             .Where(c => c.ServiceName == "orders-service")
             .ToListAsync();
@@ -265,8 +265,8 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
                 startedAt: DateTimeOffset.UtcNow);
 
             aiGovCtx.Conversations.Add(conversation);
-            extAiCtx.Providers.Add(provider);
-            orchCtx.Conversations.Add(orchConv);
+            extAiCtx.ExternalAiProviders.Add(provider);
+            orchCtx.OrchestrationConversations.Add(orchConv);
 
             await aiGovCtx.SaveChangesAsync();
             await extAiCtx.SaveChangesAsync();
