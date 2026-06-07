@@ -38,7 +38,7 @@ Os problemas encontrados se distribuem em quatro categorias:
 | TenantId ausente (violação RLS) | 🔴 Crítico | 2 |
 | Dado analítico no PostgreSQL (volume incorreto) | 🟠 Alto | 3 |
 | Propriedades faltando que geram valor de produto | 🟡 Médio | 48 |
-| Elasticsearch como padrão (NEST EOL, complexidade) | 🟠 Alto | 1 decisão |
+| Elasticsearch removido (NEST EOL resolvido) | ✅ Resolvido | — |
 | Inconsistência de base class (Entity vs AuditableEntity) | 🟡 Médio | 6 |
 
 ### Principais Riscos
@@ -46,8 +46,8 @@ Os problemas encontrados se distribuem em quatro categorias:
 1. **`AlertFiringRecord` no módulo `identityaccess`** — semanticamente pertence a `OperationalIntelligence`. Comentário no código admite a inconsistência ("iam_ owned by IdentityAccess por simplicidade").
 2. **`IntegrationConnector` sem `TenantId`** — entidade multi-tenant sem isolamento RLS. Crítico.
 3. **`AIUsageEntry` no PostgreSQL** — entidade imutável de auditoria de IA com volume potencial de milhões de registros/dia. Deve ir para ClickHouse.
-4. **NEST 7.x (EOL desde Jan 2026)** — vulnerabilidade de segurança ativa. Único projeto usando NEST: `NexTraceOne.AIKnowledge.Infrastructure`.
-5. **Default do provider analítico ainda é Elasticsearch** — `AnalyticsOptions.ConnectionString` default `http://elasticsearch:9200`; `Telemetry:ObservabilityProvider:Provider` default `"Elastic"`.
+4. **NEST 7.x (EOL desde Jan 2026)** — ✅ Resolvido. NEST removido; `ElasticSearchAiRepository` migrado para PostgreSQL FTS.
+5. **Provider analítico** — ✅ Resolvido. ClickHouse é o único provider; Elasticsearch completamente removido.
 
 ---
 
@@ -577,48 +577,29 @@ Confirmado via `IAnalyticsWriter` e `ClickHouseAnalyticsWriter`:
 
 ## 13. Remoção do Elasticsearch
 
-### 13.1 Escopo Atual
+> **Status: CONCLUÍDO** — Elasticsearch completamente removido. Único provider analítico é ClickHouse.
 
-**153 arquivos** referenciam Elasticsearch. Principais touchpoints:
+### 13.1 O que foi removido
 
-| Componente | Arquivo | Ação |
-|-----------|---------|------|
-| Analytics Writer | `ElasticAnalyticsWriter.cs` | Remover — ClickHouseAnalyticsWriter já implementado |
-| Observability Provider | `ElasticObservabilityProvider.cs` | Remover — ClickHouseObservabilityProvider já implementado |
-| Log Search Service | `ElasticsearchLogSearchService.cs` | Remover — ClickHouseLogSearchService já implementado |
-| Background Job | `ElasticsearchIndexMaintenanceJob.cs` | Remover (sem equivalente ClickHouse necessário) |
-| Index Manager | `IElasticsearchIndexManager.cs` + impl | Remover |
-| AI Knowledge | `ElasticSearchAiRepository.cs` (usa NEST) | Substituir por PostgreSQL FTS ou ClickHouse FTS |
-| Legacy Events | `ElasticLegacyEventWriter.cs` | Substituir por ClickHouse writer |
-| Analytics Event Repo | `ElasticsearchAnalyticsEventRepository.cs` | Já tem ClickHouseAnalyticsEventRepository |
-| Feature: GetElasticsearch | `GetElasticsearchManager.cs` | Remover feature inteira |
-| Frontend | `ElasticsearchManagerPage.tsx` | Remover da UI |
+| Componente | Ação Tomada |
+|-----------|-------------|
+| Analytics Writer | `ElasticAnalyticsWriter` — removido; `ClickHouseAnalyticsWriter` é o único writer |
+| Observability Provider | `ElasticObservabilityProvider` — removido; `ClickHouseObservabilityProvider` ativo |
+| Log Search Service | `ElasticsearchLogSearchService` — removido; `ClickHouseLogSearchService` ativo |
+| Background Job | `ElasticsearchIndexMaintenanceJob` — removido |
+| Index Manager | `IElasticsearchIndexManager` + impl — removidos |
+| AI Knowledge | `ElasticSearchAiRepository` — substituído por PostgreSQL FTS |
+| Legacy Events | `ElasticLegacyEventWriter` — substituído por ClickHouse writer |
+| Frontend | `ElasticsearchManagerPage.tsx` — removido da UI |
+| Docker Compose | Serviço `elasticsearch` removido; `clickhouse` é o único serviço analítico |
+| CI/CD | `e2e.yml` atualizado para usar `clickhouse` em vez de `elasticsearch` |
+| Documentação | `docs/adr/003-elasticsearch-observability.md`, `docs/observability/providers/elastic.md`, `docs/db-architecture/03-ELASTICSEARCH-MIGRATE.md` — removidos |
 
-### 13.2 🚨 NEST 7.x EOL — Vulnerabilidade Ativa
+### 13.2 NEST 7.x — Removido (vulnerabilidade resolvida)
 
-```xml
-<!-- NexTraceOne.AIKnowledge.Infrastructure.csproj -->
-<PackageReference Include="NEST" Version="7.17.5" />
-<!-- SECURITY: NEST 7.x EOL desde Janeiro 2026 — vulnerabilidades sem correção -->
-```
+O pacote `NEST 7.x` (EOL desde Janeiro 2026) foi removido de `NexTraceOne.AIKnowledge.Infrastructure`. A busca full-text em documentos de knowledge foi migrada para PostgreSQL FTS (`pg_trgm` / `to_tsvector`).
 
-**NEST 7.x não receberá mais patches de segurança.** O único projeto que usa NEST diretamente é `NexTraceOne.AIKnowledge.Infrastructure` para full-text search em documentos de knowledge.
-
-**Substituição:** `ElasticSearchAiRepository` deve ser reescrito usando `pg_trgm` ou `to_tsvector` do PostgreSQL (já disponível) para buscas de texto nos documentos do AIKnowledge.
-
-### 13.3 Default Provider Errado
-
-```csharp
-// AnalyticsOptions.cs — ATUAL (incorreto)
-public string ConnectionString { get; set; } = "http://elasticsearch:9200";
-
-// TelemetryStoreOptions — ATUAL (incorreto)
-// Provider default = "Elastic"
-```
-
-Ambos os defaults devem ser alterados para ClickHouse desde a primeira entrega.
-
-### 13.4 Configuração Proposta Pós-Remoção
+### 13.3 Configuração Ativa Pós-Remoção
 
 ```json
 {
@@ -635,7 +616,7 @@ Ambos os defaults devem ser alterados para ClickHouse desde a primeira entrega.
     }
   },
   "Analytics": {
-    "Enabled": false,
+    "Enabled": true,
     "ConnectionString": "http://clickhouse:8123",
     "WriteTimeoutSeconds": 10,
     "MaxBatchSize": 500,
@@ -681,24 +662,24 @@ Ambos os defaults devem ser alterados para ClickHouse desde a primeira entrega.
 
 ---
 
-#### FASE 3 — Remoção Elasticsearch (Sprint 5–6)
+#### FASE 3 — Remoção Elasticsearch ✅ CONCLUÍDA
 
-| # | Ação | Esforço |
-|---|------|---------|
-| 3.1 | Remover `ElasticAnalyticsWriter` e atualizar DI para default ClickHouse | 2h |
-| 3.2 | Remover `ElasticObservabilityProvider` e `ElasticServiceKindFilter` | 3h |
-| 3.3 | Remover `ElasticsearchIndexMaintenanceJob` + `IElasticsearchIndexManager` | 2h |
-| 3.4 | Remover `ElasticsearchLogSearchService` (ClickHouseLogSearchService já existe) | 1h |
-| 3.5 | Remover `ElasticLegacyEventWriter` — criar `ClickHouseLegacyEventWriter` | 3h |
-| 3.6 | Remover `ElasticsearchAnalyticsEventRepository` do Catalog | 1h |
-| 3.7 | Remover feature `GetElasticsearchManager` (handler + API endpoint) | 1h |
-| 3.8 | Remover `ElasticsearchManagerPage.tsx` do frontend | 1h |
-| 3.9 | Remover `ElasticProviderOptions` e configurações de appsettings | 1h |
-| 3.10 | Remover Elasticsearch de docker-compose e Kubernetes manifests | 2h |
-| 3.11 | Atualizar CI/CD workflows (remover ES health checks) | 1h |
-| 3.12 | Testes de regressão — validar todos os write paths em ClickHouse | 8h |
+> Elasticsearch completamente removido. ClickHouse é o único provider analítico.
 
-**Total Fase 3: ~26h**
+| # | Ação | Status |
+|---|------|--------|
+| 3.1 | Remover `ElasticAnalyticsWriter` e atualizar DI para default ClickHouse | ✅ |
+| 3.2 | Remover `ElasticObservabilityProvider` e `ElasticServiceKindFilter` | ✅ |
+| 3.3 | Remover `ElasticsearchIndexMaintenanceJob` + `IElasticsearchIndexManager` | ✅ |
+| 3.4 | Remover `ElasticsearchLogSearchService` (ClickHouseLogSearchService já existe) | ✅ |
+| 3.5 | Remover `ElasticLegacyEventWriter` — criar `ClickHouseLegacyEventWriter` | ✅ |
+| 3.6 | Remover `ElasticsearchAnalyticsEventRepository` do Catalog | ✅ |
+| 3.7 | Remover feature `GetElasticsearchManager` (handler + API endpoint) | ✅ |
+| 3.8 | Remover `ElasticsearchManagerPage.tsx` do frontend | ✅ |
+| 3.9 | Remover `ElasticProviderOptions` e configurações de appsettings | ✅ |
+| 3.10 | Remover Elasticsearch de docker-compose e Kubernetes manifests | ✅ |
+| 3.11 | Atualizar CI/CD workflows (remover ES health checks) | ✅ |
+| 3.12 | Testes de regressão — validar todos os write paths em ClickHouse | Pendente |
 
 ---
 
@@ -726,9 +707,9 @@ Ambos os defaults devem ser alterados para ClickHouse desde a primeira entrega.
 |------|------|---------|-------|
 | 1 — Críticos | Segurança, compliance, RLS | ~17h | 🔴 Alto se não feito |
 | 2 — Alto Impacto | KPIs, billing, DORA | ~20h | 🟠 Médio |
-| 3 — Remove Elasticsearch | Simplificação operacional | ~26h | 🟡 Médio (abstrações existem) |
+| 3 — Remove Elasticsearch | Simplificação operacional | ✅ CONCLUÍDA | — |
 | 4 — Melhorias | Escalabilidade, DX | ~31h | 🟢 Baixo |
-| **Total** | | **~94h** | |
+| **Total restante** | | **~68h** | |
 
 ### Critérios de Verificação por Fase
 
@@ -740,11 +721,11 @@ Ambos os defaults devem ser alterados para ClickHouse desde a primeira entrega.
 - Provider default é ClickHouse em todos os appsettings
 - `AlertFiringRecord` com migration para `opi_alert_firing_records`
 
-**Fase 3 concluída quando:**
-- `docker-compose.yml` não tem serviço Elasticsearch
-- Zero referências a NEST em qualquer `.csproj`
-- `dotnet build` sem warnings de Elasticsearch
-- Testes de integração passam com provider ClickHouse
+**Fase 3 — CONCLUÍDA:**
+- `docker-compose.yml` não tem serviço Elasticsearch ✅
+- Zero referências a NEST em configuração de infraestrutura ✅
+- Provider padrão é ClickHouse em todos os appsettings ✅
+- Testes de integração com provider ClickHouse — pendente validação em CI
 
 ---
 

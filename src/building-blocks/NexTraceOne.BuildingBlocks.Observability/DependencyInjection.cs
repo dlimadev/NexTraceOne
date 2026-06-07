@@ -17,7 +17,6 @@ using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfi
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.OpenTelemetryCollector;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.ClickHouse;
-using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elastic;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Services;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.Tracing;
@@ -30,12 +29,12 @@ namespace NexTraceOne.BuildingBlocks.Observability;
 /// <summary>
 /// Registra toda a infraestrutura de observabilidade da plataforma:
 /// OpenTelemetry (tracing + metrics via OTLP), provider de observabilidade
-/// configurável (Elastic ou ClickHouse), estratégia de coleta por ambiente
+/// configurável (ClickHouse), estratégia de coleta por ambiente
 /// (OpenTelemetry Collector ou CLR Profiler) e health checks.
 ///
 /// A plataforma é OpenTelemetry-native na ingestão, correlation-first no produto
 /// e storage-aware na persistência. O PostgreSQL serve como Product Store
-/// (agregados, correlações, topologia) e o provider configurável (Elastic ou ClickHouse)
+/// (agregados, correlações, topologia) e o provider configurável (ClickHouse)
 /// como storage analítico para traces, logs e métricas crus.
 ///
 /// Coleta, transporte, storage e análise são preocupações separadas.
@@ -45,7 +44,7 @@ public static class DependencyInjection
     /// <summary>
     /// Registra observabilidade base compartilhada da plataforma.
     /// Configura: OpenTelemetry (tracing + metrics), provider de observabilidade
-    /// (Elastic ou ClickHouse), modo de coleta (Collector ou CLR Profiler),
+    /// (ClickHouse), modo de coleta (Collector ou CLR Profiler),
     /// opções de telemetria (Product Store, retenção, collector) e health checks.
     /// </summary>
     public static IServiceCollection AddBuildingBlocksObservability(
@@ -151,17 +150,17 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Registra o provider de observabilidade configurado (Elastic ou ClickHouse).
+    /// Registra o provider de observabilidade configurado (ClickHouse).
     /// A escolha é feita por configuração em Telemetry:ObservabilityProvider:Provider.
-    /// Padrão: Elastic.
+    /// Padrão: ClickHouse.
     /// </summary>
     private static void RegisterObservabilityProvider(
         IServiceCollection services,
         IConfiguration configuration)
     {
-        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+        var clickHouseEnabled = configuration.GetValue<bool>("Telemetry:ObservabilityProvider:ClickHouse:Enabled", defaultValue: true);
 
-        if (string.Equals(providerName, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        if (clickHouseEnabled)
         {
             services.AddHttpClient<ClickHouseObservabilityProvider>(client =>
             {
@@ -172,24 +171,7 @@ public static class DependencyInjection
         }
         else
         {
-            // Verifica se Elastic está habilitado
-            var elasticEnabled = configuration.GetValue<bool>("Telemetry:ObservabilityProvider:Elastic:Enabled", defaultValue: true);
-            
-            if (!elasticEnabled)
-            {
-                // Elastic desabilitado - usa Null provider
-                services.AddSingleton<IObservabilityProvider, NullObservabilityProvider>();
-            }
-            else
-            {
-                // Default: Elastic
-                services.AddHttpClient<ElasticObservabilityProvider>(client =>
-                {
-                    client.Timeout = TimeSpan.FromSeconds(30);
-                }).AddStandardResilienceHandler();
-                services.AddSingleton<IObservabilityProvider>(sp =>
-                    sp.GetRequiredService<ElasticObservabilityProvider>());
-            }
+            services.AddSingleton<IObservabilityProvider, NullObservabilityProvider>();
         }
 
         services.AddSingleton<ITelemetryQueryService, TelemetryQueryService>();
@@ -218,8 +200,7 @@ public static class DependencyInjection
 
     /// <summary>
     /// Registra a camada de escrita analítica do NexTraceOne.
-    /// Quando Analytics:Enabled = true, seleciona o writer de acordo com
-    /// Telemetry:ObservabilityProvider:Provider (ClickHouse ou Elastic).
+    /// Quando Analytics:Enabled = true, registra ClickHouseAnalyticsWriter.
     /// Quando false, registra NullAnalyticsWriter (graceful degradation).
     ///
     /// Módulos suportados: Product Analytics, Operational Intelligence,
@@ -240,24 +221,11 @@ public static class DependencyInjection
 
         services.Configure<AnalyticsOptions>(configuration.GetSection(AnalyticsOptions.SectionName));
 
-        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
-
-        if (string.Equals(providerName, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
         {
-            services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
-            }).AddStandardResilienceHandler();
-            services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
-        }
-        else
-        {
-            services.AddHttpClient<ElasticAnalyticsWriter>(client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
-            }).AddStandardResilienceHandler();
-            services.AddSingleton<IAnalyticsWriter, ElasticAnalyticsWriter>();
-        }
+            client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
+        }).AddStandardResilienceHandler();
+        services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
 
         return services;
     }
@@ -304,7 +272,7 @@ public static class DependencyInjection
 
     /// <summary>
     /// Registra observabilidade adaptada ao modo configurado em Platform:ObservabilityMode.
-    /// Full: Elasticsearch + ClickHouse. Lite: apenas NullAnalyticsWriter (PostgreSQL product store).
+    /// Full: ClickHouse. Lite: apenas NullAnalyticsWriter (PostgreSQL product store).
     /// Minimal: sem analytics writer; apenas Serilog file sink.
     /// W7-03: Lightweight Mode.
     /// </summary>

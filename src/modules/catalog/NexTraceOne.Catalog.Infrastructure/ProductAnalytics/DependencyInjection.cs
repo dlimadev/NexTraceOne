@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 
-using NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
 using NexTraceOne.Catalog.Application.ProductAnalytics.Abstractions;
 using NexTraceOne.Catalog.Contracts;
 using NexTraceOne.Catalog.Infrastructure.ProductAnalytics.Persistence.Repositories;
@@ -27,10 +26,11 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // Repositories — P2.3
-        // Provider-aware: ClickHouse for high-cardinality analytic reads, PostgreSQL as default, Elastic as primary.
+        // Provider-aware: ClickHouse para leituras analíticas de alto volume, PostgreSQL como padrão.
+        // Elasticsearch removido — usar ClickHouse ou PostgreSQL.
         services.AddScoped<AnalyticsEventRepository>();
 
-        var analyticsProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+        var analyticsProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "PostgreSQL";
         if (string.Equals(analyticsProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
         {
             services.Configure<ClickHouseAnalyticsOptions>(
@@ -39,15 +39,6 @@ public static class DependencyInjection
                 .AddStandardResilienceHandler();
             services.AddScoped<IAnalyticsEventRepository>(
                 sp => sp.GetRequiredService<ClickHouseAnalyticsEventRepository>());
-        }
-        else if (string.Equals(analyticsProvider, "Elastic", StringComparison.OrdinalIgnoreCase))
-        {
-            services.Configure<AnalyticsOptions>(
-                configuration.GetSection(AnalyticsOptions.SectionName));
-            services.AddHttpClient<ElasticsearchAnalyticsEventRepository>()
-                .AddStandardResilienceHandler();
-            services.AddScoped<IAnalyticsEventRepository>(
-                sp => sp.GetRequiredService<ElasticsearchAnalyticsEventRepository>());
         }
         else
         {
@@ -60,7 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IPortalAdoptionReader, PortalAdoptionReader>();
         services.AddScoped<ISelfServiceWorkflowReader, SelfServiceWorkflowReader>();
 
-        // Analytics forwarder — propaga eventos do PostgreSQL para o analytics store (Elastic/ClickHouse)
+        // Analytics forwarder — propaga eventos do PostgreSQL para o analytics store (ClickHouse ou PostgreSQL)
         services.AddScoped<IAnalyticsEventForwarder, AnalyticsEventForwarder>();
 
         // Cross-module contract — consumed by Governance for adoption metrics

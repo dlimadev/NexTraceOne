@@ -9,7 +9,7 @@ namespace NexTraceOne.Integrations.Application.Services;
 /// Router que avalia buckets de storage por Priority ascendente e determina
 /// para qual backend encaminhar um evento de telemetria.
 ///
-/// Buckets default por tenant: audit (2555 dias, ES), debug (3 dias, CH), default (90 dias, ES).
+/// Buckets default por tenant: audit (2555 dias, CH), debug (3 dias, CH), default (90 dias, CH).
 /// Os buckets são cacheados por 60 segundos para evitar round-trips à BD em cada evento.
 /// </summary>
 public sealed class StorageBucketRouter(
@@ -20,7 +20,7 @@ public sealed class StorageBucketRouter(
 
     private static readonly StorageBucketRouteResult DefaultRoute = new(
         BucketName: "default",
-        BackendType: StorageBucketBackendType.Elasticsearch,
+        BackendType: StorageBucketBackendType.ClickHouse,
         RetentionDays: 90,
         IsDefault: true);
 
@@ -28,7 +28,7 @@ public sealed class StorageBucketRouter(
     /// Determina o bucket de destino para o sinal de telemetria fornecido.
     /// Avalia condições em ordem de Priority; retorna o primeiro bucket com condição satisfeita.
     /// Se nenhum bucket corresponder e existir bucket de fallback, usa-o.
-    /// Caso contrário, retorna o bucket default built-in (ES, 90 dias).
+    /// Caso contrário, retorna o bucket default built-in (ClickHouse, 90 dias).
     /// </summary>
     public async Task<StorageBucketRouteResult> RouteAsync(
         string signalJson,

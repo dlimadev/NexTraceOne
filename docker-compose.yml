@@ -3,14 +3,14 @@
 #
 # Stack mínima para desenvolvimento local e staging:
 #   - PostgreSQL (4 bancos lógicos)
-#   - Elasticsearch (observabilidade — provider padrão)
+#   - ClickHouse (observabilidade e analytics — provider padrão)
 #   - OpenTelemetry Collector (pipeline de ingestão — modo de coleta configurável)
 #   - ApiHost (API principal)
 #   - BackgroundWorkers (jobs assíncronos)
 #   - Ingestion.Api (integrações externas)
 #   - Frontend (React SPA via nginx)
 #
-# Providers suportados: Elastic (default) ou ClickHouse (alternativa)
+# Provider analítico: ClickHouse
 # Modos de coleta: OpenTelemetry Collector (Kubernetes) ou CLR Profiler (IIS/Windows)
 #
 # Uso:
@@ -49,27 +49,25 @@ services:
     networks:
       - nextraceone-net
 
-  # ── Elasticsearch (observabilidade — provider padrão) ────────────────────────
-  # AVISO: xpack.security.enabled=false é apenas para desenvolvimento local.
-  # Em produção, ativar segurança (TLS, autenticação, API keys).
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+  # ── ClickHouse (observabilidade e analytics — provider padrão) ──────────────
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
     restart: unless-stopped
     environment:
-      discovery.type: single-node
-      # WARNING: Security disabled for local development only. NEVER use in staging/production.
-      xpack.security.enabled: "false"   # APENAS para dev local — ativar em produção
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      CLICKHOUSE_DB: nextraceone_analytics
+      CLICKHOUSE_USER: nextraceone
+      CLICKHOUSE_PASSWORD: nextraceone
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - clickhouse-data:/var/lib/clickhouse
     ports:
-      - "9200:9200"
+      - "8123:8123"
+      - "9000:9000"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 60s
     networks:
       - nextraceone-net
 
@@ -85,7 +83,7 @@ services:
       - "4318:4318"    # OTLP HTTP
       - "8888:8888"    # Prometheus metrics
     depends_on:
-      elasticsearch:
+      clickhouse:
         condition: service_healthy
     networks:
       - nextraceone-net
@@ -115,10 +113,10 @@ services:
       # Observability
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-Elastic}
-      Telemetry__ObservabilityProvider__Elastic__Endpoint: ${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}
-      Telemetry__ObservabilityProvider__Elastic__Enabled: "true"
-      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "false"
+      Telemetry__ObservabilityProvider__Provider: ClickHouse
+      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "true"
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: http://clickhouse:8123
+      Analytics__ConnectionString: http://clickhouse:8123
       Telemetry__CollectionMode__ActiveMode: ${COLLECTION_MODE:-OpenTelemetryCollector}
       Telemetry__CollectionMode__OpenTelemetryCollector__OtlpGrpcEndpoint: http://otel-collector:4317
       Telemetry__CollectionMode__OpenTelemetryCollector__OtlpHttpEndpoint: http://otel-collector:4318
@@ -162,10 +160,10 @@ services:
 
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-Elastic}
-      Telemetry__ObservabilityProvider__Elastic__Endpoint: ${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}
-      Telemetry__ObservabilityProvider__Elastic__Enabled: "true"
-      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "false"
+      Telemetry__ObservabilityProvider__Provider: ClickHouse
+      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "true"
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: http://clickhouse:8123
+      Analytics__ConnectionString: http://clickhouse:8123
 
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
     ports:
@@ -203,10 +201,10 @@ services:
 
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-Elastic}
-      Telemetry__ObservabilityProvider__Elastic__Endpoint: ${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}
-      Telemetry__ObservabilityProvider__Elastic__Enabled: "true"
-      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "false"
+      Telemetry__ObservabilityProvider__Provider: ClickHouse
+      Telemetry__ObservabilityProvider__ClickHouse__Enabled: "true"
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: http://clickhouse:8123
+      Analytics__ConnectionString: http://clickhouse:8123
 
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
     ports:
@@ -297,7 +295,7 @@ services:
 volumes:
   postgres-data:
     driver: local
-  elasticsearch-data:
+  clickhouse-data:
     driver: local
   ollama-data:
     driver: local

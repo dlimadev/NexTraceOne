@@ -3,7 +3,7 @@ using NexTraceOne.Integrations.Domain.LegacyTelemetry;
 namespace NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 
 /// <summary>
-/// Abstração para persistência de eventos legacy normalizados em storage analítico (Elasticsearch).
+/// Abstração para persistência de eventos legacy normalizados em storage analítico (ClickHouse).
 /// </summary>
 public interface ILegacyEventWriter
 {

@@ -4,7 +4,7 @@ namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 
 /// <summary>
 /// Serviço de pesquisa de logs estruturados.
-/// Abstracção sobre backend de telemetria (Elasticsearch ou ClickHouse).
+/// Abstracção sobre backend de telemetria (ClickHouse ou PostgreSQL).
 /// Permite ao utilizador escolher qual database usar na instalação.
 /// SaaS-07: Log Search UI.
 /// </summary>
@@ -13,7 +13,7 @@ public interface ITelemetrySearchService
     /// <summary>
     /// Pesquisa logs com os filtros especificados.
     /// Devolve tuplo (entradas, total).
-    /// Suporta tanto Elasticsearch quanto ClickHouse como backend.
+    /// Suporta ClickHouse ou PostgreSQL como backend.
     /// </summary>
     Task<(IReadOnlyList<SearchLogs.LogEntry> Entries, long Total)> SearchAsync(
         LogSearchRequest request,

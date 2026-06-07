@@ -74,22 +74,11 @@ public static class DependencyInjection
         services.AddScoped<LogToMetricProcessor>();
         services.AddScoped<CatalogEnrichmentProcessor>();
 
-        // Legacy Telemetry — writer selecionado pelo provider de observabilidade configurado
-        var legacyProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
-        if (string.Equals(legacyProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
-        {
-            services.Configure<ClickHouseLegacyWriterOptions>(
-                configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>()
-                .AddStandardResilienceHandler();
-        }
-        else
-        {
-            services.Configure<ElasticLegacyWriterOptions>(
-                configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>()
-                .AddStandardResilienceHandler();
-        }
+        // Legacy Telemetry — ClickHouse writer (Elasticsearch removido)
+        services.Configure<ClickHouseLegacyWriterOptions>(
+            configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
+        services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>()
+            .AddStandardResilienceHandler();
 
         // Integration Context Resolver — resolves active binding descriptors by type, tenant and environment
         services.AddScoped<IIntegrationContextResolver, IntegrationContextResolver>();
