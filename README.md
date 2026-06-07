@@ -39,7 +39,7 @@ NexTraceOne serves as the **source of truth** for services, contracts, changes, 
 
 ### Infrastructure
 - Docker Compose (development + staging + production overlays)
-- Elasticsearch (observability provider)
+- ClickHouse 24.3 (analytics and observability provider)
 - OpenTelemetry Collector
 - IIS + Windows support (via CLR Profiler collection mode)
 
@@ -58,8 +58,8 @@ NexTraceOne serves as the **source of truth** for services, contracts, changes, 
 cp .env.example .env
 nano .env  # Set POSTGRES_PASSWORD, JWT_SECRET, etc.
 
-# 2. Start infrastructure (PostgreSQL, Elasticsearch, OTel Collector)
-docker compose up -d postgres elasticsearch otel-collector
+# 2. Start infrastructure (PostgreSQL, ClickHouse, OTel Collector)
+docker compose up -d postgres clickhouse otel-collector
 
 # 3. Configure local secrets
 cd src/platform/NexTraceOne.ApiHost
@@ -95,7 +95,7 @@ cd src/frontend && npm run test:e2e
 # Development
 docker compose up -d
 
-# Production (with Elasticsearch security + resource limits)
+# Production (with ClickHouse + PostgreSQL + resource limits)
 docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
 

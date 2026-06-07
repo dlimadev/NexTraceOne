@@ -456,7 +456,7 @@ O produto deve considerar como fontes válidas:
 
 ## 10.3 Armazenamento e direção arquitetural
 
-Nas conversas do projeto, a direção evoluiu para privilegiar **Elasticsearch** como base principal para workloads analíticos e de observabilidade, em vez de dependência da stack Loki/Tempo/Prometheus como centro do produto. ClickHouse permanece como opção alternativa para cenários específicos.
+A direção arquitetural privilegia **ClickHouse** como base única para workloads analíticos e de observabilidade, em vez de dependência da stack Loki/Tempo/Prometheus como centro do produto. PostgreSQL permanece para persistência transacional.
 
 Isto significa:
 
@@ -658,7 +658,7 @@ O produto deve nascer consistente como monólito modular bem desenhado, preparad
 - Windows e Linux
 - SMTP
 - evolução posterior para Kubernetes
-- stack analítica/observabilidade com Elasticsearch como provider padrão (ClickHouse como alternativa)
+- stack analítica/observabilidade com ClickHouse como único provider
 
 ## 14.5 Restrições conhecidas
 
@@ -1536,8 +1536,8 @@ Este capítulo descreve o que está efetivamente construído no código, disting
 - **`TenantIsolationBehavior`** — MediatR pipeline behavior que rejeita requests sem tenant ativo
 - **`IDateTimeProvider`** — abstração de clock (nunca usar `DateTime.Now`)
 - **Serilog** — logging estruturado
-- **OpenTelemetry** — traces e métricas; Elasticsearch como destino analítico principal
-- **ClickHouse** — desativado por padrão; ativado via `NexTrace:Analytics:Provider=ClickHouse`
+- **OpenTelemetry** — traces e métricas; ClickHouse como destino analítico único
+- **ClickHouse** — provider analítico padrão; configurado via `NexTrace:Analytics:Provider=ClickHouse`
 - **Kafka** — desativado por padrão; `NullKafkaEventProducer` como fallback; `ConfluentKafkaEventProducer` ativado via configuração
 - **Redis** — **não implementado** (sem `IDistributedCache`); cache atual é in-memory `IMemoryCache`
 - **Polly** — **não implementado**; sem circuit breakers ou retry policies nos HttpClients externos
@@ -1614,7 +1614,7 @@ O agente deve conhecer estas lacunas e não assumir que estão prontas:
 ## 44.1 Infraestrutura horizontal (P0 — crítico para produção SaaS)
 
 - **Redis** — sem cache distribuído; adição futura via `IDistributedCache` + `StackExchange.Redis`
-- **Polly** — sem retry policies ou circuit breakers nos HttpClients externos (Elasticsearch, ClickHouse, Ollama, AI providers, webhooks)
+- **Polly** — sem retry policies ou circuit breakers nos HttpClients externos (ClickHouse, Ollama, AI providers, webhooks)
 
 ## 44.2 Funcional (P1 — importante)
 
@@ -1687,7 +1687,7 @@ Comentários no código devem explicar **porquê**, nunca **o quê**. Se o nome 
 |---|---|---|
 | Monolito modular vs microserviços | Monolito modular | Coerência, menor complexidade operacional no MVP |
 | ORM | EF Core 10 + Npgsql | Ecossistema .NET, migrations, interceptors |
-| Search | PostgreSQL FTS no MVP1 | Sem dependência adicional; Elasticsearch para analítica |
+| Search | PostgreSQL FTS no MVP1 | Sem dependência adicional; ClickHouse para analítica |
 | Cache | In-memory no MVP1 | Redis adicionado quando escala horizontal necessitar |
 | Mensageria | In-process EventBus (Outbox) | Kafka opcional/desativado por default |
 | Auth | JWT + OIDC | Claims-based, multi-tenant aware |
