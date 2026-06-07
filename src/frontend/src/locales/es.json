@@ -10905,7 +10905,7 @@
     "config": {
       "smtp": "SMTP",
       "ollama": "Ollama",
-      "elasticsearch": "Elasticsearch"
+      "clickhouse": "ClickHouse"
     }
   },
   "resourceBudget": {
@@ -11418,7 +11418,7 @@
     "error": "Error al cargar la configuración del modo de observabilidad.",
     "refresh": "Actualizar",
     "currentMode": "Modo actual",
-    "elasticsearch": "Elasticsearch",
+    "clickhouse": "ClickHouse",
     "otelCollector": "OTel Collector",
     "additionalRam": "RAM adicional",
     "connected": "Conectado",

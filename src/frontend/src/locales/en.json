@@ -9604,7 +9604,7 @@
     "config": {
       "smtp": "SMTP",
       "ollama": "Ollama",
-      "elasticsearch": "Elasticsearch"
+      "clickhouse": "ClickHouse"
     }
   },
   "resourceBudget": {
@@ -10112,12 +10112,12 @@
   },
   "observabilityMode": {
     "title": "Observability Mode",
-    "subtitle": "Select the observability stack that matches your server resources. Full uses Elasticsearch; Lite uses PostgreSQL; Minimal uses file logs only.",
+    "subtitle": "Select the observability stack that matches your server resources. Full uses ClickHouse; Lite uses PostgreSQL; Minimal uses file logs only.",
     "loading": "Loading observability mode…",
     "error": "Failed to load observability mode configuration.",
     "refresh": "Refresh",
     "currentMode": "Current mode",
-    "elasticsearch": "Elasticsearch",
+    "clickhouse": "ClickHouse",
     "otelCollector": "OTel Collector",
     "additionalRam": "Additional RAM",
     "connected": "Connected",
@@ -10127,8 +10127,8 @@
     "mode.Full": "Full",
     "mode.Lite": "Lite",
     "mode.Minimal": "Minimal",
-    "modeDesc.Full": "Elasticsearch + OTel Collector — complete observability with full-text search and fast queries.",
-    "modeDesc.Lite": "PostgreSQL as analytics store — no Elasticsearch required; suitable for up to ~50 services.",
+    "modeDesc.Full": "ClickHouse + OTel Collector — complete observability with fast analytical queries.",
+    "modeDesc.Lite": "PostgreSQL as analytics store — lightweight; suitable for up to ~50 services.",
     "modeDesc.Minimal": "Serilog file logs only — zero observability overhead; dashboard panels unavailable.",
     "modeRam.Full": "~3–4 GB additional RAM",
     "modeRam.Lite": "~0 GB additional RAM",

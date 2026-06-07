@@ -63,9 +63,9 @@ export function ObservabilityModePage() {
                 active={true}
               />
               <StatusCard
-                label={t('elasticsearch')}
-                value={data.elasticsearchConnected ? (data.elasticsearchVersion ?? t('connected')) : t('notConnected')}
-                active={data.elasticsearchConnected}
+                label={t('clickhouse')}
+                value={data.clickhouseConnected ? (data.clickhouseVersion ?? t('connected')) : t('notConnected')}
+                active={data.clickhouseConnected}
               />
               <StatusCard
                 label={t('otelCollector')}
