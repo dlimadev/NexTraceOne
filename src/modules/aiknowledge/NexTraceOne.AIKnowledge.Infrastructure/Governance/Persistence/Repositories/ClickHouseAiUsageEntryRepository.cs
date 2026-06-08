@@ -50,20 +50,16 @@ internal sealed class ClickHouseAiUsageEntryRepository : IAiUsageEntryRepository
     private async Task ExecuteAsync(string sql, Dictionary<string, string>? parameters = null, CancellationToken ct = default)
     {
         var client = CreateClient();
-        var response = await client.PostAsync(
-            BuildUrl(parameters),
-            new StringContent(sql, Encoding.UTF8, "text/plain"),
-            ct);
+        using var content = new StringContent(sql, Encoding.UTF8, "text/plain");
+        var response = await client.PostAsync(BuildUrl(parameters), content, ct);
         response.EnsureSuccessStatusCode();
     }
 
     private async Task<string> QueryAsync(string sql, Dictionary<string, string> parameters, CancellationToken ct)
     {
         var client = CreateClient();
-        var response = await client.PostAsync(
-            BuildUrl(parameters),
-            new StringContent(sql, Encoding.UTF8, "text/plain"),
-            ct);
+        using var content = new StringContent(sql, Encoding.UTF8, "text/plain");
+        var response = await client.PostAsync(BuildUrl(parameters), content, ct);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(ct);
     }
