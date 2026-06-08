@@ -78,7 +78,6 @@ public static class DependencyInjection
         services.AddScoped<IAiBudgetRepository, AiBudgetRepository>();
         services.AddScoped<IAiAssistantConversationRepository, AiAssistantConversationRepository>();
         services.AddScoped<IAiMessageRepository, AiMessageRepository>();
-        services.AddScoped<IAiUsageEntryRepository, AiUsageEntryRepository>();
         services.AddScoped<IAiKnowledgeSourceRepository, AiKnowledgeSourceRepository>();
         services.AddScoped<IAiIdeClientRegistrationRepository, AiIdeClientRegistrationRepository>();
         services.AddScoped<IAiIdeCapabilityPolicyRepository, AiIdeCapabilityPolicyRepository>();
@@ -200,6 +199,7 @@ public static class DependencyInjection
             .AddStandardResilienceHandler();
 
             services.AddSingleton<IAiAnalyticsRepository, ClickHouseAiAnalyticsRepository>();
+            services.AddScoped<IAiUsageEntryRepository, ClickHouseAiUsageEntryRepository>();
 
             services.AddHealthChecks()
                 .AddCheck<ClickHouseAiHealthCheck>("ai-clickhouse-analytics", HealthStatus.Degraded, ["health", "ready"]);
@@ -207,6 +207,7 @@ public static class DependencyInjection
         else
         {
             services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
+            services.AddScoped<IAiUsageEntryRepository, NullAiUsageEntryRepository>();
         }
 
         // Elasticsearch removido — implementar busca semântica via pgvector ou PostgreSQL FTS

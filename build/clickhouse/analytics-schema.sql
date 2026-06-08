@@ -346,17 +346,48 @@ TTL captured_at + INTERVAL 2 YEAR
 SETTINGS index_granularity = 8192;
 
 -- ════════════════════════════════════════════════════════════════════════════════
--- AI & KNOWLEDGE (aik_*) — PREPARE_ONLY (E16)
--- Nível ClickHouse: OPTIONAL_LATER (promovido de RECOMMENDED no E16)
+-- AI & KNOWLEDGE — AI Analytics Database
+-- Nível ClickHouse: ACTIVE (Fase 2.5)
 -- Módulo: AI & Knowledge (07)
--- Estado: Schema definido mas tabelas comentadas — ativar no E17 ou quando
---         o volume de token usage justificar (> 10K registos/dia/tenant)
+-- IMPORTANTE: Estas tabelas estão na database configurada via "AiAnalytics"
+--             connection string — NÃO em nextraceone_analytics.
+--             Executar via: clickhouse-client --database=<AiAnalytics.Database>
 -- ════════════════════════════════════════════════════════════════════════════════
 
--- NOTA: Estas tabelas estão comentadas intencionalmente.
--- O módulo AI & Knowledge funciona inteiramente em PostgreSQL no MVP1.
--- O schema está definido aqui para referência arquitetural.
--- Para ativar: descomentar e executar no ClickHouse.
+-- ── ai_usage_entries — Trilha de auditoria de uso de IA ──────────────────────
+-- Fase 2.5: Migrado de PostgreSQL (AiHubDbContext.UsageEntries) para ClickHouse.
+-- Alimentado por: ExecuteAiChat.Handler e SendAssistantMessage.Handler via
+--                ClickHouseAiUsageEntryRepository.AddAsync().
+-- Tenant isolation via coluna TenantId (sem RLS — filtro aplicado na camada app).
+CREATE TABLE IF NOT EXISTS ai_usage_entries
+(
+    Id               String,
+    TenantId         String,
+    UserId           String,
+    UserDisplayName  String,
+    ModelId          String,
+    ModelName        LowCardinality(String),
+    Provider         LowCardinality(String),
+    IsInternal       UInt8,
+    IsExternal       UInt8,
+    Timestamp        DateTime64(3, 'UTC'),
+    PromptTokens     Int32,
+    CompletionTokens Int32,
+    TotalTokens      Int32,
+    PolicyId         Nullable(String),
+    PolicyName       Nullable(String),
+    Result           Int32,
+    ConversationId   Nullable(String),
+    ContextScope     String,
+    ClientType       Int32,
+    CorrelationId    String
+) ENGINE = MergeTree()
+PARTITION BY (TenantId, toYYYYMM(Timestamp))
+ORDER BY (TenantId, Timestamp)
+TTL Timestamp + INTERVAL 2 YEAR
+SETTINGS index_granularity = 8192;
+
+-- Tabelas preparatórias (aik_*) em nextraceone_analytics — comentadas para referência arquitetural.
 
 -- CREATE TABLE IF NOT EXISTS nextraceone_analytics.aik_token_usage
 -- (

@@ -129,6 +129,54 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
             CorrelationId = correlationId
         };
     }
+
+    /// <summary>
+    /// Reconstitui uma entrada de auditoria a partir do armazenamento analytics (ClickHouse).
+    /// Reservado para uso exclusivo da camada de infraestrutura.
+    /// </summary>
+    public static AIUsageEntry Reconstitute(
+        AIUsageEntryId id,
+        string userId,
+        string userDisplayName,
+        Guid modelId,
+        string modelName,
+        string provider,
+        bool isInternal,
+        DateTimeOffset timestamp,
+        int promptTokens,
+        int completionTokens,
+        int totalTokens,
+        Guid? policyId,
+        string? policyName,
+        UsageResult result,
+        Guid? conversationId,
+        string contextScope,
+        AIClientType clientType,
+        string correlationId)
+    {
+        return new AIUsageEntry
+        {
+            Id = id,
+            UserId = userId,
+            UserDisplayName = userDisplayName,
+            ModelId = modelId,
+            ModelName = modelName,
+            Provider = provider,
+            IsInternal = isInternal,
+            IsExternal = !isInternal,
+            Timestamp = timestamp,
+            PromptTokens = promptTokens,
+            CompletionTokens = completionTokens,
+            TotalTokens = totalTokens,
+            PolicyId = policyId,
+            PolicyName = policyName,
+            Result = result,
+            ConversationId = conversationId,
+            ContextScope = contextScope,
+            ClientType = clientType,
+            CorrelationId = correlationId
+        };
+    }
 }
 
 /// <summary>Identificador fortemente tipado de AIUsageEntry.</summary>

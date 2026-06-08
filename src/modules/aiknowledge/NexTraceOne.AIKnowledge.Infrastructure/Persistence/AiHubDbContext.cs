@@ -27,7 +27,6 @@ public sealed class AiHubDbContext(
     public DbSet<AIBudget> Budgets => Set<AIBudget>();
     public DbSet<AiAssistantConversation> Conversations => Set<AiAssistantConversation>();
     public DbSet<AiMessage> Messages => Set<AiMessage>();
-    public DbSet<AIUsageEntry> UsageEntries => Set<AIUsageEntry>();
     public DbSet<AIKnowledgeSource> KnowledgeSources => Set<AIKnowledgeSource>();
     public DbSet<AIIDEClientRegistration> IdeClientRegistrations => Set<AIIDEClientRegistration>();
     public DbSet<AIIDECapabilityPolicy> IdeCapabilityPolicies => Set<AIIDECapabilityPolicy>();
