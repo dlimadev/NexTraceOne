@@ -51,8 +51,17 @@ public sealed class User : AggregateRoot<UserId>
     /// <summary>Identificador externo do provider federado.</summary>
     public string? ExternalId { get; private set; }
 
+    /// <summary>Data/hora UTC de criação do usuário.</summary>
+    public DateTimeOffset CreatedAt { get; private set; }
+
+    /// <summary>Indica se o usuário deve trocar a senha no próximo login.</summary>
+    public bool MustChangePassword { get; private set; }
+
+    /// <summary>Data/hora UTC da última troca de senha.</summary>
+    public DateTimeOffset? LastPasswordChangeAt { get; private set; }
+
     /// <summary>Cria um usuário local com senha armazenada em BCrypt.</summary>
-    public static User CreateLocal(Email email, FullName fullName, HashedPassword passwordHash)
+    public static User CreateLocal(Email email, FullName fullName, HashedPassword passwordHash, DateTimeOffset now)
     {
         var user = new User
         {
@@ -60,7 +69,9 @@ public sealed class User : AggregateRoot<UserId>
             Email = Guard.Against.Null(email),
             FullName = Guard.Against.Null(fullName),
             PasswordHash = Guard.Against.Null(passwordHash),
-            IsActive = true
+            IsActive = true,
+            CreatedAt = now,
+            LastPasswordChangeAt = now
         };
 
         user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id, user.Email.Value));
@@ -68,7 +79,7 @@ public sealed class User : AggregateRoot<UserId>
     }
 
     /// <summary>Cria um usuário federado sem senha local.</summary>
-    public static User CreateFederated(Email email, FullName fullName, string provider, string externalId)
+    public static User CreateFederated(Email email, FullName fullName, string provider, string externalId, DateTimeOffset now)
     {
         var user = new User
         {
@@ -77,7 +88,8 @@ public sealed class User : AggregateRoot<UserId>
             FullName = Guard.Against.Null(fullName),
             IsActive = true,
             FederationProvider = Guard.Against.NullOrWhiteSpace(provider),
-            ExternalId = Guard.Against.NullOrWhiteSpace(externalId)
+            ExternalId = Guard.Against.NullOrWhiteSpace(externalId),
+            CreatedAt = now
         };
 
         user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id, user.Email.Value));
@@ -114,9 +126,16 @@ public sealed class User : AggregateRoot<UserId>
         RaiseDomainEvent(new UserLockedDomainEvent(Id, LockoutEnd.Value));
     }
 
-    /// <summary>Define ou substitui a senha local do usuário.</summary>
-    public void SetPassword(HashedPassword passwordHash)
-        => PasswordHash = Guard.Against.Null(passwordHash);
+    /// <summary>Define ou substitui a senha local do usuário e registra a data da troca.</summary>
+    public void SetPassword(HashedPassword passwordHash, DateTimeOffset now)
+    {
+        PasswordHash = Guard.Against.Null(passwordHash);
+        LastPasswordChangeAt = now;
+        MustChangePassword = false;
+    }
+
+    /// <summary>Força o usuário a trocar a senha no próximo login.</summary>
+    public void RequirePasswordChange() => MustChangePassword = true;
 
     /// <summary>Atualiza o nome completo do usuário.</summary>
     public void UpdateProfile(FullName fullName)

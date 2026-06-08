@@ -72,6 +72,17 @@ public sealed class Tenant : AggregateRoot<TenantId>
     /// </summary>
     public string? TaxId { get; private set; }
 
+    /// <summary>
+    /// Email de contacto principal do tenant para notificações de plataforma e billing.
+    /// </summary>
+    public string? ContactEmail { get; private set; }
+
+    /// <summary>
+    /// Timezone do tenant no formato IANA (ex: "America/Sao_Paulo", "Europe/Lisbon").
+    /// Usado para apresentação de horários na UI e relatórios localizados.
+    /// </summary>
+    public string? Timezone { get; private set; }
+
     /// <summary>Concurrency token (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -156,10 +167,13 @@ public sealed class Tenant : AggregateRoot<TenantId>
     }
 
     /// <summary>Atualiza dados organizacionais do tenant.</summary>
-    public void UpdateOrganizationInfo(string? legalName, string? taxId, DateTimeOffset now)
+    public void UpdateOrganizationInfo(string? legalName, string? taxId, DateTimeOffset now,
+        string? contactEmail = null, string? timezone = null)
     {
         LegalName = legalName;
         TaxId = taxId;
+        if (contactEmail is not null) ContactEmail = contactEmail;
+        if (timezone is not null) Timezone = timezone;
         UpdatedAt = now;
     }
 

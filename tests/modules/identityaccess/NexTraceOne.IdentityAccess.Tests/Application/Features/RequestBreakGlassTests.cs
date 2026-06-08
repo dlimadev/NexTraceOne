@@ -55,7 +55,7 @@ public sealed class RequestBreakGlassTests
         var email = Email.Create($"user-{Guid.NewGuid():N}@test.com");
         var fullName = FullName.Create("Test", "User");
         var hashedPwd = HashedPassword.FromPlainText("Password123!");
-        var user = User.CreateLocal(email, fullName, hashedPwd);
+        var user = User.CreateLocal(email, fullName, hashedPwd, DateTimeOffset.UtcNow);
         if (mfaEnabled)
             user.EnableMfa("TOTP", mfaSecret ?? "JBSWY3DPEHPK3PXP");
         return user;

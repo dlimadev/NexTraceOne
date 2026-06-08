@@ -42,6 +42,15 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// <summary>Data/hora UTC em que a promoção foi concluída (aprovada, rejeitada, bloqueada ou cancelada).</summary>
     public DateTimeOffset? CompletedAt { get; private set; }
 
+    /// <summary>Identificador do utilizador que aprovou ou rejeitou a promoção.</summary>
+    public string? ReviewedBy { get; private set; }
+
+    /// <summary>Notas do revisor sobre a decisão tomada.</summary>
+    public string? ReviewNotes { get; private set; }
+
+    /// <summary>Identificador do tenant ao qual esta solicitação de promoção pertence.</summary>
+    public Guid TenantId { get; private set; }
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -49,12 +58,14 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// Cria uma nova solicitação de promoção de release entre ambientes.
     /// </summary>
     public static PromotionRequest Create(
+        Guid tenantId,
         Guid releaseId,
         DeploymentEnvironmentId sourceEnvironmentId,
         DeploymentEnvironmentId targetEnvironmentId,
         string requestedBy,
         DateTimeOffset requestedAt)
     {
+        Guard.Against.Default(tenantId);
         Guard.Against.Default(releaseId);
         Guard.Against.Null(sourceEnvironmentId);
         Guard.Against.Null(targetEnvironmentId);
@@ -64,6 +75,7 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
         return new PromotionRequest
         {
             Id = PromotionRequestId.New(),
+            TenantId = tenantId,
             ReleaseId = releaseId,
             SourceEnvironmentId = sourceEnvironmentId,
             TargetEnvironmentId = targetEnvironmentId,
@@ -77,15 +89,23 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// Aprova a solicitação de promoção.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
-    public Result<Unit> Approve(DateTimeOffset completedAt)
-        => TransitionTo(PromotionStatus.Approved, completedAt);
+    public Result<Unit> Approve(DateTimeOffset completedAt, string? reviewedBy = null, string? reviewNotes = null)
+    {
+        ReviewedBy = reviewedBy;
+        ReviewNotes = reviewNotes;
+        return TransitionTo(PromotionStatus.Approved, completedAt);
+    }
 
     /// <summary>
     /// Rejeita a solicitação de promoção.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
-    public Result<Unit> Reject(DateTimeOffset completedAt)
-        => TransitionTo(PromotionStatus.Rejected, completedAt);
+    public Result<Unit> Reject(DateTimeOffset completedAt, string? reviewedBy = null, string? reviewNotes = null)
+    {
+        ReviewedBy = reviewedBy;
+        ReviewNotes = reviewNotes;
+        return TransitionTo(PromotionStatus.Rejected, completedAt);
+    }
 
     /// <summary>
     /// Bloqueia a solicitação de promoção por regra de governança.

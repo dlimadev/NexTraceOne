@@ -41,7 +41,7 @@ public sealed class ApprovePromotionTests
     {
         var srcEnv = src ?? CreateActiveEnvironment("Staging");
         var tgtEnv = tgt ?? CreateActiveEnvironment("Production");
-        var request = PromotionRequest.Create(Guid.NewGuid(), srcEnv.Id, tgtEnv.Id, "dev@company.com", FixedNow);
+        var request = PromotionRequest.Create(Guid.NewGuid(), Guid.NewGuid(), srcEnv.Id, tgtEnv.Id, "dev@company.com", FixedNow);
         request.StartEvaluation();
         return request;
     }

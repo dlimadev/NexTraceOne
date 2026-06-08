@@ -211,7 +211,8 @@ public static class OidcCallback
                     Email.Create(userInfo.Email),
                     FullName.FromDisplayName(userInfo.DisplayName),
                     provider,
-                    userInfo.ExternalId);
+                    userInfo.ExternalId,
+                    dateTimeProvider.UtcNow);
                 userRepository.Add(user);
             }
             else

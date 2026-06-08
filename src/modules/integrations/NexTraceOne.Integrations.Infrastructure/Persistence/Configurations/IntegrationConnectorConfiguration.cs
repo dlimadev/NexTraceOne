@@ -97,6 +97,12 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
                 json => System.Text.Json.JsonSerializer.Deserialize<List<string>>(json, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>())
             .IsRequired();
 
+        builder.Property(x => x.TenantId);
+
+        builder.Property(x => x.IsGlobal)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
@@ -111,6 +117,7 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Health);
         builder.HasIndex(x => x.Environment);
+        builder.HasIndex(x => x.TenantId);
 
         // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
         builder.Property(x => x.RowVersion).IsRowVersion();

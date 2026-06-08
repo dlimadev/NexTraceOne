@@ -20,7 +20,7 @@ public sealed class RefreshTokenTests
     public async Task Handle_Should_ReturnNewTokens_When_RefreshTokenIsValid()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), now);
         var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Administrative access");
         var session = Session.Create(user.Id, RefreshTokenHash.Create("refresh-token"), now.AddDays(1), "127.0.0.1", "tests");
@@ -57,7 +57,7 @@ public sealed class RefreshTokenTests
     public async Task Handle_Should_ReturnExpiredError_When_SessionIsExpired()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var session = Session.Create(user.Id, RefreshTokenHash.Create("refresh-token"), now.AddMinutes(-1), "127.0.0.1", "tests");
         var sessionRepository = Substitute.For<ISessionRepository>();
         var sut = new RefreshTokenFeature.Handler(
@@ -81,7 +81,7 @@ public sealed class RefreshTokenTests
     public async Task Handle_Should_ReturnRevokedError_When_SessionWasRevoked()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var session = Session.Create(user.Id, RefreshTokenHash.Create("refresh-token"), now.AddDays(1), "127.0.0.1", "tests");
         session.Revoke(now.AddMinutes(-5));
         var sessionRepository = Substitute.For<ISessionRepository>();

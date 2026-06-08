@@ -24,6 +24,7 @@ public sealed class PromotionModuleServiceTests
         var targetEnvId = DeploymentEnvironmentId.New();
 
         var request = PromotionRequest.Create(
+            Guid.NewGuid(),
             releaseId,
             DeploymentEnvironmentId.New(),
             targetEnvId,
@@ -49,6 +50,7 @@ public sealed class PromotionModuleServiceTests
         var targetEnvId = DeploymentEnvironmentId.New();
 
         var request = PromotionRequest.Create(
+            Guid.NewGuid(),
             releaseId,
             DeploymentEnvironmentId.New(),
             targetEnvId,
@@ -82,6 +84,7 @@ public sealed class PromotionModuleServiceTests
     {
         await using var db = CreateDbContext();
         var request = PromotionRequest.Create(
+            Guid.NewGuid(),
             Guid.NewGuid(),
             DeploymentEnvironmentId.New(),
             DeploymentEnvironmentId.New(),

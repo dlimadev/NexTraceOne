@@ -79,7 +79,7 @@ public static class ChangePassword
                 return IdentityErrors.CurrentPasswordInvalid();
             }
 
-            user.SetPassword(HashedPassword.FromHash(passwordHasher.Hash(request.NewPassword)));
+            user.SetPassword(HashedPassword.FromHash(passwordHasher.Hash(request.NewPassword)), dateTimeProvider.UtcNow);
 
             // Registra evento de sucesso para trilha de auditoria obrigatória
             RecordPasswordChangedEvent(user.Id);

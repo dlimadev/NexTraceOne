@@ -21,7 +21,7 @@ public sealed class LocalLoginTests
     public async Task Handle_Should_ReturnTokens_When_CredentialsAreValid()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), now);
         var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Administrative access");
         var userRepository = Substitute.For<IUserRepository>();
@@ -63,7 +63,7 @@ public sealed class LocalLoginTests
     public async Task Handle_Should_ReturnInvalidCredentials_When_PasswordIsWrong()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
@@ -97,7 +97,7 @@ public sealed class LocalLoginTests
     public async Task Handle_Should_LockAccount_When_FifthAttemptFails()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         for (var attempt = 0; attempt < 4; attempt++)
         {
             user.RegisterFailedLogin(now);

@@ -25,6 +25,12 @@ public sealed class TenantLicense : Entity<TenantLicenseId>
     /// <summary>Host Units além do plano incluído (overage).</summary>
     public decimal OverageHostUnits => Math.Max(0m, CurrentHostUnits - IncludedHostUnits);
 
+    /// <summary>Limite máximo de Host Units em overage antes de suspender. Null = sem limite definido.</summary>
+    public int? MaxOverageHostUnits { get; private set; }
+
+    /// <summary>Identificador externo da assinatura no sistema de billing (ex: Stripe subscription ID).</summary>
+    public string? ExternalSubscriptionId { get; private set; }
+
     public DateTimeOffset ValidFrom { get; private set; }
     public DateTimeOffset? ValidUntil { get; private set; }
     public DateTimeOffset BillingCycleStart { get; private set; }

@@ -22,7 +22,8 @@ public sealed class GetCurrentUserTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("P@ssw0rd123!"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"),
+            DateTimeOffset.UtcNow);
 
         var tenantId = TenantId.From(Guid.NewGuid());
         var roleId = RoleId.New();
@@ -110,7 +111,8 @@ public sealed class GetCurrentUserTests
         var user = User.CreateLocal(
             Email.Create("lonely@example.com"),
             FullName.Create("Lonely", "User"),
-            HashedPassword.FromPlainText("P@ssw0rd123!"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"),
+            DateTimeOffset.UtcNow);
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);

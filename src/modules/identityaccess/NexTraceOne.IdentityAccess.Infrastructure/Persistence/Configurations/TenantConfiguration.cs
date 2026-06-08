@@ -57,6 +57,12 @@ internal sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(x => x.TaxId)
             .HasMaxLength(50);
 
+        builder.Property(x => x.ContactEmail)
+            .HasMaxLength(320);
+
+        builder.Property(x => x.Timezone)
+            .HasMaxLength(100);
+
         // Índice ignora computed property (IsRoot) — baseado diretamente na coluna.
         builder.Ignore(x => x.IsRoot);
 

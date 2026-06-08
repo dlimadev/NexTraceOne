@@ -15,7 +15,7 @@ public sealed class PromotionDomainTests
     {
         var srcId = DeploymentEnvironmentId.New();
         var tgtId = DeploymentEnvironmentId.New();
-        return PromotionRequest.Create(Guid.NewGuid(), srcId, tgtId, "dev@company.com", FixedNow);
+        return PromotionRequest.Create(Guid.NewGuid(), Guid.NewGuid(), srcId, tgtId, "dev@company.com", FixedNow);
     }
 
     // ── DeploymentEnvironment ─────────────────────────────────────────────

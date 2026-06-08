@@ -241,7 +241,7 @@ public sealed class ChangeGovernanceExtendedGapTests
         var stagingEnvId = DeploymentEnvironmentId.New();
 
         var promotion = PromotionRequest.Create(
-            releaseId, devEnvId, stagingEnvId, "engineer@example.com", FixedNow);
+            Guid.NewGuid(), releaseId, devEnvId, stagingEnvId, "engineer@example.com", FixedNow);
 
         var devEnv = DeploymentEnvironment.Create(
             "Development", "Dev environment", 1, false, false, FixedNow);
@@ -277,8 +277,8 @@ public sealed class ChangeGovernanceExtendedGapTests
         var stagingId = DeploymentEnvironmentId.New();
         var prodId = DeploymentEnvironmentId.New();
 
-        var step1 = PromotionRequest.Create(releaseId, devId, stagingId, "engineer@example.com", FixedNow);
-        var step2 = PromotionRequest.Create(releaseId, stagingId, prodId, "tech-lead@example.com", FixedNow.AddHours(2));
+        var step1 = PromotionRequest.Create(Guid.NewGuid(), releaseId, devId, stagingId, "engineer@example.com", FixedNow);
+        var step2 = PromotionRequest.Create(Guid.NewGuid(), releaseId, stagingId, prodId, "tech-lead@example.com", FixedNow.AddHours(2));
 
         promotionRepo.ListByReleaseIdAsync(releaseId, Arg.Any<CancellationToken>())
             .Returns(new List<PromotionRequest> { step1, step2 }.AsReadOnly());

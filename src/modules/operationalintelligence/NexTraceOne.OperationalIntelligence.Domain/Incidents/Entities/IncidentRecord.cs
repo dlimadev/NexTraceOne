@@ -131,6 +131,17 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     /// <summary>Runbooks recomendados para mitigação (JSON).</summary>
     public string? MitigationRecommendedRunbooksJson { get; private set; }
 
+    // ── Ciclo de vida ───────────────────────────────────────────────────
+
+    /// <summary>Data/hora UTC em que o incidente foi marcado como resolvido.</summary>
+    public DateTimeOffset? ResolvedAt { get; private set; }
+
+    /// <summary>Data/hora UTC em que o incidente foi reconhecido (acknowledged).</summary>
+    public DateTimeOffset? AcknowledgedAt { get; private set; }
+
+    /// <summary>Identificador do utilizador que reconheceu o incidente.</summary>
+    public string? AcknowledgedBy { get; private set; }
+
     // ── Concorrência otimista ───────────────────────────────────────────
 
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
@@ -265,7 +276,8 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     }
 
     /// <summary>
-    /// Marca o incidente como resolvido actualizando o status e a data de última actualização.
+    /// Marca o incidente como resolvido actualizando o status, a data de última actualização
+    /// e regista o timestamp de resolução.
     /// Operação idempotente — chamar quando o incidente já está resolvido não altera o estado.
     /// </summary>
     /// <param name="resolvedAt">Data/hora UTC em que o serviço foi confirmado como restaurado.</param>
@@ -275,7 +287,24 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
             return;
 
         Status = IncidentStatus.Resolved;
+        ResolvedAt = resolvedAt;
         LastUpdatedAt = resolvedAt;
+    }
+
+    /// <summary>
+    /// Reconhece (acknowledges) o incidente, indicando que a equipa tomou conhecimento.
+    /// Operação idempotente — ignorada se o incidente já estiver reconhecido.
+    /// </summary>
+    /// <param name="acknowledgedBy">Identificador do utilizador que reconheceu o incidente.</param>
+    /// <param name="acknowledgedAt">Data/hora UTC do reconhecimento.</param>
+    public void Acknowledge(string acknowledgedBy, DateTimeOffset acknowledgedAt)
+    {
+        if (AcknowledgedAt.HasValue)
+            return;
+
+        AcknowledgedBy = Guard.Against.NullOrWhiteSpace(acknowledgedBy);
+        AcknowledgedAt = acknowledgedAt;
+        LastUpdatedAt = acknowledgedAt;
     }
 
     /// <summary>

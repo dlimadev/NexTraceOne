@@ -51,7 +51,7 @@ public static class ActivateAccount
                     "The activation token is invalid or has expired.");
 
             var hashedPassword = HashedPassword.FromHash(passwordHasher.Hash(request.Password));
-            user.SetPassword(hashedPassword);
+            user.SetPassword(hashedPassword, now);
             user.Activate();
             token.MarkUsed(now);
 
