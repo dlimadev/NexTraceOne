@@ -28,7 +28,11 @@ public sealed class CreatePromotionRequestTests
     }
 
     private CreatePromotionRequest.Handler CreateHandler()
-        => new(_requestRepository, _environmentRepository, _unitOfWork, _dateTimeProvider);
+    {
+        var tenant = Substitute.For<ICurrentTenant>();
+        tenant.Id.Returns(Guid.NewGuid());
+        return new(_requestRepository, _environmentRepository, _unitOfWork, _dateTimeProvider, tenant);
+    }
 
     private static DeploymentEnvironment CreateActiveEnvironment(string name = "Staging")
         => DeploymentEnvironment.Create(name, "Deployment environment", 0, false, false, FixedNow);

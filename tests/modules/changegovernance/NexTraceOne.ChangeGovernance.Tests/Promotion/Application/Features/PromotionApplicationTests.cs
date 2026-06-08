@@ -52,7 +52,9 @@ public sealed class PromotionApplicationTests
         envRepo.GetByIdAsync(Arg.Is<DeploymentEnvironmentId>(id => id.Value == targetEnv.Id.Value), Arg.Any<CancellationToken>())
             .Returns(targetEnv);
 
-        var sut = new CreatePromotionRequestFeature.Handler(requestRepo, envRepo, unitOfWork, dateTimeProvider);
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.Id.Returns(Guid.NewGuid());
+        var sut = new CreatePromotionRequestFeature.Handler(requestRepo, envRepo, unitOfWork, dateTimeProvider, currentTenant);
         var command = new CreatePromotionRequestFeature.Command(
             Guid.NewGuid(), sourceEnv.Id.Value, targetEnv.Id.Value, "dev@company.com", "Hotfix deployment");
 
@@ -75,7 +77,9 @@ public sealed class PromotionApplicationTests
         envRepo.GetByIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns((DeploymentEnvironment?)null);
 
-        var sut = new CreatePromotionRequestFeature.Handler(requestRepo, envRepo, unitOfWork, dateTimeProvider);
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.Id.Returns(Guid.NewGuid());
+        var sut = new CreatePromotionRequestFeature.Handler(requestRepo, envRepo, unitOfWork, dateTimeProvider, currentTenant);
         var command = new CreatePromotionRequestFeature.Command(
             Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "dev@company.com", null);
 
