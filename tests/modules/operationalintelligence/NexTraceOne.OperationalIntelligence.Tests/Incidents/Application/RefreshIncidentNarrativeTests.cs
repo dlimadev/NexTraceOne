@@ -123,7 +123,8 @@ public sealed class RefreshIncidentNarrativeTests
                 IncidentSeverity.Critical,
                 IncidentStatus.Mitigating,
                 FixedNow.AddHours(-1),
-                FixedNow),
+                FixedNow,
+                null, null, null),
             LinkedServices: new[]
             {
                 new GetIncidentDetail.LinkedServiceItem("svc-payment-gateway", "Payment Gateway", "API", "Critical")

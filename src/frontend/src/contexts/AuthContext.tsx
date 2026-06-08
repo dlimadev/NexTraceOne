@@ -202,6 +202,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         tenantName: '',
         roleName: data.user.roleName,
         permissions: data.user.permissions,
+        createdAt: new Date().toISOString(),
+        mustChangePassword: false,
       };
     }
 
@@ -244,6 +246,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         tenantName: response.tenantName,
         roleName: response.roleName,
         permissions: response.permissions,
+        createdAt: new Date().toISOString(),
+        mustChangePassword: false,
       };
     }
 
