@@ -79,6 +79,9 @@ export interface IncidentIdentity {
   status: string;
   createdAt: string;
   updatedAt: string;
+  resolvedAt?: string | null;
+  acknowledgedAt?: string | null;
+  acknowledgedBy?: string | null;
 }
 
 export interface LinkedServiceItem {

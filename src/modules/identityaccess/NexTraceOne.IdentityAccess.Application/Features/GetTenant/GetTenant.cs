@@ -28,7 +28,9 @@ public static class GetTenant
         string? TaxId,
         Guid? ParentTenantId,
         DateTimeOffset CreatedAt,
-        DateTimeOffset? UpdatedAt);
+        DateTimeOffset? UpdatedAt,
+        string? ContactEmail,
+        string? Timezone);
 
     /// <summary>Handler que obtém o tenant pelo Id.</summary>
     public sealed class Handler(
@@ -52,7 +54,9 @@ public static class GetTenant
                 tenant.TaxId,
                 tenant.ParentTenantId?.Value,
                 tenant.CreatedAt,
-                tenant.UpdatedAt);
+                tenant.UpdatedAt,
+                tenant.ContactEmail,
+                tenant.Timezone);
         }
     }
 }

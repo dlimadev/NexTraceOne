@@ -231,7 +231,10 @@ internal sealed class EfIncidentStore(
             incident.Severity,
             incident.Status,
             incident.DetectedAt,
-            incident.LastUpdatedAt);
+            incident.LastUpdatedAt,
+            incident.ResolvedAt,
+            incident.AcknowledgedAt,
+            incident.AcknowledgedBy);
 
         var linkedServices = Deserialize<List<LinkedServiceJson>>(incident.LinkedServicesJson)
             ?.Select(s => new GetIncidentDetail.LinkedServiceItem(s.ServiceId, s.DisplayName, s.ServiceType, s.Criticality))

@@ -85,7 +85,9 @@ public static class GetIntegrationConnector
                     Errors: e.Result == NexTraceOne.Integrations.Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
                     .ToList(),
                 SourceScope: sources.Select(s => s.Name).ToList(),
-                AllowedTeams: connector.AllowedTeams.ToList());
+                AllowedTeams: connector.AllowedTeams.ToList(),
+                TenantId: connector.TenantId,
+                IsGlobal: connector.IsGlobal);
 
             return Result<Response>.Success(response);
         }
@@ -122,7 +124,9 @@ public static class GetIntegrationConnector
         ConfigurationSummary Configuration,
         IReadOnlyList<ExecutionSummaryItem> RecentExecutions,
         IReadOnlyList<string> SourceScope,
-        IReadOnlyList<string> AllowedTeams);
+        IReadOnlyList<string> AllowedTeams,
+        Guid? TenantId,
+        bool IsGlobal);
 
     /// <summary>DTO com resumo da configuração do conector.</summary>
     public sealed record ConfigurationSummary(

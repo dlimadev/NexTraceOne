@@ -25,7 +25,9 @@ public static class ListPromotionRequests
         string Status,
         string RequestedBy,
         DateTimeOffset RequestedAt,
-        DateTimeOffset? CompletedAt);
+        DateTimeOffset? CompletedAt,
+        string? ReviewedBy,
+        string? ReviewNotes);
 
     /// <summary>Query para listagem de solicitações de promoção.</summary>
     public sealed record Query(string? StatusFilter, int Page, int PageSize) : IQuery<Response>;
@@ -82,7 +84,9 @@ public static class ListPromotionRequests
                     r.Status.ToString(),
                     r.RequestedBy,
                     r.RequestedAt,
-                    r.CompletedAt));
+                    r.CompletedAt,
+                    r.ReviewedBy,
+                    r.ReviewNotes));
             }
 
             return new Response(items, totalCount, request.Page, request.PageSize);

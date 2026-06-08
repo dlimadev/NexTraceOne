@@ -46,6 +46,9 @@ export interface CurrentUserProfile {
   roleName: string;
   permissions: string[];
   persona?: string;
+  createdAt: string;
+  mustChangePassword: boolean;
+  lastPasswordChangeAt?: string | null;
 }
 
 /** Informações amigáveis de um tenant para seleção. */
@@ -77,6 +80,9 @@ export interface UserProfile {
   isActive: boolean;
   lastLoginAt: string | null;
   memberships: UserMembership[];
+  createdAt: string;
+  mustChangePassword: boolean;
+  lastPasswordChangeAt?: string | null;
 }
 
 export interface UserMembership {
@@ -1742,6 +1748,9 @@ export interface Release {
   workItemReference?: string | null;
   serviceName?: string;
   createdAt: string;
+  deploymentDurationMs?: number | null;
+  succeededAt?: string | null;
+  failedAt?: string | null;
 }
 
 export interface ChangeDto {
@@ -1793,6 +1802,8 @@ export interface PromotionRequest {
   status: 'Pending' | 'Approved' | 'Rejected' | 'Promoted';
   gateResults: PromotionGateResult[];
   createdAt: string;
+  reviewedBy?: string | null;
+  reviewNotes?: string | null;
 }
 
 export interface BlastRadiusReport {
@@ -2386,6 +2397,8 @@ export interface IntegrationConnectorDetailDto {
   recentExecutions: IngestionExecutionDto[];
   createdAt: string;
   updatedAt: string;
+  tenantId?: string | null;
+  isGlobal: boolean;
 }
 
 export interface IngestionSourceDto {
