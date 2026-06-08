@@ -77,4 +77,10 @@ public interface IAnalyticsWriter
     /// Permite análise de "quais traces pertencem a esta release?" e correlação de impacto.
     /// </summary>
     Task WriteTraceReleaseMappingAsync(TraceReleaseMappingRecord record, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Escreve um evento de uso de dashboard no ClickHouse (tabela gov_dashboard_usage).
+    /// Fase 4: substitui o forward via WriteProductEventAsync para tabela dedicada.
+    /// </summary>
+    Task WriteDashboardUsageEventAsync(DashboardUsageEventRecord record, CancellationToken cancellationToken = default);
 }

@@ -67,8 +67,12 @@ public static class DependencyInjection
         services.AddScoped<IDashboardRevisionRepository, DashboardRevisionRepository>();
         services.AddScoped<ITechnicalDebtRepository, TechnicalDebtRepository>();
 
-        // Service Maturity Assessments
+        // Service Maturity Assessments & History
         services.AddScoped<IServiceMaturityAssessmentRepository, ServiceMaturityAssessmentRepository>();
+        services.AddScoped<IServiceMaturityHistoryRepository, ServiceMaturityHistoryRepository>();
+
+        // Policy Definition Versions
+        services.AddScoped<IPolicyDefinitionVersionRepository, PolicyDefinitionVersionRepository>();
 
         // Team Health Snapshots
         services.AddScoped<ITeamHealthSnapshotRepository, TeamHealthSnapshotRepository>();

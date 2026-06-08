@@ -75,6 +75,23 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
     /// <summary>Identificador de correlação para rastreamento fim-a-fim.</summary>
     public string CorrelationId { get; private set; } = string.Empty;
 
+    // ── Fase 4: AI Budget Analytics ─────────────────────────────────────────
+
+    /// <summary>Custo estimado da interação em USD (null se não calculado).</summary>
+    public decimal? CostUsd { get; private set; }
+
+    /// <summary>Latência total da resposta do modelo em milissegundos.</summary>
+    public int? DurationMs { get; private set; }
+
+    /// <summary>Indica se algum filtro de segurança/guardrail foi activado.</summary>
+    public bool SafetyFilterTriggered { get; private set; }
+
+    /// <summary>Código de erro quando Result != Allowed (null em caso de sucesso).</summary>
+    public string? ErrorCode { get; private set; }
+
+    /// <summary>Indica se a resposta foi entregue em streaming.</summary>
+    public bool IsStreaming { get; private set; }
+
     /// <summary>
     /// Regista uma nova entrada de auditoria de uso de IA.
     /// Calcula automaticamente TotalTokens e IsExternal.
@@ -96,7 +113,12 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
         string contextScope,
         AIClientType clientType,
         string correlationId,
-        Guid? conversationId = null)
+        Guid? conversationId = null,
+        decimal? costUsd = null,
+        int? durationMs = null,
+        bool safetyFilterTriggered = false,
+        string? errorCode = null,
+        bool isStreaming = false)
     {
         Guard.Against.NullOrWhiteSpace(userId);
         Guard.Against.NullOrWhiteSpace(userDisplayName);
@@ -126,7 +148,12 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
             ConversationId = conversationId,
             ContextScope = contextScope ?? string.Empty,
             ClientType = clientType,
-            CorrelationId = correlationId
+            CorrelationId = correlationId,
+            CostUsd = costUsd,
+            DurationMs = durationMs,
+            SafetyFilterTriggered = safetyFilterTriggered,
+            ErrorCode = errorCode,
+            IsStreaming = isStreaming
         };
     }
 
@@ -152,7 +179,12 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
         Guid? conversationId,
         string contextScope,
         AIClientType clientType,
-        string correlationId)
+        string correlationId,
+        decimal? costUsd = null,
+        int? durationMs = null,
+        bool safetyFilterTriggered = false,
+        string? errorCode = null,
+        bool isStreaming = false)
     {
         return new AIUsageEntry
         {
@@ -174,7 +206,12 @@ public sealed class AIUsageEntry : AuditableEntity<AIUsageEntryId>
             ConversationId = conversationId,
             ContextScope = contextScope,
             ClientType = clientType,
-            CorrelationId = correlationId
+            CorrelationId = correlationId,
+            CostUsd = costUsd,
+            DurationMs = durationMs,
+            SafetyFilterTriggered = safetyFilterTriggered,
+            ErrorCode = errorCode,
+            IsStreaming = isStreaming
         };
     }
 }

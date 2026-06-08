@@ -50,4 +50,8 @@ public sealed class NullAnalyticsWriter : IAnalyticsWriter
     /// <inheritdoc />
     public Task WriteTraceReleaseMappingAsync(TraceReleaseMappingRecord record, CancellationToken cancellationToken = default)
         => Task.CompletedTask;
+
+    /// <inheritdoc />
+    public Task WriteDashboardUsageEventAsync(DashboardUsageEventRecord record, CancellationToken cancellationToken = default)
+        => Task.CompletedTask;
 }

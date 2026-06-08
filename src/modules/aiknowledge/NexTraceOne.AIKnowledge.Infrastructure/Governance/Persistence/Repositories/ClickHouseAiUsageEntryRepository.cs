@@ -87,7 +87,12 @@ internal sealed class ClickHouseAiUsageEntryRepository : IAiUsageEntryRepository
             ConversationId = entry.ConversationId?.ToString(),
             entry.ContextScope,
             ClientType = (int)entry.ClientType,
-            entry.CorrelationId
+            entry.CorrelationId,
+            entry.CostUsd,
+            entry.DurationMs,
+            SafetyFilterTriggered = entry.SafetyFilterTriggered ? 1 : 0,
+            entry.ErrorCode,
+            IsStreaming = entry.IsStreaming ? 1 : 0
         };
 
         var json = JsonSerializer.Serialize(row, JsonOptions);

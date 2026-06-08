@@ -52,6 +52,10 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
         // ── P7.3: Correlação de auditoria ──────────────────────────────────────
         builder.Property(x => x.SourceEventId).HasMaxLength(500);
 
+        // ── Fase 4: Prioridade ──────────────────────────────────────────────────
+        builder.Property(x => x.Priority).IsRequired().HasDefaultValue(0);
+        builder.HasIndex(x => new { x.RecipientUserId, x.Priority });
+
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.RecipientUserId);
         builder.HasIndex(x => x.Status);

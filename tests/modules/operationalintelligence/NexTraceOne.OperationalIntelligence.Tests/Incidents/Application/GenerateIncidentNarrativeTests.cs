@@ -146,7 +146,7 @@ public sealed class GenerateIncidentNarrativeTests
                 IncidentStatus.Open,
                 FixedNow.AddHours(-1),
                 FixedNow,
-                null, null, null),
+                null, null, null, null, false),
             LinkedServices: new[]
             {
                 new GetIncidentDetail.LinkedServiceItem("svc-payment-gateway", "Payment Gateway", "API", "Critical")

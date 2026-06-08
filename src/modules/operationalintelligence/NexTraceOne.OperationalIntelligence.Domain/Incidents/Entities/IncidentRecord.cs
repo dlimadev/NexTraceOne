@@ -142,6 +142,20 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     /// <summary>Identificador do utilizador que reconheceu o incidente.</summary>
     public string? AcknowledgedBy { get; private set; }
 
+    // ── Fase 4: Análise Pós-Incidente ───────────────────────────────────
+
+    /// <summary>
+    /// Causa raiz determinada após análise pós-incidente (PIR).
+    /// Preenchida manualmente ou via IA após resolução.
+    /// </summary>
+    public string? RootCause { get; private set; }
+
+    /// <summary>
+    /// Indica se o SLA foi violado durante este incidente.
+    /// Calculado e persistido para relatórios sem necessidade de recálculo.
+    /// </summary>
+    public bool SlaBreached { get; private set; }
+
     // ── Concorrência otimista ───────────────────────────────────────────
 
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
@@ -316,6 +330,27 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     {
         TenantId ??= tenantId;
         EnvironmentId ??= environmentId;
+    }
+
+    /// <summary>
+    /// Regista a causa raiz determinada após análise pós-incidente.
+    /// Actualiza também o timestamp de última actualização.
+    /// </summary>
+    /// <param name="rootCause">Causa raiz identificada (null para limpar).</param>
+    /// <param name="updatedAtUtc">Data/hora UTC da actualização.</param>
+    public void SetRootCause(string? rootCause, DateTimeOffset updatedAtUtc)
+    {
+        RootCause = rootCause?.Trim();
+        LastUpdatedAt = updatedAtUtc;
+    }
+
+    /// <summary>
+    /// Marca o incidente como violação de SLA.
+    /// Persistido explicitamente para evitar recálculo em queries de relatórios.
+    /// </summary>
+    public void MarkSlaBreached()
+    {
+        SlaBreached = true;
     }
 }
 

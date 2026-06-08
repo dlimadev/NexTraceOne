@@ -243,6 +243,34 @@ public sealed record FinOpsAggregateRecord(
 );
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// GOVERNANCE ANALYTICS EVENTS — DASHBOARD USAGE (gov_dashboard_usage)
+// Módulo: Governance (08)
+// Tabela destino: nextraceone_analytics.gov_dashboard_usage
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>
+/// Evento de uso de dashboard para armazenamento analítico dedicado.
+/// Tabela destino: nextraceone_analytics.gov_dashboard_usage
+///
+/// Fase 4: substitui o forward via ProductAnalyticsRecord (pan_events)
+/// por uma tabela dedicada que preserva todos os campos de contexto.
+///
+/// Chaves de correlação com PostgreSQL:
+///   - TenantId    → iam_tenants.Id
+///   - DashboardId → gov_custom_dashboards.Id
+/// </summary>
+public sealed record DashboardUsageEventRecord(
+    Guid Id,
+    Guid TenantId,
+    Guid DashboardId,
+    string? UserId,
+    string? Persona,
+    string EventType,
+    int? DurationSeconds,
+    DateTimeOffset OccurredAt
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // CHANGE INTELLIGENCE EVENTS (chg_*)
 // Módulo: Change Governance (10)
 // Tabela destino: nextraceone_analytics.chg_trace_release_mapping

@@ -78,7 +78,9 @@ public static class GetIncidentDetail
         DateTimeOffset UpdatedAt,
         DateTimeOffset? ResolvedAt,
         DateTimeOffset? AcknowledgedAt,
-        string? AcknowledgedBy);
+        string? AcknowledgedBy,
+        string? RootCause,
+        bool SlaBreached);
 
     /// <summary>Serviço vinculado ao incidente.</summary>
     public sealed record LinkedServiceItem(
