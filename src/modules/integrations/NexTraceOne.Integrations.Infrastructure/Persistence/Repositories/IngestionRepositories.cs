@@ -205,7 +205,7 @@ internal sealed class IngestionExecutionRepository(
 
             await analyticsWriter.WriteIntegrationExecutionAsync(record, ct);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             logger.LogWarning(ex,
                 "Failed to forward IngestionExecution {ExecutionId} to ClickHouse — suppressed",
