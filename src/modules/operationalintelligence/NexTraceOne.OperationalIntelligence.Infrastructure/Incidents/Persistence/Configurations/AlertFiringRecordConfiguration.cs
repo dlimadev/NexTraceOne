@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Configurations;
 
 internal sealed class AlertFiringRecordConfiguration : IEntityTypeConfiguration<AlertFiringRecord>
 {
     public void Configure(EntityTypeBuilder<AlertFiringRecord> builder)
     {
-        builder.ToTable("iam_alert_firing_records");
+        builder.ToTable("opi_alert_firing_records");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, v => AlertFiringRecordId.From(v))
@@ -26,9 +27,9 @@ internal sealed class AlertFiringRecordConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.NotificationChannels).HasMaxLength(500);
 
         builder.HasIndex(x => new { x.TenantId, x.FiredAt })
-            .HasDatabaseName("ix_iam_alert_firing_tenant_fired");
+            .HasDatabaseName("ix_opi_alert_firing_tenant_fired");
         builder.HasIndex(x => new { x.TenantId, x.Status })
-            .HasDatabaseName("ix_iam_alert_firing_tenant_status");
-        builder.HasIndex(x => x.AlertRuleId).HasDatabaseName("ix_iam_alert_firing_rule");
+            .HasDatabaseName("ix_opi_alert_firing_tenant_status");
+        builder.HasIndex(x => x.AlertRuleId).HasDatabaseName("ix_opi_alert_firing_rule");
     }
 }

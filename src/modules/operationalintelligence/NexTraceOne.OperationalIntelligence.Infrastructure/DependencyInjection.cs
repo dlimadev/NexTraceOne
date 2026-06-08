@@ -14,6 +14,9 @@ using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Services;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Services;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
@@ -73,12 +76,15 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
+        services.AddScoped<IIncidentResponseUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IReliabilityUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IAutomationUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IRuntimeIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<ICostIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
 
         // ── Incidents ─────────────────────────────────────────────────────────
+        services.AddScoped<IAlertFiringRecordRepository, OiAlertFiringRecordRepository>();
+        services.AddScoped<IAlertFiringGateway, AlertFiringGatewayService>();
         services.AddScoped<IIncidentStore, EfIncidentStore>();
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();

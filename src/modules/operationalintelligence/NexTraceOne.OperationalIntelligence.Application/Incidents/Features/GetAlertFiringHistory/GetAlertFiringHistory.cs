@@ -5,13 +5,13 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.IdentityAccess.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.IdentityAccess.Application.Features.GetAlertFiringHistory;
+namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetAlertFiringHistory;
 
 /// <summary>
-/// SaaS-08: Retorna o histórico de alertas disparados para o tenant corrente.
+/// Retorna o histórico de alertas operacionais disparados para o tenant corrente.
 /// </summary>
 public static class GetAlertFiringHistory
 {

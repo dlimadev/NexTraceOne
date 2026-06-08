@@ -1,26 +1,28 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
-using GetAlertFiringHistoryFeature = NexTraceOne.IdentityAccess.Application.Features.GetAlertFiringHistory.GetAlertFiringHistory;
-using ResolveAlertFeature = NexTraceOne.IdentityAccess.Application.Features.ResolveAlert.ResolveAlert;
+using GetAlertFiringHistoryFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetAlertFiringHistory.GetAlertFiringHistory;
+using ResolveAlertFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveAlert.ResolveAlert;
 
-namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
+namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
 
 /// <summary>
-/// SaaS-08: Endpoints de gestão de alertas disparados.
+/// Endpoints de gestão de alertas operacionais disparados.
 /// </summary>
-internal static class AlertsEndpoints
+public sealed class AlertFiringEndpointModule
 {
-    internal static void Map(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
+    /// <summary>Mapeia os endpoints de alertas no pipeline HTTP.</summary>
+    public static void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var alertsGroup = group.MapGroup("/alerts/firing");
+        var group = app.MapGroup("/api/v1/alerts/firing");
 
-        alertsGroup.MapGet("/", async (
+        group.MapGet("/", async (
             string? status,
             int days,
             ISender sender,
@@ -29,9 +31,9 @@ internal static class AlertsEndpoints
         {
             var result = await sender.Send(new GetAlertFiringHistoryFeature.Query(status, days <= 0 ? 30 : days), ct);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:read");
+        }).RequirePermission("operations:incidents:read");
 
-        alertsGroup.MapPost("/{recordId:guid}/resolve", async (
+        group.MapPost("/{recordId:guid}/resolve", async (
             Guid recordId,
             ResolveAlertFeature.Command command,
             ISender sender,
@@ -41,6 +43,6 @@ internal static class AlertsEndpoints
             var cmd = command with { RecordId = recordId };
             var result = await sender.Send(cmd, ct);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:write");
+        }).RequirePermission("operations:incidents:write");
     }
 }

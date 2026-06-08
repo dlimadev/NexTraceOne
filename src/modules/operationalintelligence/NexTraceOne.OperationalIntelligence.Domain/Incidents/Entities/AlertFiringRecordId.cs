@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.IdentityAccess.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 
 /// <summary>Strongly-typed ID para AlertFiringRecord.</summary>
 public sealed record AlertFiringRecordId(Guid Value) : TypedIdBase(Value)

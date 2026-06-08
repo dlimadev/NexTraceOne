@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 
-using NexTraceOne.IdentityAccess.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 
-namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
-internal sealed class EfAlertFiringRecordRepository(IdentityDbContext context) : IAlertFiringRecordRepository
+internal sealed class OiAlertFiringRecordRepository(IncidentResponseDbContext context) : IAlertFiringRecordRepository
 {
     public async Task<IReadOnlyList<AlertFiringRecord>> ListByTenantAsync(
         Guid tenantId,

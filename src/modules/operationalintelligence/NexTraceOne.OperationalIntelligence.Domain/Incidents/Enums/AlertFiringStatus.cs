@@ -1,4 +1,4 @@
-namespace NexTraceOne.IdentityAccess.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 /// <summary>Estado de um registo de alerta.</summary>
 public enum AlertFiringStatus

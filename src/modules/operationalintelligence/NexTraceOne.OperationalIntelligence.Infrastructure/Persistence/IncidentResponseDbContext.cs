@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
@@ -29,12 +30,14 @@ public sealed class IncidentResponseDbContext(
     IDateTimeProvider clock)
     : NexTraceDbContextBase(options, tenant, user, clock),
       IUnitOfWork,
+      IIncidentResponseUnitOfWork,
       IReliabilityUnitOfWork,
       IAutomationUnitOfWork,
       IRuntimeIntelligenceUnitOfWork,
       ICostIntelligenceUnitOfWork
 {
     // ── Incidents ─────────────────────────────────────────────────────────────
+    public DbSet<AlertFiringRecord> AlertFiringRecords => Set<AlertFiringRecord>();
     public DbSet<IncidentRecord> Incidents => Set<IncidentRecord>();
     public DbSet<MitigationWorkflowRecord> MitigationWorkflows => Set<MitigationWorkflowRecord>();
     public DbSet<MitigationWorkflowActionLog> MitigationWorkflowActions => Set<MitigationWorkflowActionLog>();

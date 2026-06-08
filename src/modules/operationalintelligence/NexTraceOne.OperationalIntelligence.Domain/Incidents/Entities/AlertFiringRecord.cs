@@ -1,14 +1,13 @@
 using Ardalis.GuardClauses;
 
 using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.IdentityAccess.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 
 /// <summary>
-/// Registo de um alerta que disparou (ou resolveu) num dado momento.
+/// Registo de um alerta operacional que disparou (ou resolveu) num dado momento.
 /// Gerado pelo AlertEvaluationJob a partir de UserAlertRule.
-/// Prefixo de tabela: cfg_ (usa ConfigurationDbContext cross-module read)
-/// Prefixo de tabela aqui: iam_ (owned by IdentityAccess para simplicidade)
 /// </summary>
 public sealed class AlertFiringRecord : Entity<AlertFiringRecordId>
 {

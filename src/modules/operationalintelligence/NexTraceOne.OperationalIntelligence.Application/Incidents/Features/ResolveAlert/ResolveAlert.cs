@@ -5,13 +5,13 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.IdentityAccess.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 
-namespace NexTraceOne.IdentityAccess.Application.Features.ResolveAlert;
+namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveAlert;
 
 /// <summary>
-/// SaaS-08: Resolve ou silencia manualmente um alerta disparado.
+/// Resolve ou silencia manualmente um alerta operacional disparado.
 /// </summary>
 public static class ResolveAlert
 {
@@ -36,7 +36,7 @@ public static class ResolveAlert
     public sealed class Handler(
         IAlertFiringRecordRepository repository,
         IDateTimeProvider dateTimeProvider,
-        IIdentityAccessUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IIncidentResponseUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

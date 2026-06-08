@@ -1,8 +1,9 @@
-using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.IdentityAccess.Application.Abstractions;
+namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 
-/// <summary>Repositório de registos de alertas disparados.</summary>
+/// <summary>Repositório de registos de alertas operacionais disparados.</summary>
 public interface IAlertFiringRecordRepository
 {
     Task<IReadOnlyList<AlertFiringRecord>> ListByTenantAsync(
