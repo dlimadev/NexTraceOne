@@ -5,12 +5,9 @@ namespace NexTraceOne.Integrations.Domain.Enums;
 /// </summary>
 public enum StorageBucketBackendType
 {
-    /// <summary>Elasticsearch (padrão para audit e full-text search).</summary>
-    Elasticsearch = 1,
-
-    /// <summary>ClickHouse (para workloads OLAP de alto volume).</summary>
-    ClickHouse = 2,
+    /// <summary>ClickHouse (padrão para workloads OLAP de alto volume).</summary>
+    ClickHouse = 1,
 
     /// <summary>PostgreSQL (para audit compacto e correlação transaccional).</summary>
-    PostgreSQL = 3
+    PostgreSQL = 2
 }

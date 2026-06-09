@@ -85,7 +85,8 @@ public static class FederatedLogin
                     Email.Create(request.Email),
                     FullName.FromDisplayName(request.Name),
                     request.Provider,
-                    request.ExternalId);
+                    request.ExternalId,
+                    dateTimeProvider.UtcNow);
                 userRepository.Add(user);
             }
             else

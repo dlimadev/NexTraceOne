@@ -222,6 +222,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
         await promotionContext.SaveChangesAsync();
 
         var promotionRequest = PromotionRequest.Create(
+            tenantId: Guid.NewGuid(),
             releaseId: Guid.NewGuid(),
             sourceEnvironmentId: stagingEnv.Id,
             targetEnvironmentId: productionEnv.Id,

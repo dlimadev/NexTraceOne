@@ -3,6 +3,16 @@ namespace NexTraceOne.Catalog.Domain.Entities;
 /// <summary>
 /// Entidade de domínio que representa o estado actual de uma feature flag para um serviço.
 /// Wave AS.1 — Feature Flag &amp; Experimentation Governance.
+///
+/// DISTINÇÃO DE PROPÓSITO (Fase 4 — evitar confusão com Configuration.FeatureFlagDefinition):
+/// - <see cref="FeatureFlagRecord"/> (módulo Catalog): estado actual de flags por serviço,
+///   ingerido via webhook de ferramentas externas (LaunchDarkly, Unleash, etc.).
+///   Suporta upsert idempotente por (TenantId, ServiceId, FlagKey).
+///   Tabela: ctr_feature_flag_records.
+/// - <c>FeatureFlagDefinition</c> (módulo Configuration): definições globais de flags da
+///   plataforma com metadados (âmbito, valor padrão, módulo). Gerido por platform admins.
+///   Tabela: cfg_feature_flag_definitions.
+/// Os dois tipos coexistem intencionalmente — propósitos diferentes, origens diferentes.
 /// </summary>
 public sealed class FeatureFlagRecord
 {

@@ -73,12 +73,15 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
+        services.AddScoped<IIncidentResponseUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IReliabilityUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IAutomationUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<IRuntimeIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
         services.AddScoped<ICostIntelligenceUnitOfWork>(sp => sp.GetRequiredService<IncidentResponseDbContext>());
 
         // ── Incidents ─────────────────────────────────────────────────────────
+        services.AddScoped<IAlertFiringRecordRepository, OiAlertFiringRecordRepository>();
+        services.AddScoped<IAlertFiringGateway, AlertFiringGatewayService>();
         services.AddScoped<IIncidentStore, EfIncidentStore>();
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
@@ -143,27 +146,11 @@ public static class DependencyInjection
         services.AddScoped<ITrafficAnomalyReader, NexTraceOne.OperationalIntelligence.Application.Runtime.NullTrafficAnomalyReader>();
         services.AddScoped<IEnvironmentBehaviorComparisonReader, NexTraceOne.OperationalIntelligence.Application.Runtime.NullEnvironmentBehaviorComparisonReader>();
 
-        // ── Log Search — Telemetry Backend Selection (Elasticsearch ou ClickHouse) ─
+        // ── Log Search — ClickHouse backend (Elasticsearch removido) ──────────
         services.Configure<TelemetryStoreOptions>(
             configuration.GetSection(TelemetryStoreOptions.SectionName));
 
-        var telemetryOptions = configuration.GetSection(TelemetryStoreOptions.SectionName).Get<TelemetryStoreOptions>();
-        var backendType = telemetryOptions?.ObservabilityProvider?.BackendType?.ToLowerInvariant() ?? "elasticsearch";
-
-        switch (backendType)
-        {
-            case "clickhouse":
-                services.AddScoped<ITelemetrySearchService, ClickHouseLogSearchService>();
-                break;
-            case "elasticsearch":
-            default:
-                services.AddHttpClient<ITelemetrySearchService, ElasticsearchLogSearchService>(client =>
-                {
-                    client.Timeout = TimeSpan.FromSeconds(30);
-                }).AddStandardResilienceHandler();
-                break;
-        }
-
+        services.AddScoped<ITelemetrySearchService, ClickHouseLogSearchService>();
         services.AddScoped(sp => sp.GetRequiredService<ITelemetrySearchService>());
 
         var clickHouseConnectionString = configuration.GetConnectionString("ClickHouse")

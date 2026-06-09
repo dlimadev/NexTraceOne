@@ -109,7 +109,9 @@ internal sealed class InMemoryIncidentStore : IIncidentStore
         var identity = new GetIncidentDetail.IncidentIdentity(
             incident.Id.Value, incident.ExternalRef, incident.Title, incident.Description,
             incident.Type, incident.Severity, incident.Status,
-            incident.DetectedAt, incident.LastUpdatedAt);
+            incident.DetectedAt, incident.LastUpdatedAt,
+            incident.ResolvedAt, incident.AcknowledgedAt, incident.AcknowledgedBy,
+            incident.RootCause, incident.SlaBreached);
 
         var linkedServices = Deserialize<List<LinkedServiceDto>>(incident.LinkedServicesJson)
             ?.Select(s => new GetIncidentDetail.LinkedServiceItem(s.ServiceId, s.DisplayName, s.ServiceType, s.Criticality))

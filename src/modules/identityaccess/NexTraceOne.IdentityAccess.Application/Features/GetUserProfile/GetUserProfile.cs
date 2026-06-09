@@ -63,7 +63,10 @@ public static class GetUserProfile
                 user.FullName.LastName,
                 user.IsActive,
                 user.LastLoginAt,
-                membershipResponses);
+                membershipResponses,
+                user.CreatedAt,
+                user.MustChangePassword,
+                user.LastPasswordChangeAt);
         }
     }
 
@@ -75,7 +78,10 @@ public static class GetUserProfile
         string LastName,
         bool IsActive,
         DateTimeOffset? LastLoginAt,
-        IReadOnlyList<MembershipResponse> Memberships);
+        IReadOnlyList<MembershipResponse> Memberships,
+        DateTimeOffset CreatedAt,
+        bool MustChangePassword,
+        DateTimeOffset? LastPasswordChangeAt);
 
     /// <summary>Resumo de vínculo do usuário com tenants.</summary>
     public sealed record MembershipResponse(Guid TenantId, Guid RoleId, string RoleName, bool IsActive);

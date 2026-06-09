@@ -19,7 +19,8 @@ internal static class TestUserFactory
         var user = User.CreateLocal(
             Email.Create("mfa-user@example.com"),
             FullName.Create("MFA", "User"),
-            HashedPassword.FromPlainText("P@ssw0rd123!"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"),
+            DateTimeOffset.UtcNow);
 
         user.EnableMfa("TOTP", "JBSWY3DPEHPK3PXP");
         return user;
@@ -32,5 +33,6 @@ internal static class TestUserFactory
         => User.CreateLocal(
             Email.Create("user@example.com"),
             FullName.Create("Regular", "User"),
-            HashedPassword.FromPlainText("P@ssw0rd123!"));
+            HashedPassword.FromPlainText("P@ssw0rd123!"),
+            DateTimeOffset.UtcNow);
 }

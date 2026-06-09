@@ -4,7 +4,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.BackgroundWorkers;
 using NexTraceOne.BackgroundWorkers.Backup;
 using NexTraceOne.BackgroundWorkers.Configuration;
-using NexTraceOne.BackgroundWorkers.Elasticsearch;
 using NexTraceOne.BackgroundWorkers.Health;
 using NexTraceOne.BackgroundWorkers.Jobs;
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
@@ -177,11 +176,6 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [WasteDetectionJob.HealthCheckName, TimeSpan.FromHours(25)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
-        "elasticsearch-index-maintenance-job",
-        failureStatus: HealthStatus.Degraded,
-        tags: ["health"],
-        args: [ElasticsearchIndexMaintenanceJob.HealthCheckName, TimeSpan.FromHours(7)])
-    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "carbon-score-calculation-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
@@ -242,19 +236,8 @@ builder.Services.AddHostedService<LicenseRecalculationJob>();
 builder.Services.AddHostedService<PlatformHealthMonitorJob>();
 builder.Services.AddHostedService<BackupCoordinatorJob>();
 builder.Services.AddHostedService<WasteDetectionJob>();
-builder.Services.AddHostedService<ElasticsearchIndexMaintenanceJob>();
 builder.Services.AddHostedService<CarbonScoreCalculationJob>();
 builder.Services.AddHostedService<DependencyScanJob>();
-
-// W7-01: ES index manager — resolve via scoped scope in job
-var esUrl = builder.Configuration["Elasticsearch:Url"] ?? builder.Configuration["Elasticsearch:Uri"] ?? "http://localhost:9200";
-builder.Services.AddHttpClient<ElasticsearchIndexManagerService>(client =>
-{
-    client.BaseAddress = new Uri(esUrl);
-    client.Timeout = TimeSpan.FromSeconds(30);
-    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-});
-builder.Services.AddScoped<IElasticsearchIndexManager, ElasticsearchIndexManagerService>();
 
 var app = builder.Build();
 

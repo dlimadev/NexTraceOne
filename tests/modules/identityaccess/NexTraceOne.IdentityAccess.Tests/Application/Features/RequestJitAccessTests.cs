@@ -51,7 +51,8 @@ public sealed class RequestJitAccessTests
         var user = User.CreateLocal(
             Email.Create($"user-{Guid.NewGuid():N}@test.com"),
             FullName.Create("Test", "User"),
-            HashedPassword.FromPlainText("Password123!"));
+            HashedPassword.FromPlainText("Password123!"),
+            DateTimeOffset.UtcNow);
         if (mfaEnabled)
             user.EnableMfa("TOTP", mfaSecret ?? "JBSWY3DPEHPK3PXP");
         return user;

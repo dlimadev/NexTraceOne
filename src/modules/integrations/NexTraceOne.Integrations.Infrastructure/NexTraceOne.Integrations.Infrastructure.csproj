@@ -12,6 +12,7 @@
     <ProjectReference Include="..\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Integrations.Domain\NexTraceOne.Integrations.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

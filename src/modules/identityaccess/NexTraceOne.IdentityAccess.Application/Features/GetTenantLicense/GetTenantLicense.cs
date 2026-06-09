@@ -24,7 +24,9 @@ public static class GetTenantLicense
         decimal OverageHostUnits,
         DateTimeOffset ValidFrom,
         DateTimeOffset? ValidUntil,
-        IReadOnlyList<string> Capabilities);
+        IReadOnlyList<string> Capabilities,
+        int? MaxOverageHostUnits,
+        string? ExternalSubscriptionId);
 
     public sealed class Handler(
         ITenantLicenseRepository repository,
@@ -48,7 +50,9 @@ public static class GetTenantLicense
                     0m,
                     DateTimeOffset.UtcNow,
                     null,
-                    TenantCapabilities.ForPlan(TenantPlan.Starter)));
+                    TenantCapabilities.ForPlan(TenantPlan.Starter),
+                    null,
+                    null));
             }
 
             return Result<Response>.Success(new Response(
@@ -60,7 +64,9 @@ public static class GetTenantLicense
                 license.OverageHostUnits,
                 license.ValidFrom,
                 license.ValidUntil,
-                license.GetCapabilities()));
+                license.GetCapabilities(),
+                license.MaxOverageHostUnits,
+                license.ExternalSubscriptionId));
         }
     }
 }

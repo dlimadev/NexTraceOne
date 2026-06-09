@@ -25,7 +25,6 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.EventHandlers;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.HealthChecks;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Jobs;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ClickHouse;
-using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ElasticSearch;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repositories;
@@ -79,7 +78,6 @@ public static class DependencyInjection
         services.AddScoped<IAiBudgetRepository, AiBudgetRepository>();
         services.AddScoped<IAiAssistantConversationRepository, AiAssistantConversationRepository>();
         services.AddScoped<IAiMessageRepository, AiMessageRepository>();
-        services.AddScoped<IAiUsageEntryRepository, AiUsageEntryRepository>();
         services.AddScoped<IAiKnowledgeSourceRepository, AiKnowledgeSourceRepository>();
         services.AddScoped<IAiIdeClientRegistrationRepository, AiIdeClientRegistrationRepository>();
         services.AddScoped<IAiIdeCapabilityPolicyRepository, AiIdeCapabilityPolicyRepository>();
@@ -184,9 +182,9 @@ public static class DependencyInjection
         services.AddScoped<IAgentWorkflowExecutionRepository, AgentWorkflowExecutionRepository>();
         services.AddScoped<IAiOrchestrationModule, AiOrchestrationModule>();
 
-        // ── Analytics & Search: Escolha Exclusiva ─────────────────────────────
+        // ── Analytics & Search: ClickHouse analytics + busca semântica via pgvector ─
+        // Elasticsearch removido — IAiSearchRepository usa NullAiSearchRepository permanentemente.
         var clickHouseConnectionString = configuration.GetConnectionString("AiAnalytics");
-        var elasticSearchConnectionString = configuration.GetConnectionString("AiSearch");
 
         if (!string.IsNullOrEmpty(clickHouseConnectionString))
         {
@@ -201,25 +199,19 @@ public static class DependencyInjection
             .AddStandardResilienceHandler();
 
             services.AddSingleton<IAiAnalyticsRepository, ClickHouseAiAnalyticsRepository>();
-            services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
+            services.AddScoped<IAiUsageEntryRepository, ClickHouseAiUsageEntryRepository>();
 
             services.AddHealthChecks()
                 .AddCheck<ClickHouseAiHealthCheck>("ai-clickhouse-analytics", HealthStatus.Degraded, ["health", "ready"]);
         }
-        else if (!string.IsNullOrEmpty(elasticSearchConnectionString))
-        {
-            services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
-            services.AddSingleton<IAiSearchRepository>(sp =>
-                new ElasticSearchAiRepository(elasticSearchConnectionString));
-
-            services.AddHealthChecks()
-                .AddCheck<ElasticSearchAiHealthCheck>("ai-elasticsearch-search", HealthStatus.Degraded, ["health", "ready"]);
-        }
         else
         {
             services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
-            services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
+            services.AddScoped<IAiUsageEntryRepository, NullAiUsageEntryRepository>();
         }
+
+        // Elasticsearch removido — implementar busca semântica via pgvector ou PostgreSQL FTS
+        services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
 
         return services;
     }

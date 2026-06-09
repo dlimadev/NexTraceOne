@@ -11,7 +11,6 @@ using GetAdminBackupFeature = NexTraceOne.Governance.Application.Features.GetAdm
 using GetSupportBundlesFeature = NexTraceOne.Governance.Application.Features.GetSupportBundles.GetSupportBundles;
 using GetStartupReportFeature = NexTraceOne.Governance.Application.Features.GetStartupReport.GetStartupReport;
 using GetResourceBudgetFeature = NexTraceOne.Governance.Application.Features.GetResourceBudget.GetResourceBudget;
-using GetElasticsearchManagerFeature = NexTraceOne.Governance.Application.Features.GetElasticsearchManager.GetElasticsearchManager;
 using GetPlatformAlertRulesFeature = NexTraceOne.Governance.Application.Features.GetPlatformAlertRules.GetPlatformAlertRules;
 using GetRestorePointsFeature = NexTraceOne.Governance.Application.Features.GetRestorePoints.GetRestorePoints;
 using GetGreenOpsReportFeature = NexTraceOne.Governance.Application.Features.GetGreenOpsReport.GetGreenOpsReport;
@@ -37,7 +36,7 @@ namespace NexTraceOne.Governance.API.Endpoints;
 
 /// <summary>
 /// Endpoints de Platform Admin — gestão de SSO, mTLS, backups, bundles de suporte,
-/// recursos, Elasticsearch, alertas, recovery, GreenOps, IA, proxy, auditoria HTTP,
+/// recursos, alertas, recovery, GreenOps, IA, proxy, auditoria HTTP,
 /// políticas de ambiente, agendas não-produtivas, capacidade, demo seed,
 /// graceful shutdown, segurança de sessão, rightsizing, modo de observabilidade e conformidade.
 /// Destinados exclusivamente a Platform Admins.
@@ -193,26 +192,6 @@ public sealed class PlatformAdminEndpointModule
 
         admin.MapPut("/resource-budget", async (
             GetResourceBudgetFeature.UpdateResourceBudget command,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("platform:admin:write");
-
-        // ── Elasticsearch ─────────────────────────────────────────────────────────
-        admin.MapGet("/elasticsearch", async (
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(new GetElasticsearchManagerFeature.Query(), cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("platform:admin:read");
-
-        admin.MapPut("/elasticsearch/ilm", async (
-            GetElasticsearchManagerFeature.UpdateElasticsearchIlm command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

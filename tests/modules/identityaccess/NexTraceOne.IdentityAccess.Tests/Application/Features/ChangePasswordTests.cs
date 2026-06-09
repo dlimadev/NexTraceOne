@@ -23,7 +23,8 @@ public sealed class ChangePasswordTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("OldP@ss123!!"));
+            HashedPassword.FromPlainText("OldP@ss123!!"),
+            DateTimeOffset.UtcNow);
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);
@@ -63,7 +64,8 @@ public sealed class ChangePasswordTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("OldP@ss123!!"));
+            HashedPassword.FromPlainText("OldP@ss123!!"),
+            DateTimeOffset.UtcNow);
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);
@@ -102,7 +104,8 @@ public sealed class ChangePasswordTests
             Email.Create("fed@example.com"),
             FullName.Create("Fed", "User"),
             "azure-ad",
-            "ext-12345");
+            "ext-12345",
+            DateTimeOffset.UtcNow);
 
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(true);

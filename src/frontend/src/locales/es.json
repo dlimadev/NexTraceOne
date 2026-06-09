@@ -1652,6 +1652,112 @@
     "title": "Configuración de Catálogo, Contratos & Change Governance"
   },
   "changeConfidence": {
+    "title": "Confianza en Cambios",
+    "subtitle": "Rastrea y valida cambios en todos los despliegues",
+    "filters": {
+      "searchPlaceholder": "Buscar cambios...",
+      "serviceName": "Nombre del servicio",
+      "allEnvironments": "Todos los entornos",
+      "allTypes": "Todos los tipos",
+      "allStatuses": "Todos los estados"
+    },
+    "table": {
+      "service": "Servicio",
+      "version": "Versión",
+      "team": "Equipo",
+      "changeType": "Tipo",
+      "environment": "Entorno",
+      "status": "Estado",
+      "score": "Puntuación",
+      "createdAt": "Creado",
+      "noChanges": "No se encontraron cambios",
+      "noChangesDescription": "Ajusta los filtros o espera nuevos despliegues"
+    },
+    "summary": {
+      "totalChanges": "Total de Cambios",
+      "validatedChanges": "Validados",
+      "changesNeedingAttention": "Necesitan Atención",
+      "suspectedRegressions": "Regresiones Sospechosas",
+      "changesCorrelatedWithIncidents": "Correlacionados con Incidentes"
+    },
+    "changeType": {
+      "Deployment": "Despliegue",
+      "ContractChange": "Cambio de Contrato",
+      "ConfigChange": "Cambio de Configuración",
+      "SchemaChange": "Cambio de Esquema"
+    },
+    "confidenceStatus": {
+      "Validated": "Validado",
+      "NeedsAttention": "Necesita Atención",
+      "Investigating": "Investigando",
+      "Pending": "Pendiente"
+    },
+    "detail": {
+      "backToCatalog": "Volver al Catálogo",
+      "overview": "Resumen",
+      "description": "Descripción",
+      "changeType": "Tipo de Cambio",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Origen del Pipeline",
+      "workItem": "Elemento de Trabajo",
+      "riskAndConfidence": "Riesgo y Confianza",
+      "changeScore": "Puntuación de Cambio",
+      "confidenceStatus": "Estado de Confianza",
+      "validationStatus": "Estado de Validación",
+      "blastRadius": "Radio de Impacto",
+      "totalAffected": "Total Afectado",
+      "directConsumers": "Consumidores Directos",
+      "transitiveConsumers": "Consumidores Transitivos",
+      "noBlastRadius": "No hay datos de radio de impacto disponibles",
+      "evidenceReadiness": "Preparación de Evidencias",
+      "evidenceReadinessSubtitle": "Porcentaje de factores de evidencia aprobados",
+      "evidenceComplete": "Todas las evidencias completas",
+      "evidencePartial": "Evidencias parcialmente completas",
+      "evidenceNone": "No hay evidencias disponibles",
+      "advisory": "Asesoría",
+      "advisorySubtitle": "Recomendación basada en la evaluación de evidencias",
+      "recommendation": "Recomendación",
+      "overallConfidence": "Confianza Global",
+      "rationale": "Justificación",
+      "advisoryFactors": "Factores Contribuyentes",
+      "noAdvisory": "No hay datos de asesoría disponibles",
+      "decisionActions": "Acciones de Decisión",
+      "decisionSubtitle": "Registra tu decisión de gobernanza para este cambio",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "approveConditionally": "Aprobar Condicionalmente",
+      "decisionRationale": "Justificación",
+      "decisionRationalePlaceholder": "Explica el motivo de tu decisión...",
+      "decisionConditions": "Condiciones",
+      "decisionConditionsPlaceholder": "Lista las condiciones para aprobación condicional...",
+      "submitDecision": "Enviar Decisión",
+      "decisionSuccess": "Decisión registrada con éxito",
+      "decisionError": "Error al registrar la decisión",
+      "decisionHistory": "Historial de Decisiones",
+      "decisionHistorySubtitle": "Decisiones de gobernanza anteriores para este cambio",
+      "decidedBy": "Decidido por",
+      "noDecisions": "Sin decisiones registradas",
+      "noDecisionsDescription": "Aún no se han tomado decisiones de gobernanza para este cambio",
+      "validation": "Validación y Evidencias",
+      "factorName": {
+        "EvidenceCompleteness": "Completitud de Evidencias",
+        "BlastRadiusScope": "Alcance del Radio de Impacto",
+        "ChangeScore": "Puntuación de Cambio",
+        "RollbackReadiness": "Preparación para Rollback"
+      },
+      "factorStatus": {
+        "Pass": "Aprobado",
+        "Warning": "Advertencia",
+        "Fail": "Reprobado",
+        "Unknown": "Desconocido"
+      },
+      "recommendationType": {
+        "Approve": "Aprobar",
+        "Reject": "Rechazar",
+        "ApproveConditionally": "Aprobar Condicionalmente",
+        "NeedsMoreEvidence": "Necesita Más Evidencias"
+      }
+    },
     "breakdown": {
       "title": "Desglose de Confianza en el Cambio",
       "aggregatedScore": "Puntuación Agregada",
@@ -10799,7 +10905,7 @@
     "config": {
       "smtp": "SMTP",
       "ollama": "Ollama",
-      "elasticsearch": "Elasticsearch"
+      "clickhouse": "ClickHouse"
     }
   },
   "resourceBudget": {
@@ -11312,7 +11418,7 @@
     "error": "Error al cargar la configuración del modo de observabilidad.",
     "refresh": "Actualizar",
     "currentMode": "Modo actual",
-    "elasticsearch": "Elasticsearch",
+    "clickhouse": "ClickHouse",
     "otelCollector": "OTel Collector",
     "additionalRam": "RAM adicional",
     "connected": "Conectado",
@@ -12780,6 +12886,13 @@
     "riskScore": "Puntuación de Riesgo",
     "apiCount": "APIs Expuestas",
     "riskFactors": "Factores de Riesgo",
+    "loadError": "Error al cargar los riesgos de dependencia. Inténtalo de nuevo.",
+    "riskLevel": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
     "errors": {
       "noServices": "No se encontraron servicios para el filtro especificado.",
       "tenantRequired": "El ID de tenant es obligatorio."

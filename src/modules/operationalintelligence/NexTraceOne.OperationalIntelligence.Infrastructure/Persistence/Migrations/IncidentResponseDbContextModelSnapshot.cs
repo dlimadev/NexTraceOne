@@ -71,6 +71,69 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Persistence.Migrati
                     b.ToTable("ops_incident_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.AlertFiringRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AlertRuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AlertRuleName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("ConditionSummary")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("FiredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NotificationChannels")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResolvedReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlertRuleId")
+                        .HasDatabaseName("ix_opi_alert_firing_rule");
+
+                    b.HasIndex("TenantId", "FiredAt")
+                        .HasDatabaseName("ix_opi_alert_firing_tenant_fired");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("ix_opi_alert_firing_tenant_status");
+
+                    b.ToTable("opi_alert_firing_records", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.BuildingBlocks.Observability.Telemetry.Models.AnomalySnapshot", b =>
                 {
                     b.Property<Guid>("Id")

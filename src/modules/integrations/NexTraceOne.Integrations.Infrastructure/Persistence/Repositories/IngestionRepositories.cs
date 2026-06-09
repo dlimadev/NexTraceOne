@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Events;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using NexTraceOne.Integrations.Domain.Enums;
@@ -64,8 +67,13 @@ internal sealed class IngestionSourceRepository(IntegrationsDbContext context) :
 
 /// <summary>
 /// Implementação do repositório de IngestionExecutions usando EF Core.
+/// Fase 4: ao completar uma execução (estado terminal), replica o registo para ClickHouse
+/// via IAnalyticsWriter para análise histórica de longa duração.
 /// </summary>
-internal sealed class IngestionExecutionRepository(IntegrationsDbContext context) : IIngestionExecutionRepository
+internal sealed class IngestionExecutionRepository(
+    IntegrationsDbContext context,
+    IAnalyticsWriter analyticsWriter,
+    ILogger<IngestionExecutionRepository> logger) : IIngestionExecutionRepository
 {
     public async Task<IReadOnlyList<IngestionExecution>> ListAsync(
         IntegrationConnectorId? connectorId,
@@ -156,7 +164,53 @@ internal sealed class IngestionExecutionRepository(IntegrationsDbContext context
     public Task UpdateAsync(IngestionExecution execution, CancellationToken ct)
     {
         context.IngestionExecutions.Update(execution);
+
+        // Fase 4: replica execuções terminais para ClickHouse (fire-and-forget).
+        if (execution.Result != ExecutionResult.Running)
+            _ = ForwardToClickHouseAsync(execution, ct);
+
         return Task.CompletedTask;
+    }
+
+    private async Task ForwardToClickHouseAsync(IngestionExecution execution, CancellationToken ct)
+    {
+        try
+        {
+            var connector = await context.IntegrationConnectors
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.Id == execution.ConnectorId, ct);
+
+            if (connector is null) return;
+
+            var record = new IntegrationExecutionRecord(
+                Id: execution.Id.Value,
+                TenantId: connector.TenantId ?? Guid.Empty,
+                ConnectorId: execution.ConnectorId.Value,
+                ConnectorName: connector.Name,
+                ConnectorType: connector.ConnectorType,
+                Provider: connector.Provider,
+                SourceId: execution.SourceId?.Value,
+                DataDomain: connector.ConnectorType,
+                CorrelationId: execution.CorrelationId,
+                StartedAt: execution.StartedAt,
+                CompletedAt: execution.CompletedAt,
+                DurationMs: execution.DurationMs,
+                Result: execution.Result.ToString(),
+                ItemsProcessed: execution.ItemsProcessed,
+                ItemsSucceeded: execution.ItemsSucceeded,
+                ItemsFailed: execution.ItemsFailed,
+                ErrorCode: execution.ErrorCode,
+                RetryAttempt: execution.RetryAttempt,
+                CreatedAt: execution.CreatedAt);
+
+            await analyticsWriter.WriteIntegrationExecutionAsync(record, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex,
+                "Failed to forward IngestionExecution {ExecutionId} to ClickHouse — suppressed",
+                execution.Id.Value);
+        }
     }
 
     public async Task<int> CountByResultInPeriodAsync(

@@ -2,7 +2,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
 
 /// <summary>
 /// Configuração central da camada analítica do NexTraceOne.
-/// Provider padrão: Elasticsearch. ClickHouse mantém-se como alternativa.
+/// Provider: ClickHouse.
 /// Define endpoint, timeouts, modo de escrita e comportamento de falha.
 /// </summary>
 public sealed class AnalyticsOptions
@@ -11,34 +11,29 @@ public sealed class AnalyticsOptions
     public const string SectionName = "Analytics";
 
     /// <summary>
-    /// Habilita a escrita para o storage analítico (Elasticsearch por padrão).
+    /// Habilita a escrita para o storage analítico (ClickHouse).
     /// Quando false, NullAnalyticsWriter é usado (sem I/O analítico).
-    /// Padrão: false — activar explicitamente quando Elasticsearch estiver disponível.
+    /// Padrão: false — activar explicitamente quando ClickHouse estiver disponível.
     /// </summary>
     public bool Enabled { get; set; } = false;
 
     /// <summary>
-    /// Endpoint do storage analítico.
-    /// Para Elasticsearch: http://elasticsearch:9200
-    /// Para ClickHouse (alternativa): http://clickhouse:8123/?database=nextraceone_analytics
-    ///
-    /// NOTA: O nome "ConnectionString" é mantido por backward-compatibility com
-    /// configurações existentes (Analytics:ConnectionString). Para Elasticsearch,
-    /// o valor esperado é o URL base do cluster (ex: http://elasticsearch:9200).
+    /// Endpoint do storage analítico ClickHouse.
+    /// Exemplo: http://clickhouse:8123/?database=nextraceone_analytics
     /// </summary>
-    public string ConnectionString { get; set; } = "http://elasticsearch:9200";
+    public string ConnectionString { get; set; } = "http://clickhouse:8123";
 
     /// <summary>
-    /// API Key para autenticação no Elasticsearch (recomendado sobre user/password).
-    /// Deixar vazio quando xpack.security.enabled=false (desenvolvimento local).
+    /// Token de autenticação ClickHouse (opcional).
+    /// Deixar vazio quando autenticação não está configurada (desenvolvimento local).
     /// </summary>
     public string ApiKey { get; set; } = string.Empty;
 
     /// <summary>
-    /// Prefixo para índices criados pelo NexTraceOne no Elasticsearch.
-    /// Exemplo: "nextraceone-analytics" gera índices como "nextraceone-analytics-pan-events".
+    /// Prefixo para tabelas criadas pelo NexTraceOne no ClickHouse.
+    /// Exemplo: "nextraceone-analytics" gera tabelas como "nextraceone-analytics-pan-events".
     /// </summary>
-    public string IndexPrefix { get; set; } = "nextraceone-analytics";
+    public string TablePrefix { get; set; } = "nextraceone-analytics";
 
     /// <summary>
     /// Timeout em segundos para operações de escrita.

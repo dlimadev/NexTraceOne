@@ -185,7 +185,7 @@ export interface BackupScheduleConfig {
 export interface StartupConfigSnapshot {
   smtpConfigured: boolean;
   ollamaConfigured: boolean;
-  elasticsearchConfigured: boolean;
+  clickhouseConfigured: boolean;
   corsOrigins: string[];
 }
 
@@ -239,47 +239,6 @@ export interface TenantBudgetEntry {
 export interface ResourceBudgetResponse {
   tenants: TenantBudgetEntry[];
   updatedAt: string;
-}
-
-// ─── W7-01/02 Elasticsearch Manager ──────────────────────────────────────────
-
-export type EsIndexPhase = 'hot' | 'warm' | 'cold' | 'delete';
-
-export interface EsIndexInfo {
-  name: string;
-  docsCount: number;
-  storeSizeGb: number;
-  currentPhase: EsIndexPhase;
-  createdAt: string;
-  ilmPolicyName: string | null;
-}
-
-export interface EsClusterHealth {
-  status: 'green' | 'yellow' | 'red';
-  clusterName: string;
-  numberOfNodes: number;
-  activeShards: number;
-  unassignedShards: number;
-  jvmHeapUsedPercent: number;
-  diskUsedPercent: number;
-  diskTotalGb: number;
-  diskUsedGb: number;
-  projectedDaysUntilFull: number | null;
-  isReadOnly: boolean;
-  checkedAt: string;
-}
-
-export interface EsIlmPolicy {
-  name: string;
-  hotMaxAgeDays: number | null;
-  warmAfterDays: number | null;
-  deleteAfterDays: number | null;
-}
-
-export interface ElasticsearchManagerResponse {
-  clusterHealth: EsClusterHealth;
-  indices: EsIndexInfo[];
-  ilmPolicies: EsIlmPolicy[];
 }
 
 export interface BackupCoordinatorResponse {
@@ -444,26 +403,6 @@ export const platformAdminApi = {
   updateTenantQuota: (tenantId: string, quota: TenantResourceQuota) =>
     client
       .put<TenantBudgetEntry>(`/api/v1/admin/resource-budget/${tenantId}`, quota)
-      .then((r) => r.data),
-
-  // ── W7-01/02: Elasticsearch Manager ──────────────────────────────────────
-
-  /**
-   * GET /api/v1/admin/elasticsearch — requer platform:admin:read.
-   * Retorna saúde do cluster, lista de índices e políticas ILM.
-   */
-  getElasticsearchManager: () =>
-    client
-      .get<ElasticsearchManagerResponse>('/api/v1/admin/elasticsearch')
-      .then((r) => r.data),
-
-  /**
-   * PUT /api/v1/admin/elasticsearch/ilm/:policyName — requer platform:admin:write.
-   * Actualiza uma política ILM.
-   */
-  updateIlmPolicy: (policyName: string, policy: EsIlmPolicy) =>
-    client
-      .put<EsIlmPolicy>(`/api/v1/admin/elasticsearch/ilm/${policyName}`, policy)
       .then((r) => r.data),
 
   // ── W2-03: Platform Alert Rules ───────────────────────────────────────────
@@ -1490,8 +1429,8 @@ export type ObservabilityMode = 'Full' | 'Lite' | 'Minimal';
 
 export interface ObservabilityModeConfig {
   currentMode: ObservabilityMode;
-  elasticsearchConnected: boolean;
-  elasticsearchVersion?: string;
+  clickhouseConnected: boolean;
+  clickhouseVersion?: string;
   postgresAnalyticsEnabled: boolean;
   otelCollectorConnected: boolean;
   additionalRamUsageGb: number;

@@ -21,6 +21,10 @@ internal sealed class TenantLicenseConfiguration : IEntityTypeConfiguration<Tena
         builder.Property(x => x.ValidFrom).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.ValidUntil).HasColumnType("timestamp with time zone");
         builder.Property(x => x.BillingCycleStart).HasColumnType("timestamp with time zone").IsRequired();
+        builder.Property(x => x.MaxOverageHostUnits);
+        builder.Property(x => x.ExternalSubscriptionId).HasMaxLength(200);
+        builder.Ignore(x => x.OverageHostUnits);
+
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone");
 

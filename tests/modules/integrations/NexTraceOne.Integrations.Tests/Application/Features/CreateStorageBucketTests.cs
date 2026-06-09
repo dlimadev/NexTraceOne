@@ -40,7 +40,7 @@ public sealed class CreateStorageBucketTests
         var command = new CreateStorageBucket.Command(
             TenantId: "tenant-abc",
             BucketName: "audit-logs",
-            BackendType: StorageBucketBackendType.Elasticsearch,
+            BackendType: StorageBucketBackendType.ClickHouse,
             RetentionDays: 90,
             FilterJson: null,
             Priority: 10,
@@ -54,7 +54,7 @@ public sealed class CreateStorageBucketTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.BucketName.Should().Be("audit-logs");
-        result.Value.BackendType.Should().Be(StorageBucketBackendType.Elasticsearch);
+        result.Value.BackendType.Should().Be(StorageBucketBackendType.ClickHouse);
         result.Value.RetentionDays.Should().Be(90);
         result.Value.Priority.Should().Be(10);
         result.Value.IsEnabled.Should().BeTrue();
@@ -110,7 +110,7 @@ public sealed class CreateStorageBucketTests
         var command = new CreateStorageBucket.Command(
             TenantId: "tenant-1",
             BucketName: longName,
-            BackendType: StorageBucketBackendType.Elasticsearch,
+            BackendType: StorageBucketBackendType.ClickHouse,
             RetentionDays: 30,
             FilterJson: null,
             Priority: 1);

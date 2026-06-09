@@ -16,7 +16,8 @@ public sealed class ActivateAccountTests
         var user = User.CreateLocal(
             Email.Create("alice@example.com"),
             FullName.Create("Alice", "Doe"),
-            HashedPassword.FromPlainText("OldP@ssword1"));
+            HashedPassword.FromPlainText("OldP@ssword1"),
+            DateTimeOffset.UtcNow);
         if (!active) user.Deactivate();
         return user;
     }

@@ -73,6 +73,18 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
     /// <summary>Teams allowed to use this connector (stored as JSON).</summary>
     public IReadOnlyList<string> AllowedTeams { get; private set; } = [];
 
+    /// <summary>
+    /// Identificador do tenant proprietário do conector.
+    /// Null quando <see cref="IsGlobal"/> for true (conector de plataforma).
+    /// </summary>
+    public Guid? TenantId { get; private set; }
+
+    /// <summary>
+    /// Indica se o conector é global (gerido pela plataforma) ou pertence a um tenant específico.
+    /// Conectores globais são partilhados por todos os tenants e não têm RLS aplicado.
+    /// </summary>
+    public bool IsGlobal { get; private set; }
+
     /// <summary>Data/hora UTC de criação.</summary>
     public DateTimeOffset CreatedAt { get; private init; }
 
@@ -97,7 +109,9 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
         string? authenticationMode,
         string? pollingMode,
         IReadOnlyList<string>? allowedTeams,
-        DateTimeOffset utcNow)
+        DateTimeOffset utcNow,
+        Guid? tenantId = null,
+        bool isGlobal = false)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Guard.Against.StringTooLong(name, 200, nameof(name));
@@ -105,6 +119,9 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
         Guard.Against.StringTooLong(connectorType, 100, nameof(connectorType));
         Guard.Against.NullOrWhiteSpace(provider, nameof(provider));
         Guard.Against.StringTooLong(provider, 100, nameof(provider));
+
+        if (!isGlobal && tenantId is null)
+            throw new ArgumentException("Tenant-scoped connectors must have a TenantId.");
 
         return new IntegrationConnector
         {
@@ -123,7 +140,9 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
             TotalExecutions = 0,
             SuccessfulExecutions = 0,
             FailedExecutions = 0,
-            CreatedAt = utcNow
+            CreatedAt = utcNow,
+            TenantId = isGlobal ? null : tenantId,
+            IsGlobal = isGlobal
         };
     }
 

@@ -20,6 +20,15 @@ public sealed record FeatureFlagDefinitionId(Guid Value) : TypedIdBase(Value);
 ///
 /// NOTA: A resolução de valores por âmbito (FeatureFlagEntry) e a UI de gestão
 /// completa ficam para a fase P3.2.
+///
+/// DISTINÇÃO DE PROPÓSITO (Fase 4 — evitar confusão com Catalog.FeatureFlagRecord):
+/// - <see cref="FeatureFlagDefinition"/> (módulo Configuration): definições globais de flags da
+///   plataforma com metadados (âmbito, valor padrão, módulo). Gerido por platform admins.
+///   Tabela: cfg_feature_flag_definitions.
+/// - <c>FeatureFlagRecord</c> (módulo Catalog): estado actual de flags por serviço,
+///   ingerido via webhook de ferramentas externas (LaunchDarkly, etc.).
+///   Tabela: ctr_feature_flag_records.
+/// Os dois tipos coexistem intencionalmente — propósitos diferentes, origens diferentes.
 /// </summary>
 public sealed class FeatureFlagDefinition : Entity<FeatureFlagDefinitionId>
 {

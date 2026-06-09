@@ -18,7 +18,7 @@ public sealed class EvaluateContractComplianceGateTests
         => DeploymentEnvironment.Create(name, "Target environment", 1, true, true, FixedNow);
 
     private static PromotionRequest CreateRequest(DeploymentEnvironment target)
-        => PromotionRequest.Create(Guid.NewGuid(), target.Id, target.Id, "dev@company.com", FixedNow);
+        => PromotionRequest.Create(Guid.NewGuid(), Guid.NewGuid(), target.Id, target.Id, "dev@company.com", FixedNow);
 
     [Fact]
     public async Task Handle_ShouldReturnFalse_WhenNoContractComplianceGateConfigured()

@@ -17,7 +17,7 @@ public sealed class AssignRoleTests
     public async Task Handle_Should_CreateMembership_When_UserHasNoMembershipInTenant()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var role = Role.CreateSystem(RoleId.New(), Role.Developer, "Developer access");
         var tenantId = Guid.NewGuid();
 
@@ -49,7 +49,7 @@ public sealed class AssignRoleTests
     public async Task Handle_Should_UpdateExistingMembership_When_UserAlreadyHasMembership()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"));
+        var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123!"), DateTimeOffset.UtcNow);
         var oldRole = Role.CreateSystem(RoleId.New(), Role.Viewer, "Viewer access");
         var newRole = Role.CreateSystem(RoleId.New(), Role.Developer, "Developer access");
         var tenantId = Guid.NewGuid();

@@ -32,7 +32,7 @@ public sealed class GetObservabilityModeTests
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Platform:Observability:Mode"] = "Full",
-                ["Elasticsearch:Url"] = "http://elasticsearch:9200",
+                ["ClickHouse:ConnectionString"] = "http://clickhouse:8123",
                 ["Platform:Observability:PostgresAnalyticsEnabled"] = "true",
                 ["Platform:Observability:OtelCollectorEndpoint"] = "http://otel-collector:4317"
             })
@@ -43,8 +43,7 @@ public sealed class GetObservabilityModeTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.CurrentMode.Should().Be("Full");
-        result.Value.ElasticsearchConnected.Should().BeTrue();
-        result.Value.Version.Should().Be("8.x");
+        result.Value.ClickHouseConnected.Should().BeTrue();
         result.Value.PostgresAnalyticsEnabled.Should().BeTrue();
         result.Value.OtelCollectorConnected.Should().BeTrue();
         result.Value.AdditionalRamUsageGb.Should().Be(4.0);
@@ -60,7 +59,7 @@ public sealed class GetObservabilityModeTests
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Platform:Observability:Mode"] = "Lite",
-                ["Elasticsearch:Url"] = "",
+                ["ClickHouse:ConnectionString"] = "",
                 ["Platform:Observability:PostgresAnalyticsEnabled"] = "true",
                 ["Platform:Observability:OtelCollectorEndpoint"] = ""
             })
@@ -71,8 +70,7 @@ public sealed class GetObservabilityModeTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.CurrentMode.Should().Be("Lite");
-        result.Value.ElasticsearchConnected.Should().BeFalse();
-        result.Value.Version.Should().BeNull();
+        result.Value.ClickHouseConnected.Should().BeFalse();
         result.Value.PostgresAnalyticsEnabled.Should().BeTrue();
         result.Value.OtelCollectorConnected.Should().BeFalse();
         result.Value.AdditionalRamUsageGb.Should().Be(1.5);
@@ -87,7 +85,7 @@ public sealed class GetObservabilityModeTests
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Platform:Observability:Mode"] = "Minimal",
-                ["Elasticsearch:Url"] = null,
+                ["ClickHouse:ConnectionString"] = null,
                 ["Platform:Observability:PostgresAnalyticsEnabled"] = "false",
                 ["Platform:Observability:OtelCollectorEndpoint"] = null
             })
@@ -98,7 +96,7 @@ public sealed class GetObservabilityModeTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.CurrentMode.Should().Be("Minimal");
-        result.Value.ElasticsearchConnected.Should().BeFalse();
+        result.Value.ClickHouseConnected.Should().BeFalse();
         result.Value.PostgresAnalyticsEnabled.Should().BeFalse();
         result.Value.OtelCollectorConnected.Should().BeFalse();
         result.Value.AdditionalRamUsageGb.Should().Be(0.5);
@@ -121,21 +119,20 @@ public sealed class GetObservabilityModeTests
     }
 
     [Fact]
-    public async Task Handle_WhenElasticsearchUriProvided_DetectsConnection()
+    public async Task Handle_WhenClickHouseConnectionStringProvided_DetectsConnection()
     {
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Platform:Observability:Mode"] = "Full",
-                ["Elasticsearch:Uri"] = "http://localhost:9200"
+                ["ClickHouse:ConnectionString"] = "http://clickhouse:8123"
             })
             .Build();
 
         var handler = new GetObservabilityMode.Handler(config, CreateClock());
         var result = await handler.Handle(new GetObservabilityMode.Query(), CancellationToken.None);
 
-        result.Value.ElasticsearchConnected.Should().BeTrue();
-        result.Value.Version.Should().Be("8.x");
+        result.Value.ClickHouseConnected.Should().BeTrue();
     }
 
     // ── Update Command Handler Tests ────────────────────────────────────────────
@@ -152,7 +149,7 @@ public sealed class GetObservabilityModeTests
         result.Value.AdditionalRamUsageGb.Should().Be(4.0);
         result.Value.TradeOffs.Should().Contain("Higher RAM usage");
         result.Value.TradeOffs.Should().Contain("Full trace correlation");
-        result.Value.TradeOffs.Should().Contain("Elasticsearch required");
+        result.Value.TradeOffs.Should().Contain("ClickHouse required");
         result.Value.UpdatedAt.Should().Be(FixedNow);
     }
 

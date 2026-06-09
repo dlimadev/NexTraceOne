@@ -304,13 +304,13 @@ public sealed class TenantPipelineRuleTests
     public void StorageBucket_Create_ShouldHaveCorrectProperties()
     {
         var bucket = StorageBucket.Create(
-            "t", "audit", StorageBucketBackendType.Elasticsearch,
+            "t", "audit", StorageBucketBackendType.ClickHouse,
             retentionDays: 2555, filterJson: null, priority: 100,
             isEnabled: true, isFallback: true, description: "Audit bucket",
             utcNow: DateTimeOffset.UtcNow);
 
         bucket.BucketName.Should().Be("audit");
-        bucket.BackendType.Should().Be(StorageBucketBackendType.Elasticsearch);
+        bucket.BackendType.Should().Be(StorageBucketBackendType.ClickHouse);
         bucket.RetentionDays.Should().Be(2555);
         bucket.IsFallback.Should().BeTrue();
         bucket.IsEnabled.Should().BeTrue();

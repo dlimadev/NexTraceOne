@@ -24,22 +24,21 @@ public static class GetObservabilityMode
         public Task<Result<ObservabilityModeConfigResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             var mode = configuration["Platform:Observability:Mode"] ?? "Lite";
-            var esUrl = configuration["Elasticsearch:Url"] ?? configuration["Elasticsearch:Uri"];
-            var esConnected = !string.IsNullOrWhiteSpace(esUrl);
+            var clickHouseUrl = configuration["ClickHouse:ConnectionString"] ?? configuration["ClickHouse:Url"];
+            var clickHouseConnected = !string.IsNullOrWhiteSpace(clickHouseUrl);
             var pgAnalytics = bool.TryParse(configuration["Platform:Observability:PostgresAnalyticsEnabled"], out var pga) && pga;
             var otelCollector = !string.IsNullOrWhiteSpace(configuration["Platform:Observability:OtelCollectorEndpoint"]);
 
             var tradeOffs = mode switch
             {
-                "Full" => new List<string> { "Higher RAM usage", "Full trace correlation", "Elasticsearch required" },
+                "Full" => new List<string> { "Higher RAM usage", "Full trace correlation", "ClickHouse required" },
                 "Lite" => new List<string> { "Moderate RAM", "Limited trace sampling", "PostgreSQL analytics" },
                 _ => new List<string> { "Minimal RAM", "No traces", "Metrics only" }
             };
 
             var response = new ObservabilityModeConfigResponse(
                 CurrentMode: mode,
-                ElasticsearchConnected: esConnected,
-                Version: esConnected ? "8.x" : null,
+                ClickHouseConnected: clickHouseConnected,
                 PostgresAnalyticsEnabled: pgAnalytics,
                 OtelCollectorConnected: otelCollector,
                 AdditionalRamUsageGb: mode == "Full" ? 4.0 : mode == "Lite" ? 1.5 : 0.5,
@@ -57,15 +56,14 @@ public static class GetObservabilityMode
         {
             var tradeOffs = request.Mode switch
             {
-                "Full" => new List<string> { "Higher RAM usage", "Full trace correlation", "Elasticsearch required" },
+                "Full" => new List<string> { "Higher RAM usage", "Full trace correlation", "ClickHouse required" },
                 "Lite" => new List<string> { "Moderate RAM", "Limited trace sampling", "PostgreSQL analytics" },
                 _ => new List<string> { "Minimal RAM", "No traces", "Metrics only" }
             };
 
             var response = new ObservabilityModeConfigResponse(
                 CurrentMode: request.Mode,
-                ElasticsearchConnected: false,
-                Version: null,
+                ClickHouseConnected: false,
                 PostgresAnalyticsEnabled: false,
                 OtelCollectorConnected: false,
                 AdditionalRamUsageGb: request.Mode == "Full" ? 4.0 : request.Mode == "Lite" ? 1.5 : 0.5,
@@ -79,8 +77,7 @@ public static class GetObservabilityMode
     /// <summary>Resposta com configuração do modo de observabilidade.</summary>
     public sealed record ObservabilityModeConfigResponse(
         string CurrentMode,
-        bool ElasticsearchConnected,
-        string? Version,
+        bool ClickHouseConnected,
         bool PostgresAnalyticsEnabled,
         bool OtelCollectorConnected,
         double AdditionalRamUsageGb,

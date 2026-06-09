@@ -67,16 +67,19 @@ public static class CreateUser
                 return IdentityErrors.RoleNotFound(request.RoleId);
             }
 
+            var now = dateTimeProvider.UtcNow;
             User user = string.IsNullOrWhiteSpace(request.Password)
                 ? User.CreateFederated(
                     email,
                     FullName.Create(request.FirstName, request.LastName),
                     request.Provider ?? "federated",
-                    request.ExternalId ?? email.Value)
+                    request.ExternalId ?? email.Value,
+                    now)
                 : User.CreateLocal(
                     email,
                     FullName.Create(request.FirstName, request.LastName),
-                    HashedPassword.FromHash(passwordHasher.Hash(request.Password)));
+                    HashedPassword.FromHash(passwordHasher.Hash(request.Password)),
+                    now);
 
             userRepository.Add(user);
 

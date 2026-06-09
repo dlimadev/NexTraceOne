@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.IdentityAccess.Infrastructure.Jobs;
 
@@ -54,10 +55,9 @@ internal sealed class AlertEvaluationJob(
     {
         using var scope = serviceScopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-        var firingRepo = scope.ServiceProvider.GetRequiredService<IAlertFiringRecordRepository>();
+        var alertGateway = scope.ServiceProvider.GetRequiredService<IAlertFiringGateway>();
         var agentRepo = scope.ServiceProvider.GetRequiredService<IAgentRegistrationRepository>();
         var licenseRepo = scope.ServiceProvider.GetRequiredService<ITenantLicenseRepository>();
-        var uow = scope.ServiceProvider.GetRequiredService<IIdentityAccessUnitOfWork>();
         var clock = scope.ServiceProvider.GetRequiredService<NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider>();
 
         var alertRules = await ReadActiveAlertRulesAsync(context, ct);
@@ -66,7 +66,7 @@ internal sealed class AlertEvaluationJob(
         {
             try
             {
-                await EvaluateRuleAsync(rule, firingRepo, agentRepo, licenseRepo, uow, clock, ct);
+                await EvaluateRuleAsync(rule, alertGateway, agentRepo, licenseRepo, clock, ct);
             }
             catch (Exception ex)
             {
@@ -116,14 +116,13 @@ internal sealed class AlertEvaluationJob(
 
     private async Task EvaluateRuleAsync(
         AlertRuleDto rule,
-        IAlertFiringRecordRepository firingRepo,
+        IAlertFiringGateway alertGateway,
         IAgentRegistrationRepository agentRepo,
         ITenantLicenseRepository licenseRepo,
-        IIdentityAccessUnitOfWork uow,
         NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider clock,
         CancellationToken ct)
     {
-        var alreadyFiring = await firingRepo.HasFiringAlertAsync(rule.TenantId, rule.RuleId, ct);
+        var alreadyFiring = await alertGateway.HasFiringAlertAsync(rule.TenantId, rule.RuleId, ct);
         if (alreadyFiring)
             return;
 
@@ -131,7 +130,7 @@ internal sealed class AlertEvaluationJob(
         if (!shouldFire)
             return;
 
-        var record = AlertFiringRecord.Fire(
+        await alertGateway.RecordFiringAlertAsync(
             rule.TenantId,
             rule.RuleId,
             rule.Name,
@@ -139,10 +138,8 @@ internal sealed class AlertEvaluationJob(
             message,
             rule.ServiceName,
             rule.NotificationChannels,
-            clock.UtcNow);
-
-        firingRepo.Add(record);
-        await uow.CommitAsync(ct);
+            clock.UtcNow,
+            ct);
 
         logger.LogInformation("Alert fired: {RuleName} for tenant {TenantId}. Reason: {Message}.",
             rule.Name, rule.TenantId, message);

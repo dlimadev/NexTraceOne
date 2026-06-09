@@ -45,7 +45,7 @@ environment:
 # Volumes persistentes
 volumes:
   - postgres_data:/var/lib/postgresql/data
-  - elasticsearch_data:/usr/share/elasticsearch/data
+  - clickhouse_data:/var/lib/clickhouse
 ```
 
 ### Passo 3: Criar values-custom.yaml
@@ -135,22 +135,20 @@ kubectl exec -it $POSTGRES_POD --namespace nextraceone -- \
   psql -U nextraceone -d nextraceone -f /tmp/backup.sql
 ```
 
-### Passo 5: Migrar Elasticsearch Data
+### Passo 5: Migrar ClickHouse Data
 
 ```bash
-# Se você tem dados importantes no Elasticsearch:
+# Se você tem dados importantes no ClickHouse:
 
-# 1. Snapshot dos índices (via API Elasticsearch)
-curl -X PUT "http://localhost:9200/_snapshot/my_backup/snapshot_1" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "indices": "nextraceone-*",
-    "ignore_unavailable": true,
-    "include_global_state": false
-  }'
+# 1. Backup das tabelas de analytics
+clickhouse-client --host localhost --query \
+  "SELECT * FROM nextraceone_analytics.observability_logs" \
+  --format Native > /tmp/clickhouse_backup.native
 
-# 2. Após deploy Kubernetes, restaurar snapshot
-curl -X POST "http://elasticsearch-master:9200/_snapshot/my_backup/snapshot_1/_restore"
+# 2. Após deploy Kubernetes, restaurar dados
+clickhouse-client --host clickhouse-service --query \
+  "INSERT INTO nextraceone_analytics.observability_logs FORMAT Native" \
+  < /tmp/clickhouse_backup.native
 ```
 
 ### Passo 6: Validar Migração

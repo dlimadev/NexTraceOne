@@ -51,6 +51,13 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.MfaMethod).HasMaxLength(32);
         builder.Property(x => x.MfaSecret).HasMaxLength(256);
 
+        builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
+
+        builder.Property(x => x.MustChangePassword).IsRequired();
+        builder.Property(x => x.LastPasswordChangeAt).HasColumnType("timestamp with time zone");
+
         builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -18,6 +18,8 @@ export interface TenantLicenseResponse {
   validUntil: string | null;
   billingCycleStart: string;
   capabilities: string[];
+  maxOverageHostUnits?: number | null;
+  externalSubscriptionId?: string | null;
 }
 
 export interface ProvisionLicenseRequest {

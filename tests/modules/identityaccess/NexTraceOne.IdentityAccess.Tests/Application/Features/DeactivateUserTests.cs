@@ -43,7 +43,8 @@ public sealed class DeactivateUserTests
         => User.CreateLocal(
             Email.Create("user@test.com"),
             FullName.Create("Test", "User"),
-            HashedPassword.FromPlainText("Password123!"));
+            HashedPassword.FromPlainText("Password123!"),
+            DateTimeOffset.UtcNow);
 
     [Fact]
     public async Task Handle_Should_ReturnError_WhenUserNotFound()

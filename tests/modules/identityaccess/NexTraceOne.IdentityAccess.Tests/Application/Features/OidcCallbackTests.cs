@@ -59,7 +59,8 @@ public sealed class OidcCallbackTests
             Email.Create("test@azure.com"),
             FullName.Create("Test", "User"),
             Provider,
-            "ext-id-123");
+            "ext-id-123",
+            DateTimeOffset.UtcNow);
     }
 
     private static TenantMembership CreateMembership(UserId userId, RoleId roleId)

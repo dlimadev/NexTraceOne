@@ -2,6 +2,8 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetAlertFiringHistory;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveAlert;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CorrelateIncidentWithChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
@@ -46,6 +48,10 @@ public static class DependencyInjection
         // Dynamic correlation engine features
         services.AddTransient<IValidator<CorrelateIncidentWithChanges.Command>, CorrelateIncidentWithChanges.Validator>();
         services.AddTransient<IValidator<GetCorrelatedChanges.Query>, GetCorrelatedChanges.Validator>();
+
+        // Alert firing features
+        services.AddTransient<IValidator<GetAlertFiringHistory.Query>, GetAlertFiringHistory.Validator>();
+        services.AddTransient<IValidator<ResolveAlert.Command>, ResolveAlert.Validator>();
 
         // Incident features
         services.AddTransient<IValidator<CreateIncident.Command>, CreateIncident.Validator>();

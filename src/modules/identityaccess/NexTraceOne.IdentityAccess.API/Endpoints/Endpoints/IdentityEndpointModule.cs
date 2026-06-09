@@ -38,7 +38,6 @@ public sealed class IdentityEndpointModule
 
         // SaaS Evolution (v2.0)
         LicensingEndpoints.Map(group);
-        AlertsEndpoints.Map(group);
 
         // W5-05 — Fine-Grained Auth per Environment
         EnvironmentPolicyEndpoints.Map(group);

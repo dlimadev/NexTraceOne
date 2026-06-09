@@ -331,7 +331,8 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         var user = User.CreateLocal(
             Email.Create("techlead@nextraceone.io"),
             FullName.Create("Carlos", "Mendes"),
-            HashedPassword.FromPlainText("S3cur3Pass!1"));
+            HashedPassword.FromPlainText("S3cur3Pass!1"),
+            DateTimeOffset.UtcNow);
 
         var role = Role.CreateCustom(name: "TechLead", description: "Tech lead with approval rights");
 
@@ -377,9 +378,9 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         var tenantId = TenantId.New();
         var roleId = RoleId.New();
 
-        var user1 = User.CreateLocal(Email.Create("eng1@nextraceone.io"), FullName.Create("Ana", "Souza"), HashedPassword.FromPlainText("Str0ngPass1!"));
-        var user2 = User.CreateLocal(Email.Create("eng2@nextraceone.io"), FullName.Create("Bruno", "Lima"), HashedPassword.FromPlainText("Str0ngPass2!"));
-        var user3 = User.CreateLocal(Email.Create("eng3@nextraceone.io"), FullName.Create("Carla", "Faria"), HashedPassword.FromPlainText("Str0ngPass3!"));
+        var user1 = User.CreateLocal(Email.Create("eng1@nextraceone.io"), FullName.Create("Ana", "Souza"), HashedPassword.FromPlainText("Str0ngPass1!"), DateTimeOffset.UtcNow);
+        var user2 = User.CreateLocal(Email.Create("eng2@nextraceone.io"), FullName.Create("Bruno", "Lima"), HashedPassword.FromPlainText("Str0ngPass2!"), DateTimeOffset.UtcNow);
+        var user3 = User.CreateLocal(Email.Create("eng3@nextraceone.io"), FullName.Create("Carla", "Faria"), HashedPassword.FromPlainText("Str0ngPass3!"), DateTimeOffset.UtcNow);
 
         var m1 = TenantMembership.Create(user1.Id, tenantId, roleId, DateTimeOffset.UtcNow);
         var m2 = TenantMembership.Create(user2.Id, tenantId, roleId, DateTimeOffset.UtcNow);

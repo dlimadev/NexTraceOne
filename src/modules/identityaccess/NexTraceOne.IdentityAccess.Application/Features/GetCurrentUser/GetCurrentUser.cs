@@ -74,7 +74,10 @@ public static class GetCurrentUser
                 membership?.TenantId.Value ?? Guid.Empty,
                 tenantName,
                 roleName,
-                permissions);
+                permissions,
+                user.CreatedAt,
+                user.MustChangePassword,
+                user.LastPasswordChangeAt);
         }
     }
 
@@ -90,5 +93,8 @@ public static class GetCurrentUser
         Guid TenantId,
         string TenantName,
         string RoleName,
-        IReadOnlyList<string> Permissions);
+        IReadOnlyList<string> Permissions,
+        DateTimeOffset CreatedAt,
+        bool MustChangePassword,
+        DateTimeOffset? LastPasswordChangeAt);
 }

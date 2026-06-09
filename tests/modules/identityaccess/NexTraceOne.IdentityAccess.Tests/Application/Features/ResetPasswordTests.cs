@@ -15,7 +15,8 @@ public sealed class ResetPasswordTests
         User.CreateLocal(
             Email.Create("bob@example.com"),
             FullName.Create("Bob", "Smith"),
-            HashedPassword.FromPlainText("OldP@ssword1"));
+            HashedPassword.FromPlainText("OldP@ssword1"),
+            DateTimeOffset.UtcNow);
 
     private static (string Raw, string Hash) MakeToken()
     {

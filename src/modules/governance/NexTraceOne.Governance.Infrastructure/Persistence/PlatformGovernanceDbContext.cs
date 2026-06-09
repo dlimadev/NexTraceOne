@@ -77,6 +77,12 @@ public sealed class PlatformGovernanceDbContext(
     /// <summary>Avaliações de maturidade de serviços.</summary>
     public DbSet<ServiceMaturityAssessment> ServiceMaturityAssessments => Set<ServiceMaturityAssessment>();
 
+    /// <summary>Histórico de snapshots de maturidade por reavaliação (trending).</summary>
+    public DbSet<ServiceMaturityHistory> ServiceMaturityHistory => Set<ServiceMaturityHistory>();
+
+    /// <summary>Snapshots imutáveis de versões de definições de política como código.</summary>
+    public DbSet<PolicyDefinitionVersion> PolicyDefinitionVersions => Set<PolicyDefinitionVersion>();
+
     /// <summary>Snapshots de saúde de equipas (Team Health Dashboard).</summary>
     public DbSet<TeamHealthSnapshot> TeamHealthSnapshots => Set<TeamHealthSnapshot>();
 

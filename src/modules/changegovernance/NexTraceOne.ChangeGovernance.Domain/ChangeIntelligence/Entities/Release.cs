@@ -139,6 +139,15 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// </summary>
     public bool? ExternalValidationPassed { get; private set; }
 
+    /// <summary>Duração total do deployment em milissegundos.</summary>
+    public long? DeploymentDurationMs { get; private set; }
+
+    /// <summary>Data/hora UTC em que o deployment foi concluído com sucesso.</summary>
+    public DateTimeOffset? SucceededAt { get; private set; }
+
+    /// <summary>Data/hora UTC em que o deployment falhou.</summary>
+    public DateTimeOffset? FailedAt { get; private set; }
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -204,12 +213,24 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// Atualiza o status do deployment desta release.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
-    public Result<Unit> UpdateStatus(DeploymentStatus status)
+    public Result<Unit> UpdateStatus(DeploymentStatus status, DateTimeOffset? occurredAt = null, long? durationMs = null)
     {
         if (!IsValidTransition(Status, status))
             return ChangeIntelligenceErrors.InvalidStatusTransition(Status.ToString(), status.ToString());
 
         Status = status;
+
+        if (status == DeploymentStatus.Succeeded && occurredAt.HasValue)
+        {
+            SucceededAt = occurredAt;
+            DeploymentDurationMs = durationMs;
+        }
+        else if (status == DeploymentStatus.Failed && occurredAt.HasValue)
+        {
+            FailedAt = occurredAt;
+            DeploymentDurationMs = durationMs;
+        }
+
         return Unit.Value;
     }
 

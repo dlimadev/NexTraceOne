@@ -192,7 +192,8 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         var user = User.CreateLocal(
             Email.Create("engineer@nextraceone.io"),
             FullName.Create("Ana", "Silva"),
-            HashedPassword.FromPlainText("Str0ngPass!1"));
+            HashedPassword.FromPlainText("Str0ngPass!1"),
+            DateTimeOffset.UtcNow);
 
         user.RegisterSuccessfulLogin(DateTimeOffset.UtcNow);
         context.Users.Add(user);

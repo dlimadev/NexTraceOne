@@ -51,7 +51,7 @@ public static class ResetPassword
                     "The password reset token is invalid or has expired.");
 
             var newHash = HashedPassword.FromHash(passwordHasher.Hash(request.NewPassword));
-            user.SetPassword(newHash);
+            user.SetPassword(newHash, now);
             token.MarkUsed(now);
 
             await unitOfWork.CommitAsync(cancellationToken);

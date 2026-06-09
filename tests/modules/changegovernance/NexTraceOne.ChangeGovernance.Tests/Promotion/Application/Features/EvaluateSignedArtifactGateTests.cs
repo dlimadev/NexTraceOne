@@ -34,7 +34,7 @@ public sealed class EvaluateSignedArtifactGateTests
         => DeploymentEnvironment.Create("Production", "Prod env", 1, true, true, FixedNow);
 
     private static PromotionRequest CreatePromotionRequest(DeploymentEnvironment env)
-        => PromotionRequest.Create(Guid.NewGuid(), env.Id, env.Id, "dev@example.com", FixedNow);
+        => PromotionRequest.Create(Guid.NewGuid(), Guid.NewGuid(), env.Id, env.Id, "dev@example.com", FixedNow);
 
     private static Release CreateRelease(string? digest = null, string? provenanceUri = null)
     {

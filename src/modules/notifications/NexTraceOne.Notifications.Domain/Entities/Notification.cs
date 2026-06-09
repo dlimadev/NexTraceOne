@@ -174,6 +174,12 @@ public sealed class Notification : AggregateRoot<NotificationId>
     /// </summary>
     public string? SourceEventId { get; private set; }
 
+    /// <summary>
+    /// Prioridade de exibição na central de notificações (0 = normal, 10 = crítico).
+    /// Permite ordenação por urgência independentemente da severidade.
+    /// </summary>
+    public int Priority { get; private set; }
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -340,4 +346,13 @@ public sealed class Notification : AggregateRoot<NotificationId>
 
     /// <summary>Verifica se a notificação está expirada.</summary>
     public bool IsExpired() => ExpiresAt.HasValue && DateTimeOffset.UtcNow > ExpiresAt.Value;
+
+    /// <summary>Define a prioridade de exibição (0–10). Valores superiores têm maior urgência.</summary>
+    public void SetPriority(int priority)
+    {
+        if (priority < 0 || priority > 10)
+            throw new ArgumentOutOfRangeException(nameof(priority), "Priority must be between 0 and 10.");
+
+        Priority = priority;
+    }
 }

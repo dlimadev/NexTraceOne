@@ -587,3 +587,44 @@ public interface IFinOpsBudgetApprovalRepository
     /// <summary>Atualiza um pedido de aprovação existente.</summary>
     void Update(FinOpsBudgetApproval approval);
 }
+
+/// <summary>
+/// Interface do repositório de ServiceMaturityHistory para o módulo Governance.
+/// Suporta apenas adição e leitura (append-only — sem actualizações).
+/// </summary>
+public interface IServiceMaturityHistoryRepository
+{
+    /// <summary>Lista o histórico de maturidade de um serviço por ordem cronológica.</summary>
+    Task<IReadOnlyList<ServiceMaturityHistory>> ListByServiceIdAsync(
+        Guid serviceId,
+        CancellationToken ct);
+
+    /// <summary>Lista o histórico de maturidade de uma avaliação específica.</summary>
+    Task<IReadOnlyList<ServiceMaturityHistory>> ListByAssessmentIdAsync(
+        ServiceMaturityAssessmentId assessmentId,
+        CancellationToken ct);
+
+    /// <summary>Adiciona um novo snapshot histórico.</summary>
+    Task AddAsync(ServiceMaturityHistory history, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de PolicyDefinitionVersion para o módulo Governance.
+/// Suporta apenas adição e leitura (append-only — sem actualizações).
+/// </summary>
+public interface IPolicyDefinitionVersionRepository
+{
+    /// <summary>Lista todas as versões de uma política por ordem descendente de criação.</summary>
+    Task<IReadOnlyList<PolicyDefinitionVersion>> ListByPolicyIdAsync(
+        PolicyAsCodeDefinitionId policyId,
+        CancellationToken ct);
+
+    /// <summary>Obtém um snapshot de versão pelo identificador único da versão.</summary>
+    Task<PolicyDefinitionVersion?> GetByVersionAsync(
+        PolicyAsCodeDefinitionId policyId,
+        string version,
+        CancellationToken ct);
+
+    /// <summary>Adiciona um novo snapshot de versão.</summary>
+    Task AddAsync(PolicyDefinitionVersion version, CancellationToken ct);
+}

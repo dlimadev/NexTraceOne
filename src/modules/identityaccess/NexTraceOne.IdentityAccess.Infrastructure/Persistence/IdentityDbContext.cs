@@ -23,7 +23,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 /// - v1.4: UserRoleAssignment, Tenant hierarquia (ParentTenantId, TenantType)
 /// - v1.5: PlatformApiToken, AgentQueryRecord (Agent-to-Agent Protocol — Wave D.4)
 /// - v1.6: PolicyDefinition (Policy Studio — Wave D.3)
-/// - v2.0: TenantLicense, AgentRegistration, AlertFiringRecord (SaaS Evolution)
+/// - v2.0: TenantLicense, AgentRegistration (SaaS Evolution — AlertFiringRecord movido para OI)
 /// - v2.1: AccountActivationToken, PasswordResetToken (Token Infrastructure)
 /// </summary>
 public sealed class IdentityDbContext(
@@ -126,9 +126,6 @@ public sealed class IdentityDbContext(
 
     /// <summary>Registos de agentes NexTrace instalados (heartbeat, host units).</summary>
     public DbSet<AgentRegistration> AgentRegistrations => Set<AgentRegistration>();
-
-    /// <summary>Histórico de alertas disparados (AlertEvaluationJob).</summary>
-    public DbSet<AlertFiringRecord> AlertFiringRecords => Set<AlertFiringRecord>();
 
     // ── v2.1 — Token Infrastructure ───────────────────────────────────────
 

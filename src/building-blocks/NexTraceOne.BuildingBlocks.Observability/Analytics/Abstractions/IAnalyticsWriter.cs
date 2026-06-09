@@ -6,8 +6,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Abstractions;
 /// Interface de escrita para a camada analítica do NexTraceOne.
 ///
 /// Responsabilidade: receber eventos de domínio analítico e persistir no storage analítico
-/// (Elasticsearch por padrão, ClickHouse como alternativa). Esta interface é a fronteira
-/// entre os módulos de domínio e o storage analítico.
+/// (ClickHouse). Esta interface é a fronteira entre os módulos de domínio e o storage analítico.
 ///
 /// Princípios:
 /// - Append-only: nunca atualiza ou remove registos
@@ -78,4 +77,10 @@ public interface IAnalyticsWriter
     /// Permite análise de "quais traces pertencem a esta release?" e correlação de impacto.
     /// </summary>
     Task WriteTraceReleaseMappingAsync(TraceReleaseMappingRecord record, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Escreve um evento de uso de dashboard no ClickHouse (tabela gov_dashboard_usage).
+    /// Fase 4: substitui o forward via WriteProductEventAsync para tabela dedicada.
+    /// </summary>
+    Task WriteDashboardUsageEventAsync(DashboardUsageEventRecord record, CancellationToken cancellationToken = default);
 }

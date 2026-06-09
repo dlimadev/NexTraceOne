@@ -74,13 +74,13 @@ helm install my-nextraceone ./deploy/kubernetes/helm/nextraceone \
 | `redis.auth.enabled` | Autenticação habilitada | `true` |
 | `redis.auth.password` | Senha do Redis | `""` (gerada) |
 
-### Elasticsearch (Observabilidade)
+### ClickHouse (Analytics e Observabilidade)
 
 | Parâmetro | Descrição | Padrão |
 |-----------|-----------|--------|
-| `elasticsearch.enabled` | Deploy Elasticsearch | `true` |
-| `elasticsearch.replicas` | Número de nós | `3` |
-| `elasticsearch.volumeClaimTemplate.resources.requests.storage` | Storage por nó | `50Gi` |
+| `clickhouse.enabled` | Deploy ClickHouse | `true` |
+| `clickhouse.replicas` | Número de nós | `3` |
+| `clickhouse.persistence.size` | Storage por nó | `50Gi` |
 
 ### Kafka (Event Streaming - Opcional)
 
@@ -112,7 +112,7 @@ resources:
 autoscaling:
   enabled: false
 
-elasticsearch:
+clickhouse:
   replicas: 1
 ```
 
@@ -166,12 +166,10 @@ postgresql:
         cpu: 4000m
         memory: 8Gi
 
-elasticsearch:
+clickhouse:
   replicas: 5
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: 200Gi
+  persistence:
+    size: 200Gi
 ```
 
 ```bash

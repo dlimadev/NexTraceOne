@@ -202,7 +202,7 @@ public sealed class GovernancePlatformConfigTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.CurrentMode.Should().Be("Lite");
-        result.Value.ElasticsearchConnected.Should().BeFalse();
+        result.Value.ClickHouseConnected.Should().BeFalse();
         result.Value.UpdatedAt.Should().Be(FixedNow);
     }
 
@@ -217,20 +217,19 @@ public sealed class GovernancePlatformConfigTests
 
         result.Value.CurrentMode.Should().Be("Full");
         result.Value.AdditionalRamUsageGb.Should().Be(4.0);
-        result.Value.TradeOffs.Should().Contain("Elasticsearch required");
+        result.Value.TradeOffs.Should().Contain("ClickHouse required");
     }
 
     [Fact]
-    public async Task GetObservabilityMode_Handler_ElasticsearchConfigured_ShouldShowConnected()
+    public async Task GetObservabilityMode_Handler_ClickHouseConfigured_ShouldShowConnected()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["Elasticsearch:Url"] = "http://localhost:9200" })
+            .AddInMemoryCollection(new Dictionary<string, string?> { ["ClickHouse:ConnectionString"] = "http://clickhouse:8123" })
             .Build();
         var handler = new GetObservabilityMode.Handler(config, CreateClock());
         var result = await handler.Handle(new GetObservabilityMode.Query(), CancellationToken.None);
 
-        result.Value.ElasticsearchConnected.Should().BeTrue();
-        result.Value.Version.Should().Be("8.x");
+        result.Value.ClickHouseConnected.Should().BeTrue();
     }
 
     [Fact]

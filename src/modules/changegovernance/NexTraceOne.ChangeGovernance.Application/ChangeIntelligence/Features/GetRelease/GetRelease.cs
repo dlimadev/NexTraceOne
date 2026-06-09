@@ -50,7 +50,10 @@ public static class GetRelease
                 release.ChangeLevel,
                 release.ChangeScore,
                 release.WorkItemReference,
-                release.CreatedAt);
+                release.CreatedAt,
+                release.DeploymentDurationMs,
+                release.SucceededAt,
+                release.FailedAt);
         }
     }
 
@@ -65,5 +68,8 @@ public static class GetRelease
         ChangeLevel ChangeLevel,
         decimal ChangeScore,
         string? WorkItemReference,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt,
+        long? DeploymentDurationMs,
+        DateTimeOffset? SucceededAt,
+        DateTimeOffset? FailedAt);
 }

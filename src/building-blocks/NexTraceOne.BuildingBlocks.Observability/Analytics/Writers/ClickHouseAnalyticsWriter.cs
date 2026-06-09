@@ -282,6 +282,24 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter
         await InsertAsync("nextraceone_analytics.chg_trace_release_mapping", [row], cancellationToken);
     }
 
+    /// <inheritdoc />
+    public async Task WriteDashboardUsageEventAsync(DashboardUsageEventRecord record, CancellationToken cancellationToken = default)
+    {
+        var row = new
+        {
+            id = record.Id,
+            tenant_id = record.TenantId,
+            dashboard_id = record.DashboardId,
+            user_id = record.UserId,
+            persona = record.Persona,
+            event_type = record.EventType,
+            duration_seconds = record.DurationSeconds,
+            occurred_at = FormatDateTime(record.OccurredAt)
+        };
+
+        await InsertAsync("nextraceone_analytics.gov_dashboard_usage", [row], cancellationToken);
+    }
+
     /// <summary>
     /// Executa um INSERT em formato JSONEachRow via HTTP interface do ClickHouse.
     /// O timeout é aplicado via HttpClient.Timeout configurado no DI.

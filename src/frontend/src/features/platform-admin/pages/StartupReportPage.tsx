@@ -70,7 +70,7 @@ function ReportCard({ report, index }: { report: StartupReportEntry; index: numb
             {[
               { key: 'smtp', value: report.configuration.smtpConfigured },
               { key: 'ollama', value: report.configuration.ollamaConfigured },
-              { key: 'elasticsearch', value: report.configuration.elasticsearchConfigured },
+              { key: 'clickhouse', value: report.configuration.clickhouseConfigured },
             ].map(({ key, value }) => (
               <span
                 key={key}

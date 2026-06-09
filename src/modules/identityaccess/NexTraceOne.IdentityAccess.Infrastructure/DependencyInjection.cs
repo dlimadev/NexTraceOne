@@ -80,10 +80,9 @@ public static class DependencyInjection
         // Repositórios — v1.6 Policy Studio (Wave D.3)
         services.AddScoped<IPolicyDefinitionRepository, PolicyDefinitionRepository>();
 
-        // Repositórios — v2.0 SaaS Evolution (licensing, agent heartbeat, alerts)
+        // Repositórios — v2.0 SaaS Evolution (licensing, agent heartbeat)
         services.AddScoped<ITenantLicenseRepository, EfTenantLicenseRepository>();
         services.AddScoped<IAgentRegistrationRepository, EfAgentRegistrationRepository>();
-        services.AddScoped<IAlertFiringRecordRepository, EfAlertFiringRecordRepository>();
 
         // Repositórios — v2.1 Token Infrastructure
         services.AddScoped<IAccountActivationTokenRepository, AccountActivationTokenRepository>();

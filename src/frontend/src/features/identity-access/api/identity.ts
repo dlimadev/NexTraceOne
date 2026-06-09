@@ -79,6 +79,8 @@ export interface TenantAdminItem {
   parentTenantId?: string;
   createdAt: string;
   updatedAt?: string;
+  contactEmail?: string;
+  timezone?: string;
 }
 
 /** Payload para criação de tenant (Platform Admin). */

@@ -43,7 +43,8 @@ public static class CreatePromotionRequest
         IPromotionRequestRepository requestRepository,
         IDeploymentEnvironmentRepository environmentRepository,
         IPromotionUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -63,6 +64,7 @@ public static class CreatePromotionRequest
                 return PromotionErrors.EnvironmentNotFound(request.TargetEnvironmentId.ToString());
 
             var promotionRequest = PromotionRequest.Create(
+                currentTenant.Id,
                 request.ReleaseId,
                 sourceEnv.Id,
                 targetEnv.Id,
