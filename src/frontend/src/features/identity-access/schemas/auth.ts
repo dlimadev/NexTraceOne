@@ -24,6 +24,31 @@ export const forgotPasswordSchema = z.object({
 });
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
+export const signUpSchema = z.object({
+  companyName: z
+    .string()
+    .min(1, 'validation.required')
+    .max(256, 'validation.tooLong'),
+  slug: z
+    .string()
+    .min(1, 'validation.required')
+    .max(128, 'validation.tooLong')
+    .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/, 'signup.slugInvalid'),
+  email: z
+    .string()
+    .min(1, 'validation.required')
+    .email('validation.invalidEmail'),
+  firstName: z
+    .string()
+    .min(1, 'validation.required')
+    .max(100, 'validation.tooLong'),
+  lastName: z
+    .string()
+    .min(1, 'validation.required')
+    .max(100, 'validation.tooLong'),
+});
+export type SignUpFormData = z.infer<typeof signUpSchema>;
+
 const passwordRules = z
   .string()
   .min(8, 'resetPassword.passwordTooShort')

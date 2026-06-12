@@ -1,5 +1,6 @@
 /** Barrel export — bounded context IdentityAccess (autenticação, autorização, sessões, SSO). */
 export { LoginPage } from './pages/LoginPage';
+export { SignupPage } from './pages/SignupPage';
 export { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 export { ResetPasswordPage } from './pages/ResetPasswordPage';
 export { ActivationPage } from './pages/ActivationPage';

@@ -178,6 +178,12 @@ export const identityApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     client.put('/identity/auth/password', { currentPassword, newPassword }),
 
+  // ── Self-Service Signup ────────────────────────────────────────
+  signUp: (data: { companyName: string; slug: string; email: string; firstName: string; lastName: string }) =>
+    client
+      .post<{ tenantId: string; slug: string; activationEmailSent: boolean }>('/identity/auth/signup', data)
+      .then((r) => r.data),
+
   // ── Password Recovery & Account Activation ─────────────────────
   forgotPassword: (email: string) =>
     client.post('/identity/auth/forgot-password', { email }),

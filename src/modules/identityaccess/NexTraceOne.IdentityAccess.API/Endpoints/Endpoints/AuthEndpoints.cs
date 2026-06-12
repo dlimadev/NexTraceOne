@@ -20,6 +20,7 @@ using ForgotPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.Fo
 using ResetPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ResetPassword.ResetPassword;
 using ActivateAccountFeature = NexTraceOne.IdentityAccess.Application.Features.ActivateAccount.ActivateAccount;
 using RequestAccountActivationFeature = NexTraceOne.IdentityAccess.Application.Features.RequestAccountActivation.RequestAccountActivation;
+using SignUpTenantFeature = NexTraceOne.IdentityAccess.Application.Features.SignUpTenant.SignUpTenant;
 using ResendMfaCodeFeature = NexTraceOne.IdentityAccess.Application.Features.ResendMfaCode.ResendMfaCode;
 using StartSamlLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartSamlLogin.StartSamlLogin;
 using SamlAcsCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.SamlAcsCallback.SamlAcsCallback;
@@ -41,6 +42,18 @@ internal static class AuthEndpoints
     internal static void Map(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
     {
         var authGroup = group.MapGroup("/auth");
+
+        // POST /auth/signup — cadastro self-service público (tenant + admin + trial)
+        authGroup.MapPost("/signup", async (
+            SignUpTenantFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth-sensitive");
 
         authGroup.MapPost("/login", async (
             LocalLoginFeature.Command command,
