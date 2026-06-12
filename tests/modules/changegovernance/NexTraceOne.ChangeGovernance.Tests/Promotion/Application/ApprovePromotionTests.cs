@@ -1,9 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+
+using IReleaseRepository = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions.IReleaseRepository;
 
 namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Application;
 

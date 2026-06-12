@@ -5,13 +5,14 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
+
+using IReleaseRepository = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions.IReleaseRepository;
 
 namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.BlockPromotion;
 
