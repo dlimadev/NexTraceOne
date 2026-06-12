@@ -6822,6 +6822,7 @@
     "list": {
       "correlationIndicator": "Correlacionado",
       "mitigationIndicator": "Mitigação",
+      "resolveAction": "Resolver",
       "title": "Lista de Incidentes"
     },
     "mitigation": {

@@ -23,6 +23,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetOnCallIntelligence;
@@ -55,6 +56,25 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:write")
         .WithName("CreateIncident")
         .WithSummary("Create operational incident and compute initial correlation");
+
+        // ── POST /api/v1/incidents/{incidentId}/resolve — Resolução de incidente ──
+        group.MapPost("/{incidentId}/resolve", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string incidentId,
+            ResolveIncidentRequest? body,
+            CancellationToken cancellationToken = default) =>
+        {
+            var command = new ResolveIncident.Command(
+                incidentId,
+                body?.ResolvedAtUtc,
+                body?.ResolutionNote);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:write")
+        .WithName("ResolveIncident")
+        .WithSummary("Mark an operational incident as resolved");
 
         // ── GET /api/v1/incidents — Listagem filtrada de incidentes ──
         group.MapGet("/", async (
@@ -367,3 +387,6 @@ public sealed class IncidentEndpointModule
 
 /// <summary>Corpo opcional do pedido de correlação dinâmica.</summary>
 internal sealed record CorrelateRequest(int? TimeWindowHours);
+
+/// <summary>Corpo opcional do pedido de resolução de incidente.</summary>
+internal sealed record ResolveIncidentRequest(DateTimeOffset? ResolvedAtUtc, string? ResolutionNote);

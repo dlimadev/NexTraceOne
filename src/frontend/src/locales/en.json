@@ -5524,6 +5524,7 @@
     "list": {
       "correlationIndicator": "Correlated",
       "mitigationIndicator": "Mitigation",
+      "resolveAction": "Resolve",
       "title": "Incident List"
     },
     "mitigation": {

@@ -5,7 +5,10 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
 
@@ -39,8 +42,11 @@ public static class ApprovePromotion
         IPromotionRequestRepository requestRepository,
         IPromotionGateRepository gateRepository,
         IGateEvaluationRepository evaluationRepository,
+        IReleaseRepository releaseRepository,
+        IDeploymentEnvironmentRepository environmentRepository,
         IPromotionUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEventBus eventBus) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -70,12 +76,27 @@ public static class ApprovePromotion
             }
 
             var now = dateTimeProvider.UtcNow;
-            var approveResult = promotionRequest.Approve(now);
+            var approveResult = promotionRequest.Approve(now, request.ApprovedBy, request.Comment);
             if (approveResult.IsFailure)
                 return approveResult.Error;
 
             requestRepository.Update(promotionRequest);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            // Publica o evento de integração após o commit — consumido pelo módulo
+            // de notificações para avisar o owner do serviço sobre a promoção.
+            var release = await releaseRepository.GetByIdAsync(
+                ReleaseId.From(promotionRequest.ReleaseId), cancellationToken);
+            var targetEnvironment = await environmentRepository.GetByIdAsync(
+                promotionRequest.TargetEnvironmentId, cancellationToken);
+
+            await eventBus.PublishAsync(
+                new PromotionCompletedIntegrationEvent(
+                    promotionRequest.Id.Value,
+                    release?.ServiceName ?? string.Empty,
+                    targetEnvironment?.Name ?? string.Empty,
+                    OwnerUserId: null),
+                cancellationToken);
 
             return new Response(promotionRequest.Id.Value, promotionRequest.Status.ToString(), promotionRequest.CompletedAt);
         }

@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
@@ -45,7 +46,8 @@ public static class CreateIncident
         IIncidentStore store,
         IIncidentCorrelationService correlationService,
         ICurrentTenant currentTenant,
-        ICurrentEnvironment currentEnvironment) : ICommandHandler<Command, Response>
+        ICurrentEnvironment currentEnvironment,
+        IEventBus eventBus) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -67,6 +69,18 @@ public static class CreateIncident
                 environmentId));
 
             var correlation = await correlationService.RecomputeAsync(created.IncidentId.ToString(), cancellationToken);
+
+            // Publica o evento de integração — consumido pelo módulo de notificações
+            // para alertar o owner do serviço e a equipa operacional.
+            await eventBus.PublishAsync(
+                new IncidentCreatedIntegrationEvent(
+                    created.IncidentId,
+                    request.ServiceDisplayName,
+                    request.Severity.ToString(),
+                    request.Description,
+                    OwnerUserId: null,
+                    tenantId),
+                cancellationToken);
 
             return new Response(
                 created.IncidentId,

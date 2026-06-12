@@ -304,6 +304,18 @@ export interface CreateIncidentResponse {
   correlationReason?: string;
 }
 
+export interface ResolveIncidentRequest {
+  resolvedAtUtc?: string;
+  resolutionNote?: string;
+}
+
+export interface ResolveIncidentResponse {
+  incidentId: string;
+  status: string;
+  resolvedAt: string;
+  resolutionNote?: string;
+}
+
 // ── Evidence ─────────────────────────────────────────────────────────
 
 export interface EvidenceObservation {
@@ -524,6 +536,9 @@ export const incidentsApi = {
 
   createIncident: (data: CreateIncidentRequest) =>
     client.post<CreateIncidentResponse>('/incidents', data).then(r => r.data),
+
+  resolveIncident: (incidentId: string, data?: ResolveIncidentRequest) =>
+    client.post<ResolveIncidentResponse>(`/incidents/${incidentId}/resolve`, data ?? {}).then(r => r.data),
 
   getIncidentDetail: (incidentId: string) =>
     client.get<IncidentDetailResponse>(`/incidents/${incidentId}`).then(r => r.data),

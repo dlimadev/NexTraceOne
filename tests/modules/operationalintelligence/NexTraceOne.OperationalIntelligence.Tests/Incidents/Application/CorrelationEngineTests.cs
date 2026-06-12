@@ -195,7 +195,8 @@ public sealed class CorrelationEngineTests
 
         var handler = new CreateIncident.Handler(store, correlationService,
             Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentTenant>(),
-            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentEnvironment>());
+            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentEnvironment>(),
+            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.IEventBus>());
         var command = new CreateIncident.Command(
             "Payment gateway degraded",
             "Error rate above 10%",
@@ -236,7 +237,8 @@ public sealed class CorrelationEngineTests
 
         var handler = new CreateIncident.Handler(store, correlationService,
             Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentTenant>(),
-            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentEnvironment>());
+            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentEnvironment>(),
+            Substitute.For<NexTraceOne.BuildingBlocks.Application.Abstractions.IEventBus>());
         var command = new CreateIncident.Command(
             "Catalog sync failure",
             "External API returning 503",

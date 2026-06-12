@@ -30,7 +30,7 @@ public sealed class ResolveIncidentTests
     [Fact]
     public async Task ResolveIncident_KnownOpenIncident_ShouldReturnResolved()
     {
-        var handler = new ResolveIncident.Handler(_store, CreateClock());
+        var handler = new ResolveIncident.Handler(_store, CreateClock(), Substitute.For<ICurrentUser>(), Substitute.For<ICurrentTenant>(), Substitute.For<IEventBus>());
         var command = new ResolveIncident.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             ResolvedAtUtc: FixedNow,
@@ -49,7 +49,7 @@ public sealed class ResolveIncidentTests
     public async Task ResolveIncident_WhenResolvedAtOmitted_ShouldUseClockUtcNow()
     {
         var clock = CreateClock(FixedNow);
-        var handler = new ResolveIncident.Handler(_store, clock);
+        var handler = new ResolveIncident.Handler(_store, clock, Substitute.For<ICurrentUser>(), Substitute.For<ICurrentTenant>(), Substitute.For<IEventBus>());
         var command = new ResolveIncident.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             ResolvedAtUtc: null,
@@ -66,7 +66,7 @@ public sealed class ResolveIncidentTests
     [Fact]
     public async Task ResolveIncident_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new ResolveIncident.Handler(_store, CreateClock());
+        var handler = new ResolveIncident.Handler(_store, CreateClock(), Substitute.For<ICurrentUser>(), Substitute.For<ICurrentTenant>(), Substitute.For<IEventBus>());
         var command = new ResolveIncident.Command(
             IncidentId: "00000000-0000-0000-0000-000000000000",
             ResolvedAtUtc: null,
@@ -83,7 +83,7 @@ public sealed class ResolveIncidentTests
     [Fact]
     public async Task ResolveIncident_AlreadyResolved_ShouldBeIdempotent()
     {
-        var handler = new ResolveIncident.Handler(_store, CreateClock());
+        var handler = new ResolveIncident.Handler(_store, CreateClock(), Substitute.For<ICurrentUser>(), Substitute.For<ICurrentTenant>(), Substitute.For<IEventBus>());
         var incidentId = "a1b2c3d4-0001-0000-0000-000000000001";
 
         // First resolve

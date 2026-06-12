@@ -1,6 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion;
+using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Application;
@@ -19,10 +21,16 @@ public sealed class ApprovePromotionTests
         Substitute.For<IPromotionGateRepository>();
     private readonly IGateEvaluationRepository _evaluationRepository =
         Substitute.For<IGateEvaluationRepository>();
+    private readonly IReleaseRepository _releaseRepository =
+        Substitute.For<IReleaseRepository>();
+    private readonly IDeploymentEnvironmentRepository _environmentRepository =
+        Substitute.For<IDeploymentEnvironmentRepository>();
     private readonly IPromotionUnitOfWork _unitOfWork =
         Substitute.For<IPromotionUnitOfWork>();
     private readonly IDateTimeProvider _dateTimeProvider =
         Substitute.For<IDateTimeProvider>();
+    private readonly IEventBus _eventBus =
+        Substitute.For<IEventBus>();
 
     public ApprovePromotionTests()
     {
@@ -30,7 +38,8 @@ public sealed class ApprovePromotionTests
     }
 
     private ApprovePromotion.Handler CreateHandler()
-        => new(_requestRepository, _gateRepository, _evaluationRepository, _unitOfWork, _dateTimeProvider);
+        => new(_requestRepository, _gateRepository, _evaluationRepository, _releaseRepository,
+            _environmentRepository, _unitOfWork, _dateTimeProvider, _eventBus);
 
     private static DeploymentEnvironment CreateActiveEnvironment(string name = "Production")
         => DeploymentEnvironment.Create(name, "Deployment environment", 1, true, true, FixedNow);
@@ -74,6 +83,8 @@ public sealed class ApprovePromotionTests
         result.Value.CompletedAt.Should().Be(FixedNow);
 
         _requestRepository.Received(1).Update(Arg.Any<PromotionRequest>());
+        await _eventBus.Received(1).PublishAsync(
+            Arg.Any<PromotionCompletedIntegrationEvent>(), Arg.Any<CancellationToken>());
         await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
