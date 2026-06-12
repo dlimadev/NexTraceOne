@@ -80,9 +80,15 @@ public static class DependencyInjection
         // Channel dispatchers
         services.AddScoped<INotificationChannelDispatcher, EmailNotificationDispatcher>();
         services.AddScoped<INotificationChannelDispatcher, TeamsNotificationDispatcher>();
+        services.AddScoped<INotificationChannelDispatcher, SlackNotificationDispatcher>();
+        services.AddScoped<INotificationChannelDispatcher, WebhookNotificationDispatcher>();
 
-        // HttpClientFactory para Teams webhook
+        // HttpClientFactory para webhooks externos (Teams, Slack, genérico)
         services.AddHttpClient("NexTraceOneTeams")
+            .AddStandardResilienceHandler();
+        services.AddHttpClient("NexTraceOneSlack")
+            .AddStandardResilienceHandler();
+        services.AddHttpClient("NexTraceOneWebhook")
             .AddStandardResilienceHandler();
 
         // External delivery service (coordena roteamento + dispatch + logging)

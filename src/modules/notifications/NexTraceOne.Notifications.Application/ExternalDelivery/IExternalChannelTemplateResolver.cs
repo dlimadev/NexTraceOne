@@ -14,6 +14,9 @@ public interface IExternalChannelTemplateResolver
 
     /// <summary>Gera payload de Adaptive Card para o canal Microsoft Teams.</summary>
     TeamsCardPayload ResolveTeamsTemplate(Notification notification, string baseUrl);
+
+    /// <summary>Gera payload Block Kit para o canal Slack.</summary>
+    SlackMessagePayload ResolveSlackTemplate(Notification notification, string baseUrl);
 }
 
 /// <summary>Template materializado para envio por email.</summary>
@@ -24,3 +27,6 @@ public sealed record EmailTemplate(
 
 /// <summary>Payload estruturado para Adaptive Card do Microsoft Teams.</summary>
 public sealed record TeamsCardPayload(string JsonPayload);
+
+/// <summary>Payload estruturado em Block Kit para mensagem Slack.</summary>
+public sealed record SlackMessagePayload(string JsonPayload);
