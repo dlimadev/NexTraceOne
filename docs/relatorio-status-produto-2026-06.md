@@ -157,7 +157,31 @@ Cofre de segredos próprio · runtime de feature flags (SDKs/edge) · agentes de
 
 ---
 
-## 6. Leitura estratégica final
+## 6. Execução — status em 12/06/2026 (mesma branch/PR)
+
+A Fase 1 foi **implementada integralmente** nesta branch, mais o item 8 da Fase 2:
+
+| Item | Status | Commit |
+|---|---|---|
+| Bug #1 — SQL injection ClickHouse (provider + repo OTel) | ✅ Corrigido — parâmetros nativos `{name:Type}` | `a04cf24` |
+| Bug #2 — Telemetria sem tenant | ✅ Corrigido — coluna `TenantId` + índice + migration + filtros | `a04cf24` |
+| Bug #3 — Resolver incidente | ✅ Corrigido — endpoint `POST /incidents/{id}/resolve` + botão na UI + i18n | `f4066cf` |
+| Bug #4 — Eventos nunca publicados | ✅ Corrigido — Approve/BlockPromotion e Create/ResolveIncident publicam integration events (pós-commit) | `f4066cf` |
+| Bug #5 — Perda silenciosa na ingestão | ✅ Corrigido — falha propaga em vez de retornar 0 | `a04cf24` |
+| Bug #6 — Aprovação sem controle | ✅ Mitigado — ator derivado de `ICurrentUser` (anti-spoofing); permissão dedicada `promotion:requests:approve` pendente (exige migration de seed do IAM) | `a04cf24` |
+| Bugs #7-9 — Endpoints órfãos | ✅ Corrigido — `ContractOpsEndpointModule` expõe SBOM, feature flags registry e schedule-deprecation | `0081f8a` |
+| Bug #10 — Dashboard fake + catches silenciosos | ✅ Corrigido — stats reais de `/observability/stats`, estados de erro visíveis; ObservabilityService migrado para o client autenticado (estava em axios cru, sem token/CSRF/tenant) | `0081f8a` |
+| Bug #11 — PostIncidentPage com mock | ✅ Corrigido — dados reais + empty state; teste atualizado | `0081f8a` |
+| Fase 2 item 8 — Slack + webhook genérico | ✅ Implementado — dispatchers, settings, Block Kit, DI | `dba2c85` |
+| Extra — `ApprovedBy/Comment` descartados no Approve | ✅ Corrigido — persistidos via `ReviewedBy/ReviewNotes` | `f4066cf` |
+
+**Validação:** frontend `tsc` 0 erros, ESLint 0 erros, testes afetados passando. Backend validado estaticamente + CI do GitHub (sem SDK .NET neste ambiente).
+
+**Próximos da fila (Fase 2 restante → Fase 3):** status page pública · webhooks inbound CI/CD · UI de rulesets/SLA · substituir null readers de SLO · on-call mínimo · permissão dedicada de aprovador (migration IAM) · **signup self-service · billing Stripe · enforcement de capabilities via pipeline behavior** · docs de cliente.
+
+---
+
+## 7. Leitura estratégica final
 
 A tese central do produto — **correlação serviço → contrato → release → incidente — já funciona no código**, e é exatamente a parte que os concorrentes do bundle barato não têm. O catálogo/contratos está em nível demonstrável hoje.
 
