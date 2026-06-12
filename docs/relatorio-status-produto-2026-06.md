@@ -18,7 +18,7 @@
 
 **Conclusão geral:** a plataforma está em estágio **beta interno**. A jornada principal (registrar serviço → contrato → release → promoção → incidente correlacionado) existe e funciona em grande parte, mas é interrompida por lacunas de wiring (eventos não publicados, endpoints não mapeados) e está **inviável para receber um cliente externo** por ausência total do funil comercial e por 3 vulnerabilidades de segurança que precisam ser corrigidas antes de qualquer piloto.
 
-**Saúde do frontend (verificado por execução):** `tsc` — 0 erros; ESLint — 0 erros, 149 warnings cosméticos; testes unitários — ver seção 5.
+**Saúde do frontend (verificado por execução):** `tsc` — 0 erros; ESLint — 0 erros, 149 warnings cosméticos; Vitest — 2.323 testes passando. A base de código é saudável; os problemas são funcionais (wiring e lacunas), não de qualidade de código.
 
 ---
 
@@ -151,7 +151,7 @@ Cofre de segredos próprio · runtime de feature flags (SDKs/edge) · agentes de
 
 - **TypeScript (`tsc -b`)**: ✅ 0 erros
 - **ESLint**: ✅ 0 erros, 149 warnings (imports/variáveis não usados — cosmético)
-- **Vitest**: (resultado na seção abaixo)
+- **Vitest**: ✅ 311 arquivos de teste, **2.323 testes, todos passando** (238s)
 
 *Backend não pôde ser compilado neste ambiente (sem SDK .NET); a auditoria backend foi estática, arquivo a arquivo.*
 
