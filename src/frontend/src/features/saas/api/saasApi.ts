@@ -119,6 +119,9 @@ export const saasApi = {
   provisionLicense: (req: ProvisionLicenseRequest): Promise<ProvisionLicenseResponse> =>
     client.post<ProvisionLicenseResponse>('/identity/license/provision', req).then((r) => r.data),
 
+  createCheckoutSession: (plan: string): Promise<{ checkoutUrl: string }> =>
+    client.post<{ checkoutUrl: string }>('/identity/billing/checkout-session', { plan }).then((r) => r.data),
+
   listAgents: (): Promise<ListAgentRegistrationsResponse> =>
     client.get<ListAgentRegistrationsResponse>('/identity/agents').then((r) => r.data),
 
