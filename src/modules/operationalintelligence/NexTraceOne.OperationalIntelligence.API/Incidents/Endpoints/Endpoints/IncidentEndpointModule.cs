@@ -27,6 +27,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.Resolve
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetOnCallIntelligence;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetPublicStatus;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
@@ -41,6 +42,21 @@ public sealed class IncidentEndpointModule
     /// <summary>Mapeia os endpoints de incidentes no pipeline HTTP.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
+        // ── GET /api/v1/status/public/{tenantId} — Status page pública (anônima) ──
+        app.MapGet("/api/v1/status/public/{tenantId:guid}", async (
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(new GetPublicStatus.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .AllowAnonymous()
+        .RequireRateLimiting("operations")
+        .WithName("GetPublicStatus")
+        .WithSummary("Public status page: overall status and active incidents for a tenant");
+
         var group = app.MapGroup("/api/v1/incidents").RequireRateLimiting("operations");
 
         // ── POST /api/v1/incidents — Criação real de incidente ──

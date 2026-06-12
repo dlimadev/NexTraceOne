@@ -11,6 +11,7 @@ import { AppShell } from './components/shell/AppShell';
 
 // Eager imports — critical for fast first paint
 import { LoginPage, SignupPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage, OnboardingWizardPage } from './features/identity-access';
+import { PublicStatusPage } from './features/operations/pages/PublicStatusPage';
 
 // ── Route groups (lazy-loaded by module) ──────────────────────────────────────
 import { CatalogRoutes } from './routes/catalogRoutes';
@@ -113,6 +114,7 @@ export default function App() {
                   <Route path="/mfa" element={<MfaPage />} />
                   <Route path="/select-tenant" element={<TenantSelectionPage />} />
                   <Route path="/onboarding" element={<OnboardingWizardPage />} />
+                  <Route path="/status/:tenantId" element={<PublicStatusPage />} />
 
                   {/* ── Authenticated shell ── */}
                   <Route element={<AppShell />}>

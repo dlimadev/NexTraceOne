@@ -83,6 +83,7 @@ public static class DependencyInjection
         services.AddScoped<IAlertFiringRecordRepository, OiAlertFiringRecordRepository>();
         services.AddScoped<IAlertFiringGateway, AlertFiringGatewayService>();
         services.AddScoped<IIncidentStore, EfIncidentStore>();
+        services.AddScoped<IPublicStatusReader, EfPublicStatusReader>();
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
         services.AddScoped<IIncidentCorrelationRepository, EfIncidentCorrelationRepository>();

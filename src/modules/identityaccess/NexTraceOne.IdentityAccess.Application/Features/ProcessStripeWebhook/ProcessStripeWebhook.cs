@@ -50,6 +50,9 @@ public static class ProcessStripeWebhook
             var root = document.RootElement;
             var eventType = root.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
 
+            if (string.Equals(eventType, "customer.subscription.deleted", StringComparison.Ordinal))
+                return await HandleSubscriptionDeletedAsync(root, cancellationToken);
+
             if (!string.Equals(eventType, "checkout.session.completed", StringComparison.Ordinal))
                 return new Response(false, eventType);
 
@@ -84,6 +87,36 @@ public static class ProcessStripeWebhook
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(true, eventType);
+        }
+
+        /// <summary>
+        /// Assinatura cancelada no gateway: faz downgrade da licença para Starter,
+        /// mantendo o tenant operacional no plano gratuito.
+        /// </summary>
+        private async Task<Result<Response>> HandleSubscriptionDeletedAsync(
+            JsonElement root,
+            CancellationToken cancellationToken)
+        {
+            var subscriptionId = root.TryGetProperty("data", out var data)
+                && data.TryGetProperty("object", out var subscription)
+                && subscription.TryGetProperty("id", out var idProp)
+                && idProp.ValueKind == JsonValueKind.String
+                    ? idProp.GetString()
+                    : null;
+
+            if (string.IsNullOrWhiteSpace(subscriptionId))
+                return Error.Validation("billing.webhook.malformed", "Subscription event is missing data.object.id.");
+
+            var license = await licenseRepository.GetByExternalSubscriptionIdAsync(subscriptionId, cancellationToken);
+            if (license is null)
+                return new Response(false, "customer.subscription.deleted");
+
+            var now = clock.UtcNow;
+            license.Upgrade(TenantPlan.Starter, license.IncludedHostUnits, newValidUntil: null, now);
+            licenseRepository.Update(license);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return new Response(true, "customer.subscription.deleted");
         }
     }
 }
