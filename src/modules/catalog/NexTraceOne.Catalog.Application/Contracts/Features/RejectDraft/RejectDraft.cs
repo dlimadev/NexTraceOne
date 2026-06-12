@@ -20,6 +20,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft;
 public static class RejectDraft
 {
     /// <summary>Comando de rejeição de draft de contrato.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         Guid DraftId,
         string RejectedBy,

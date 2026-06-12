@@ -981,7 +981,9 @@
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
     "welcomeTitle": "Welcome back",
-    "logout": "Logout"
+    "logout": "Logout",
+    "noAccount": "Don't have an account?",
+    "createWorkspace": "Create your workspace"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -5524,6 +5526,7 @@
     "list": {
       "correlationIndicator": "Correlated",
       "mitigationIndicator": "Mitigation",
+      "resolveAction": "Resolve",
       "title": "Incident List"
     },
     "mitigation": {
@@ -16302,5 +16305,23 @@
       "parseError": "Parse error",
       "empty": "No preview — start writing to see a live preview"
     }
+  },
+  "signup": {
+    "title": "Create your workspace",
+    "subtitle": "Start a 14-day free trial. No credit card required.",
+    "companyLabel": "Company name",
+    "companyPlaceholder": "Acme Corp",
+    "slugLabel": "Workspace URL",
+    "slugPlaceholder": "acme-corp",
+    "slugInvalid": "Use lowercase letters, numbers and hyphens only.",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "emailLabel": "Work email",
+    "emailPlaceholder": "you@company.com",
+    "submit": "Create workspace",
+    "submitting": "Creating workspace…",
+    "successTitle": "Check your email",
+    "successMessage": "We sent an activation link to {{email}}. Open it to set your password and access your workspace.",
+    "backToLogin": "Back to sign in"
   }
 }

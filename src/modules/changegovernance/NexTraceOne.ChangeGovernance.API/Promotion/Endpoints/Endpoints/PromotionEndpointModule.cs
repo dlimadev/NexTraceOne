@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -72,9 +73,12 @@ public sealed class PromotionEndpointModule
             ApprovePromotionFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            ICurrentUser currentUser,
             CancellationToken cancellationToken) =>
         {
-            var updated = command with { PromotionRequestId = id };
+            // O aprovador é sempre a identidade autenticada do servidor —
+            // o valor enviado pelo cliente é ignorado para impedir spoofing.
+            var updated = command with { PromotionRequestId = id, ApprovedBy = ResolveActor(currentUser) };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -85,9 +89,11 @@ public sealed class PromotionEndpointModule
             BlockPromotionFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            ICurrentUser currentUser,
             CancellationToken cancellationToken) =>
         {
-            var updated = command with { PromotionRequestId = id };
+            // Idem ao approve: identidade derivada do contexto autenticado.
+            var updated = command with { PromotionRequestId = id, BlockedBy = ResolveActor(currentUser) };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -173,5 +179,18 @@ public sealed class PromotionEndpointModule
         .RequirePermission("promotion:requests:read")
         .WithName("GetEnvironmentPromotionPath")
         .WithSummary("Returns the environment promotion path for a release — shows which environments the release has reached and its status at each step");
+    }
+
+    /// <summary>
+    /// Resolve a identidade do ator a partir do contexto autenticado.
+    /// Prioriza email, depois nome e por fim o Id do utilizador.
+    /// </summary>
+    private static string ResolveActor(ICurrentUser currentUser)
+    {
+        if (!string.IsNullOrWhiteSpace(currentUser.Email))
+            return currentUser.Email;
+        if (!string.IsNullOrWhiteSpace(currentUser.Name))
+            return currentUser.Name;
+        return currentUser.Id;
     }
 }

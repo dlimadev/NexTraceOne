@@ -23,9 +23,11 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetOnCallIntelligence;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetPublicStatus;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
@@ -40,6 +42,21 @@ public sealed class IncidentEndpointModule
     /// <summary>Mapeia os endpoints de incidentes no pipeline HTTP.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
+        // ── GET /api/v1/status/public/{tenantId} — Status page pública (anônima) ──
+        app.MapGet("/api/v1/status/public/{tenantId:guid}", async (
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(new GetPublicStatus.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .AllowAnonymous()
+        .RequireRateLimiting("operations")
+        .WithName("GetPublicStatus")
+        .WithSummary("Public status page: overall status and active incidents for a tenant");
+
         var group = app.MapGroup("/api/v1/incidents").RequireRateLimiting("operations");
 
         // ── POST /api/v1/incidents — Criação real de incidente ──
@@ -55,6 +72,25 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:write")
         .WithName("CreateIncident")
         .WithSummary("Create operational incident and compute initial correlation");
+
+        // ── POST /api/v1/incidents/{incidentId}/resolve — Resolução de incidente ──
+        group.MapPost("/{incidentId}/resolve", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string incidentId,
+            ResolveIncidentRequest? body,
+            CancellationToken cancellationToken = default) =>
+        {
+            var command = new ResolveIncident.Command(
+                incidentId,
+                body?.ResolvedAtUtc,
+                body?.ResolutionNote);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:write")
+        .WithName("ResolveIncident")
+        .WithSummary("Mark an operational incident as resolved");
 
         // ── GET /api/v1/incidents — Listagem filtrada de incidentes ──
         group.MapGet("/", async (
@@ -367,3 +403,6 @@ public sealed class IncidentEndpointModule
 
 /// <summary>Corpo opcional do pedido de correlação dinâmica.</summary>
 internal sealed record CorrelateRequest(int? TimeWindowHours);
+
+/// <summary>Corpo opcional do pedido de resolução de incidente.</summary>
+internal sealed record ResolveIncidentRequest(DateTimeOffset? ResolvedAtUtc, string? ResolutionNote);

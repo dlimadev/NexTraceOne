@@ -39,6 +39,9 @@ public sealed class IdentityEndpointModule
         // SaaS Evolution (v2.0)
         LicensingEndpoints.Map(group);
 
+        // SaaS-09 — Billing (Stripe checkout + webhook)
+        BillingEndpoints.Map(group);
+
         // W5-05 — Fine-Grained Auth per Environment
         EnvironmentPolicyEndpoints.Map(group);
 

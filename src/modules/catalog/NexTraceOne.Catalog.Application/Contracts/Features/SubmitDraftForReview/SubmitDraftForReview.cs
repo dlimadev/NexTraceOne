@@ -18,6 +18,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForRevie
 public static class SubmitDraftForReview
 {
     /// <summary>Comando de submissão de draft para revisão.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(Guid DraftId) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de submissão.</summary>

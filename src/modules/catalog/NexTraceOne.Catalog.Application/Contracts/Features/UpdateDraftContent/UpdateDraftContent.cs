@@ -18,6 +18,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 public static class UpdateDraftContent
 {
     /// <summary>Comando de atualização de conteúdo de draft.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         Guid DraftId,
         string SpecContent,

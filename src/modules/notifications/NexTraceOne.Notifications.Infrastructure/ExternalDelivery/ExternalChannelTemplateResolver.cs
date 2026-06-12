@@ -35,6 +35,58 @@ internal sealed class ExternalChannelTemplateResolver : IExternalChannelTemplate
         return new TeamsCardPayload(json);
     }
 
+    /// <inheritdoc/>
+    public SlackMessagePayload ResolveSlackTemplate(Notification notification, string baseUrl)
+    {
+        var actionLink = BuildActionLink(notification, baseUrl);
+        var emoji = GetSeverityEmoji(notification.Severity);
+
+        var payload = new
+        {
+            text = $"{emoji} [{notification.Severity}] {notification.Title}",
+            blocks = new object[]
+            {
+                new
+                {
+                    type = "header",
+                    text = new { type = "plain_text", text = $"{emoji} {notification.Title}", emoji = true }
+                },
+                new
+                {
+                    type = "section",
+                    text = new { type = "mrkdwn", text = notification.Message }
+                },
+                new
+                {
+                    type = "context",
+                    elements = new object[]
+                    {
+                        new
+                        {
+                            type = "mrkdwn",
+                            text = $"*Severity:* {notification.Severity} • *Category:* {notification.Category} • *Source:* {notification.SourceModule}"
+                        }
+                    }
+                },
+                new
+                {
+                    type = "actions",
+                    elements = new object[]
+                    {
+                        new
+                        {
+                            type = "button",
+                            text = new { type = "plain_text", text = "Open in NexTraceOne", emoji = true },
+                            url = actionLink
+                        }
+                    }
+                }
+            }
+        };
+
+        return new SlackMessagePayload(JsonSerializer.Serialize(payload));
+    }
+
     private static string BuildActionLink(Notification notification, string baseUrl)
     {
         if (string.IsNullOrWhiteSpace(notification.ActionUrl))

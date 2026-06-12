@@ -81,23 +81,32 @@ internal sealed class ClickHouseOtelMetricRepository(
     {
         try
         {
+            // Parâmetros nativos do ClickHouse ({name:Type} + param_name na URL)
+            // em vez de interpolação de strings — imune a SQL injection.
             var envClause = string.IsNullOrWhiteSpace(environment)
                 ? string.Empty
-                : $" AND environment = '{environment.Replace("'", "\\'")}'";
+                : " AND environment = {environment:String}";
 
-            var sql = $"""
+            var sql = $$"""
                 SELECT metric_name, metric_type, value, service_name, service_version,
                        environment, timestamp, resource_attributes, metric_attributes
                 FROM nextraceone_obs.otel_metrics
-                WHERE service_name = '{serviceName.Replace("'", "\\'")}'
-                  AND metric_name  = '{metricName.Replace("'", "\\'")}'
-                  AND timestamp >= '{from.UtcDateTime:yyyy-MM-dd HH:mm:ss}'
-                  AND timestamp <= '{to.UtcDateTime:yyyy-MM-dd HH:mm:ss}'{envClause}
+                WHERE service_name = {serviceName:String}
+                  AND metric_name  = {metricName:String}
+                  AND timestamp >= {fromTs:DateTime}
+                  AND timestamp <= {toTs:DateTime}{{envClause}}
                 ORDER BY timestamp ASC
                 FORMAT JSONEachRow
                 """;
 
-            var url = $"{options.Value.Endpoint}/?query={Uri.EscapeDataString(sql)}";
+            var url = $"{options.Value.Endpoint}/?query={Uri.EscapeDataString(sql)}"
+                + $"&param_serviceName={Uri.EscapeDataString(serviceName)}"
+                + $"&param_metricName={Uri.EscapeDataString(metricName)}"
+                + $"&param_fromTs={Uri.EscapeDataString(from.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"))}"
+                + $"&param_toTs={Uri.EscapeDataString(to.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"))}"
+                + (string.IsNullOrWhiteSpace(environment)
+                    ? string.Empty
+                    : $"&param_environment={Uri.EscapeDataString(environment)}");
             var responseText = await httpClient.GetStringAsync(url, cancellationToken);
 
             var results = new List<OtelMetricDataPoint>();

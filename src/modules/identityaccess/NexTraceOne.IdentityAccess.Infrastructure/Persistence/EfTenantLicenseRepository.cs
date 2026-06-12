@@ -14,6 +14,10 @@ internal sealed class EfTenantLicenseRepository(IdentityDbContext context) : ITe
     public async Task<TenantLicense?> GetByIdAsync(TenantLicenseId id, CancellationToken ct = default)
         => await context.TenantLicenses.FindAsync([id], ct);
 
+    public async Task<TenantLicense?> GetByExternalSubscriptionIdAsync(string subscriptionId, CancellationToken ct = default)
+        => await context.TenantLicenses
+            .FirstOrDefaultAsync(l => l.ExternalSubscriptionId == subscriptionId, ct);
+
     public async Task<IReadOnlyList<TenantLicense>> ListAllAsync(CancellationToken ct = default)
         => await context.TenantLicenses.ToListAsync(ct);
 

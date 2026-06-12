@@ -981,7 +981,9 @@
     "trustCompliant": "Conforme para empresas",
     "trustEncrypted": "Cifrado en tránsito",
     "welcomeTitle": "Bienvenido de vuelta",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "createWorkspace": "Crea tu workspace"
   },
   "authorization": {
     "accessDenied": "Acceso Denegado",
@@ -6825,6 +6827,7 @@
     "list": {
       "correlationIndicator": "Correlacionado",
       "mitigationIndicator": "Mitigación",
+      "resolveAction": "Resolver",
       "title": "Lista de Incidentes"
     },
     "mitigation": {
@@ -17617,5 +17620,23 @@
       "parseError": "Error de parse",
       "empty": "Sin preview — empiece a escribir para ver un preview en vivo"
     }
+  },
+  "signup": {
+    "title": "Crea tu workspace",
+    "subtitle": "Comienza una prueba gratuita de 14 días. Sin tarjeta de crédito.",
+    "companyLabel": "Nombre de la empresa",
+    "companyPlaceholder": "Acme Corp",
+    "slugLabel": "URL del workspace",
+    "slugPlaceholder": "acme-corp",
+    "slugInvalid": "Usa solo letras minúsculas, números y guiones.",
+    "firstNameLabel": "Nombre",
+    "lastNameLabel": "Apellido",
+    "emailLabel": "Correo corporativo",
+    "emailPlaceholder": "tu@empresa.com",
+    "submit": "Crear workspace",
+    "submitting": "Creando workspace…",
+    "successTitle": "Revisa tu correo",
+    "successMessage": "Enviamos un enlace de activación a {{email}}. Ábrelo para definir tu contraseña y acceder a tu workspace.",
+    "backToLogin": "Volver al inicio de sesión"
   }
 }

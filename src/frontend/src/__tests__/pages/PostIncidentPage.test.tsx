@@ -142,11 +142,11 @@ describe('PostIncidentPage', () => {
     });
   });
 
-  it('shows fallback data when API returns empty array', async () => {
+  it('shows empty state when API returns empty array', async () => {
     vi.mocked(getPostMortems).mockResolvedValueOnce([]);
     renderPage();
     await waitFor(() => {
-      expect(screen.getAllByRole('row').length).toBeGreaterThan(0);
+      expect(screen.getByText(/no post-mortems found/i)).toBeTruthy();
     });
   });
 

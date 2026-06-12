@@ -23,6 +23,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 public static class ApproveDraft
 {
     /// <summary>Comando de aprovação de draft de contrato.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         Guid DraftId,
         string ApprovedBy,

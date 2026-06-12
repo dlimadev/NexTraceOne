@@ -179,6 +179,14 @@ export function LoginPage() {
         </Button>
         <p className="text-xs text-muted text-center mt-2.5">{t('auth.ssoDescription')}</p>
 
+        {/* Self-service signup */}
+        <p className="text-center text-xs text-muted mt-4">
+          {t('auth.noAccount', "Don't have an account?")}{' '}
+          <Link to="/signup" className="text-cyan hover:text-cyan-hover transition-colors font-medium">
+            {t('auth.createWorkspace', 'Create your workspace')}
+          </Link>
+        </p>
+
         {/* Help link — custom or default */}
         <p className="text-center text-xs text-faded mt-6">
           {loginHelpText ? (

@@ -94,6 +94,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         CancellationToken cancellationToken = default)
     {
         var db = _database;
+        var parameters = new Dictionary<string, string>();
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT Timestamp, ServiceName, SeverityText, Body, TraceId, SpanId, " +
@@ -102,24 +103,27 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             $"WHERE Timestamp >= '{FormatDateTime(filter.From)}' " +
             $"AND Timestamp <= '{FormatDateTime(filter.Until)}'");
 
-        AppendCondition(sb, "ResourceAttributes['deployment.environment']", filter.Environment);
+        AppendCondition(sb, parameters, "ResourceAttributes['deployment.environment']", filter.Environment, "env");
 
         if (!string.IsNullOrWhiteSpace(filter.ServiceName))
-            AppendCondition(sb, "ServiceName", filter.ServiceName);
+            AppendCondition(sb, parameters, "ServiceName", filter.ServiceName, "service");
 
         if (!string.IsNullOrWhiteSpace(filter.Level))
-            AppendCondition(sb, "SeverityText", filter.Level);
+            AppendCondition(sb, parameters, "SeverityText", filter.Level, "level");
 
         if (!string.IsNullOrWhiteSpace(filter.MessageContains))
-            sb.Append(CultureInfo.InvariantCulture, $" AND Body LIKE '%{EscapeLikePattern(filter.MessageContains)}%'");
+        {
+            sb.Append(" AND Body LIKE {messagePattern:String}");
+            parameters["messagePattern"] = "%" + EscapeLikeWildcards(filter.MessageContains) + "%";
+        }
 
         if (!string.IsNullOrWhiteSpace(filter.TraceId))
-            AppendCondition(sb, "TraceId", filter.TraceId);
+            AppendCondition(sb, parameters, "TraceId", filter.TraceId, "traceId");
 
         sb.Append(" ORDER BY Timestamp DESC");
         sb.Append(CultureInfo.InvariantCulture, $" LIMIT {filter.Limit}");
 
-        var rows = await QueryAsync(sb.ToString(), cancellationToken);
+        var rows = await QueryAsync(sb.ToString(), parameters, cancellationToken);
 
         var results = new List<LogEntry>();
         foreach (var row in rows)
@@ -146,6 +150,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         CancellationToken cancellationToken = default)
     {
         var db = _database;
+        var parameters = new Dictionary<string, string>();
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT TraceId, ServiceName, SpanName, Timestamp, Duration, " +
@@ -154,13 +159,13 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             $"WHERE Timestamp >= '{FormatDateTime(filter.From)}' " +
             $"AND Timestamp <= '{FormatDateTime(filter.Until)}'");
 
-        AppendCondition(sb, "ResourceAttributes['deployment.environment']", filter.Environment);
+        AppendCondition(sb, parameters, "ResourceAttributes['deployment.environment']", filter.Environment, "env");
 
         if (!string.IsNullOrWhiteSpace(filter.ServiceName))
-            AppendCondition(sb, "ServiceName", filter.ServiceName);
+            AppendCondition(sb, parameters, "ServiceName", filter.ServiceName, "service");
 
         if (!string.IsNullOrWhiteSpace(filter.OperationName))
-            AppendCondition(sb, "SpanName", filter.OperationName);
+            AppendCondition(sb, parameters, "SpanName", filter.OperationName, "operation");
 
         if (filter.MinDurationMs.HasValue)
         {
@@ -170,7 +175,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         }
 
         if (filter.HasErrors == true)
-            AppendCondition(sb, "StatusCode", "Error");
+            AppendCondition(sb, parameters, "StatusCode", "Error", "status");
 
         if (!string.IsNullOrWhiteSpace(filter.ServiceKind))
         {
@@ -185,7 +190,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         sb.Append(" ORDER BY Timestamp DESC");
         sb.Append(CultureInfo.InvariantCulture, $" LIMIT {filter.Limit}");
 
-        var rows = await QueryAsync(sb.ToString(), cancellationToken);
+        var rows = await QueryAsync(sb.ToString(), parameters, cancellationToken);
 
         var results = new List<TraceSummary>();
         foreach (var row in rows)
@@ -226,11 +231,14 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
                     $"Timestamp, Duration, StatusCode, StatusMessage, SpanKind, " +
                     $"ResourceAttributes, SpanAttributes, Events.Name, Events.Timestamp " +
                     $"FROM {db}.otel_traces " +
-                    $"WHERE TraceId = '{EscapeSqlString(traceId)}' " +
-                    $"ORDER BY Timestamp ASC " +
-                    $"LIMIT 1000";
+                    "WHERE TraceId = {traceId:String} " +
+                    "ORDER BY Timestamp ASC " +
+                    "LIMIT 1000";
 
-        var rows = await QueryAsync(query, cancellationToken);
+        var rows = await QueryAsync(
+            query,
+            new Dictionary<string, string> { ["traceId"] = traceId },
+            cancellationToken);
 
         if (rows.Count == 0)
             return null;
@@ -299,6 +307,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         CancellationToken cancellationToken = default)
     {
         var db = _database;
+        var parameters = new Dictionary<string, string>();
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT TimeUnix, MetricName, Value, ServiceName, ResourceAttributes, Attributes " +
@@ -306,16 +315,16 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             $"WHERE TimeUnix >= '{FormatDateTime(filter.From)}' " +
             $"AND TimeUnix <= '{FormatDateTime(filter.Until)}'");
 
-        AppendCondition(sb, "ResourceAttributes['deployment.environment']", filter.Environment);
-        AppendCondition(sb, "MetricName", filter.MetricName);
+        AppendCondition(sb, parameters, "ResourceAttributes['deployment.environment']", filter.Environment, "env");
+        AppendCondition(sb, parameters, "MetricName", filter.MetricName, "metricName");
 
         if (!string.IsNullOrWhiteSpace(filter.ServiceName))
-            AppendCondition(sb, "ServiceName", filter.ServiceName);
+            AppendCondition(sb, parameters, "ServiceName", filter.ServiceName, "service");
 
         sb.Append(" ORDER BY TimeUnix ASC");
         sb.Append(" LIMIT 1000");
 
-        var rows = await QueryAsync(sb.ToString(), cancellationToken);
+        var rows = await QueryAsync(sb.ToString(), parameters, cancellationToken);
 
         var results = new List<TelemetryMetricPoint>();
         foreach (var row in rows)
@@ -340,13 +349,27 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
     /// </summary>
     private async Task<List<JsonElement>> QueryAsync(
         string sql,
+        IReadOnlyDictionary<string, string>? parameters,
         CancellationToken cancellationToken)
     {
         try
         {
             var baseUrl = ResolveHttpEndpoint();
             var fullQuery = sql + " FORMAT JSONEachRow";
-            var requestUri = new Uri($"{baseUrl}/?query=" + Uri.EscapeDataString(fullQuery));
+            var uriBuilder = new StringBuilder($"{baseUrl}/?query=" + Uri.EscapeDataString(fullQuery));
+
+            // Parâmetros nativos do ClickHouse ({name:Type} no SQL + param_name na URL)
+            // — valores nunca são concatenados na query, eliminando SQL injection.
+            if (parameters is not null)
+            {
+                foreach (var (name, value) in parameters)
+                {
+                    uriBuilder.Append(CultureInfo.InvariantCulture,
+                        $"&param_{name}={Uri.EscapeDataString(value)}");
+                }
+            }
+
+            var requestUri = new Uri(uriBuilder.ToString());
 
             var response = await _httpClient.GetAsync(requestUri, cancellationToken);
 
@@ -431,27 +454,28 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         => dt.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
     /// <summary>
-    /// Escapa aspas simples e barras invertidas numa string para uso seguro em queries SQL do ClickHouse.
-    /// Protege contra SQL injection em valores fornecidos pelo utilizador.
+    /// Escapa os wildcards do operador LIKE do ClickHouse (% e _) dentro do valor do utilizador.
+    /// O valor é enviado como parâmetro nativo — apenas os wildcards precisam de escape.
     /// </summary>
-    private static string EscapeSqlString(string value)
+    private static string EscapeLikeWildcards(string value)
         => value.Replace("\\", "\\\\", StringComparison.Ordinal)
-                .Replace("'", "\\'", StringComparison.Ordinal);
-
-    /// <summary>
-    /// Escapa caracteres especiais do operador LIKE do ClickHouse (% e _) além do escape SQL padrão.
-    /// Usado quando o valor do utilizador é inserido dentro de um padrão LIKE.
-    /// </summary>
-    private static string EscapeLikePattern(string value)
-        => EscapeSqlString(value)
             .Replace("%", "\\%", StringComparison.Ordinal)
             .Replace("_", "\\_", StringComparison.Ordinal);
 
     /// <summary>
-    /// Adiciona uma condição de igualdade ao StringBuilder da query SQL.
+    /// Adiciona uma condição de igualdade parametrizada à query e regista o valor
+    /// no dicionário de parâmetros nativos do ClickHouse.
     /// </summary>
-    private static void AppendCondition(StringBuilder sb, string column, string value)
-        => sb.Append(CultureInfo.InvariantCulture, $" AND {column} = '{EscapeSqlString(value)}'");
+    private static void AppendCondition(
+        StringBuilder sb,
+        Dictionary<string, string> parameters,
+        string column,
+        string value,
+        string paramName)
+    {
+        sb.Append(CultureInfo.InvariantCulture, $" AND {column} = {{{paramName}:String}}");
+        parameters[paramName] = value;
+    }
 
     /// <summary>
     /// Traduz um ServiceKind (REST, SOAP, Kafka, etc.) em cláusula WHERE SQL para ClickHouse,

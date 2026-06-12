@@ -36,8 +36,17 @@ export function LicensingPage() {
   });
 
   const upgradeMutation = useMutation({
-    mutationFn: (plan: TenantPlan) =>
-      saasApi.provisionLicense({ plan, includedHostUnits: data?.includedHostUnits ?? 0 }),
+    mutationFn: async (plan: TenantPlan) => {
+      try {
+        // Caminho pago: redireciona para o checkout hospedado do Stripe.
+        const { checkoutUrl } = await saasApi.createCheckoutSession(plan);
+        window.location.assign(checkoutUrl);
+        return null;
+      } catch {
+        // Billing não configurado neste ambiente — aplica o upgrade direto.
+        return saasApi.provisionLicense({ plan, includedHostUnits: data?.includedHostUnits ?? 0 });
+      }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['saas-license'] });
       setUpgradeTarget(null);

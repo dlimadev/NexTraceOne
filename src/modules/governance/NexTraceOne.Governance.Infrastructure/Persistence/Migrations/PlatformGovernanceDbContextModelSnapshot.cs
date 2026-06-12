@@ -2696,6 +2696,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<string>("ServiceVersion")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
@@ -2704,6 +2707,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "ServiceName", "MetricName", "Timestamp");
 
                     b.ToTable("OtelMetrics");
                 });

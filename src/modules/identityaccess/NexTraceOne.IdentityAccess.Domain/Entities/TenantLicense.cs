@@ -98,6 +98,13 @@ public sealed class TenantLicense : Entity<TenantLicenseId>
         UpdatedAt = now;
     }
 
+    /// <summary>Vincula a assinatura do gateway de pagamento (ex.: subscription do Stripe).</summary>
+    public void AttachExternalSubscription(string subscriptionId, DateTimeOffset now)
+    {
+        ExternalSubscriptionId = subscriptionId;
+        UpdatedAt = now;
+    }
+
     /// <summary>Retorna as capabilities do plano actual.</summary>
     public IReadOnlyList<string> GetCapabilities() => TenantCapabilities.ForPlan(Plan);
 }

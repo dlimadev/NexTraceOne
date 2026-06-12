@@ -118,6 +118,17 @@ export function IncidentsPage() {
     && createForm.environment.trim().length > 0
   ), [createForm]);
 
+  const resolveIncidentMutation = useMutation({
+    mutationFn: (incidentId: string) => incidentsApi.resolveIncident(incidentId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['incidents'] });
+      await queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+    },
+    onError: (error: unknown) => {
+      setCreateError(resolveApiError(error));
+    },
+  });
+
   const createIncidentMutation = useMutation({
     mutationFn: () => incidentsApi.createIncident({
       ...createForm,
@@ -436,6 +447,22 @@ export function IncidentsPage() {
                               <Wrench size={10} />
                               {t('incidents.list.mitigationIndicator')}
                             </Badge>
+                          )}
+                          {canCreateIncident && inc.status !== 'Resolved' && inc.status !== 'Closed' && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                resolveIncidentMutation.mutate(inc.incidentId);
+                              }}
+                              disabled={resolveIncidentMutation.isPending}
+                              className="flex items-center gap-1 px-2 py-1 text-[11px] rounded-md border border-edge text-muted hover:text-success hover:border-success transition-colors disabled:opacity-50"
+                              title={t('incidents.list.resolveAction', 'Resolve incident')}
+                            >
+                              <CheckCircle2 size={12} />
+                              {t('incidents.list.resolveAction', 'Resolve')}
+                            </button>
                           )}
                         </div>
                       </NavLink>

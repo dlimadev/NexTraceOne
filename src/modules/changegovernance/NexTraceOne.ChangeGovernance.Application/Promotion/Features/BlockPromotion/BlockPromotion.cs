@@ -6,9 +6,13 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
+
+using IReleaseRepository = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions.IReleaseRepository;
 
 namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.BlockPromotion;
 
@@ -38,8 +42,11 @@ public static class BlockPromotion
     /// <summary>Handler que bloqueia uma PromotionRequest por regra de governança.</summary>
     public sealed class Handler(
         IPromotionRequestRepository requestRepository,
+        IReleaseRepository releaseRepository,
+        IDeploymentEnvironmentRepository environmentRepository,
         IPromotionUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEventBus eventBus) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -66,6 +73,22 @@ public static class BlockPromotion
 
             requestRepository.Update(promotionRequest);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            // Publica o evento de integração após o commit — consumido pelo módulo
+            // de notificações para alertar o owner sobre o bloqueio e a razão.
+            var release = await releaseRepository.GetByIdAsync(
+                ReleaseId.From(promotionRequest.ReleaseId), cancellationToken);
+            var targetEnvironment = await environmentRepository.GetByIdAsync(
+                promotionRequest.TargetEnvironmentId, cancellationToken);
+
+            await eventBus.PublishAsync(
+                new PromotionBlockedIntegrationEvent(
+                    promotionRequest.Id.Value,
+                    release?.ServiceName ?? string.Empty,
+                    targetEnvironment?.Name ?? string.Empty,
+                    request.Reason,
+                    OwnerUserId: null),
+                cancellationToken);
 
             return new Response(promotionRequest.Id.Value, promotionRequest.Status.ToString(), promotionRequest.CompletedAt);
         }

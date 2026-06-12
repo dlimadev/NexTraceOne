@@ -56,6 +56,9 @@ internal static class IngestionEndpointModule
     /// </summary>
     internal static void MapEndpoints(IEndpointRouteBuilder app)
     {
+        // ── Inbound webhooks (api_key na query + assinatura HMAC) ─────────────
+        GitHubWebhookEndpoints.Map(app);
+
         // ── Write groups (integrations:write) ─────────────────────────────────
         var deployments = app.MapGroup("/api/v1/deployments")
             .WithTags("Deployments")

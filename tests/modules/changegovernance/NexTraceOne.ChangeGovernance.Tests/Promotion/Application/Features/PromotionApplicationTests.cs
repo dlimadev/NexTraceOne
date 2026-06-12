@@ -232,7 +232,10 @@ public sealed class PromotionApplicationTests
         evalRepo.ListByRequestIdAsync(Arg.Any<PromotionRequestId>(), Arg.Any<CancellationToken>())
             .Returns(new List<GateEvaluation> { evaluation });
 
-        var sut = new ApprovePromotionFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider);
+        var sut = new ApprovePromotionFeature.Handler(
+            requestRepo, gateRepo, evalRepo, Substitute.For<IReleaseRepository>(),
+            Substitute.For<IDeploymentEnvironmentRepository>(), unitOfWork, dateTimeProvider,
+            Substitute.For<IEventBus>());
         var command = new ApprovePromotionFeature.Command(request.Id.Value, "lead@company.com", "LGTM");
 
         var result = await sut.Handle(command, CancellationToken.None);
@@ -266,7 +269,10 @@ public sealed class PromotionApplicationTests
         evalRepo.ListByRequestIdAsync(Arg.Any<PromotionRequestId>(), Arg.Any<CancellationToken>())
             .Returns(new List<GateEvaluation>());
 
-        var sut = new ApprovePromotionFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider);
+        var sut = new ApprovePromotionFeature.Handler(
+            requestRepo, gateRepo, evalRepo, Substitute.For<IReleaseRepository>(),
+            Substitute.For<IDeploymentEnvironmentRepository>(), unitOfWork, dateTimeProvider,
+            Substitute.For<IEventBus>());
         var command = new ApprovePromotionFeature.Command(request.Id.Value, "lead@company.com", null);
 
         var result = await sut.Handle(command, CancellationToken.None);

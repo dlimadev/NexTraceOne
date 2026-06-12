@@ -32,15 +32,24 @@ public sealed class ApiKeyAuthenticationHandler(
     /// <summary>Header HTTP que transporta a API key.</summary>
     private const string ApiKeyHeaderName = "X-Api-Key";
 
+    /// <summary>
+    /// Parâmetro de query string aceito como fallback para webhooks externos
+    /// (GitHub/GitLab não permitem headers customizados na entrega de webhooks).
+    /// </summary>
+    private const string ApiKeyQueryName = "api_key";
+
     /// <inheritdoc/>
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyValues))
-        {
-            return Task.FromResult(AuthenticateResult.NoResult());
-        }
+        string? apiKey = null;
 
-        var apiKey = apiKeyValues.FirstOrDefault();
+        if (Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyValues))
+            apiKey = apiKeyValues.FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(apiKey)
+            && Request.Query.TryGetValue(ApiKeyQueryName, out var queryValues))
+            apiKey = queryValues.FirstOrDefault();
+
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             return Task.FromResult(AuthenticateResult.NoResult());

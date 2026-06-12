@@ -109,6 +109,13 @@ public static class DependencyInjection
         // SaaS-01: Capability resolver para claims JWT
         services.AddScoped<ICapabilityResolver, DefaultCapabilityResolver>();
 
+        // SaaS-09: Billing via Stripe (checkout sessions + webhook assinado)
+        services.Configure<Services.StripeBillingOptions>(
+            configuration.GetSection(Services.StripeBillingOptions.SectionName));
+        services.AddScoped<IBillingGateway, Services.StripeBillingGateway>();
+        services.AddHttpClient("NexTraceOneStripe")
+            .AddStandardResilienceHandler();
+
         // SaaS-08: Alert evaluation background job
         services.AddHostedService<Jobs.AlertEvaluationJob>();
 
