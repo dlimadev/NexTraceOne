@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.IngestOtelMetrics;
 using NexTraceOne.Governance.Infrastructure.Persistence;
@@ -16,6 +17,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 /// </summary>
 public sealed class OtelMetricRepository(
     PlatformGovernanceDbContext context,
+    ICurrentTenant currentTenant,
     ILogger<OtelMetricRepository> logger) : IOtelMetricRepository
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -34,9 +36,12 @@ public sealed class OtelMetricRepository(
         if (dataPoints.Count == 0)
             return 0;
 
+        var tenantId = currentTenant.IsActive ? currentTenant.Id : Guid.Empty;
+
         var records = dataPoints.Select(dp => new OtelMetricRecord
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             MetricName = dp.MetricName,
             MetricType = dp.MetricType.ToString(),
             Value = dp.Value,
@@ -49,19 +54,16 @@ public sealed class OtelMetricRepository(
             IngestedAt = DateTime.UtcNow,
         }).ToList();
 
-        try
-        {
-            context.OtelMetrics.AddRange(records);
-            await context.SaveChangesAsync(cancellationToken);
-            return records.Count;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex,
-                "Batch insert of {Count} OTEL metrics failed",
-                dataPoints.Count);
-            return 0;
-        }
+        // Falhas de persistência propagam — perda silenciosa de telemetria
+        // mascararia problemas de ingestão (o endpoint converte em 500/422).
+        context.OtelMetrics.AddRange(records);
+        await context.SaveChangesAsync(cancellationToken);
+
+        logger.LogDebug(
+            "Batch insert of {Count} OTEL metrics persisted for tenant {TenantId}",
+            records.Count, tenantId);
+
+        return records.Count;
     }
 
     /// <summary>Consulta datapoints para análise de correlação change ↔ métrica.</summary>
@@ -78,6 +80,11 @@ public sealed class OtelMetricRepository(
                      && m.MetricName == metricName
                      && m.Timestamp >= from.UtcDateTime
                      && m.Timestamp <= to.UtcDateTime);
+
+        // Isolamento de tenant (defesa em profundidade) — jobs sem contexto
+        // de tenant mantêm visão global intencionalmente.
+        if (currentTenant.IsActive)
+            query = query.Where(m => m.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(environment))
             query = query.Where(m => m.Environment == environment);
@@ -101,7 +108,12 @@ public sealed class OtelMetricRepository(
     public async Task<IReadOnlyList<string>> GetDistinctServiceNamesAsync(
         CancellationToken cancellationToken = default)
     {
-        return await context.OtelMetrics
+        var query = context.OtelMetrics.AsQueryable();
+
+        if (currentTenant.IsActive)
+            query = query.Where(m => m.TenantId == currentTenant.Id);
+
+        return await query
             .Select(m => m.ServiceName)
             .Distinct()
             .OrderBy(n => n)
@@ -129,6 +141,7 @@ public sealed class OtelMetricRepository(
 public sealed class OtelMetricRecord
 {
     public Guid Id { get; set; }
+    public Guid TenantId { get; set; }
     public string MetricName { get; set; } = string.Empty;
     public string MetricType { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
