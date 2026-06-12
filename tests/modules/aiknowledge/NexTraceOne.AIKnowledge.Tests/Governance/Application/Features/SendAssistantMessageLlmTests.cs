@@ -34,15 +34,20 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IAiRoutingResolver _routingResolver = Substitute.For<IAiRoutingResolver>();
     private readonly IConversationPersistenceService _convPersistence = Substitute.For<IConversationPersistenceService>();
     private readonly IAiGuardrailEnforcementService _guardrailService = Substitute.For<IAiGuardrailEnforcementService>();
-    private readonly IContextWindowManager _contextWindow = Substitute.For<IContextWindowManager>();
+    private readonly ITokenCounterService _tokenCounter = Substitute.For<ITokenCounterService>();
+    private readonly IContextWindowManager _contextWindow;
     private readonly IPromptCacheService _promptCache = Substitute.For<IPromptCacheService>();
     private readonly IAiModelCatalogService _modelCatalogService = Substitute.For<IAiModelCatalogService>();
+    private readonly IAiMessageRepository _messageRepo = Substitute.For<IAiMessageRepository>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
 
     public SendAssistantMessageLlmTests()
     {
+        _tokenCounter.CountTokens(Arg.Any<string>()).Returns(10);
+        _contextWindow = new ContextWindowManager(_tokenCounter);
+
         _currentUser.Id.Returns("user-001");
         _currentUser.Email.Returns("engineer@nextraceone.io");
         _currentUser.Name.Returns("Test Engineer");
@@ -110,6 +115,10 @@ public sealed class SendAssistantMessageLlmTests
 
         // Default conversation persistence
         SetupDefaultConversationPersistence();
+
+        // Default message repository — no history
+        _messageRepo.ListByConversationAsync(Arg.Any<Guid>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiMessage>().AsReadOnly());
     }
 
     private void SetupDefaultConversationPersistence()
@@ -161,6 +170,7 @@ public sealed class SendAssistantMessageLlmTests
         _contextWindow,
         _promptCache,
         _modelCatalogService,
+        _messageRepo,
         _currentUser,
         _currentTenant,
         _currentEnvironment,
@@ -344,8 +354,11 @@ public sealed class SendAssistantMessageLlmTests
             CancellationToken.None);
 
         capturedRequest.Should().NotBeNull();
-        capturedRequest!.SystemPrompt.Should().Contain(persona);
-        capturedRequest.SystemPrompt.Should().Contain(contextScope);
+        // Phase 4: system prompt is now included as a "system" message in the Messages list
+        var systemMessage = capturedRequest!.Messages.FirstOrDefault(m => m.Role.Equals("system", StringComparison.OrdinalIgnoreCase));
+        systemMessage.Should().NotBeNull();
+        systemMessage!.Content.Should().Contain(persona);
+        systemMessage.Content.Should().Contain(contextScope);
     }
 
     // ── Test 7: provider empty response triggers degradation ─────────────

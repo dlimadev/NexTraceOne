@@ -54,19 +54,21 @@ public static class ReflectionAgent
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var aiPlan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.reflection",
+                    RequestType: "agent"),
+                cancellationToken);
 
-            if (provider is null)
+            if (!aiPlan.IsAvailable)
             {
-                logger.LogWarning("No AI provider available for reflection agent");
-                return CreateFallbackResponse(request, Guid.NewGuid().ToString("N"));
+                return Error.Business("AI.NotAvailable", aiPlan.UnavailabilityReason ?? "IA indisponível.");
             }
 
             var session = AgentReflectionSession.Start(
@@ -80,7 +82,7 @@ public static class ReflectionAgent
 
             try
             {
-                var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                var kernel = kernelService.CreateKernel(aiPlan.ProviderId, aiPlan.ModelId);
                 kernel.Data["GroundingQuery"] = request.Task;
 
                 for (var i = 1; i <= session.MaxIterations; i++)

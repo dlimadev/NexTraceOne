@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Bot,
   Send,
@@ -30,6 +30,7 @@ import {
   PanelLeftOpen,
   PanelLeftClose,
   LogOut,
+  Settings,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -219,6 +220,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
   const { persona, config } = usePersona();
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Auto-detect full-screen mode for AiUser persona
   const fullScreen = fullScreenProp ?? persona === 'AiUser';
@@ -639,6 +641,15 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
                 {providerStatus}
               </span>
             )}
+
+            {/* Preferences Link */}
+            <button
+              onClick={() => navigate('/me/ai-preferences')}
+              className="p-1.5 rounded-lg text-muted hover:text-body hover:bg-hover transition-colors"
+              title="Preferências de IA"
+            >
+              <Settings size={16} />
+            </button>
 
             {/* Model Selector */}
             {availableModels && (

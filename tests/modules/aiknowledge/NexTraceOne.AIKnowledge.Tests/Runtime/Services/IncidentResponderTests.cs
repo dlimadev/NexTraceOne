@@ -12,23 +12,31 @@ namespace NexTraceOne.AIKnowledge.Tests.Runtime.Services;
 public sealed class IncidentResponderTests
 {
     private readonly IAiKernelService _kernelService = Substitute.For<IAiKernelService>();
-    private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
+    private readonly IAiExecutionGateway _aiGateway = Substitute.For<IAiExecutionGateway>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ILogger<IncidentResponder.Handler> _logger = NullLogger<IncidentResponder.Handler>.Instance;
 
     public IncidentResponderTests()
     {
         _clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        _aiGateway.PreviewExecutionAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionPlan(
+                ProviderType: AiProviderType.Internal,
+                ProviderId: "ollama",
+                ModelId: "ollama",
+                ModelDisplayName: "Ollama",
+                IsAvailable: true,
+                UnavailabilityReason: null,
+                EstimatedCost: null,
+                AppliedPolicies: []));
     }
 
-    private IncidentResponder.Handler CreateHandler() => new(_kernelService, _providerFactory, _clock, _logger);
+    private IncidentResponder.Handler CreateHandler() => new(_kernelService, _aiGateway, _clock, _logger);
 
     [Fact]
     public async Task Handle_ValidIncident_ReturnsStructuredResponse()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
+
 
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
@@ -66,22 +74,27 @@ public sealed class IncidentResponderTests
     [Fact]
     public async Task Handle_NoProvider_ReturnsError()
     {
-        _providerFactory.GetChatProvider(Arg.Any<string>()).Returns((IChatCompletionProvider?)null);
+        _aiGateway.PreviewExecutionAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionPlan(
+                ProviderType: AiProviderType.Null,
+                ProviderId: "null",
+                ModelId: "null",
+                ModelDisplayName: "Null",
+                IsAvailable: false,
+                UnavailabilityReason: "No provider available",
+                EstimatedCost: null,
+                AppliedPolicies: []));
 
         var handler = CreateHandler();
         var result = await handler.Handle(new IncidentResponder.Command("Incident description"), CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("AI.ProviderNotFound");
+        result.Error.Code.Should().Be("AI.NotAvailable");
     }
 
     [Fact]
     public async Task Handle_InvalidJson_ReturnsFallbackResponse()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
-
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
         _kernelService.ExecuteChatAsync(Arg.Any<Kernel>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<ChatMessage>>(), Arg.Any<CancellationToken>())
@@ -98,10 +111,6 @@ public sealed class IncidentResponderTests
     [Fact]
     public async Task Handle_ServiceNameIncluded_InGroundingQuery()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
-
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
         _kernelService.ExecuteChatAsync(Arg.Any<Kernel>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<ChatMessage>>(), Arg.Any<CancellationToken>())

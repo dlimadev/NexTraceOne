@@ -1774,6 +1774,9 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Mode")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("RequiredModelId")
                         .HasColumnType("uuid");
 
@@ -3710,6 +3713,64 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SelfHealingActions");
+                });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.UserAiPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisableReason")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ExternalProduct")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ExternalProductModel")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FeatureKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PreferenceType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("PreferredModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PreferredProviderId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserAiPreferences");
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.WarRoomSession", b =>

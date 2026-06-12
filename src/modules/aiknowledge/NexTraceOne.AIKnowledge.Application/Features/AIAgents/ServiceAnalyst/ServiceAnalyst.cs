@@ -58,24 +58,26 @@ public static class ServiceAnalyst
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.service-analyst",
+                    RequestType: "agent"),
+                cancellationToken);
 
-            if (provider is null)
+            if (!plan.IsAvailable)
             {
-                logger.LogWarning("No AI provider available for service analysis");
-                return CreateFallbackResponse(request);
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
             }
 
             try
             {
-                var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
                 var groundingQuery = $"{request.ServiceName} {request.ServiceDescription}".Trim();
                 kernel.Data["GroundingQuery"] = groundingQuery;
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Application.Abstractions;
@@ -138,6 +139,8 @@ public static class DependencyInjection
         services.AddScoped<IPromptIntentClassifier, NexTraceOne.AIKnowledge.Application.Governance.Services.PromptIntentClassifierService>();
         services.AddScoped<IModelPredictionRepository, EfModelPredictionRepository>();
         services.AddScoped<IAiFeatureModelBindingRepository, AiFeatureModelBindingRepository>();
+        services.AddScoped<IUserAiPreferenceRepository, UserAiPreferenceRepository>();
+        services.AddScoped<IAiExecutionGateway, AiExecutionGateway>();
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
         services.AddScoped<IExternalDataSourceRepository, ExternalDataSourceRepository>();
         services.AddScoped<IDataSourceSyncService, DataSourceSyncService>();

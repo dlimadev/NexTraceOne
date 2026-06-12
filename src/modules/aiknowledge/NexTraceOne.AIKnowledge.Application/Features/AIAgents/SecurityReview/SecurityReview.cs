@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.SemanticKernel;
 using NexTraceOne.AIKnowledge.Application.Runtime.Utils;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -53,67 +52,73 @@ public static class SecurityReview
         string Description);
 
     internal sealed class Handler(
-        IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ICurrentTenant currentTenant,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
-
             List<Vulnerability> vulnerabilities;
             List<ComplianceIssue> compliance;
 
-            if (provider is not null)
+            try
             {
-                try
-                {
-                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
-                    kernel.Data["GroundingQuery"] = request.ProjectPath;
-                    var systemPrompt = """
-                        You are a security expert. Analyze the project and identify vulnerabilities and compliance issues.
-                        Respond ONLY with valid JSON. No markdown, no explanations.
+                var systemPrompt = """
+                    You are a security expert. Analyze the project and identify vulnerabilities and compliance issues.
+                    Respond ONLY with valid JSON. No markdown, no explanations.
 
-                        Expected JSON format:
+                    Expected JSON format:
+                    {
+                      "vulnerabilities": [
                         {
-                          "vulnerabilities": [
-                            {
-                              "type": "SQL Injection",
-                              "severity": "High",
-                              "location": "Repository.cs:45",
-                              "description": "Raw SQL query without parameterization",
-                              "remediation": "Use parameterized queries",
-                              "cveId": "CWE-89"
-                            }
-                          ],
-                          "compliance": [
-                            {
-                              "standard": "OWASP Top 10",
-                              "requirement": "A01:2021 - Broken Access Control",
-                              "compliant": true,
-                              "description": "Access control properly implemented"
-                            }
-                          ]
+                          "type": "SQL Injection",
+                          "severity": "High",
+                          "location": "Repository.cs:45",
+                          "description": "Raw SQL query without parameterization",
+                          "remediation": "Use parameterized queries",
+                          "cveId": "CWE-89"
                         }
-                        """;
-                    var messages = new List<ChatMessage> { new("user", $"Analyze security of project at: {request.ProjectPath}") };
-                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+                      ],
+                      "compliance": [
+                        {
+                          "standard": "OWASP Top 10",
+                          "requirement": "A01:2021 - Broken Access Control",
+                          "compliant": true,
+                          "description": "Access control properly implemented"
+                        }
+                      ]
+                    }
+                    """;
+                var messages = new List<ChatMessage> { new("user", $"Analyze security of project at: {request.ProjectPath}") };
 
-                    // Phase 2: parse LLM JSON response into structured data
-                    // For now, use fallback if parsing fails
-                    (vulnerabilities, compliance) = TryParseLlmResponse(llmResponse);
-                }
-                catch (Exception ex)
+                var executionResult = await aiExecutionGateway.ExecuteAsync(
+                    new AiExecutionRequest(
+                        FeatureKey: "aiknowledge.agent.security-review",
+                        RequestType: "agent",
+                        SystemPrompt: systemPrompt,
+                        Messages: messages,
+                        ContextData: new Dictionary<string, object> { ["GroundingQuery"] = request.ProjectPath }),
+                    cancellationToken);
+
+                if (executionResult.Success && !string.IsNullOrWhiteSpace(executionResult.Content))
                 {
-                    logger.LogWarning(ex, "LLM security review failed; falling back to simulated data");
+                    (vulnerabilities, compliance) = TryParseLlmResponse(executionResult.Content);
+                    logger.LogInformation(
+                        "SecurityReview executed via gateway using provider {Provider}",
+                        executionResult.ResolvedProviderId);
+                }
+                else
+                {
+                    logger.LogWarning(
+                        "SecurityReview gateway execution failed: {Error}. Using simulated fallback.",
+                        executionResult.ErrorMessage);
                     (vulnerabilities, compliance) = (GetSimulatedVulnerabilities(), GetSimulatedCompliance());
                 }
             }
-            else
+            catch (Exception ex)
             {
+                logger.LogWarning(ex, "LLM security review failed via gateway; falling back to simulated data");
                 (vulnerabilities, compliance) = (GetSimulatedVulnerabilities(), GetSimulatedCompliance());
             }
 

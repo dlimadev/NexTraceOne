@@ -55,24 +55,26 @@ public static class IncidentResponder
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.incident-responder",
+                    RequestType: "agent"),
+                cancellationToken);
 
-            if (provider is null)
+            if (!plan.IsAvailable)
             {
-                logger.LogWarning("No AI provider available for incident response");
-                return Error.NotFound("AI.ProviderNotFound", "No AI provider available for incident response.");
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
             }
 
             try
             {
-                var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
                 var groundingQuery = $"{request.IncidentDescription} {request.ServiceName}".Trim();
                 kernel.Data["GroundingQuery"] = groundingQuery;
 

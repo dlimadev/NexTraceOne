@@ -1,5 +1,6 @@
 using FluentAssertions;
 
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GenerateIncidentNarrative;
@@ -13,7 +14,7 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 
 /// <summary>
 /// Testes unitários para a feature GenerateIncidentNarrative.
-/// Verificam: sucesso, incidente não encontrado, narrativa duplicada.
+/// Verificam: sucesso via IA, sucesso via fallback template, incidente não encontrado, narrativa duplicada.
 /// </summary>
 public sealed class GenerateIncidentNarrativeTests
 {
@@ -24,6 +25,7 @@ public sealed class GenerateIncidentNarrativeTests
     private readonly IIncidentNarrativeRepository _narrativeRepo = Substitute.For<IIncidentNarrativeRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
+    private readonly IAiExecutionGateway _aiGateway = Substitute.For<IAiExecutionGateway>();
 
     public GenerateIncidentNarrativeTests()
     {
@@ -33,7 +35,7 @@ public sealed class GenerateIncidentNarrativeTests
     }
 
     [Fact]
-    public async Task Handle_IncidentExists_NoExistingNarrative_ShouldSucceed()
+    public async Task Handle_IncidentExists_NoExistingNarrative_AiFails_ShouldFallbackToTemplate()
     {
         _store.IncidentExists(KnownIncidentGuid.ToString()).Returns(true);
         _narrativeRepo.GetByIncidentIdAsync(KnownIncidentGuid, Arg.Any<CancellationToken>())
@@ -42,7 +44,19 @@ public sealed class GenerateIncidentNarrativeTests
         var detail = CreateMockDetail();
         _store.GetIncidentDetail(KnownIncidentGuid.ToString()).Returns(detail);
 
-        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant);
+        _aiGateway.ExecuteAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionResult(
+                Success: false,
+                Content: null,
+                ProviderType: AiProviderType.Null,
+                ResolvedProviderId: "",
+                ResolvedModelId: "",
+                ResolvedModelDisplayName: "",
+                PromptTokens: 0,
+                CompletionTokens: 0,
+                Duration: TimeSpan.Zero));
+
+        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant, _aiGateway);
         var command = new GenerateIncidentNarrative.Command(KnownIncidentGuid, null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -56,7 +70,7 @@ public sealed class GenerateIncidentNarrativeTests
     }
 
     [Fact]
-    public async Task Handle_IncidentExists_WithModelPreference_ShouldUsePreferredModel()
+    public async Task Handle_IncidentExists_AiSucceeds_ShouldUseAiContent()
     {
         _store.IncidentExists(KnownIncidentGuid.ToString()).Returns(true);
         _narrativeRepo.GetByIncidentIdAsync(KnownIncidentGuid, Arg.Any<CancellationToken>())
@@ -65,13 +79,28 @@ public sealed class GenerateIncidentNarrativeTests
         var detail = CreateMockDetail();
         _store.GetIncidentDetail(KnownIncidentGuid.ToString()).Returns(detail);
 
-        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant);
+        _aiGateway.ExecuteAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionResult(
+                Success: true,
+                Content: "## AI Generated Narrative\n\nSymptoms: High latency.",
+                ProviderType: AiProviderType.Internal,
+                ResolvedProviderId: "openai",
+                ResolvedModelId: "gpt-4o",
+                ResolvedModelDisplayName: "GPT-4o",
+                PromptTokens: 50,
+                CompletionTokens: 100,
+                Duration: TimeSpan.FromMilliseconds(200)));
+
+        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant, _aiGateway);
         var command = new GenerateIncidentNarrative.Command(KnownIncidentGuid, "gpt-4o");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.ModelUsed.Should().Be("gpt-4o");
+        result.Value.NarrativeText.Should().Be("## AI Generated Narrative\n\nSymptoms: High latency.");
+        result.Value.ModelUsed.Should().Be("openai/gpt-4o");
+
+        await _narrativeRepo.Received(1).AddAsync(Arg.Any<IncidentNarrative>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -79,7 +108,7 @@ public sealed class GenerateIncidentNarrativeTests
     {
         _store.IncidentExists(Arg.Any<string>()).Returns(false);
 
-        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant);
+        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant, _aiGateway);
         var command = new GenerateIncidentNarrative.Command(Guid.NewGuid(), null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -103,7 +132,7 @@ public sealed class GenerateIncidentNarrativeTests
         _narrativeRepo.GetByIncidentIdAsync(KnownIncidentGuid, Arg.Any<CancellationToken>())
             .Returns(existingNarrative);
 
-        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant);
+        var handler = new GenerateIncidentNarrative.Handler(_store, _narrativeRepo, _clock, _currentTenant, _aiGateway);
         var command = new GenerateIncidentNarrative.Command(KnownIncidentGuid, null);
 
         var result = await handler.Handle(command, CancellationToken.None);

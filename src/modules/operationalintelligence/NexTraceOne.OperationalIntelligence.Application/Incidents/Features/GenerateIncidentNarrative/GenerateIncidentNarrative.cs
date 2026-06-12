@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -43,7 +44,8 @@ public static class GenerateIncidentNarrative
         IIncidentStore incidentStore,
         IIncidentNarrativeRepository narrativeRepository,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
+        ICurrentTenant currentTenant,
+        IAiExecutionGateway aiExecutionGateway) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -63,36 +65,68 @@ public static class GenerateIncidentNarrative
             }
 
             var detail = incidentStore.GetIncidentDetail(incidentId);
-            var modelUsed = request.ModelPreference ?? "template-v1";
             var now = dateTimeProvider.UtcNow;
             var tenantId = currentTenant.IsActive ? currentTenant.Id : (Guid?)null;
 
-            var symptomsSection = detail?.Identity.Summary ?? "No symptoms description available.";
-            var timelineSection = $"Incident reported at {detail?.Identity.CreatedAt:u}.";
-            var affectedServicesSection = $"Service: {(detail?.LinkedServices is { Count: > 0 } ls ? ls[0].DisplayName : "N/A")} " +
-                $"(Team: {detail?.OwnerTeam ?? "N/A"})";
-            var probableCauseSection = $"Under investigation. Severity: {detail?.Identity.Severity}.";
-            var mitigationSection = $"Status: {detail?.Identity.Status}.";
+            var affectedServiceName = (detail?.LinkedServices is { Count: > 0 } ls ? ls[0].DisplayName : "N/A");
 
-            var narrativeText = $"## Incident Narrative: {detail?.Identity.Title ?? "Unknown"}\n\n" +
-                $"### Symptoms\n{symptomsSection}\n\n" +
-                $"### Timeline\n{timelineSection}\n\n" +
-                $"### Affected Services\n{affectedServicesSection}\n\n" +
-                $"### Probable Cause\n{probableCauseSection}\n\n" +
-                $"### Mitigation\n{mitigationSection}\n";
+            string narrativeText;
+            string modelUsed;
+            int tokensUsed = 0;
+
+            var aiResult = await aiExecutionGateway.ExecuteAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "operationalintelligence.incident-narrative",
+                    RequestType: "chat",
+                    UserPrompt: $"Generate an incident narrative for: {detail?.Identity.Title ?? "Unknown"}. Severity: {detail?.Identity.Severity}. Status: {detail?.Identity.Status}. Symptoms: {detail?.Identity.Summary ?? "N/A"}. Affected service: {affectedServiceName}.",
+                    SystemPrompt: "You are an incident response assistant. Generate a structured incident narrative with sections: Symptoms, Timeline, Affected Services, Probable Cause, Mitigation. Use markdown headers. Be concise.",
+                    Temperature: 0.3f,
+                    MaxTokens: 1500),
+                cancellationToken);
+
+            if (aiResult.Success && !string.IsNullOrWhiteSpace(aiResult.Content))
+            {
+                narrativeText = aiResult.Content;
+                modelUsed = $"{aiResult.ResolvedProviderId}/{aiResult.ResolvedModelId}";
+                tokensUsed = aiResult.PromptTokens + aiResult.CompletionTokens;
+            }
+            else
+            {
+                var symptomsSection = detail?.Identity.Summary ?? "No symptoms description available.";
+                var timelineSection = $"Incident reported at {detail?.Identity.CreatedAt:u}.";
+                var affectedServicesSection = $"Service: {affectedServiceName} " +
+                    $"(Team: {detail?.OwnerTeam ?? "N/A"})";
+                var probableCauseSection = $"Under investigation. Severity: {detail?.Identity.Severity}.";
+                var mitigationSection = $"Status: {detail?.Identity.Status}.";
+
+                narrativeText = $"## Incident Narrative: {detail?.Identity.Title ?? "Unknown"}\n\n" +
+                    $"### Symptoms\n{symptomsSection}\n\n" +
+                    $"### Timeline\n{timelineSection}\n\n" +
+                    $"### Affected Services\n{affectedServicesSection}\n\n" +
+                    $"### Probable Cause\n{probableCauseSection}\n\n" +
+                    $"### Mitigation\n{mitigationSection}\n";
+                modelUsed = "template-v1";
+            }
+
+            var symptomsSectionForCreate = detail?.Identity.Summary ?? "No symptoms description available.";
+            var timelineSectionForCreate = $"Incident reported at {detail?.Identity.CreatedAt:u}.";
+            var affectedServicesSectionForCreate = $"Service: {affectedServiceName} " +
+                $"(Team: {detail?.OwnerTeam ?? "N/A"})";
+            var probableCauseSectionForCreate = $"Under investigation. Severity: {detail?.Identity.Severity}.";
+            var mitigationSectionForCreate = $"Status: {detail?.Identity.Status}.";
 
             var narrative = IncidentNarrative.Create(
                 IncidentNarrativeId.New(),
                 request.IncidentId,
                 narrativeText,
-                symptomsSection,
-                timelineSection,
-                probableCauseSection,
-                mitigationSection,
+                symptomsSectionForCreate,
+                timelineSectionForCreate,
+                probableCauseSectionForCreate,
+                mitigationSectionForCreate,
                 relatedChangesSection: null,
-                affectedServicesSection,
+                affectedServicesSectionForCreate,
                 modelUsed,
-                tokensUsed: 0,
+                tokensUsed,
                 NarrativeStatus.Draft,
                 tenantId,
                 now);

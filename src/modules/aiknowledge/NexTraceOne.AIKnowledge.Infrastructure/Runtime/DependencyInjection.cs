@@ -12,8 +12,11 @@ using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.VectorStore;
 using NexTraceOne.AIKnowledge.Application.Runtime.Plugins;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Gemini;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.GitHubCopilot;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.LmStudio;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Null;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.SemanticKernel;
@@ -48,6 +51,10 @@ public static class DependencyInjection
             configuration.GetSection(AnthropicOptions.SectionName));
         services.Configure<LmStudioOptions>(
             configuration.GetSection(LmStudioOptions.SectionName));
+        services.Configure<GeminiOptions>(
+            configuration.GetSection(GeminiOptions.SectionName));
+        services.Configure<GitHubCopilotOptions>(
+            configuration.GetSection(GitHubCopilotOptions.SectionName));
 
         // Ollama HTTP client (registered via IHttpClientFactory — typed client pattern)
         services.AddHttpClient<OllamaHttpClient>((sp, client) =>
@@ -69,6 +76,11 @@ public static class DependencyInjection
             // SamplingDuration must be >= 2× AttemptTimeout per Polly validation
             opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(300);
         });
+
+        // Null provider — always registered; used when AI is disabled for a feature
+        services.AddScoped<NullAiProvider>();
+        services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<NullAiProvider>());
+        services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<NullAiProvider>());
 
         // Ollama provider — scoped because OllamaHttpClient is transient (from HttpClientFactory)
         services.AddScoped<OllamaProvider>();
@@ -147,6 +159,54 @@ public static class DependencyInjection
             services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<LmStudioProvider>());
         }
 
+        // Gemini provider — registered only when ApiKey is configured
+        var geminiOptions = configuration.GetSection(GeminiOptions.SectionName).Get<GeminiOptions>();
+        if (geminiOptions?.IsConfigured == true)
+        {
+            services.AddHttpClient<GeminiHttpClient>((sp, client) =>
+            {
+                var normalized = geminiOptions.BaseUrl.EndsWith("/", StringComparison.Ordinal)
+                    ? geminiOptions.BaseUrl
+                    : $"{geminiOptions.BaseUrl}/";
+                client.BaseAddress = new Uri(normalized);
+                client.Timeout = TimeSpan.FromSeconds(geminiOptions.TimeoutSeconds);
+            }).AddStandardResilienceHandler(opts =>
+            {
+                opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(90);
+                opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(180);
+                opts.Retry.MaxRetryAttempts = 2;
+            });
+
+            services.AddScoped<GeminiProvider>();
+            services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<GeminiProvider>());
+            services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<GeminiProvider>());
+        }
+
+        // GitHub Copilot provider — registered only when ApiToken is configured
+        var gitHubCopilotOptions = configuration.GetSection(GitHubCopilotOptions.SectionName).Get<GitHubCopilotOptions>();
+        if (gitHubCopilotOptions?.IsConfigured == true)
+        {
+            services.AddHttpClient<GitHubCopilotHttpClient>((sp, client) =>
+            {
+                var normalized = gitHubCopilotOptions.BaseUrl.EndsWith("/", StringComparison.Ordinal)
+                    ? gitHubCopilotOptions.BaseUrl
+                    : $"{gitHubCopilotOptions.BaseUrl}/";
+                client.BaseAddress = new Uri(normalized);
+                client.Timeout = TimeSpan.FromSeconds(gitHubCopilotOptions.TimeoutSeconds);
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", gitHubCopilotOptions.ApiToken);
+            }).AddStandardResilienceHandler(opts =>
+            {
+                opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(90);
+                opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(180);
+                opts.Retry.MaxRetryAttempts = 2;
+            });
+
+            services.AddScoped<GitHubCopilotProvider>();
+            services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<GitHubCopilotProvider>());
+            services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<GitHubCopilotProvider>());
+        }
+
         // Factory — scoped to resolve scoped providers
         services.AddScoped<IAiProviderFactory, AiProviderFactory>();
 
@@ -158,6 +218,14 @@ public static class DependencyInjection
 
         // Health — scoped (depends on scoped factory)
         services.AddScoped<IAiProviderHealthService, AiProviderHealthService>();
+
+        // Health monitor — singleton background service with cached health state
+        services.AddSingleton<AiProviderHealthBackgroundService>();
+        services.AddSingleton<IAiProviderHealthMonitor>(sp => sp.GetRequiredService<AiProviderHealthBackgroundService>());
+        services.AddHostedService(sp => sp.GetRequiredService<AiProviderHealthBackgroundService>());
+
+        // Routing metrics — scoped (depends on scoped ledger repository)
+        services.AddScoped<IAiRoutingMetricsService, AiRoutingMetricsService>();
 
         // Token quota cache — singleton (shared across requests, thread-safe via MemoryCache)
         // AI-0.2: usa DistributedTokenQuotaCache quando Redis está configurado; fallback in-memory.

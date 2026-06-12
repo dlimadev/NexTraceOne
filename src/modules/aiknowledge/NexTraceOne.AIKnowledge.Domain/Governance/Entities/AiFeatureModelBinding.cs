@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using MediatR;
 
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
@@ -50,6 +51,9 @@ public sealed class AiFeatureModelBinding : AuditableEntity<AiFeatureModelBindin
     /// <summary>Provider do modelo de fallback.</summary>
     public string? FallbackProviderId { get; private set; }
 
+    /// <summary>Modo de operação da vinculação: Disabled, Internal ou ExternalProduct.</summary>
+    public AiBindingMode Mode { get; private set; }
+
     /// <summary>Indica se esta vinculação está ativa e sendo aplicada.</summary>
     public bool IsActive { get; private set; }
 
@@ -63,7 +67,8 @@ public sealed class AiFeatureModelBinding : AuditableEntity<AiFeatureModelBindin
         string description,
         Guid requiredModelId,
         string requiredModelName,
-        string requiredProviderId)
+        string requiredProviderId,
+        AiBindingMode mode = AiBindingMode.Internal)
     {
         Guard.Against.Default(tenantId, nameof(tenantId));
         Guard.Against.NullOrWhiteSpace(featureKey);
@@ -80,18 +85,20 @@ public sealed class AiFeatureModelBinding : AuditableEntity<AiFeatureModelBindin
             RequiredModelId = requiredModelId,
             RequiredModelName = requiredModelName,
             RequiredProviderId = requiredProviderId,
+            Mode = mode,
             IsActive = true
         };
     }
 
     /// <summary>
-    /// Atualiza a descrição e o modelo obrigatório da vinculação.
+    /// Atualiza a descrição, o modo e o modelo obrigatório da vinculação.
     /// </summary>
     public Result<Unit> Update(
         string description,
         Guid requiredModelId,
         string requiredModelName,
-        string requiredProviderId)
+        string requiredProviderId,
+        AiBindingMode? mode = null)
     {
         Guard.Against.Default(requiredModelId, nameof(requiredModelId));
         Guard.Against.NullOrWhiteSpace(requiredModelName);
@@ -101,6 +108,17 @@ public sealed class AiFeatureModelBinding : AuditableEntity<AiFeatureModelBindin
         RequiredModelId = requiredModelId;
         RequiredModelName = requiredModelName;
         RequiredProviderId = requiredProviderId;
+        if (mode.HasValue)
+            Mode = mode.Value;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Define o modo de operação da vinculação.
+    /// </summary>
+    public Result<Unit> SetMode(AiBindingMode mode)
+    {
+        Mode = mode;
         return Unit.Value;
     }
 

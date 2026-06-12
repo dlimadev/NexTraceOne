@@ -63,24 +63,27 @@ public static class ChangeAdvisor
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.change-advisor",
+                    RequestType: "agent"),
+                cancellationToken);
 
-            if (provider is null)
+            if (!plan.IsAvailable)
             {
-                logger.LogWarning("No AI provider available for change advisory");
-                return CreateFallbackResponse(request);
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
             }
+
+            var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
 
             try
             {
-                var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
                 var groundingQuery = $"{request.ChangeType} {request.ChangeDescription}".Trim();
                 kernel.Data["GroundingQuery"] = groundingQuery;
 

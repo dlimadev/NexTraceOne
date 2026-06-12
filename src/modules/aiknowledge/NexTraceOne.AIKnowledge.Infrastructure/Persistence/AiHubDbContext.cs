@@ -72,6 +72,7 @@ public sealed class AiHubDbContext(
     public DbSet<AgentExecutionPlan> AgentExecutionPlans => Set<AgentExecutionPlan>();
     public DbSet<AiFeatureModelBinding> FeatureModelBindings => Set<AiFeatureModelBinding>();
     public DbSet<ModelPredictionSample> ModelPredictionSamples => Set<ModelPredictionSample>();
+    public DbSet<UserAiPreference> UserAiPreferences => Set<UserAiPreference>();
 
     // ── ExternalAI — prefixo "ExternalAi" evita conflito com AiProvider.Providers ──
     public DbSet<ExternalAiProvider> ExternalAiProviders => Set<ExternalAiProvider>();

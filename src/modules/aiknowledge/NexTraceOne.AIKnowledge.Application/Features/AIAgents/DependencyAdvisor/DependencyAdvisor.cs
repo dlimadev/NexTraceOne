@@ -51,70 +51,70 @@ public static class DependencyAdvisor
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ICurrentTenant currentTenant,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.dependency-advisor",
+                    RequestType: "agent"),
+                cancellationToken);
+
+            if (!plan.IsAvailable)
+            {
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
+            }
+
+            var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
 
             List<DependencyInfo> dependencies;
             List<VulnerabilityInfo> vulnerabilities;
             List<string> recommendations;
 
-            if (provider is not null)
+            try
             {
-                try
-                {
-                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
-                    kernel.Data["GroundingQuery"] = request.ProjectPath;
-                    var systemPrompt = """
-                        You are a dependency security analyst. Analyze the project dependencies and identify vulnerabilities and outdated packages.
-                        Respond ONLY with valid JSON. No markdown, no explanations.
+                kernel.Data["GroundingQuery"] = request.ProjectPath;
+                var systemPrompt = """
+                    You are a dependency security analyst. Analyze the project dependencies and identify vulnerabilities and outdated packages.
+                    Respond ONLY with valid JSON. No markdown, no explanations.
 
-                        Expected JSON format:
+                    Expected JSON format:
+                    {
+                      "dependencies": [
                         {
-                          "dependencies": [
-                            {
-                              "name": "Newtonsoft.Json",
-                              "version": "13.0.2",
-                              "latestVersion": "13.0.3",
-                              "isOutdated": true,
-                              "hasVulnerabilities": false
-                            }
-                          ],
-                          "vulnerabilities": [
-                            {
-                              "packageName": "Newtonsoft.Json",
-                              "severity": "Medium",
-                              "cveId": "CVE-2024-1234",
-                              "description": "Deserialization vulnerability",
-                              "remediation": "Upgrade to 13.0.3"
-                            }
-                          ],
-                          "recommendations": [
-                            "Upgrade Newtonsoft.Json to 13.0.3"
-                          ]
+                          "name": "Newtonsoft.Json",
+                          "version": "13.0.2",
+                          "latestVersion": "13.0.3",
+                          "isOutdated": true,
+                          "hasVulnerabilities": false
                         }
-                        """;
-                    var messages = new List<ChatMessage> { new("user", $"Analyze dependencies of project at: {request.ProjectPath}") };
-                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+                      ],
+                      "vulnerabilities": [
+                        {
+                          "packageName": "Newtonsoft.Json",
+                          "severity": "Medium",
+                          "cveId": "CVE-2024-1234",
+                          "description": "Deserialization vulnerability",
+                          "remediation": "Upgrade to 13.0.3"
+                        }
+                      ],
+                      "recommendations": [
+                        "Upgrade Newtonsoft.Json to 13.0.3"
+                      ]
+                    }
+                    """;
+                var messages = new List<ChatMessage> { new("user", $"Analyze dependencies of project at: {request.ProjectPath}") };
+                var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
 
-                    (dependencies, vulnerabilities, recommendations) = TryParseLlmResponse(llmResponse);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "LLM dependency analysis failed; falling back to simulated data");
-                    dependencies = GetSimulatedDependencies();
-                    vulnerabilities = GetSimulatedVulnerabilities();
-                    recommendations = GetSimulatedRecommendations();
-                }
+                (dependencies, vulnerabilities, recommendations) = TryParseLlmResponse(llmResponse);
             }
-            else
+            catch (Exception ex)
             {
+                logger.LogWarning(ex, "LLM dependency analysis failed; falling back to simulated data");
                 dependencies = GetSimulatedDependencies();
                 vulnerabilities = GetSimulatedVulnerabilities();
                 recommendations = GetSimulatedRecommendations();

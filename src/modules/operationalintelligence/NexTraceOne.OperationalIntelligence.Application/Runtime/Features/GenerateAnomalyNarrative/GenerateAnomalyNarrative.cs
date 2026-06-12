@@ -5,6 +5,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
@@ -38,13 +39,15 @@ public static class GenerateAnomalyNarrative
     /// <summary>
     /// Handler que gera a narrativa estruturada de uma anomalia (drift finding).
     /// Valida que o drift finding existe e que não há narrativa duplicada.
+    /// Tenta gerar via IA com fallback para template estruturado.
     /// </summary>
     public sealed class Handler(
         IDriftFindingRepository driftFindingRepository,
         IAnomalyNarrativeRepository narrativeRepository,
         IRuntimeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
+        ICurrentTenant currentTenant,
+        IAiExecutionGateway aiExecutionGateway) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -64,25 +67,55 @@ public static class GenerateAnomalyNarrative
                 return RuntimeIntelligenceErrors.AnomalyNarrativeAlreadyExists(request.DriftFindingId.ToString());
             }
 
-            var modelUsed = request.ModelPreference ?? "template-v1";
             var now = dateTimeProvider.UtcNow;
             var tenantId = currentTenant.IsActive ? currentTenant.Id : (Guid?)null;
 
-            var symptomsSection = $"Anomaly detected on metric '{driftFinding.MetricName}' " +
-                $"for service '{driftFinding.ServiceName}' in environment '{driftFinding.Environment}'.";
-            var baselineComparisonSection = $"Expected value: {driftFinding.ExpectedValue}, " +
-                $"Actual value: {driftFinding.ActualValue}, " +
-                $"Deviation: {driftFinding.DeviationPercent}%.";
-            var severityJustificationSection = $"Severity '{driftFinding.Severity}' assigned based on " +
-                $"{driftFinding.DeviationPercent}% deviation from baseline.";
-            var recommendedActionsSection = $"Investigate service '{driftFinding.ServiceName}' " +
-                $"in environment '{driftFinding.Environment}' for recent changes affecting '{driftFinding.MetricName}'.";
+            // Tentar gerar via IA com fallback para template
+            var aiResult = await aiExecutionGateway.ExecuteAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "operationalintelligence.anomaly-narrative",
+                    RequestType: "chat",
+                    UserPrompt: $"Generate an anomaly narrative for metric '{driftFinding.MetricName}' on service '{driftFinding.ServiceName}' in '{driftFinding.Environment}'. Expected: {driftFinding.ExpectedValue}, Actual: {driftFinding.ActualValue}, Deviation: {driftFinding.DeviationPercent}%.",
+                    SystemPrompt: "You are an SRE assistant. Generate a structured anomaly narrative with sections: Symptoms, Baseline Comparison, Severity Justification, Recommended Actions. Use markdown headers. Be concise.",
+                    Temperature: 0.3f,
+                    MaxTokens: 1500),
+                cancellationToken);
 
-            var narrativeText = $"## Anomaly Narrative: {driftFinding.MetricName}\n\n" +
-                $"### Symptoms\n{symptomsSection}\n\n" +
-                $"### Baseline Comparison\n{baselineComparisonSection}\n\n" +
-                $"### Severity Justification\n{severityJustificationSection}\n\n" +
-                $"### Recommended Actions\n{recommendedActionsSection}\n";
+            string narrativeText;
+            string modelUsed;
+            string symptomsSection;
+            string baselineComparisonSection;
+            string severityJustificationSection;
+            string recommendedActionsSection;
+
+            if (aiResult.Success && !string.IsNullOrWhiteSpace(aiResult.Content))
+            {
+                narrativeText = aiResult.Content;
+                modelUsed = $"{aiResult.ResolvedProviderId}/{aiResult.ResolvedModelId}";
+                symptomsSection = narrativeText;
+                baselineComparisonSection = narrativeText;
+                severityJustificationSection = narrativeText;
+                recommendedActionsSection = narrativeText;
+            }
+            else
+            {
+                symptomsSection = $"Anomaly detected on metric '{driftFinding.MetricName}' " +
+                    $"for service '{driftFinding.ServiceName}' in environment '{driftFinding.Environment}'.";
+                baselineComparisonSection = $"Expected value: {driftFinding.ExpectedValue}, " +
+                    $"Actual value: {driftFinding.ActualValue}, " +
+                    $"Deviation: {driftFinding.DeviationPercent}%.";
+                severityJustificationSection = $"Severity '{driftFinding.Severity}' assigned based on " +
+                    $"{driftFinding.DeviationPercent}% deviation from baseline.";
+                recommendedActionsSection = $"Investigate service '{driftFinding.ServiceName}' " +
+                    $"in environment '{driftFinding.Environment}' for recent changes affecting '{driftFinding.MetricName}'.";
+
+                narrativeText = $"## Anomaly Narrative: {driftFinding.MetricName}\n\n" +
+                    $"### Symptoms\n{symptomsSection}\n\n" +
+                    $"### Baseline Comparison\n{baselineComparisonSection}\n\n" +
+                    $"### Severity Justification\n{severityJustificationSection}\n\n" +
+                    $"### Recommended Actions\n{recommendedActionsSection}\n";
+                modelUsed = "template-v1";
+            }
 
             var narrative = AnomalyNarrative.Create(
                 AnomalyNarrativeId.New(),
@@ -95,7 +128,7 @@ public static class GenerateAnomalyNarrative
                 recommendedActionsSection,
                 severityJustificationSection,
                 modelUsed,
-                tokensUsed: 0,
+                tokensUsed: aiResult.Success ? aiResult.PromptTokens + aiResult.CompletionTokens : 0,
                 AnomalyNarrativeStatus.Draft,
                 tenantId,
                 now);

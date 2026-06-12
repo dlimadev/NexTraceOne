@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Application\NexTraceOne.ChangeGovernance.Application.csproj" />
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Domain\NexTraceOne.Integrations.Domain.csproj" />
+    <ProjectReference Include="..\..\aiknowledge\NexTraceOne.AIKnowledge.Application\NexTraceOne.AIKnowledge.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />

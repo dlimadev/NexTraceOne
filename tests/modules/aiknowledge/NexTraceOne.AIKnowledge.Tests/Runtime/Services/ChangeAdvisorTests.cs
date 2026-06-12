@@ -11,23 +11,31 @@ namespace NexTraceOne.AIKnowledge.Tests.Runtime.Services;
 public sealed class ChangeAdvisorTests
 {
     private readonly IAiKernelService _kernelService = Substitute.For<IAiKernelService>();
-    private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
+    private readonly IAiExecutionGateway _aiGateway = Substitute.For<IAiExecutionGateway>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ILogger<ChangeAdvisor.Handler> _logger = NullLogger<ChangeAdvisor.Handler>.Instance;
 
     public ChangeAdvisorTests()
     {
         _clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        _aiGateway.PreviewExecutionAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionPlan(
+                ProviderType: AiProviderType.Internal,
+                ProviderId: "ollama",
+                ModelId: "ollama",
+                ModelDisplayName: "Ollama",
+                IsAvailable: true,
+                UnavailabilityReason: null,
+                EstimatedCost: null,
+                AppliedPolicies: []));
     }
 
-    private ChangeAdvisor.Handler CreateHandler() => new(_kernelService, _providerFactory, _clock, _logger);
+    private ChangeAdvisor.Handler CreateHandler() => new(_kernelService, _aiGateway, _clock, _logger);
 
     [Fact]
     public async Task Handle_ValidChange_ReturnsStructuredResponse()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
+
 
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
@@ -87,27 +95,29 @@ public sealed class ChangeAdvisorTests
     }
 
     [Fact]
-    public async Task Handle_NoProvider_ReturnsFallbackResponse()
+    public async Task Handle_NoProvider_ReturnsNotAvailableError()
     {
-        _providerFactory.GetChatProvider(Arg.Any<string>()).Returns((IChatCompletionProvider?)null);
+        _aiGateway.PreviewExecutionAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionPlan(
+                ProviderType: AiProviderType.Null,
+                ProviderId: "null",
+                ModelId: "null",
+                ModelDisplayName: "Null",
+                IsAvailable: false,
+                UnavailabilityReason: "No provider available",
+                EstimatedCost: null,
+                AppliedPolicies: []));
 
         var handler = CreateHandler();
         var result = await handler.Handle(new ChangeAdvisor.Command("Deploy new feature"), CancellationToken.None);
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.RiskLevel.Should().Be("Unknown");
-        result.Value.ReadinessScore.Should().Be(50);
-        result.Value.ApprovalRecommended.Should().BeFalse();
-        result.Value.Mitigations.Should().HaveCount(3);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("AI.NotAvailable");
     }
 
     [Fact]
     public async Task Handle_InvalidJson_ReturnsFallbackResponse()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
-
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
         _kernelService.ExecuteChatAsync(Arg.Any<Kernel>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<ChatMessage>>(), Arg.Any<CancellationToken>())
@@ -124,10 +134,6 @@ public sealed class ChangeAdvisorTests
     [Fact]
     public async Task Handle_LowReadinessScore_ReturnsLowValue()
     {
-        var provider = Substitute.For<IChatCompletionProvider>();
-        provider.ProviderId.Returns("ollama");
-        _providerFactory.GetChatProvider("ollama").Returns(provider);
-
         var kernel = Kernel.CreateBuilder().Build();
         _kernelService.CreateKernel("ollama", "ollama").Returns(kernel);
 

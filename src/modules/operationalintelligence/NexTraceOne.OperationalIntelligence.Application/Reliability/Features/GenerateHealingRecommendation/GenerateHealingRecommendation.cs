@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -64,7 +65,8 @@ public static class GenerateHealingRecommendation
         IHealingRecommendationRepository repository,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider,
-        IReliabilityUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IReliabilityUnitOfWork unitOfWork,
+        IAiExecutionGateway aiExecutionGateway) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -75,13 +77,31 @@ public static class GenerateHealingRecommendation
 
             var now = dateTimeProvider.UtcNow;
 
+            var aiResult = await aiExecutionGateway.ExecuteAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "operationalintelligence.healing-recommendation",
+                    RequestType: "chat",
+                    UserPrompt: $"Service: {request.ServiceName}. Environment: {request.Environment}. Root cause: {request.RootCauseDescription}. Action type: {request.ActionType}. Details: {request.ActionDetails}. Confidence: {request.ConfidenceScore}. Historical success: {request.HistoricalSuccessRate}.",
+                    SystemPrompt: "You are an SRE assistant. Given incident details, generate a concise self-healing recommendation with: rationale, steps, expected outcome, and risk assessment. Return plain text, max 800 tokens.",
+                    Temperature: 0.2f,
+                    MaxTokens: 800),
+                cancellationToken);
+
+            string? enrichedDetails = null;
+            int tokensUsed = 0;
+            if (aiResult.Success && !string.IsNullOrWhiteSpace(aiResult.Content))
+            {
+                enrichedDetails = aiResult.Content;
+                tokensUsed = aiResult.PromptTokens + aiResult.CompletionTokens;
+            }
+
             var recommendation = HealingRecommendation.Generate(
                 request.ServiceName,
                 request.Environment,
                 request.IncidentId,
                 request.RootCauseDescription,
                 actionType,
-                request.ActionDetails,
+                enrichedDetails ?? request.ActionDetails,
                 request.ConfidenceScore,
                 request.EstimatedImpact,
                 request.RelatedRunbookIds,
@@ -102,7 +122,9 @@ public static class GenerateHealingRecommendation
                 recommendation.ConfidenceScore,
                 recommendation.HistoricalSuccessRate,
                 recommendation.Status.ToString(),
-                recommendation.GeneratedAt));
+                recommendation.GeneratedAt,
+                tokensUsed,
+                aiResult.Success ? $"{aiResult.ResolvedProviderId}/{aiResult.ResolvedModelId}" : null));
         }
     }
 
@@ -117,5 +139,7 @@ public static class GenerateHealingRecommendation
         int ConfidenceScore,
         decimal? HistoricalSuccessRate,
         string Status,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        int? TokensUsed = null,
+        string? ModelUsed = null);
 }

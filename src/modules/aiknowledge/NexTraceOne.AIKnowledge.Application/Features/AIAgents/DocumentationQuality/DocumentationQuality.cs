@@ -45,64 +45,62 @@ public static class DocumentationQuality
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ICurrentTenant currentTenant,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.documentation-quality",
+                    RequestType: "agent"),
+                cancellationToken);
+
+            if (!plan.IsAvailable)
+            {
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
+            }
 
             double coverage, quality;
             List<DocumentationGap> gaps;
             List<string> recommendations;
 
-            if (provider is not null)
+            try
             {
-                try
-                {
-                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
-                    kernel.Data["GroundingQuery"] = request.ProjectPath;
-                    var systemPrompt = """
-                        You are a documentation quality analyst. Analyze the project documentation and identify gaps.
-                        Respond ONLY with valid JSON. No markdown, no explanations.
+                var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
+                kernel.Data["GroundingQuery"] = request.ProjectPath;
+                var systemPrompt = """
+                    You are a documentation quality analyst. Analyze the project documentation and identify gaps.
+                    Respond ONLY with valid JSON. No markdown, no explanations.
 
-                        Expected JSON format:
+                    Expected JSON format:
+                    {
+                      "coverage": 75.5,
+                      "quality": 82.0,
+                      "gaps": [
                         {
-                          "coverage": 75.5,
-                          "quality": 82.0,
-                          "gaps": [
-                            {
-                              "itemType": "Class",
-                              "itemName": "UserService",
-                              "location": "Services/UserService.cs",
-                              "severity": "High",
-                              "suggestion": "Missing class-level XML documentation"
-                            }
-                          ],
-                          "recommendations": [
-                            "Enable StyleCop analyzer to enforce XML documentation"
-                          ]
+                          "itemType": "Class",
+                          "itemName": "UserService",
+                          "location": "Services/UserService.cs",
+                          "severity": "High",
+                          "suggestion": "Missing class-level XML documentation"
                         }
-                        """;
-                    var messages = new List<ChatMessage> { new("user", $"Analyze documentation of project at: {request.ProjectPath}") };
-                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+                      ],
+                      "recommendations": [
+                        "Enable StyleCop analyzer to enforce XML documentation"
+                      ]
+                    }
+                    """;
+                var messages = new List<ChatMessage> { new("user", $"Analyze documentation of project at: {request.ProjectPath}") };
+                var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
 
-                    (coverage, quality, gaps, recommendations) = TryParseLlmResponse(llmResponse);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "LLM documentation analysis failed; falling back to simulated data");
-                    coverage = 75.5;
-                    quality = 82.0;
-                    gaps = GetSimulatedGaps();
-                    recommendations = GetSimulatedRecommendations();
-                }
+                (coverage, quality, gaps, recommendations) = TryParseLlmResponse(llmResponse);
             }
-            else
+            catch (Exception ex)
             {
+                logger.LogWarning(ex, "LLM documentation analysis failed; falling back to simulated data");
                 coverage = 75.5;
                 quality = 82.0;
                 gaps = GetSimulatedGaps();

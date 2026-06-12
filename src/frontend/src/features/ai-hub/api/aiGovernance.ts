@@ -305,6 +305,27 @@ export const aiGovernanceApi = {
   }) =>
     client.post(`/ai/artifacts/${artifactId}/review`, data).then(r => r.data),
 
+  // ── User AI Preferences ────────────────────────────────────────────
+  getUserAiPreferences: () =>
+    client.get('/me/ai-preferences').then(r => r.data),
+  getUserAiPreference: (featureKey: string) =>
+    client.get(`/me/ai-preferences/${featureKey}`).then(r => r.data),
+  upsertUserAiPreference: (data: {
+    featureKey: string;
+    preferenceType: number;
+    preferredModelId?: string | null;
+    preferredProviderId?: string | null;
+    externalProduct?: number | null;
+    externalProductModel?: string | null;
+    disableReason?: string | null;
+  }) => client.put('/me/ai-preferences', data).then(r => r.data),
+  deleteUserAiPreference: (featureKey: string) =>
+    client.delete(`/me/ai-preferences/${featureKey}`).then(r => r.data),
+  checkAiAvailability: (featureKey: string) =>
+    client.get(`/me/ai-preferences/availability/${featureKey}`).then(r => r.data),
+  previewAiExecution: (data: { featureKey: string; requestType?: string }) =>
+    client.post('/me/ai-preferences/execution-preview', data).then(r => r.data),
+
   // ── AI Environment Analysis (Phase 7) ────────────────────────────────
   analyzeNonProdEnvironment: (data: {
     tenantId: string;

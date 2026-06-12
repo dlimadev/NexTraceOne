@@ -1,6 +1,7 @@
 using FluentAssertions;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GenerateAnomalyNarrative;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
@@ -23,12 +24,25 @@ public sealed class GenerateAnomalyNarrativeTests
     private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
+    private readonly IAiExecutionGateway _aiGateway = Substitute.For<IAiExecutionGateway>();
 
     public GenerateAnomalyNarrativeTests()
     {
         _clock.UtcNow.Returns(FixedNow);
         _currentTenant.IsActive.Returns(true);
         _currentTenant.Id.Returns(Guid.NewGuid());
+        _aiGateway.ExecuteAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionResult(
+                Success: false,
+                Content: null,
+                ProviderType: AiProviderType.Null,
+                ResolvedProviderId: "null",
+                ResolvedModelId: "null",
+                ResolvedModelDisplayName: "Null",
+                PromptTokens: 0,
+                CompletionTokens: 0,
+                Duration: TimeSpan.Zero,
+                ErrorMessage: "IA not available"));
     }
 
     [Fact]
@@ -45,7 +59,7 @@ public sealed class GenerateAnomalyNarrativeTests
             .Returns((AnomalyNarrative?)null);
 
         var handler = new GenerateAnomalyNarrative.Handler(
-            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant);
+            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant, _aiGateway);
         var command = new GenerateAnomalyNarrative.Command(driftFindingGuid, null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -60,7 +74,7 @@ public sealed class GenerateAnomalyNarrativeTests
     }
 
     [Fact]
-    public async Task Handle_DriftExists_WithModelPreference_ShouldUsePreferredModel()
+    public async Task Handle_DriftExists_AiUnavailable_ShouldFallbackToTemplate()
     {
         var driftFinding = DriftFinding.Detect(
             "order-service", "production", "ErrorRate",
@@ -72,13 +86,13 @@ public sealed class GenerateAnomalyNarrativeTests
             .Returns((AnomalyNarrative?)null);
 
         var handler = new GenerateAnomalyNarrative.Handler(
-            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant);
+            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant, _aiGateway);
         var command = new GenerateAnomalyNarrative.Command(driftFinding.Id.Value, "gpt-4o");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.ModelUsed.Should().Be("gpt-4o");
+        result.Value.ModelUsed.Should().Be("template-v1");
     }
 
     [Fact]
@@ -88,7 +102,7 @@ public sealed class GenerateAnomalyNarrativeTests
             .Returns((DriftFinding?)null);
 
         var handler = new GenerateAnomalyNarrative.Handler(
-            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant);
+            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant, _aiGateway);
         var command = new GenerateAnomalyNarrative.Command(Guid.NewGuid(), null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -118,7 +132,7 @@ public sealed class GenerateAnomalyNarrativeTests
             .Returns(existingNarrative);
 
         var handler = new GenerateAnomalyNarrative.Handler(
-            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant);
+            _driftRepo, _narrativeRepo, _unitOfWork, _clock, _currentTenant, _aiGateway);
         var command = new GenerateAnomalyNarrative.Command(driftFinding.Id.Value, null);
 
         var result = await handler.Handle(command, CancellationToken.None);

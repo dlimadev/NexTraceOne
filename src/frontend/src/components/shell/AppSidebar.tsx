@@ -201,6 +201,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.userTokenQuotas', to: '/ai/user-token-quotas', icon: <Clock size={18} />, permission: 'ai:governance:write', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
   { labelKey: 'sidebar.aiMcp', to: '/ai/mcp', icon: <Network size={18} />, permission: 'ai:runtime:read', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
   { labelKey: 'sidebar.aiIde', to: '/ai/ide', icon: <Code2 size={18} />, permission: 'ai:governance:read', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
+  { labelKey: 'sidebar.aiPreferences', to: '/me/ai-preferences', icon: <Settings2 size={18} />, permission: 'ai:assistant:read', section: 'aiHub', subGroup: 'sidebar.subGroupAiTools' },
 
   // ── ADMIN ─────────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },

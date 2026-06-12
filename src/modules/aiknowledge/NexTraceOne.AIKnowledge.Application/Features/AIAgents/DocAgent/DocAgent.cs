@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.SemanticKernel;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -36,31 +35,38 @@ public static class DocAgent
         List<string> Warnings);
 
     internal sealed class Handler(
-        IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
-
-            if (provider is null)
-            {
-                return Error.NotFound("AI.ProviderNotFound", "No AI provider available for DocAgent.");
-            }
-
-            var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
-            kernel.Data["GroundingQuery"] = request.Content;
-
             var systemPrompt = BuildSystemPrompt(request.DocType, request.TargetAudience, request.Style);
             var messages = new List<ChatMessage>
             {
                 new("user", $"Generate documentation for the following content:\n\n{request.Content}")
             };
 
-            var generated = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+            var executionResult = await aiExecutionGateway.ExecuteAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.doc-agent",
+                    RequestType: "agent",
+                    SystemPrompt: systemPrompt,
+                    Messages: messages,
+                    ContextData: new Dictionary<string, object> { ["GroundingQuery"] = request.Content }),
+                cancellationToken);
+
+            if (!executionResult.Success)
+            {
+                logger.LogWarning(
+                    "DocAgent execution failed via gateway: {Error}",
+                    executionResult.ErrorMessage);
+                return Error.Business(
+                    "AI.DocGenerationFailed",
+                    executionResult.ErrorMessage ?? "Falha ao gerar documentação via IA.");
+            }
+
+            var generated = executionResult.Content;
 
             if (string.IsNullOrWhiteSpace(generated))
             {
@@ -73,8 +79,8 @@ public static class DocAgent
             var warnings = ExtractWarnings(generated, request.Content);
 
             logger.LogInformation(
-                "DocAgent generated {DocType} doc with quality {Quality} at {Timestamp}",
-                request.DocType, qualityScore, dateTimeProvider.UtcNow);
+                "DocAgent generated {DocType} doc with quality {Quality} via provider {Provider} at {Timestamp}",
+                request.DocType, qualityScore, executionResult.ResolvedProviderId, dateTimeProvider.UtcNow);
 
             return new Response(generated, qualityScore, suggestions, warnings);
         }

@@ -82,6 +82,7 @@ public static class SendAssistantMessage
         IContextWindowManager contextWindow,
         IPromptCacheService promptCache,
         IAiModelCatalogService modelCatalogService,
+        IAiMessageRepository messageRepository,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         ICurrentEnvironment currentEnvironment,
@@ -200,9 +201,15 @@ public static class SendAssistantMessage
                 }
             }
 
-            // 5. Pre-validate token quota
-            var estimatedTokens = contextWindow.EstimateTokens(request.Message) +
-                                  contextWindow.EstimateTokens(groundingResult.GroundingContext);
+            // 5. Build message list with conversation history
+            var messages = await BuildMessageListAsync(
+                conversation.Id.Value,
+                request.Message,
+                groundingResult.SystemPrompt,
+                cancellationToken);
+
+            // 5b. Pre-validate token quota (now includes full message history)
+            var estimatedTokens = contextWindow.EstimateTotalTokens(messages);
 
             var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
                 currentUser.Id,
@@ -221,7 +228,10 @@ public static class SendAssistantMessage
                 return AiGovernanceErrors.QuotaExceeded("user", currentUser.Id);
             }
 
-            // 6. Execute inference (with prompt cache)
+            // 6. Execute inference
+            // Note: Prompt cache is intentionally DISABLED for stateful assistant chat.
+            // Caching responses with conversation history is unreliable — the same user message
+            // with different history should produce different responses.
             var selectedModel = routingResult.SelectedModel;
             var selectedProvider = routingResult.SelectedProvider;
             var isInternal = routingResult.IsInternal;
@@ -230,100 +240,75 @@ public static class SendAssistantMessage
             int promptTokens;
             int completionTokens;
 
-            // 6a. Check prompt cache
-            var promptHash = promptCache.ComputePromptHash(
-                request.Message + "|" + groundingResult.GroundingContext,
-                selectedModel,
-                temperature: null,
-                maxTokens: null);
-            var cachedResponse = await promptCache.GetCachedResponseAsync(promptHash, selectedModel, cancellationToken);
-
-            if (!string.IsNullOrEmpty(cachedResponse))
+            try
             {
-                logger.LogDebug("Prompt cache HIT for conversation {ConversationId}", conversation.Id.Value);
-                grounded = cachedResponse;
-                promptTokens = contextWindow.EstimateTokens(request.Message + groundingResult.GroundingContext);
-                completionTokens = contextWindow.EstimateTokens(grounded);
-            }
-            else
-            {
-                try
+                var chatProvider = providerFactory.GetChatProvider(selectedProvider);
+                if (chatProvider is not null)
                 {
-                    var chatProvider = providerFactory.GetChatProvider(selectedProvider);
-                    if (chatProvider is not null)
+                    logger.LogDebug(
+                        "Calling IChatCompletionProvider {ProviderId} model {ModelId} for conversation {ConversationId}",
+                        chatProvider.ProviderId, selectedModel, conversation.Id.Value);
+
+                    var chatRequest = new ChatCompletionRequest(selectedModel, messages, SystemPrompt: null);
+                    var result = await chatProvider.CompleteAsync(chatRequest, cancellationToken);
+
+                    if (result.Success && !string.IsNullOrWhiteSpace(result.Content))
                     {
-                        logger.LogDebug(
-                            "Calling IChatCompletionProvider {ProviderId} model {ModelId} for conversation {ConversationId}",
-                            chatProvider.ProviderId, selectedModel, conversation.Id.Value);
-
-                        var messages = new List<ChatMessage> { new("user", request.Message) };
-                        var chatRequest = new ChatCompletionRequest(selectedModel, messages, SystemPrompt: groundingResult.SystemPrompt);
-                        var result = await chatProvider.CompleteAsync(chatRequest, cancellationToken);
-
-                        if (result.Success && !string.IsNullOrWhiteSpace(result.Content))
-                        {
-                            grounded = result.Content;
-                            promptTokens = result.PromptTokens > 0
-                                ? result.PromptTokens
-                                : contextWindow.EstimateTokens(request.Message + groundingResult.GroundingContext);
-                            completionTokens = result.CompletionTokens > 0
-                                ? result.CompletionTokens
-                                : contextWindow.EstimateTokens(grounded);
-                            if (!string.IsNullOrWhiteSpace(result.ModelId)) selectedModel = result.ModelId;
-                            if (!string.IsNullOrWhiteSpace(result.ProviderId)) selectedProvider = result.ProviderId;
-
-                            // Cache successful response
-                            await promptCache.CacheResponseAsync(promptHash, selectedModel, grounded, ct: cancellationToken);
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                string.IsNullOrWhiteSpace(result.ErrorMessage)
-                                    ? "Provider returned empty response."
-                                    : result.ErrorMessage);
-                        }
+                        grounded = result.Content;
+                        promptTokens = result.PromptTokens > 0
+                            ? result.PromptTokens
+                            : contextWindow.EstimateTotalTokens(messages);
+                        completionTokens = result.CompletionTokens > 0
+                            ? result.CompletionTokens
+                            : contextWindow.EstimateTokens(grounded);
+                        if (!string.IsNullOrWhiteSpace(result.ModelId)) selectedModel = result.ModelId;
+                        if (!string.IsNullOrWhiteSpace(result.ProviderId)) selectedProvider = result.ProviderId;
                     }
                     else
                     {
-                        logger.LogDebug(
-                            "No local provider registered for {ProviderId}; routing via IExternalAIRoutingPort",
-                            selectedProvider);
-
-                        var routingEnvironment = currentEnvironment.IsResolved && currentEnvironment.IsProductionLike
-                            ? "production"
-                            : null;
-
-                        grounded = await externalAiRoutingPort.RouteQueryAsync(
-                            groundingResult.GroundingContext,
-                            request.Message,
-                            preferredProvider: selectedProvider,
-                            capability: groundingResult.UseCaseType.ToString(),
-                            environment: routingEnvironment,
-                            cancellationToken: cancellationToken);
-
-                        promptTokens = contextWindow.EstimateTokens(request.Message + groundingResult.GroundingContext);
-                        completionTokens = contextWindow.EstimateTokens(grounded);
-                        if (string.IsNullOrWhiteSpace(selectedModel)) selectedModel = "external-routed";
-                        if (string.IsNullOrWhiteSpace(selectedProvider)) selectedProvider = "external-routing-port";
-
-                        // Cache external routed response
-                        await promptCache.CacheResponseAsync(promptHash, selectedModel, grounded, ct: cancellationToken);
+                        throw new InvalidOperationException(
+                            string.IsNullOrWhiteSpace(result.ErrorMessage)
+                                ? "Provider returned empty response."
+                                : result.ErrorMessage);
                     }
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                else
                 {
-                    logger.LogWarning(ex,
-                        "AI provider routing failed for conversation {ConversationId}. Persisting explicit degraded response.",
-                        conversation.Id.Value);
+                    logger.LogDebug(
+                        "No local provider registered for {ProviderId}; routing via IExternalAIRoutingPort",
+                        selectedProvider);
 
-                    degradedReason = AiMessage.ProviderUnavailableReason;
-                    grounded = BuildExplicitProviderUnavailableResponse(request.Message, groundingResult.GroundingContext, ex.Message);
-                    selectedModel = DegradedModelName;
-                    selectedProvider = DegradedProviderId;
-                    isInternal = true;
-                    promptTokens = contextWindow.EstimateTokens(request.Message + groundingResult.GroundingContext);
+                    var routingEnvironment = currentEnvironment.IsResolved && currentEnvironment.IsProductionLike
+                        ? "production"
+                        : null;
+
+                    grounded = await externalAiRoutingPort.RouteQueryAsync(
+                        groundingResult.GroundingContext,
+                        request.Message,
+                        preferredProvider: selectedProvider,
+                        capability: groundingResult.UseCaseType.ToString(),
+                        environment: routingEnvironment,
+                        cancellationToken: cancellationToken);
+
+                    promptTokens = contextWindow.EstimateTotalTokens(messages);
                     completionTokens = contextWindow.EstimateTokens(grounded);
+                    if (string.IsNullOrWhiteSpace(selectedModel)) selectedModel = "external-routed";
+                    if (string.IsNullOrWhiteSpace(selectedProvider)) selectedProvider = "external-routing-port";
                 }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogWarning(ex,
+                    "AI provider routing failed for conversation {ConversationId}. Persisting explicit degraded response.",
+                    conversation.Id.Value);
+
+                degradedReason = AiMessage.ProviderUnavailableReason;
+                grounded = BuildExplicitProviderUnavailableResponse(request.Message, groundingResult.GroundingContext, ex.Message);
+                selectedModel = DegradedModelName;
+                selectedProvider = DegradedProviderId;
+                isInternal = true;
+                promptTokens = contextWindow.EstimateTotalTokens(messages);
+                completionTokens = contextWindow.EstimateTokens(grounded);
             }
 
             var usedDeterministicFallback = grounded.StartsWith(AiMessage.DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase);
@@ -455,6 +440,64 @@ public static class SendAssistantMessage
                 ConversationTitle: persistResult.ConversationTitle,
                 ConversationMessageCount: persistResult.ConversationMessageCount,
                 ConversationLastMessageAt: persistResult.ConversationLastMessageAt);
+        }
+
+        /// <summary>
+        /// Constrói a lista completa de mensagens para o LLM incluindo histórico da conversa.
+        /// Aplica sliding window via IContextWindowManager para respeitar o context window do modelo.
+        /// </summary>
+        private async Task<List<ChatMessage>> BuildMessageListAsync(
+            Guid conversationId,
+            string currentMessage,
+            string? systemPrompt,
+            CancellationToken ct)
+        {
+            const int defaultMaxContextTokens = 128_000; // Safe default for modern chat models
+            const int reserveForCompletion = 4096;
+
+            var messages = new List<ChatMessage>();
+
+            if (!string.IsNullOrWhiteSpace(systemPrompt))
+            {
+                messages.Add(new ChatMessage("system", systemPrompt));
+            }
+
+            // Load conversation history
+            var history = await messageRepository.ListByConversationAsync(conversationId, pageSize: 100, ct);
+            foreach (var msg in history ?? Array.Empty<AiMessage>())
+            {
+                if (string.Equals(msg.Role, "user", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Skip degraded assistant responses — replaying them confuses the model
+                    if (string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase) &&
+                        msg.Content.StartsWith(AiMessage.DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    messages.Add(new ChatMessage(msg.Role, msg.Content));
+                }
+            }
+
+            // Add current user message
+            messages.Add(new ChatMessage("user", currentMessage));
+
+            // Apply sliding window if needed
+            var (trimmed, wasTruncated) = contextWindow.TrimToFit(messages, defaultMaxContextTokens, reserveForCompletion);
+
+            // Defensive: ensure we never return null (protects against faulty implementations or test mocks)
+            var result = trimmed ?? messages;
+
+            if (wasTruncated)
+            {
+                logger.LogInformation(
+                    "Conversation {ConversationId} history truncated to fit context window. " +
+                    "Original={OriginalCount}, Trimmed={TrimmedCount}",
+                    conversationId, messages.Count, result.Count);
+            }
+
+            return result.ToList();
         }
 
         private static string BuildExplicitProviderUnavailableResponse(string query, string groundingContext, string errorMessage)

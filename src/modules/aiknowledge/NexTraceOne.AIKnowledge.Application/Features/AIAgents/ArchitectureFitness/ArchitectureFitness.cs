@@ -51,72 +51,72 @@ public static class ArchitectureFitness
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider clock,
         ICurrentTenant currentTenant,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.architecture-fitness",
+                    RequestType: "agent"),
+                cancellationToken);
+
+            if (!plan.IsAvailable)
+            {
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
+            }
+
+            var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
 
             List<CodeSmell> codeSmells;
             List<RefactoringSuggestion> suggestions;
             double overall, modularity, coupling, cohesion, maintainability;
 
-            if (provider is not null)
+            try
             {
-                try
-                {
-                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
-                    kernel.Data["GroundingQuery"] = request.ProjectPath;
-                    var systemPrompt = """
-                        You are a software architect. Analyze the project structure and identify code smells and refactoring opportunities.
-                        Respond ONLY with valid JSON. No markdown, no explanations.
+                kernel.Data["GroundingQuery"] = request.ProjectPath;
+                var systemPrompt = """
+                    You are a software architect. Analyze the project structure and identify code smells and refactoring opportunities.
+                    Respond ONLY with valid JSON. No markdown, no explanations.
 
-                        Expected JSON format:
+                    Expected JSON format:
+                    {
+                      "overallScore": 85.0,
+                      "modularityScore": 80.0,
+                      "couplingScore": 75.0,
+                      "cohesionScore": 90.0,
+                      "maintainabilityScore": 88.0,
+                      "codeSmells": [
                         {
-                          "overallScore": 85.0,
-                          "modularityScore": 80.0,
-                          "couplingScore": 75.0,
-                          "cohesionScore": 90.0,
-                          "maintainabilityScore": 88.0,
-                          "codeSmells": [
-                            {
-                              "type": "Long Method",
-                              "severity": "Medium",
-                              "location": "Service.cs:45",
-                              "description": "Method exceeds 50 lines"
-                            }
-                          ],
-                          "refactoringSuggestions": [
-                            {
-                              "title": "Extract Methods",
-                              "description": "Break down long methods",
-                              "priority": 2,
-                              "effortEstimate": "1 day",
-                              "benefits": ["Better readability", "Easier testing"]
-                            }
-                          ]
+                          "type": "Long Method",
+                          "severity": "Medium",
+                          "location": "Service.cs:45",
+                          "description": "Method exceeds 50 lines"
                         }
-                        """;
-                    var messages = new List<ChatMessage> { new("user", $"Analyze architecture of project at: {request.ProjectPath}") };
-                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+                      ],
+                      "refactoringSuggestions": [
+                        {
+                          "title": "Extract Methods",
+                          "description": "Break down long methods",
+                          "priority": 2,
+                          "effortEstimate": "1 day",
+                          "benefits": ["Better readability", "Easier testing"]
+                        }
+                      ]
+                    }
+                    """;
+                var messages = new List<ChatMessage> { new("user", $"Analyze architecture of project at: {request.ProjectPath}") };
+                var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
 
-                    // Phase 2: parse structured response
-                    (overall, modularity, coupling, cohesion, maintainability, codeSmells, suggestions) = TryParseLlmResponse(llmResponse);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "LLM architecture analysis failed; falling back to simulated data");
-                    (overall, modularity, coupling, cohesion, maintainability) = (85.0, 80.0, 75.0, 90.0, 88.0);
-                    codeSmells = GetSimulatedCodeSmells();
-                    suggestions = GetSimulatedSuggestions(overall, codeSmells);
-                }
+                // Phase 2: parse structured response
+                (overall, modularity, coupling, cohesion, maintainability, codeSmells, suggestions) = TryParseLlmResponse(llmResponse);
             }
-            else
+            catch (Exception ex)
             {
+                logger.LogWarning(ex, "LLM architecture analysis failed; falling back to simulated data");
                 (overall, modularity, coupling, cohesion, maintainability) = (85.0, 80.0, 75.0, 90.0, 88.0);
                 codeSmells = GetSimulatedCodeSmells();
                 suggestions = GetSimulatedSuggestions(overall, codeSmells);

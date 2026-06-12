@@ -7,49 +7,47 @@ using NexTraceOne.Governance.Application.Abstractions;
 namespace NexTraceOne.Governance.Infrastructure.AI;
 
 /// <summary>
-/// Implementação de IAiDashboardComposerService que delega ao IChatCompletionProvider do módulo AIKnowledge.
-/// Quando o provider não está configurado, IsConfigured = false e o handler usa fallback keyword-based.
+/// Implementação de IAiDashboardComposerService que delega ao IAiExecutionGateway do módulo AIKnowledge.
+/// Quando o gateway não retorna sucesso, o handler usa fallback keyword-based.
 /// </summary>
 internal sealed class AiDashboardComposerService(
-    IChatCompletionProvider? chatProvider,
+    IAiExecutionGateway aiExecutionGateway,
     ILogger<AiDashboardComposerService> logger) : IAiDashboardComposerService
 {
-    public bool IsConfigured => chatProvider is not null;
+    public bool IsConfigured => true;
 
     public async Task<AiDashboardProposal?> ComposeAsync(
         AiDashboardCompositionRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (chatProvider is null) return null;
-
         var systemPrompt = BuildSystemPrompt();
         var userPrompt = BuildUserPrompt(request);
 
-        var completionRequest = new ChatCompletionRequest(
-            ModelId: "default",
-            Messages: [new ChatMessage("user", userPrompt)],
-            Temperature: 0.3,
-            MaxTokens: 1500,
-            SystemPrompt: systemPrompt);
-
-        ChatCompletionResult result;
         try
         {
-            result = await chatProvider.CompleteAsync(completionRequest, cancellationToken);
+            var result = await aiExecutionGateway.ExecuteAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "governance.dashboard-composer",
+                    RequestType: "chat",
+                    UserPrompt: userPrompt,
+                    SystemPrompt: systemPrompt,
+                    Temperature: 0.3f,
+                    MaxTokens: 1500),
+                cancellationToken);
+
+            if (!result.Success || string.IsNullOrWhiteSpace(result.Content))
+            {
+                logger.LogWarning("AI dashboard composition returned no content");
+                return null;
+            }
+
+            return ParseProposal(result.Content, result.ResolvedModelId, result.ResolvedProviderId);
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "AI dashboard composition failed; falling back to keyword analysis");
             return null;
         }
-
-        if (!result.Success || string.IsNullOrWhiteSpace(result.Content))
-        {
-            logger.LogWarning("AI provider returned no content for dashboard composition");
-            return null;
-        }
-
-        return ParseProposal(result.Content, result.ModelId, result.ProviderId);
     }
 
     // ── Prompt builders ──────────────────────────────────────────────────────

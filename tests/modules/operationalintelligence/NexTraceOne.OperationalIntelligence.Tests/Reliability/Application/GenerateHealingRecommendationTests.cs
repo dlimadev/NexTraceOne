@@ -1,3 +1,4 @@
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GenerateHealingRecommendation;
@@ -16,12 +17,25 @@ public sealed class GenerateHealingRecommendationTests
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
     private readonly IReliabilityUnitOfWork _unitOfWork = Substitute.For<IReliabilityUnitOfWork>();
+    private readonly IAiExecutionGateway _aiGateway = Substitute.For<IAiExecutionGateway>();
 
     public GenerateHealingRecommendationTests()
     {
         _currentTenant.Id.Returns(TenantId);
         _dateTimeProvider.UtcNow.Returns(FixedNow);
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
+        _aiGateway.ExecuteAsync(Arg.Any<AiExecutionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AiExecutionResult(
+                Success: false,
+                Content: null,
+                ProviderType: AiProviderType.Null,
+                ResolvedProviderId: "null",
+                ResolvedModelId: "null",
+                ResolvedModelDisplayName: "Null",
+                PromptTokens: 0,
+                CompletionTokens: 0,
+                Duration: TimeSpan.Zero,
+                ErrorMessage: "IA not available"));
     }
 
     [Fact]
@@ -129,5 +143,5 @@ public sealed class GenerateHealingRecommendationTests
     }
 
     private GenerateHealingRecommendation.Handler CreateHandler()
-        => new(_repository, _currentTenant, _dateTimeProvider, _unitOfWork);
+        => new(_repository, _currentTenant, _dateTimeProvider, _unitOfWork, _aiGateway);
 }

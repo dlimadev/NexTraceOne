@@ -43,21 +43,24 @@ public static class PRAgent
 
     internal sealed class Handler(
         IAiKernelService kernelService,
-        IAiProviderFactory providerFactory,
+        IAiExecutionGateway aiExecutionGateway,
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var provider = providerFactory.GetChatProvider("ollama")
-                ?? providerFactory.GetChatProvider("openai");
+            var plan = await aiExecutionGateway.PreviewExecutionAsync(
+                new AiExecutionRequest(
+                    FeatureKey: "aiknowledge.agent.pr-agent",
+                    RequestType: "agent"),
+                cancellationToken);
 
-            if (provider is null)
+            if (!plan.IsAvailable)
             {
-                return Error.NotFound("AI.ProviderNotFound", "No AI provider available for PRAgent.");
+                return Error.Business("AI.NotAvailable", plan.UnavailabilityReason ?? "IA indisponível.");
             }
 
-            var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+            var kernel = kernelService.CreateKernel(plan.ProviderId, plan.ModelId);
             kernel.Data["GroundingQuery"] = $"{request.Title} {request.Description}".Trim();
 
             var systemPrompt = BuildSystemPrompt(request.Language);

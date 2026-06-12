@@ -23,6 +23,7 @@ const AiMemoryIntelligencePage = lazy(() => import('../features/ai-hub/pages/AiM
 const FeatureModelBindingsPage = lazy(() => import('../features/ai-hub/pages/FeatureModelBindingsPage').then(m => ({ default: m.FeatureModelBindingsPage })));
 const UserModelPoliciesPage = lazy(() => import('../features/ai-hub/pages/UserModelPoliciesPage').then(m => ({ default: m.UserModelPoliciesPage })));
 const UserTokenQuotasPage = lazy(() => import('../features/ai-hub/pages/UserTokenQuotasPage').then(m => ({ default: m.UserTokenQuotasPage })));
+const UserAiPreferencesPage = lazy(() => import('../features/ai-hub/pages/UserAiPreferencesPage').then(m => ({ default: m.UserAiPreferencesPage })));
 
 export function AiHubRoutes() {
   return (
@@ -160,6 +161,14 @@ export function AiHubRoutes() {
         element={
           <ProtectedRoute permission="ai:governance:write" redirectTo="/unauthorized">
             <UserTokenQuotasPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/me/ai-preferences"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <UserAiPreferencesPage />
           </ProtectedRoute>
         }
       />

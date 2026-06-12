@@ -184,10 +184,10 @@ public static class DependencyInjection
         // Dashboard Variable Value Resolver — dynamic template variables (Grafana-like)
         services.AddScoped<IVariableValueResolver, VariableValueResolver>();
 
-        // AI Dashboard Composer — Wave V3.4; uses IChatCompletionProvider when configured
+        // AI Dashboard Composer — Wave V3.4; uses IAiExecutionGateway
         services.AddScoped<IAiDashboardComposerService>(sp =>
             new AiDashboardComposerService(
-                sp.GetService<IChatCompletionProvider>(),
+                sp.GetRequiredService<IAiExecutionGateway>(),
                 sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AiDashboardComposerService>>()));
 
         // Artifact Signing & SBOM Generation — Compliance & Security Governance
