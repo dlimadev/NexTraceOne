@@ -1,7 +1,5 @@
-import axios from 'axios';
+import client from '../../../api/client';
 import type { RequestMetrics, ErrorAnalytics, UserActivityMetrics, SystemHealthMetrics, DashboardFilters } from '../types/ObservabilityTypes';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export class ObservabilityService {
   private static instance: ObservabilityService;
@@ -18,7 +16,7 @@ export class ObservabilityService {
   async getRequestMetrics(filters: DashboardFilters): Promise<RequestMetrics[]> {
     try {
       const params = this.buildQueryParams(filters);
-      const response = await axios.get(`${API_BASE_URL}/api/v1/observability/request-metrics`, { params });
+      const response = await client.get(`/observability/request-metrics`, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching request metrics:', error);
@@ -29,7 +27,7 @@ export class ObservabilityService {
   async getErrorAnalytics(filters: DashboardFilters): Promise<ErrorAnalytics[]> {
     try {
       const params = this.buildQueryParams(filters);
-      const response = await axios.get(`${API_BASE_URL}/api/v1/observability/error-analytics`, { params });
+      const response = await client.get(`/observability/error-analytics`, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching error analytics:', error);
@@ -40,7 +38,7 @@ export class ObservabilityService {
   async getUserActivity(filters: DashboardFilters): Promise<UserActivityMetrics[]> {
     try {
       const params = this.buildQueryParams(filters);
-      const response = await axios.get(`${API_BASE_URL}/api/v1/observability/user-activity`, { params });
+      const response = await client.get(`/observability/user-activity`, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching user activity:', error);
@@ -51,7 +49,7 @@ export class ObservabilityService {
   async getSystemHealth(filters: DashboardFilters): Promise<SystemHealthMetrics[]> {
     try {
       const params = this.buildQueryParams(filters);
-      const response = await axios.get(`${API_BASE_URL}/api/v1/observability/system-health`, { params });
+      const response = await client.get(`/observability/system-health`, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching system health:', error);
@@ -67,7 +65,7 @@ export class ObservabilityService {
   }> {
     try {
       const params = this.buildQueryParams(filters);
-      const response = await axios.get(`${API_BASE_URL}/api/v1/observability/stats`, { params });
+      const response = await client.get(`/observability/stats`, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching overall stats:', error);

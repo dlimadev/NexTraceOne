@@ -9,6 +9,7 @@ import { Loader2, Server, Cpu, HardDrive, Activity } from 'lucide-react';
 export const SystemHealthDashboard: React.FC = () => {
   const [health, setHealth] = useState<SystemHealthMetrics[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [filters] = useState<DashboardFilters>({
     timeRange: '1h'
   });
@@ -16,9 +17,10 @@ export const SystemHealthDashboard: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError(false);
     observabilityService.getSystemHealth(filters)
       .then(data => { if (!cancelled) setHealth(data); })
-      .catch(() => { /* Erro tratado silenciosamente — estado vazio */ })
+      .catch(() => { if (!cancelled) setLoadError(true); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [filters]);
@@ -40,6 +42,14 @@ export const SystemHealthDashboard: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-96">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex items-center justify-center h-96 text-sm text-critical">
+        Failed to load system health metrics. Check the observability backend and try again.
       </div>
     );
   }

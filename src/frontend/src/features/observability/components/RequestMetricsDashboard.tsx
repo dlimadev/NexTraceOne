@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 export const RequestMetricsDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<RequestMetrics[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [filters, setFilters] = useState<DashboardFilters>({
     timeRange: '24h'
   });
@@ -16,9 +17,10 @@ export const RequestMetricsDashboard: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError(false);
     observabilityService.getRequestMetrics(filters)
       .then(data => { if (!cancelled) setMetrics(data); })
-      .catch(() => { /* Erro tratado silenciosamente — estado vazio */ })
+      .catch(() => { if (!cancelled) setLoadError(true); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [filters]);
@@ -35,6 +37,14 @@ export const RequestMetricsDashboard: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-96">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex items-center justify-center h-96 text-sm text-critical">
+        Failed to load request metrics. Check the observability backend and try again.
       </div>
     );
   }

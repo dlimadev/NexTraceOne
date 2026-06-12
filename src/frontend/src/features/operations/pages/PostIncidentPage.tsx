@@ -19,7 +19,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { getPostMortems, type PostMortem, type PostMortemStatus } from '../api/telemetry';
+import { getPostMortems, type PostMortemStatus } from '../api/telemetry';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type TimeRange = '1h' | '6h' | '24h' | '7d';
@@ -42,13 +42,6 @@ function timeRangeToInterval(range: TimeRange) {
   }
   return { from: from.toISOString(), until: until.toISOString() };
 }
-
-const FALLBACK: PostMortem[] = [
-  { id: '1', title: 'Payment service outage - 45min downtime', incidentId: 'INC-2024-0142', incidentTitle: 'Payment Gateway Down', status: 'published', author: 'João Silva', severity: 'critical', actionItemsCount: 5, openActionItemsCount: 2, createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), publishedAt: new Date(Date.now() - 86400000).toISOString(), patternCount: 3, environment: 'production' },
-  { id: '2', title: 'Database connection pool exhaustion', incidentId: 'INC-2024-0138', incidentTitle: 'Orders DB Degraded', status: 'review', author: 'Maria Costa', severity: 'high', actionItemsCount: 8, openActionItemsCount: 8, createdAt: new Date(Date.now() - 86400000 * 5).toISOString(), patternCount: 2, environment: 'production' },
-  { id: '3', title: 'CDN misconfiguration causing 404 cascade', incidentId: 'INC-2024-0129', incidentTitle: 'Frontend Asset Unavailable', status: 'published', author: 'Carlos Mendes', severity: 'medium', actionItemsCount: 3, openActionItemsCount: 0, createdAt: new Date(Date.now() - 86400000 * 12).toISOString(), publishedAt: new Date(Date.now() - 86400000 * 10).toISOString(), patternCount: 0, environment: 'production' },
-  { id: '4', title: 'Memory leak in notification worker after deploy', incidentId: 'INC-2024-0115', incidentTitle: 'Notification Delays', status: 'draft', author: 'Ana Ferreira', severity: 'medium', actionItemsCount: 4, openActionItemsCount: 4, createdAt: new Date(Date.now() - 86400000 * 20).toISOString(), patternCount: 1, environment: 'production' },
-];
 
 function statusVariant(status: PostMortemStatus): 'secondary' | 'warning' | 'success' | 'info' {
   switch (status) {
@@ -75,7 +68,7 @@ export function PostIncidentPage() {
     retry: false,
   });
 
-  const mortems = (data && data.length > 0) ? data : FALLBACK;
+  const mortems = data ?? [];
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
