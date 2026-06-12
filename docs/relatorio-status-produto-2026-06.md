@@ -177,7 +177,15 @@ A Fase 1 foi **implementada integralmente** nesta branch, mais o item 8 da Fase 
 
 **Validação:** frontend `tsc` 0 erros, ESLint 0 erros, testes afetados passando. Backend validado estaticamente + CI do GitHub (sem SDK .NET neste ambiente).
 
-**Próximos da fila (Fase 2 restante → Fase 3):** status page pública · webhooks inbound CI/CD · UI de rulesets/SLA · substituir null readers de SLO · on-call mínimo · permissão dedicada de aprovador (migration IAM) · **signup self-service · billing Stripe · enforcement de capabilities via pipeline behavior** · docs de cliente.
+**Fase 3 (funil comercial) — implementada em 12/06:**
+
+| Item | Status | Commit |
+|---|---|---|
+| Signup self-service | ✅ `POST /auth/signup` público + `SignupPage` (/signup): tenant + admin (PlatformAdmin) + trial 14 dias + ativação por e-mail; link na LoginPage; i18n 4 idiomas; testes | `9f5b849` |
+| Enforcement de capabilities | ✅ `[RequiresCapability]` + `CapabilityEnforcementBehavior` no pipeline MediatR (403 CapabilityRequired); aplicado aos 7 commands do Contract Studio; testes | `3c86252` |
+| Billing v1 (Stripe) | ✅ Checkout Session via REST + webhook assinado (HMAC t/v1); `checkout.session.completed` → `TenantLicense.Upgrade` + `ExternalSubscriptionId`; LicensingPage redireciona ao checkout com fallback dev; config `Billing:Stripe` (off por padrão) | `c091165` |
+
+**Próximos da fila (Fase 2 restante):** status page pública · webhooks inbound CI/CD · UI de rulesets/SLA · substituir null readers de SLO · on-call mínimo · permissão dedicada de aprovador (migration IAM) · estender `[RequiresCapability]` aos demais módulos premium · eventos Stripe adicionais (cancelamento/downgrade/falha de pagamento) · docs de cliente.
 
 ---
 
