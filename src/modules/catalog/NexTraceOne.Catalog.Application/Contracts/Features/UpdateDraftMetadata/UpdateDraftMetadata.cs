@@ -18,6 +18,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata
 public static class UpdateDraftMetadata
 {
     /// <summary>Comando de atualização de metadados de draft.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         Guid DraftId,
         string? Title,

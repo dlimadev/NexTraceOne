@@ -23,6 +23,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft;
 public static class PublishDraft
 {
     /// <summary>Comando de publicação de draft de contrato.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         Guid DraftId,
         string PublishedBy) : ICommand<Response>;

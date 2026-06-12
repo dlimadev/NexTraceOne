@@ -25,6 +25,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
 public static class CreateDraft
 {
     /// <summary>Comando de criação de draft de contrato.</summary>
+    [RequiresCapability("contract_studio")]
     public sealed record Command(
         string Title,
         string Author,
