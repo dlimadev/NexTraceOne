@@ -23,3 +23,19 @@ public enum PromotionStatus
     /// <summary>Cancelada — solicitação cancelada antes da conclusão.</summary>
     Cancelled = 5
 }
+
+/// <summary>
+/// Modo de aplicação de um gate de qualidade na promoção.
+/// Segue o padrão forward-only Advisory → SoftEnforce → HardEnforce.
+/// </summary>
+public enum CodeQualityGateEnforcement
+{
+    /// <summary>Apenas informa — nunca bloqueia nem sinaliza como aviso.</summary>
+    Advisory = 0,
+
+    /// <summary>Sinaliza como aviso quando o gate falha, mas não bloqueia a promoção.</summary>
+    SoftEnforce = 1,
+
+    /// <summary>Bloqueia a promoção quando o gate falha.</summary>
+    HardEnforce = 2
+}

@@ -52,7 +52,10 @@ public static class RegisterServiceAsset
         string? ChangeFrequency = null,
         string? ProductOwner = null,
         string? ContactChannel = null,
-        string? OnCallRotationId = null) : ICommand<Response>;
+        string? OnCallRotationId = null,
+        // Proveniência (scaffold a partir de template)
+        Guid? OriginTemplateId = null,
+        string? OriginTemplateVersion = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de registo de serviço.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -93,6 +96,7 @@ public static class RegisterServiceAsset
             RuleFor(x => x.ProductOwner).MaximumLength(200).When(x => x.ProductOwner is not null);
             RuleFor(x => x.ContactChannel).MaximumLength(500).When(x => x.ContactChannel is not null);
             RuleFor(x => x.OnCallRotationId).MaximumLength(200).When(x => x.OnCallRotationId is not null);
+            RuleFor(x => x.OriginTemplateVersion).MaximumLength(50).When(x => x.OriginTemplateVersion is not null);
         }
     }
 
@@ -190,6 +194,12 @@ public static class RegisterServiceAsset
                     request.ProductOwner,
                     request.ContactChannel,
                     request.OnCallRotationId);
+            }
+
+            // ── Proveniência: template de origem (scaffold) ──────────────────
+            if (request.OriginTemplateId is { } originTemplateId)
+            {
+                serviceAsset.SetOriginTemplate(originTemplateId, request.OriginTemplateVersion);
             }
 
             // ── PARAMETERIZATION: approval gate ──────────────────────────────
