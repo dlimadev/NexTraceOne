@@ -182,7 +182,26 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
 2. O agente `ArchitectureFitness` (IA) torna-se **enriquecimento opcional** por cima do resultado determinístico (sugestões de refactor), nunca pré-requisito.
    - **Verificar:** com IA desligada, a conformância continua a produzir resultado válido.
 
+### Fase 3 (revista) — Gerador determinístico OpenAPI → código (contract-first)
+
+> Reordenada para refletir o fluxo real da equipa: contrato OpenAPI → API gerada num
+> padrão de arquitetura pré-estabelecido (estilo `openapi-generator`), **sem IA**.
+
+1. Modelo neutro `OpenApiContractModel` + `IOpenApiContractParser` (seam para parser de
+   contrato) + gerador puro `DotNetCleanArchitectureCodeGenerator` (OpenAPI → DTOs + endpoints
+   .NET Clean Architecture). Feature `GenerateCodeFromContract` + endpoint
+   `POST /api/v1/contracts/generate-code`.
+   - **Estado:** implementado para **OpenAPI JSON** (parser `System.Text.Json`, zero novas
+     dependências). Gerador e mapeamento de tipos cobertos por testes unitários puros.
+   - **Follow-up YAML:** o suporte a YAML requer um leitor de OpenAPI (ex: `Microsoft.OpenApi.Readers`
+     ou `Microsoft.OpenApi.YamlReader`) — adicionar com verificação de compilação por causa do
+     potencial conflito de versão com `Microsoft.AspNetCore.OpenApi` 10 (Microsoft.OpenApi 2.x).
+     Basta uma implementação alternativa de `IOpenApiContractParser`; gerador e feature não mudam.
+   - **IA opcional:** quando configurada, pode enriquecer o corpo dos handlers; nunca é necessária.
+
 ### Fase 4 — Acabamentos
+
+0. Conformidade arquitetural determinística (`ArchitectureConformanceChecker` / `nex conformance check`) — ver descrição acima.
 
 1. Geradores de scaffold para **GraphQL** e **Terraform** em `GenerateEnvironmentBlueprint`.
 2. Comando de IDE/CLI para **criar/editar template** (não só consumir).

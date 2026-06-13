@@ -40,6 +40,8 @@ using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Portal.Services;
 using NexTraceOne.Catalog.Infrastructure.Readers;
+using NexTraceOne.Catalog.Application.Contracts.Generation;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Generation;
 using NexTraceOne.Catalog.Infrastructure.Quality.Services;
 using NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Templates.Services;
@@ -196,6 +198,9 @@ public static class DependencyInjection
 
         // ── Quality Gate (contrato inter-módulo) ───────────────────────────────
         services.AddScoped<ICatalogQualityGateModule, CatalogQualityGateModuleService>();
+
+        // ── Geração de código a partir de contrato (OpenAPI → código) ───────────
+        services.AddScoped<IOpenApiContractParser, OpenApiContractParser>();
 
         // ── Developer Portal ──────────────────────────────────────────────────
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
