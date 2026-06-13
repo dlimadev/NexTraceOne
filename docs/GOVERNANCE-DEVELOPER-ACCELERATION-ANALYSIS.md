@@ -138,6 +138,14 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
 3. Expor `GET /api/v1/catalog/services/{id}/quality-gate` + cartão no portal.
    - **Verificar:** endpoint retorna avaliação; teste de contrato.
 
+> **Estado de implementação (atualizado):** o passo 1 está implementado — feature
+> `EvaluateTemplateQualityGates` (catalog `Application/Contracts/Features/`) +
+> endpoint `GET /api/v1/quality/services/{serviceId}/gate` + testes unitários.
+> A avaliação é **determinística** (cobertura vs. mínimo do manifesto e quality gate
+> do SonarQube), recebendo o template por `templateId`/`templateSlug`. O passo 2
+> (persistir `OriginTemplateId` em `ServiceAsset` para dispensar o identificador
+> explícito) e o cartão de portal ficam para o próximo incremento.
+
 ### Fase 2 — Quality gate como gate de promoção (resolve §5.3)
 
 1. No fluxo de promoção de `changegovernance`, adicionar avaliação de `QualityGateEvaluation` como *check* (modo configurável `Advisory`/`SoftEnforce`/`HardEnforce`, reutilizando o padrão de `PolicyAsCodeDefinition.EnforcementMode`).

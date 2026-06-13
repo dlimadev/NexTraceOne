@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
+using EvaluateTemplateQualityGatesFeature = NexTraceOne.Catalog.Application.Contracts.Features.EvaluateTemplateQualityGates.EvaluateTemplateQualityGates;
 using GetCodeQualityReportFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCodeQualityReport.GetCodeQualityReport;
 using IngestCodeQualityRecordFeature = NexTraceOne.Catalog.Application.Contracts.Features.IngestCodeQualityRecord.IngestCodeQualityRecord;
 
@@ -49,6 +50,21 @@ public sealed class CodeQualityEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(new GetCodeQualityReportFeature.Query(tenantId), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Quality gate do template (laço de governança) ─────────────────
+        group.MapGet("/services/{serviceId}/gate", async (
+            string serviceId,
+            string tenantId,
+            Guid? templateId,
+            string? templateSlug,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(
+                new EvaluateTemplateQualityGatesFeature.Query(serviceId, tenantId, templateId, templateSlug), ct);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
     }
