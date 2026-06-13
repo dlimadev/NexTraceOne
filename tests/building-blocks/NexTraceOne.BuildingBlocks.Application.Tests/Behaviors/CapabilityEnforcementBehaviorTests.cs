@@ -26,7 +26,8 @@ public sealed class CapabilityEnforcementBehaviorTests
 
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
 
-    private static Task<Result<string>> Next() => Task.FromResult(Result<string>.Success("executed"));
+    // MediatR 14: RequestHandlerDelegate<TResponse> recebe um CancellationToken.
+    private static Task<Result<string>> Next(CancellationToken ct) => Task.FromResult(Result<string>.Success("executed"));
 
     [Fact]
     public async Task Handle_RequestWithoutAttribute_ShouldExecute()
