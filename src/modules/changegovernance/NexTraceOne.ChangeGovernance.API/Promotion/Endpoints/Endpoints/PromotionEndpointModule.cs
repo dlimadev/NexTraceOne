@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
 using ApprovePromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion.ApprovePromotion;
 using BlockPromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.BlockPromotion.BlockPromotion;
@@ -18,6 +19,7 @@ using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promo
 using ListPromotionRequestsFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests.ListPromotionRequests;
 using OverrideGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification.OverrideGateWithJustification;
 using EvaluateContractComplianceGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluateContractComplianceGate.EvaluateContractComplianceGate;
+using EvaluateCodeQualityGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluateCodeQualityPromotionGate.EvaluateCodeQualityPromotionGate;
 using GetEnvironmentPromotionPathFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetEnvironmentPromotionPath.GetEnvironmentPromotionPath;
 
 namespace NexTraceOne.ChangeGovernance.API.Promotion.Endpoints.Endpoints;
@@ -163,6 +165,24 @@ public sealed class PromotionEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("promotion:requests:read");
+
+        // ── GET .../code-quality-gate — Qualidade de código como gate de promoção ────────
+        group.MapGet("/services/{serviceId}/code-quality-gate", async (
+            string serviceId,
+            ISender sender,
+            ICurrentTenant currentTenant,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            CodeQualityGateEnforcement enforcement = CodeQualityGateEnforcement.Advisory) =>
+        {
+            var result = await sender.Send(
+                new EvaluateCodeQualityGateFeature.Query(serviceId, currentTenant.Id.ToString(), enforcement),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("promotion:requests:read")
+        .WithName("EvaluateCodeQualityPromotionGate")
+        .WithSummary("Evaluates the template code-quality gate (coverage + SonarQube) for a service and applies the given enforcement mode (Advisory/SoftEnforce/HardEnforce)");
 
         // ── GET /api/v1/promotion/releases/{releaseId}/path — Caminho de promoção (Gap 10) ────────
         group.MapGet("/releases/{releaseId:guid}/path", async (

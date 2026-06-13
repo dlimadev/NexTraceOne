@@ -158,6 +158,22 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
 1. No fluxo de promoção de `changegovernance`, adicionar avaliação de `QualityGateEvaluation` como *check* (modo configurável `Advisory`/`SoftEnforce`/`HardEnforce`, reutilizando o padrão de `PolicyAsCodeDefinition.EnforcementMode`).
    - **Verificar:** release de serviço que falha o gate do Sonar é bloqueado em `HardEnforce` e apenas avisado em `Advisory`.
 
+> **Estado de implementação (atualizado):** implementado.
+> - Contrato inter-módulo `ICatalogQualityGateModule` (Catalog.Contracts) +
+>   implementação `CatalogQualityGateModuleService` (reutiliza a feature da Fase 1
+>   via MediatR — sem aceder ao DbContext do Catalog).
+> - Feature `EvaluateCodeQualityPromotionGate` (changegovernance) aplica o modo
+>   `CodeQualityGateEnforcement` (Advisory/SoftEnforce/HardEnforce) e devolve um
+>   veredito com `Blocking` — convertível num `GateEvaluationInput` do motor de
+>   gates existente. Endpoint
+>   `GET /api/v1/promotion/services/{serviceId}/code-quality-gate?enforcement=…`.
+> - Testes: HardEnforce bloqueia quando falha; SoftEnforce avisa; Advisory nunca
+>   bloqueia; gate aprovado nunca bloqueia.
+>
+> A ligação automática ao motor de promoção (incluir este veredito na lista de
+> gates de uma `PromotionRequest`) e a origem do modo via configuração de ambiente
+> ficam para o próximo incremento.
+
 ### Fase 3 — Conformidade arquitetural determinística (resolve §5.2)
 
 1. Criar `ArchitectureConformanceChecker` (determinístico) que recebe um *manifesto de estrutura* do repositório (lista de pastas + dependências do `.csproj`/`package.json`/`pom.xml`) e compara com `ManifestFolder[]`/`ManifestRequiredDependency[]`.
