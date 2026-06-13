@@ -116,7 +116,7 @@ public interface I__NAME__Service
 /// <summary>Implementação gerada do serviço SOAP '__SERVICE__'.</summary>
 public sealed class __NAME__Service : I__NAME__Service
 {
-    // TODO: implementar as operações do contrato WSDL.
+    // TODO: completar as operações do contrato WSDL.
 }
 ";
         return
@@ -169,7 +169,7 @@ public sealed class __NAME__Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // TODO: implementar a lógica de execução do serviço.
+        // TODO: completar a lógica de execução do serviço.
         while (!stoppingToken.IsCancellationRequested)
         {
             await Task.Delay(1000, stoppingToken).ConfigureAwait(false);

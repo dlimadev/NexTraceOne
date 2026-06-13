@@ -125,7 +125,7 @@ public static class DotNetCleanArchitectureCodeGenerator
 
             sb.AppendLine($"        app.{mapMethod}(\"{op.Path}\", ({requestParam}) =>");
             sb.AppendLine("        {");
-            sb.AppendLine($"            // TODO: implementar a lógica de {operationName}.");
+            sb.AppendLine($"            // TODO: completar a lógica de {operationName}.");
             sb.AppendLine("            return Results.Ok();");
             sb.AppendLine($"        }})\n        .WithName(\"{operationName}\");");
             sb.AppendLine();
