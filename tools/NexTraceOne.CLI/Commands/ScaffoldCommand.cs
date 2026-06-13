@@ -15,6 +15,7 @@ namespace NexTraceOne.CLI.Commands;
 ///   templates  — lista templates disponíveis
 ///   init       — gera projeto localmente a partir de um template + serviço registado
 ///   register   — regista no catálogo um serviço scaffoldado
+///   service    — gera a aplicação de um serviço registado (deteta tipo e contrato)
 /// </summary>
 public static class ScaffoldCommand
 {
@@ -37,8 +38,144 @@ public static class ScaffoldCommand
         command.Add(CreateTemplatesCommand());
         command.Add(CreateInitCommand());
         command.Add(CreateRegisterCommand());
+        command.Add(CreateServiceCommand());
 
         return command;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // nex scaffold service <name>
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private static Command CreateServiceCommand()
+    {
+        var nameArg = new Argument<string>("name")
+        {
+            Description = "Unique name of the service registered in NexTraceOne."
+        };
+        var urlOption = CreateUrlOption();
+        var tokenOption = CreateTokenOption();
+        var formatOption = CreateFormatOption();
+        var outputOption = new Option<string?>("--output")
+        {
+            Description = "Output directory (default: ./<name>)."
+        };
+
+        var command = new Command("service",
+            "Generate the application for a registered service — auto-detects the service type and its contract.");
+        command.Add(nameArg);
+        command.Add(urlOption);
+        command.Add(tokenOption);
+        command.Add(formatOption);
+        command.Add(outputOption);
+
+        command.SetAction((parseResult, cancellationToken) =>
+        {
+            var name = parseResult.GetValue(nameArg)!;
+            var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOption));
+            var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOption));
+            var format = parseResult.GetValue(formatOption) ?? "text";
+            var output = parseResult.GetValue(outputOption);
+            return RunServiceAsync(name, url, token, format, output, cancellationToken);
+        });
+
+        return command;
+    }
+
+    private static async Task<int> RunServiceAsync(
+        string serviceName, string apiUrl, string? token, string format, string? outputDir,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(outputDir))
+            outputDir = Path.Combine(Directory.GetCurrentDirectory(), serviceName);
+
+        AnsiConsole.MarkupLine("[bold cyan]NexTraceOne Service Scaffold[/]");
+        AnsiConsole.MarkupLine($"  Service : [bold]{serviceName.EscapeMarkup()}[/]");
+        AnsiConsole.MarkupLine($"  Output  : {outputDir.EscapeMarkup()}");
+        AnsiConsole.WriteLine();
+
+        try
+        {
+            using var client = CreateHttpClient(apiUrl, token);
+            var path = $"/api/v1/catalog/services/{Uri.EscapeDataString(serviceName)}/scaffold";
+
+            ServiceScaffoldApiResponse? result = null;
+            await AnsiConsole.Status().StartAsync("Resolving service and generating code...", async ctx =>
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, path)
+                {
+                    Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                };
+                var response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    throw new InvalidOperationException($"Service '{serviceName}' not found in the catalog.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var err = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    throw new InvalidOperationException($"Server returned {(int)response.StatusCode}: {err}");
+                }
+
+                result = await response.Content.ReadFromJsonAsync<ServiceScaffoldApiResponse>(
+                    JsonReadOptions, cancellationToken).ConfigureAwait(false);
+
+                ctx.Status("Writing files...");
+            });
+
+            if (result is null)
+            {
+                AnsiConsole.MarkupLine("[red]Error:[/] Empty response from scaffold API.");
+                return 1;
+            }
+
+            if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine(JsonSerializer.Serialize(result, JsonPrintOptions));
+                return 0;
+            }
+
+            Directory.CreateDirectory(outputDir);
+            var filesWritten = 0;
+
+            foreach (var file in result.Files)
+            {
+                if (file.Path is null) continue;
+                var filePath = Path.GetFullPath(Path.Combine(outputDir, file.Path.Replace('/', Path.DirectorySeparatorChar)));
+
+                if (!filePath.StartsWith(Path.GetFullPath(outputDir) + Path.DirectorySeparatorChar, StringComparison.Ordinal)
+                    && filePath != Path.GetFullPath(outputDir))
+                {
+                    AnsiConsole.MarkupLine($"[yellow]Skipped[/] (path traversal): {file.Path.EscapeMarkup()}");
+                    continue;
+                }
+
+                var fileDir = Path.GetDirectoryName(filePath);
+                if (fileDir is not null) Directory.CreateDirectory(fileDir);
+                await File.WriteAllTextAsync(filePath, file.Content ?? string.Empty, Encoding.UTF8, cancellationToken)
+                    .ConfigureAwait(false);
+                AnsiConsole.MarkupLine($"  [green]✓[/] {file.Path.EscapeMarkup()}");
+                filesWritten++;
+            }
+
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[bold green]✓ Generated {filesWritten} file(s)[/] to [bold]{outputDir.EscapeMarkup()}[/]");
+            AnsiConsole.MarkupLine($"[grey]Service type : {(result.ServiceType ?? "-").EscapeMarkup()}[/]");
+            AnsiConsole.MarkupLine($"[grey]Strategy     : {(result.GenerationStrategy ?? "-").EscapeMarkup()}[/]");
+            AnsiConsole.MarkupLine($"[grey]Contract     : {(result.ContractProtocol ?? "none").EscapeMarkup()}[/]");
+            return 0;
+        }
+        catch (InvalidOperationException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message.EscapeMarkup()}");
+            return 1;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Could not connect to {apiUrl.EscapeMarkup()}");
+            AnsiConsole.MarkupLine($"[grey]{ex.Message.EscapeMarkup()}[/]");
+            return 1;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -613,6 +750,14 @@ public static class ScaffoldCommand
     private sealed record ScaffoldedFile(
         [property: JsonPropertyName("path")] string? Path,
         [property: JsonPropertyName("content")] string? Content);
+
+    private sealed record ServiceScaffoldApiResponse(
+        [property: JsonPropertyName("serviceName")] string? ServiceName,
+        [property: JsonPropertyName("serviceType")] string? ServiceType,
+        [property: JsonPropertyName("generationStrategy")] string? GenerationStrategy,
+        [property: JsonPropertyName("contractProtocol")] string? ContractProtocol,
+        [property: JsonPropertyName("fileCount")] int FileCount,
+        [property: JsonPropertyName("files")] IReadOnlyList<ScaffoldedFile> Files);
 
     private sealed record RegisterBody(
         [property: JsonPropertyName("serviceName")] string ServiceName,

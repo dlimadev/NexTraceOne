@@ -198,6 +198,15 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
      potencial conflito de versão com `Microsoft.AspNetCore.OpenApi` 10 (Microsoft.OpenApi 2.x).
      Basta uma implementação alternativa de `IOpenApiContractParser`; gerador e feature não mudam.
    - **IA opcional:** quando configurada, pode enriquecer o corpo dos handlers; nunca é necessária.
+2. **Scaffold por modelo de serviço + CLI orientado ao serviço registado.** Para suportar
+   *todos* os modelos (não só REST): gerador `ServiceScaffoldGenerator` (Kafka consumer/producer,
+   SOAP, gRPC, worker/background, REST-sem-contrato, genérico) + feature `GenerateServiceScaffold`
+   que recebe o **nome único do serviço**, resolve o **tipo** (`ServiceAsset`) e o **contrato**
+   (`ServiceAsset → ApiAsset → ContractVersion`) e despacha: API REST com OpenAPI → classes; restantes
+   → esqueleto do modelo. Endpoint `POST /api/v1/catalog/services/{serviceName}/scaffold` e comando
+   **CLI `nex scaffold service <nome>`** (deteta tipo e contrato, escreve os ficheiros localmente).
+   - **Verificar:** `nex scaffold service payment-events` num serviço KafkaConsumer gera um
+     `BackgroundService` consumidor; num RestApi com contrato OpenAPI gera DTOs + endpoints.
 
 ### Fase 4 — Acabamentos
 

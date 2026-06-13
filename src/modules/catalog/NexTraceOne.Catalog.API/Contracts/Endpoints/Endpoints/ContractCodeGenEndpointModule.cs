@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GenerateCodeFromContractFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateCodeFromContract.GenerateCodeFromContract;
+using GenerateServiceScaffoldFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateServiceScaffold.GenerateServiceScaffold;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -38,5 +39,20 @@ public sealed class ContractCodeGenEndpointModule
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
+
+        // POST /api/v1/catalog/services/{serviceName}/scaffold — scaffold da aplicação a partir
+        // do serviço registado: deteta o tipo e o contrato e gera o código adequado ao modelo.
+        var services = app.MapGroup("/api/v1/catalog/services")
+            .WithTags("Service Scaffold");
+
+        services.MapPost("/{serviceName}/scaffold", async (
+            string serviceName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GenerateServiceScaffoldFeature.Query(serviceName), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:templates:scaffold");
     }
 }
