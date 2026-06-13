@@ -3,14 +3,16 @@ using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Generation;
 
+using YamlDotNet.Serialization;
+
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Generation;
 
 /// <summary>
-/// Parser de OpenAPI baseado em System.Text.Json (sem dependências externas).
-/// Suporta especificações OpenAPI 3.x em formato JSON.
+/// Parser de OpenAPI baseado em System.Text.Json. Suporta especificações OpenAPI 3.x em
+/// formato JSON e YAML (o YAML é convertido para JSON via YamlDotNet antes do parsing).
 ///
-/// Isolado atrás de <see cref="IOpenApiContractParser"/>: um leitor de YAML (ou um parser
-/// dedicado de OpenAPI) pode substituir esta implementação sem impactar o gerador nem a feature.
+/// Isolado atrás de <see cref="IOpenApiContractParser"/>: pode ser substituído por um parser
+/// dedicado de OpenAPI sem impactar o gerador nem a feature.
 /// </summary>
 internal sealed class OpenApiContractParser : IOpenApiContractParser
 {
@@ -19,15 +21,19 @@ internal sealed class OpenApiContractParser : IOpenApiContractParser
         if (string.IsNullOrWhiteSpace(specContent))
             return Error.Validation("Contract.Empty", "The OpenAPI specification is empty.");
 
-        var trimmed = specContent.TrimStart();
-        if (!trimmed.StartsWith('{'))
-            return Error.Validation(
-                "Contract.UnsupportedFormat",
-                "Only JSON OpenAPI specifications are supported for now. Convert the YAML spec to JSON.");
+        string json;
+        try
+        {
+            json = LooksLikeJson(specContent) ? specContent : ConvertYamlToJson(specContent);
+        }
+        catch (YamlDotNet.Core.YamlException ex)
+        {
+            return Error.Validation("Contract.InvalidYaml", $"Invalid OpenAPI YAML: {ex.Message}");
+        }
 
         try
         {
-            using var doc = JsonDocument.Parse(specContent);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
             var title = TryGetString(root, "info", "title") ?? "API";
@@ -39,8 +45,24 @@ internal sealed class OpenApiContractParser : IOpenApiContractParser
         }
         catch (JsonException ex)
         {
-            return Error.Validation("Contract.InvalidJson", $"Invalid OpenAPI JSON: {ex.Message}");
+            return Error.Validation("Contract.InvalidSpec", $"Invalid OpenAPI document: {ex.Message}");
         }
+    }
+
+    private static bool LooksLikeJson(string content)
+    {
+        var trimmed = content.AsSpan().TrimStart();
+        return trimmed.Length > 0 && (trimmed[0] == '{' || trimmed[0] == '[');
+    }
+
+    /// <summary>Converte YAML em JSON preservando a estrutura (mapas→objetos, sequências→arrays).</summary>
+    private static string ConvertYamlToJson(string yaml)
+    {
+        var graph = new DeserializerBuilder().Build().Deserialize(new StringReader(yaml));
+        if (graph is null)
+            return "{}";
+
+        return new SerializerBuilder().JsonCompatible().Build().Serialize(graph);
     }
 
     // ── Schemas ──────────────────────────────────────────────────────────

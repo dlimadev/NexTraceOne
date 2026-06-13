@@ -107,7 +107,7 @@ public static class GenerateServiceScaffold
                     return (generated, "openapi");
                 }
 
-                // Contrato presente mas não parseável (ex: YAML por agora) → esqueleto REST.
+                // Contrato presente mas inválido/não parseável → esqueleto REST como fallback seguro.
                 return (ServiceScaffoldGenerator.Generate(serviceName, serviceType), "skeleton (contract not parseable)");
             }
 

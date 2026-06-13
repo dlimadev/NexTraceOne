@@ -191,12 +191,9 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
    contrato) + gerador puro `DotNetCleanArchitectureCodeGenerator` (OpenAPI → DTOs + endpoints
    .NET Clean Architecture). Feature `GenerateCodeFromContract` + endpoint
    `POST /api/v1/contracts/generate-code`.
-   - **Estado:** implementado para **OpenAPI JSON** (parser `System.Text.Json`, zero novas
-     dependências). Gerador e mapeamento de tipos cobertos por testes unitários puros.
-   - **Follow-up YAML:** o suporte a YAML requer um leitor de OpenAPI (ex: `Microsoft.OpenApi.Readers`
-     ou `Microsoft.OpenApi.YamlReader`) — adicionar com verificação de compilação por causa do
-     potencial conflito de versão com `Microsoft.AspNetCore.OpenApi` 10 (Microsoft.OpenApi 2.x).
-     Basta uma implementação alternativa de `IOpenApiContractParser`; gerador e feature não mudam.
+   - **Estado:** implementado para **OpenAPI JSON e YAML**. O parser (`System.Text.Json`) converte
+     YAML→JSON via `YamlDotNet` (já presente no repo, sem conflito com `Microsoft.OpenApi`), antes
+     do parsing. Gerador, mapeamento de tipos e parser (JSON+YAML) cobertos por testes unitários.
    - **IA opcional:** quando configurada, pode enriquecer o corpo dos handlers; nunca é necessária.
 2. **Scaffold por modelo de serviço + CLI orientado ao serviço registado.** Para suportar
    *todos* os modelos (não só REST): gerador `ServiceScaffoldGenerator` (Kafka consumer/producer,
