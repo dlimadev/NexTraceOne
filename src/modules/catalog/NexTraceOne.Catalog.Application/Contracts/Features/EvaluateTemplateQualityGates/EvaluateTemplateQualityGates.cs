@@ -4,7 +4,10 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.Templates.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Templates.Entities;
 using NexTraceOne.Catalog.Domain.Templates.ValueObjects;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.EvaluateTemplateQualityGates;
@@ -42,13 +45,18 @@ public static class EvaluateTemplateQualityGates
 
         /// <summary>O template não declara um manifesto de arquitetura com quality gates.</summary>
         public const string NoGatesDefined = "NoGatesDefined";
+
+        /// <summary>O serviço não tem template de origem e nenhum foi indicado explicitamente.</summary>
+        public const string NoTemplateLinked = "NoTemplateLinked";
     }
 
     // ── Query ──────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Avalia o serviço identificado por <paramref name="ServiceId"/> contra os quality gates
-    /// do template indicado por <paramref name="TemplateId"/> ou <paramref name="TemplateSlug"/>.
+    /// de um template. O template pode ser indicado explicitamente por <paramref name="TemplateId"/>
+    /// ou <paramref name="TemplateSlug"/>; se nenhum for fornecido, é resolvido a partir do
+    /// template de origem registado no próprio serviço (OriginTemplateId).
     /// </summary>
     public sealed record Query(
         string ServiceId,
@@ -62,9 +70,6 @@ public static class EvaluateTemplateQualityGates
         {
             RuleFor(x => x.ServiceId).NotEmpty().MaximumLength(200);
             RuleFor(x => x.TenantId).NotEmpty().MaximumLength(200);
-            RuleFor(x => x)
-                .Must(x => x.TemplateId.HasValue || !string.IsNullOrWhiteSpace(x.TemplateSlug))
-                .WithMessage("Either TemplateId or TemplateSlug must be provided.");
         }
     }
 
@@ -100,6 +105,7 @@ public static class EvaluateTemplateQualityGates
 
     internal sealed class Handler(
         IServiceTemplateRepository templateRepository,
+        IServiceAssetRepository serviceAssetRepository,
         ICodeQualityRepository codeQualityRepository,
         IDateTimeProvider clock) : IQueryHandler<Query, Evaluation>
     {
@@ -112,19 +118,38 @@ public static class EvaluateTemplateQualityGates
             Guard.Against.NullOrWhiteSpace(request.ServiceId);
             Guard.Against.NullOrWhiteSpace(request.TenantId);
 
-            var template = request.TemplateId.HasValue
-                ? await templateRepository.GetByIdAsync(request.TemplateId.Value, cancellationToken)
-                : await templateRepository.GetBySlugAsync(request.TemplateSlug!, cancellationToken);
-
-            if (template is null)
-            {
-                var identifier = request.TemplateId?.ToString() ?? request.TemplateSlug!;
-                return Error.NotFound(
-                    "Template.NotFound",
-                    $"Service template '{identifier}' was not found.");
-            }
-
             var now = clock.UtcNow;
+
+            // 1. Resolver o template — explícito ou a partir do template de origem do serviço.
+            ServiceTemplate? template;
+            if (request.TemplateId.HasValue || !string.IsNullOrWhiteSpace(request.TemplateSlug))
+            {
+                template = request.TemplateId.HasValue
+                    ? await templateRepository.GetByIdAsync(request.TemplateId.Value, cancellationToken)
+                    : await templateRepository.GetBySlugAsync(request.TemplateSlug!, cancellationToken);
+
+                if (template is null)
+                {
+                    var identifier = request.TemplateId?.ToString() ?? request.TemplateSlug!;
+                    return Error.NotFound(
+                        "Template.NotFound",
+                        $"Service template '{identifier}' was not found.");
+                }
+            }
+            else
+            {
+                var originTemplateId = await ResolveOriginTemplateIdAsync(request.ServiceId, cancellationToken);
+                if (originTemplateId is null)
+                {
+                    return Result<Evaluation>.Success(NoTemplate(request.ServiceId, now));
+                }
+
+                template = await templateRepository.GetByIdAsync(originTemplateId.Value, cancellationToken);
+                if (template is null)
+                {
+                    return Result<Evaluation>.Success(NoTemplate(request.ServiceId, now));
+                }
+            }
             var manifest = TemplateManifestV2.TryParse(template.ArchitecturePatternJson);
 
             // Sem manifesto V2 não há gates declarados a aplicar.
@@ -238,5 +263,38 @@ public static class EvaluateTemplateQualityGates
 
             return requirements;
         }
+
+        /// <summary>
+        /// Resolve o template de origem (OriginTemplateId) do serviço.
+        /// Aceita o ServiceId como Guid (identificador) ou como nome único do serviço.
+        /// </summary>
+        private async Task<Guid?> ResolveOriginTemplateIdAsync(string serviceId, CancellationToken ct)
+        {
+            var serviceAsset = Guid.TryParse(serviceId, out var serviceGuid)
+                ? await serviceAssetRepository.GetByIdAsync(ServiceAssetId.From(serviceGuid), ct)
+                : await serviceAssetRepository.GetByNameAsync(serviceId, ct);
+
+            return serviceAsset?.OriginTemplateId;
+        }
+
+        /// <summary>Avaliação para um serviço sem template de origem nem template indicado.</summary>
+        private static Evaluation NoTemplate(string serviceId, DateTimeOffset now)
+            => new(
+                ServiceId: serviceId,
+                TemplateId: Guid.Empty,
+                TemplateSlug: string.Empty,
+                TemplateVersion: string.Empty,
+                Status: Statuses.NoTemplateLinked,
+                Passed: true,
+                RequiredCoverage: 0,
+                ActualCoverage: null,
+                SonarQualityGateStatus: null,
+                Bugs: 0,
+                Vulnerabilities: 0,
+                CodeSmells: 0,
+                Breaches: [],
+                DeclaredRequirements: [],
+                AnalyzedAt: null,
+                EvaluatedAt: now);
     }
 }

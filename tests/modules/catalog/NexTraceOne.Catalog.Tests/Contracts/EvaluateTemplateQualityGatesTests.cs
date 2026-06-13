@@ -1,7 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateTemplateQualityGates;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.Templates.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Templates.Entities;
 using NexTraceOne.Catalog.Domain.Templates.Enums;
 using NexTraceOne.Catalog.Domain.Templates.ValueObjects;
@@ -16,6 +18,7 @@ namespace NexTraceOne.Catalog.Tests.Contracts;
 public sealed class EvaluateTemplateQualityGatesTests
 {
     private readonly IServiceTemplateRepository _templateRepo = Substitute.For<IServiceTemplateRepository>();
+    private readonly IServiceAssetRepository _serviceAssetRepo = Substitute.For<IServiceAssetRepository>();
     private readonly ICodeQualityRepository _codeQualityRepo = Substitute.For<ICodeQualityRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
@@ -71,7 +74,7 @@ public sealed class EvaluateTemplateQualityGatesTests
             AnalyzedAt: _now);
 
     private EvaluateTemplateQualityGates.Handler CreateHandler()
-        => new(_templateRepo, _codeQualityRepo, _clock);
+        => new(_templateRepo, _serviceAssetRepo, _codeQualityRepo, _clock);
 
     private EvaluateTemplateQualityGates.Query QueryBySlug(string slug = "dotnet-rest-api")
         => new(ServiceId, TenantId, TemplateId: null, TemplateSlug: slug);
@@ -161,6 +164,40 @@ public sealed class EvaluateTemplateQualityGatesTests
         result.Value.Status.Should().Be(EvaluateTemplateQualityGates.Statuses.NoGatesDefined);
         await _codeQualityRepo.DidNotReceive().GetLatestAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_NoTemplateGiven_ResolvesFromServiceOriginTemplate()
+    {
+        var template = TemplateWithCoverageGate(70);
+        var service = ServiceAsset.Create("payments", "payments", "platform-team", Guid.NewGuid());
+        service.SetOriginTemplate(template.Id.Value, "1.0.0");
+
+        _serviceAssetRepo.GetByNameAsync(ServiceId, Arg.Any<CancellationToken>()).Returns(service);
+        _templateRepo.GetByIdAsync(template.Id.Value, Arg.Any<CancellationToken>()).Returns(template);
+        _codeQualityRepo.GetLatestAsync(ServiceId, TenantId, Arg.Any<CancellationToken>())
+            .Returns(Record(coverage: 88, qualityGateStatus: "OK"));
+
+        var query = new EvaluateTemplateQualityGates.Query(ServiceId, TenantId, TemplateId: null, TemplateSlug: null);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Status.Should().Be(EvaluateTemplateQualityGates.Statuses.Passed);
+        result.Value.TemplateId.Should().Be(template.Id.Value);
+    }
+
+    [Fact]
+    public async Task Handle_NoTemplateAndServiceHasNoOrigin_ReturnsNoTemplateLinked()
+    {
+        var service = ServiceAsset.Create("payments", "payments", "platform-team", Guid.NewGuid());
+        _serviceAssetRepo.GetByNameAsync(ServiceId, Arg.Any<CancellationToken>()).Returns(service);
+
+        var query = new EvaluateTemplateQualityGates.Query(ServiceId, TenantId, TemplateId: null, TemplateSlug: null);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Passed.Should().BeTrue();
+        result.Value.Status.Should().Be(EvaluateTemplateQualityGates.Statuses.NoTemplateLinked);
     }
 
     [Fact]

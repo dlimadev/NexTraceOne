@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Templates.Abstractions;
 
 using RegisterFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset.RegisterServiceAsset;
 
@@ -34,7 +35,9 @@ public static class AutoRegisterScaffoldedService
         string? TechnicalOwner = null,
         string? BusinessOwner = null,
         string? ScaffoldId = null,
-        string? TemplateSlug = null) : ICommand<Response>;
+        string? TemplateSlug = null,
+        Guid? TemplateId = null,
+        string? TemplateVersion = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -57,7 +60,9 @@ public static class AutoRegisterScaffoldedService
     /// Handler que regista automaticamente um serviço scaffoldado no catálogo.
     /// Delega a criação real ao handler de <see cref="RegisterFeature"/>.
     /// </summary>
-    public sealed class Handler(ISender sender) : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        ISender sender,
+        IServiceTemplateRepository templateRepository) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -65,6 +70,11 @@ public static class AutoRegisterScaffoldedService
 
             // Constrói a descrição enriquecida com contexto de scaffold quando disponível
             var description = BuildDescription(request);
+
+            // Resolve o template de origem para proveniência. Se o TemplateId não foi
+            // fornecido mas o slug sim, resolve-o para preencher OriginTemplateId/Version.
+            var (originTemplateId, originTemplateVersion) =
+                await ResolveOriginTemplateAsync(request, cancellationToken);
 
             var registerCommand = new RegisterFeature.Command(
                 Name: request.ServiceName,
@@ -75,7 +85,9 @@ public static class AutoRegisterScaffoldedService
                 TechnicalOwner: request.TechnicalOwner,
                 BusinessOwner: request.BusinessOwner,
                 DocumentationUrl: request.DocumentationUrl,
-                RepositoryUrl: request.RepositoryUrl);
+                RepositoryUrl: request.RepositoryUrl,
+                OriginTemplateId: originTemplateId,
+                OriginTemplateVersion: originTemplateVersion);
 
             var registerResult = await sender.Send(registerCommand, cancellationToken);
             if (!registerResult.IsSuccess)
@@ -90,6 +102,25 @@ public static class AutoRegisterScaffoldedService
                 TemplateSlug: request.TemplateSlug,
                 ScaffoldId: request.ScaffoldId,
                 RegisteredAt: DateTimeOffset.UtcNow));
+        }
+
+        /// <summary>
+        /// Determina o template de origem (id + versão) para registar no serviço.
+        /// Usa o TemplateId explícito quando fornecido; caso contrário resolve pelo slug.
+        /// </summary>
+        private async Task<(Guid? Id, string? Version)> ResolveOriginTemplateAsync(
+            Command request, CancellationToken cancellationToken)
+        {
+            if (request.TemplateId is { } explicitId)
+                return (explicitId, request.TemplateVersion);
+
+            if (string.IsNullOrWhiteSpace(request.TemplateSlug))
+                return (null, null);
+
+            var template = await templateRepository.GetBySlugAsync(request.TemplateSlug, cancellationToken);
+            return template is null
+                ? (null, null)
+                : (template.Id.Value, request.TemplateVersion ?? template.Version);
         }
 
         private static string? BuildDescription(Command request)

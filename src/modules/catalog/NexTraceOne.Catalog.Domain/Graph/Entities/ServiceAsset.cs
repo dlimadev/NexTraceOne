@@ -136,6 +136,18 @@ public sealed class ServiceAsset : AuditableEntity<ServiceAssetId>
     /// </summary>
     public DateTimeOffset? LastOwnershipReviewAt { get; private set; }
 
+    // ── Proveniência ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// Identificador do ServiceTemplate a partir do qual o serviço foi gerado (scaffold).
+    /// Null quando o serviço foi registado manualmente, sem template de origem.
+    /// Permite avaliar o serviço contra os quality gates do template que o originou.
+    /// </summary>
+    public Guid? OriginTemplateId { get; private set; }
+
+    /// <summary>Versão do template de origem no momento do scaffold (ex: 1.0.0).</summary>
+    public string? OriginTemplateVersion { get; private set; }
+
     // ── Concorrência ──────────────────────────────────────────────────
 
     /// <summary>
@@ -231,6 +243,15 @@ public sealed class ServiceAsset : AuditableEntity<ServiceAssetId>
 
     /// <summary>Define o tier operacional do serviço.</summary>
     public void SetTier(ServiceTierType tier) => Tier = tier;
+
+    /// <summary>
+    /// Regista o template de origem a partir do qual o serviço foi gerado (scaffold).
+    /// </summary>
+    public void SetOriginTemplate(Guid templateId, string? templateVersion)
+    {
+        OriginTemplateId = templateId;
+        OriginTemplateVersion = templateVersion;
+    }
 
     /// <summary>
     /// Regista o momento em que o ownership foi revisto.

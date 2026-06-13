@@ -138,13 +138,20 @@ Existe `TemplateEditorPage.tsx` (web) e CRUD via API/CLI, mas não há um *desig
 3. Expor `GET /api/v1/catalog/services/{id}/quality-gate` + cartão no portal.
    - **Verificar:** endpoint retorna avaliação; teste de contrato.
 
-> **Estado de implementação (atualizado):** o passo 1 está implementado — feature
-> `EvaluateTemplateQualityGates` (catalog `Application/Contracts/Features/`) +
-> endpoint `GET /api/v1/quality/services/{serviceId}/gate` + testes unitários.
-> A avaliação é **determinística** (cobertura vs. mínimo do manifesto e quality gate
-> do SonarQube), recebendo o template por `templateId`/`templateSlug`. O passo 2
-> (persistir `OriginTemplateId` em `ServiceAsset` para dispensar o identificador
-> explícito) e o cartão de portal ficam para o próximo incremento.
+> **Estado de implementação (atualizado):** passos 1 e 2 implementados.
+> - **Passo 1** — feature `EvaluateTemplateQualityGates` (catalog
+>   `Application/Contracts/Features/`) + endpoint
+>   `GET /api/v1/quality/services/{serviceId}/gate` + testes unitários.
+>   Avaliação **determinística** (cobertura vs. mínimo do manifesto e quality gate
+>   do SonarQube).
+> - **Passo 2** — `ServiceAsset` ganha `OriginTemplateId`/`OriginTemplateVersion`
+>   (migration `AddServiceOriginTemplate`), preenchidos no fluxo de registo
+>   (`RegisterServiceAsset` ← `AutoRegisterScaffoldedService`). Quando o gate é
+>   avaliado sem `templateId`/`templateSlug`, o template é resolvido a partir do
+>   template de origem do serviço; sem origem, devolve `NoTemplateLinked`.
+>
+> Falta apenas as superfícies de scaffold (VS/VS Code/CLI) passarem o `templateId`
+> no registo e o cartão de quality gate no portal.
 
 ### Fase 2 — Quality gate como gate de promoção (resolve §5.3)
 
