@@ -368,7 +368,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         style={{ width: SIDEBAR_RAIL_WIDTH, background: 'var(--t-sidebar-gradient)' }}
       >
         {/* Logo */}
-        <div className="flex items-center justify-center h-[70px] shrink-0 border-b border-edge">
+        <div className="flex items-center justify-center h-[56px] shrink-0 border-b border-edge">
           <img
             src="/brand/logo-icon.svg"
             alt={t('brand.name')}
@@ -400,13 +400,13 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                     }}
                     title={sectionLabels[section] ? t(sectionLabels[section]) : section}
                     className={cn(
-                      'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-md mb-1',
+                      'relative flex items-center justify-center w-[40px] h-[40px] mx-auto rounded-md mb-1',
                       'transition-all duration-200',
                       isActive
-                        ? 'bg-[rgba(27,127,232,.25)] text-[#3D96F2] shadow-[0_0_12px_rgba(27,127,232,.18),inset_0_0_0_1px_rgba(27,127,232,.4)]'
+                        ? 'bg-accent-muted text-accent shadow-[inset_0_0_0_1px_var(--t-accent-muted)]'
                         : isHighlighted
-                          ? 'text-cyan hover:bg-hover hover:text-cyan'
-                          : 'text-[rgba(129,170,214,.5)] hover:bg-[rgba(255,255,255,.04)] hover:text-[rgba(129,170,214,.8)]',
+                          ? 'text-accent hover:bg-hover hover:text-accent'
+                          : 'text-faded hover:bg-hover hover:text-body',
                     )}
                     aria-current={isActive ? 'true' : undefined}
                   >
@@ -452,8 +452,8 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         }}
       >
         {/* Section header + collapse toggle */}
-        <div className="flex items-center justify-between h-[70px] px-5 shrink-0 border-b border-edge">
-          <span className="text-sm font-semibold text-[rgba(181,196,216,.9)] tracking-wide select-none">
+        <div className="flex items-center justify-between h-[56px] px-5 shrink-0 border-b border-edge">
+          <span className="text-sm font-semibold text-heading tracking-wide select-none">
             {t('brand.name')}
           </span>
           {onToggleCollapse && !mobile && (
@@ -499,10 +499,10 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                       'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm',
                       'transition-all duration-150',
                       isActive
-                        ? 'bg-[linear-gradient(90deg,rgba(27,127,232,.22),rgba(18,196,232,.08))] text-[#EAF2FF] font-medium shadow-[inset_2px_0_0_#1B7FE8]'
+                        ? 'bg-accent-muted text-accent font-medium shadow-[inset_2px_0_0_var(--t-accent)]'
                         : item.preview
-                          ? 'text-[rgba(129,170,214,.4)] hover:bg-[rgba(255,255,255,.04)] hover:text-[rgba(181,196,216,.8)]'
-                          : 'text-[rgba(181,196,216,.6)] hover:bg-[rgba(255,255,255,.04)] hover:text-[#EAF2FF] font-normal',
+                          ? 'text-faded hover:bg-hover hover:text-body'
+                          : 'text-body hover:bg-hover hover:text-heading font-normal',
                     )
                   }
                 >
