@@ -17,9 +17,9 @@ const sizeClasses = {
 };
 
 const directionClasses = {
-  up: 'bg-success/15 text-success',
-  down: 'bg-critical/15 text-critical',
-  neutral: 'bg-neutral/15 text-neutral',
+  up: 'bg-success-muted text-success',
+  down: 'bg-critical-muted text-critical',
+  neutral: 'bg-elevated text-muted',
 };
 
 const icons = {
