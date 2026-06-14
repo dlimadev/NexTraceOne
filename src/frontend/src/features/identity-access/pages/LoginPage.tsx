@@ -150,7 +150,7 @@ export function LoginPage() {
             <Checkbox label={t('auth.rememberMe')} />
             <Link
               to="/forgot-password"
-              className="text-xs text-cyan hover:text-cyan-hover transition-colors"
+              className="text-xs text-accent hover:text-accent-hover transition-colors"
             >
               {t('auth.forgotPasswordLink')}
             </Link>
@@ -182,7 +182,7 @@ export function LoginPage() {
         {/* Self-service signup */}
         <p className="text-center text-xs text-muted mt-4">
           {t('auth.noAccount', "Don't have an account?")}{' '}
-          <Link to="/signup" className="text-cyan hover:text-cyan-hover transition-colors font-medium">
+          <Link to="/signup" className="text-accent hover:text-accent-hover transition-colors font-medium">
             {t('auth.createWorkspace', 'Create your workspace')}
           </Link>
         </p>
@@ -194,7 +194,7 @@ export function LoginPage() {
           ) : (
             <>
               {t('auth.needHelp')}{' '}
-              <button type="button" className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
+              <button type="button" className="text-accent hover:text-accent-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
                 {t('auth.contactSupport')}
               </button>
             </>
