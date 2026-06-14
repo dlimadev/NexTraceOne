@@ -386,32 +386,32 @@
    dark values, enabling an always-dark sidebar without duplicating classes.
    ────────────────────────────────────────────────────────────────────────────── */
 [data-sidebar] {
-  /* Dynatrace Strato dock — always near-black */
-  --t-canvas: #141419;
-  --t-deep: #19192c;
-  --t-panel: #141419;
-  --t-card: #19192c;
-  --t-elevated: #212135;
-  --t-subtle: #1a1a2e;
+  /* Betterstack dock — flat near-black */
+  --t-canvas: #0a0b0e;
+  --t-deep: #0a0b0e;
+  --t-panel: #0f1014;
+  --t-card: #15171c;
+  --t-elevated: #1a1d23;
+  --t-subtle: #121419;
   --t-hover: rgba(255, 255, 255, 0.05);
-  --t-active: #2a2a40;
-  --t-edge: rgba(255, 255, 255, 0.08);
-  --t-edge-strong: rgba(255, 255, 255, 0.14);
-  --t-edge-focus: rgba(173, 176, 255, 0.40);
+  --t-active: rgba(255, 255, 255, 0.08);
+  --t-edge: rgba(255, 255, 255, 0.07);
+  --t-edge-strong: rgba(255, 255, 255, 0.12);
+  --t-edge-focus: rgba(59, 130, 246, 0.40);
   --t-divider: rgba(255, 255, 255, 0.06);
-  --t-heading: #ebecff;
-  --t-body: rgba(160, 161, 192, 0.9);
-  --t-muted: rgba(107, 107, 138, 0.8);
-  --t-faded: rgba(80, 80, 106, 0.7);
-  --t-accent: #adb0ff;
-  --t-accent-hover: #c4c6ff;
-  --t-accent-muted: rgba(173, 176, 255, 0.12);
-  --t-blue: #1B7FE8;
-  --t-blue-muted: rgba(27, 127, 232, 0.15);
-  --t-success: #47ae8f;
-  --t-warning: #e9b86e;
-  --t-critical: #da7288;
-  --t-sidebar-gradient: linear-gradient(180deg, #141419, #141419);
+  --t-heading: #f3f4f6;
+  --t-body: rgba(182, 188, 198, 0.9);
+  --t-muted: rgba(139, 144, 154, 0.85);
+  --t-faded: rgba(108, 112, 121, 0.7);
+  --t-accent: #3b82f6;
+  --t-accent-hover: #5a98f8;
+  --t-accent-muted: rgba(59, 130, 246, 0.14);
+  --t-blue: #3b82f6;
+  --t-blue-muted: rgba(59, 130, 246, 0.15);
+  --t-success: #34d399;
+  --t-warning: #fbbf24;
+  --t-critical: #f87171;
+  --t-sidebar-gradient: linear-gradient(180deg, #0f1014, #0f1014);
 }
 
 /* ─── Global Base ────────────────────────────────────────────────────────────── */
