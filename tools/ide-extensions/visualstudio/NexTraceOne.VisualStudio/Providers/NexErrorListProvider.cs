@@ -128,7 +128,7 @@ public sealed class NexErrorListProvider : IDisposable
         return ParseIssues(body);
     }
 
-    private static List<NexGovernanceIssue> ParseIssues(string json)
+    internal static List<NexGovernanceIssue> ParseIssues(string json)
     {
         var result = new List<NexGovernanceIssue>();
         try

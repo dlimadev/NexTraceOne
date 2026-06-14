@@ -49,3 +49,12 @@ src/**/obj*/
 # Superpowers visual brainstorming sessions
 .superpowers/
 *.lscache
+
+# Tools build artifacts
+tools/**/bin/
+tools/**/obj/
+tools/**/out/
+tools/**/node_modules/
+tools/**/publish/
+tools/**/*.vsix
+tools/**/*.nupkg

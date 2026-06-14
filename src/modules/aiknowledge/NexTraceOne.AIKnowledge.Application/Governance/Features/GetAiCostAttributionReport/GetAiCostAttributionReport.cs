@@ -47,7 +47,7 @@ public static class GetAiCostAttributionReport
             Guard.Against.Null(request);
 
             var cutoff = dateTimeProvider.UtcNow.AddDays(-request.PeriodDays);
-            var entries = await ledgerRepository.ListByPeriodAsync(cutoff, ct);
+            var entries = await ledgerRepository.ListByPeriodAsync(cutoff, ct: ct);
 
             var filtered = entries.AsEnumerable();
             if (request.TenantId.HasValue)

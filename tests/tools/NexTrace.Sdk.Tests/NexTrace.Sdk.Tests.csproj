@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTrace.Sdk.Tests</RootNamespace>
+    <AssemblyName>NexTrace.Sdk.Tests</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\tools\NexTrace.Sdk\NexTrace.Sdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+</Project>

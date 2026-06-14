@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +18,7 @@ public sealed class AiProviderHealthBackgroundService : BackgroundService, IAiPr
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<AiProviderHealthBackgroundService> _logger;
     private readonly ConcurrentDictionary<string, AiProviderHealthResult> _healthCache = new(StringComparer.OrdinalIgnoreCase);
-    private DateTimeOffset _lastCheckTime;
+    private long _lastCheckTimeTicks;
 
     public AiProviderHealthBackgroundService(
         IServiceScopeFactory serviceScopeFactory,
@@ -27,7 +28,14 @@ public sealed class AiProviderHealthBackgroundService : BackgroundService, IAiPr
         _logger = logger;
     }
 
-    public DateTimeOffset? LastCheckTime => _lastCheckTime == default ? null : _lastCheckTime;
+    public DateTimeOffset? LastCheckTime
+    {
+        get
+        {
+            var ticks = Interlocked.Read(ref _lastCheckTimeTicks);
+            return ticks == 0 ? null : new DateTimeOffset(ticks, TimeSpan.Zero);
+        }
+    }
 
     public IReadOnlyList<AiProviderHealthResult> GetAllHealthStatuses()
         => _healthCache.Values.ToList();
@@ -113,11 +121,11 @@ public sealed class AiProviderHealthBackgroundService : BackgroundService, IAiPr
                 _healthCache.TryRemove(key, out _);
         }
 
-        _lastCheckTime = DateTimeOffset.UtcNow;
+        Interlocked.Exchange(ref _lastCheckTimeTicks, DateTimeOffset.UtcNow.Ticks);
 
         var healthy = results.Count(r => r.IsHealthy);
         _logger.LogDebug(
             "Health check cycle complete. {Healthy}/{Total} providers healthy. Checked at {Timestamp}",
-            healthy, results.Count, _lastCheckTime);
+            healthy, results.Count, DateTimeOffset.UtcNow);
     }
 }

@@ -41,7 +41,7 @@ internal sealed class NexAiAskAboutSelectionCommand
     {
         ThreadHelper.ThrowIfNotOnUIThread();
 
-        _package.JoinableTaskFactory.RunAsync(async delegate
+        _ = _package.JoinableTaskFactory.RunAsync(async delegate
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 

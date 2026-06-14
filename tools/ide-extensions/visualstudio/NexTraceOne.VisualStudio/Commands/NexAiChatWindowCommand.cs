@@ -39,7 +39,7 @@ internal sealed class NexAiChatWindowCommand
     {
         ThreadHelper.ThrowIfNotOnUIThread();
 
-        _package.JoinableTaskFactory.RunAsync(async delegate
+        _ = _package.JoinableTaskFactory.RunAsync(async delegate
         {
             var window = await _package.ShowToolWindowAsync(
                 typeof(NexAiChatWindow),
@@ -47,6 +47,7 @@ internal sealed class NexAiChatWindowCommand
                 create: true,
                 cancellationToken: _package.DisposalToken);
 
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (window?.Frame is not IVsWindowFrame windowFrame)
                 throw new NotSupportedException("Cannot create NexTraceOne AI Chat window.");
 

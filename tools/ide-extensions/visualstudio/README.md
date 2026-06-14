@@ -1,5 +1,7 @@
 # NexTraceOne Visual Studio Extension
 
+> **Status:** em desenvolvimento. O projeto ainda requer ajustes de referências WPF e build só é viável dentro do Visual Studio 2022 com a workload "Visual Studio extension development".
+
 VSIX extension for Visual Studio 2022 that brings NexTraceOne AI Copilot capabilities directly into the IDE.
 
 ## Features

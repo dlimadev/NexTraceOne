@@ -62,11 +62,11 @@ public static class ReportCommand
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();
-        var serviceOpt = new Option<string>("--service", "Filter by service name.");
-        var teamOpt = new Option<string>("--team", "Filter by team name.");
-        var envOpt = new Option<string>("--environment", "Filter by environment name.");
-        var fromOpt = new Option<DateTimeOffset?>("--from", "Start of the time window (ISO 8601).");
-        var toOpt = new Option<DateTimeOffset?>("--to", "End of the time window (ISO 8601).");
+        var serviceOpt = new Option<string>("--service") { Description = "Filter by service name." };
+        var teamOpt = new Option<string>("--team") { Description = "Filter by team name." };
+        var envOpt = new Option<string>("--environment") { Description = "Filter by environment name." };
+        var fromOpt = new Option<DateTimeOffset?>("--from") { Description = "Start of the time window (ISO 8601)." };
+        var toOpt = new Option<DateTimeOffset?>("--to") { Description = "End of the time window (ISO 8601)." };
 
         var command = new Command("dora", "Display DORA metrics (Deployment Frequency, Lead Time, MTTR, Change Failure Rate).");
         command.Add(urlOpt);
@@ -220,10 +220,10 @@ public static class ReportCommand
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();
-        var teamOpt = new Option<string>("--team", "Filter by team name.");
-        var envOpt = new Option<string>("--environment", "Filter by environment name.");
-        var fromOpt = new Option<DateTimeOffset?>("--from", "Start of the time window (ISO 8601).");
-        var toOpt = new Option<DateTimeOffset?>("--to", "End of the time window (ISO 8601).");
+        var teamOpt = new Option<string>("--team") { Description = "Filter by team name." };
+        var envOpt = new Option<string>("--environment") { Description = "Filter by environment name." };
+        var fromOpt = new Option<DateTimeOffset?>("--from") { Description = "Start of the time window (ISO 8601)." };
+        var toOpt = new Option<DateTimeOffset?>("--to") { Description = "End of the time window (ISO 8601)." };
 
         var command = new Command("changes-summary", "Display an aggregated summary of changes (counts by type, status, environment).");
         command.Add(urlOpt);

@@ -6,6 +6,7 @@
     <AssemblyName>NexTraceOne.VisualStudio</AssemblyName>
     <Description>NexTraceOne AI Copilot for Visual Studio 2022</Description>
     <OutputType>Library</OutputType>
+    <UseWPF>true</UseWPF>
     <UseCodebase>true</UseCodebase>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -17,6 +18,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- VS SDK packages are managed locally because they are not part of the central package manifest. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +27,18 @@
     <!-- For a full build, install the "Visual Studio extension development" workload -->
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.6.36556.113" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.6.2167" ExcludeAssets="runtime" />
+    <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Design" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>NexTraceOne.VisualStudio.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

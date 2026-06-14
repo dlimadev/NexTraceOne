@@ -6,6 +6,10 @@
 #   validate       → quality gate (anti-demo check)
 #   build-backend  → dotnet restore + build
 #   test-backend   → dotnet test (unit + integration)
+#   build-tools    → dotnet build SDK + CLI
+#   test-tools     → dotnet test SDK + CLI tests
+#   build-vscode-extension → npm ci + build
+#   build-vsix     → dotnet build Visual Studio extension (Windows only)
 #   build-frontend → npm ci + tsc + vite build
 #   test-frontend  → vitest run
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -391,6 +395,131 @@ jobs:
           name: openapi-swagger-json
           path: ./openapi-artifact/swagger.json
           retention-days: 30
+
+  # ── build-tools ──────────────────────────────────────────────────────────────
+  build-tools:
+    name: Build Tools
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore tools solution projects
+        run: |
+          dotnet restore tools/NexTrace.Sdk/NexTrace.Sdk.csproj
+          dotnet restore tools/NexTraceOne.CLI/NexTraceOne.CLI.csproj
+
+      - name: Build SDK
+        run: dotnet build tools/NexTrace.Sdk/NexTrace.Sdk.csproj --configuration Release --no-restore
+
+      - name: Build CLI
+        run: dotnet build tools/NexTraceOne.CLI/NexTraceOne.CLI.csproj --configuration Release --no-restore
+
+  # ── test-tools ─────────────────────────────────────────────────────────────────
+  test-tools:
+    name: Test Tools
+    runs-on: ubuntu-latest
+    needs: build-tools
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore tests/tools/NexTrace.Sdk.Tests/NexTrace.Sdk.Tests.csproj
+
+      - name: Run SDK tests
+        run: dotnet test tests/tools/NexTrace.Sdk.Tests/NexTrace.Sdk.Tests.csproj --configuration Release --no-restore --verbosity normal
+
+      - name: Run CLI tests
+        run: dotnet test tests/platform/NexTraceOne.CLI.Tests/NexTraceOne.CLI.Tests.csproj --configuration Release --no-restore --verbosity normal
+
+  # ── build-vscode-extension ─────────────────────────────────────────────────────
+  build-vscode-extension:
+    name: Build VS Code Extension
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: tools/ide-extensions/vscode
+        run: npm ci
+
+      - name: Build extension
+        working-directory: tools/ide-extensions/vscode
+        run: npm run build
+
+      - name: Run extension tests
+        working-directory: tools/ide-extensions/vscode
+        run: npm test
+
+      - name: Run lint (if available)
+        working-directory: tools/ide-extensions/vscode
+        run: npm run lint --if-present
+
+  # ── build-vsix ───────────────────────────────────────────────────────────────
+  build-vsix:
+    name: Build Visual Studio Extension
+    runs-on: windows-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore VSIX project
+        run: dotnet restore tools/ide-extensions/visualstudio/NexTraceOne.VisualStudio/NexTraceOne.VisualStudio.csproj
+
+      - name: Build VSIX
+        run: dotnet build tools/ide-extensions/visualstudio/NexTraceOne.VisualStudio/NexTraceOne.VisualStudio.csproj --configuration Release --no-restore
+
+      - name: Run VSIX unit tests
+        run: dotnet test tests/tools/NexTraceOne.VisualStudio.Tests/NexTraceOne.VisualStudio.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextraceone-visualstudio-extension
+          path: tools/ide-extensions/visualstudio/NexTraceOne.VisualStudio/bin/Release/net48/NexTraceOne.VisualStudio.vsix
+          retention-days: 7
 
   # ── build-frontend ───────────────────────────────────────────────────────────
   build-frontend:
@@ -790,6 +919,10 @@ jobs:
       - test-backend-integration
       - test-backend-e2e
       - openapi-artifact
+      - build-tools
+      - test-tools
+      - build-vscode-extension
+      - build-vsix
       - build-frontend
       - test-frontend
       - e2e-smoke
@@ -804,6 +937,10 @@ jobs:
           echo "test-backend-integration: ${{ needs.test-backend-integration.result }}"
           echo "test-backend-e2e: ${{ needs.test-backend-e2e.result }}"
           echo "openapi-artifact: ${{ needs.openapi-artifact.result }}"
+          echo "build-tools: ${{ needs.build-tools.result }}"
+          echo "test-tools: ${{ needs.test-tools.result }}"
+          echo "build-vscode-extension: ${{ needs.build-vscode-extension.result }}"
+          echo "build-vsix: ${{ needs.build-vsix.result }}"
           echo "build-frontend: ${{ needs.build-frontend.result }}"
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
@@ -818,6 +955,10 @@ jobs:
                 "${{ needs.test-backend-integration.result }}" == "failure" || \
                 "${{ needs.test-backend-e2e.result }}" == "failure" || \
                 "${{ needs.openapi-artifact.result }}" == "failure" || \
+                "${{ needs.build-tools.result }}" == "failure" || \
+                "${{ needs.test-tools.result }}" == "failure" || \
+                "${{ needs.build-vscode-extension.result }}" == "failure" || \
+                "${{ needs.build-vsix.result }}" == "failure" || \
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
                 "${{ needs.security-audit.result }}" == "failure" || \

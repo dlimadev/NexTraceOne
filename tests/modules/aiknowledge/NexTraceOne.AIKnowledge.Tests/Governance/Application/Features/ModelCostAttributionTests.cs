@@ -22,7 +22,7 @@ public sealed class ModelCostAttributionTests
             CreateEntry("gpt-4o", "GPT-4o", 800, 300, 0.04m),
             CreateEntry("claude-3", "Claude 3", 600, 400, 0.03m),
         };
-        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(entries);
+        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(entries);
 
         var handler = new GetModelCostAttribution.Handler(repo);
         var result = await handler.Handle(new GetModelCostAttribution.Query(PeriodDays: 30), CancellationToken.None);
@@ -38,7 +38,7 @@ public sealed class ModelCostAttributionTests
     public async Task GetModelCostAttribution_FilterByModelId_ReturnsOnlyMatching()
     {
         var repo = Substitute.For<IAiTokenUsageLedgerRepository>();
-        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenUsageLedger>
             {
                 CreateEntry("gpt-4o", "GPT-4o", 1000, 500, 0.05m),
@@ -58,7 +58,7 @@ public sealed class ModelCostAttributionTests
     public async Task GetModelCostAttribution_EmptyLedger_ReturnsZeroValues()
     {
         var repo = Substitute.For<IAiTokenUsageLedgerRepository>();
-        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        repo.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenUsageLedger>());
 
         var handler = new GetModelCostAttribution.Handler(repo);

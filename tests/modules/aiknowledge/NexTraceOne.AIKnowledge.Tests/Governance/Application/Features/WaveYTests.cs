@@ -697,7 +697,7 @@ public sealed class WaveYTests
     public async Task GetTokenBudgetReport_EmptyLedger_ReturnsZeros()
     {
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
-        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<AiTokenUsageLedger>>([]));
         var (dt, cfg) = CreateBudgetMocks();
         var handler = new GetAiTokenBudgetReport.Handler(ledger, dt, cfg);
@@ -727,7 +727,7 @@ public sealed class WaveYTests
         // 850k tokens with 1M limit = 85% > 80% threshold → approaching
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
         var fakeEntry = BuildFakeLedgerEntry(850_000, 0m, "gpt-4", TenantId);
-        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<AiTokenUsageLedger>>(new[] { fakeEntry }));
         var (dt, cfg) = CreateBudgetMocks("1000000", "80");
         var handler = new GetAiTokenBudgetReport.Handler(ledger, dt, cfg);
@@ -747,7 +747,7 @@ public sealed class WaveYTests
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
         var gptEntry = BuildFakeLedgerEntry(1000, 0.01m, "gpt-4", TenantId);
         var internalEntry = BuildFakeLedgerEntry(500, 0m, "internal-llama", TenantId);
-        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<AiTokenUsageLedger>>(
                 new[] { gptEntry, internalEntry }));
         var (dt, cfg) = CreateBudgetMocks();
@@ -769,7 +769,7 @@ public sealed class WaveYTests
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
         var myEntry = BuildFakeLedgerEntry(500, 0m, "claude-3", TenantId);
         var otherEntry = BuildFakeLedgerEntry(9999, 0m, "gpt-4", otherTenant);
-        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        ledger.ListByPeriodAsync(Arg.Any<DateTimeOffset>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<AiTokenUsageLedger>>(
                 new[] { myEntry, otherEntry }));
         var (dt, cfg) = CreateBudgetMocks();

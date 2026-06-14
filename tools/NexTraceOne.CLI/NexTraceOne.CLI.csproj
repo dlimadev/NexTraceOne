@@ -14,6 +14,9 @@
     <ProjectReference Include="..\..\src\modules\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NexTrace.Sdk\NexTrace.Sdk.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.CommandLine" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Spectre.Console.Cli" />

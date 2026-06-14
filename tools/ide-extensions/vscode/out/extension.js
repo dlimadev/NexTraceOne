@@ -42,6 +42,7 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
 const url_1 = require("url");
+const utils_1 = require("./utils");
 let outputChannel;
 // ═══════════════════════════════════════════════════════════════════════════════
 // Activation
@@ -78,7 +79,7 @@ function activate(context) {
     }), vscode.commands.registerCommand('nextraceone.openServiceDashboard', (serviceName) => handleOpenServiceDashboardCommand(serviceName)), vscode.commands.registerCommand('nextraceone.askAboutService', (serviceName) => {
         void chatViewProvider.sendQuery(`Show service context, ownership, contracts and recent changes for: ${serviceName}`);
         void vscode.commands.executeCommand('nextraceone.chatView.focus');
-    }));
+    }), vscode.commands.registerCommand('nextraceone.migrateContract', () => handleMigrateContractCommand(chatViewProvider)));
     // Reload catalog when settings change
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((e) => {
         if (e.affectsConfiguration('nextraceone')) {
@@ -171,7 +172,7 @@ class NexChatViewProvider {
             const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
                 queryText: text,
                 clientType: 'vscode',
-                clientVersion: '0.2.0',
+                clientVersion: '0.6.0',
                 queryType: 'GeneralQuery',
                 context,
                 persona: config.persona,
@@ -605,6 +606,10 @@ function registerChatParticipant(context) {
                     queryType = 'CodeGeneration';
                     prefix = `[Code generation] `;
                     break;
+                case 'migrate':
+                    queryType = 'CodeGeneration';
+                    prefix = `[Contract migration patch — generate code update hints for provider and consumers] `;
+                    break;
             }
             const queryText = prefix + request.prompt;
             stream.progress('Querying NexTraceOne AI…');
@@ -614,7 +619,7 @@ function registerChatParticipant(context) {
                 const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
                     queryText,
                     clientType: 'vscode-chat',
-                    clientVersion: '0.2.0',
+                    clientVersion: '0.6.0',
                     queryType,
                     persona: config.persona,
                 });
@@ -668,6 +673,9 @@ function updateStatusBar() {
         _statusBarItem.backgroundColor = undefined;
     }
 }
+// ═══════════════════════════════════════════════════════════════════════════════
+// Service Catalog Tree View
+// ═══════════════════════════════════════════════════════════════════════════════
 class CatalogNode extends vscode.TreeItem {
     constructor(label, collapsibleState, contextValue, serviceItem) {
         super(label, collapsibleState);
@@ -785,8 +793,7 @@ function fetchCatalogServices(serverUrl, apiKey) {
                     return;
                 }
                 try {
-                    const parsed = JSON.parse(body);
-                    resolve(Array.isArray(parsed) ? parsed : (parsed.items ?? []));
+                    resolve((0, utils_1.parseCatalogResponse)(body));
                 }
                 catch {
                     reject(new Error('Invalid catalog response'));
@@ -933,7 +940,7 @@ async function handleChatCommand(_context) {
         const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
             queryText: query,
             clientType: 'vscode',
-            clientVersion: '0.2.0',
+            clientVersion: '0.6.0',
             queryType: 'GeneralQuery',
             persona: config.persona,
         });
@@ -971,7 +978,7 @@ async function handleInspectServiceCommand() {
         const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
             queryText: `Show service context, recent changes, contracts and reliability for: ${service}`,
             clientType: 'vscode',
-            clientVersion: '0.2.0',
+            clientVersion: '0.6.0',
             queryType: 'OwnershipLookup',
             serviceContext: service,
             persona: config.persona,
@@ -1008,7 +1015,7 @@ async function handleAskAboutSelectionCommand() {
         const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
             queryText: `Analyse and explain this code in the context of NexTraceOne services and contracts:\n\n${selectedText}`,
             clientType: 'vscode',
-            clientVersion: '0.2.0',
+            clientVersion: '0.6.0',
             queryType: 'CodeGeneration',
             context: selectedText,
             persona: config.persona,
@@ -1093,7 +1100,7 @@ async function handleOpenDashboardCommand() {
 /** Handles opening a specific service page in the NexTraceOne dashboard. */
 async function handleOpenServiceDashboardCommand(serviceName) {
     const config = getConfig();
-    const serviceUrl = `${config.serverUrl.replace(/\/$/, '')}/services/${encodeURIComponent(serviceName)}`;
+    const serviceUrl = (0, utils_1.buildServiceDashboardUrl)(config.serverUrl, serviceName);
     try {
         await vscode.env.openExternal(vscode.Uri.parse(serviceUrl));
         outputChannel.appendLine(`Opened service dashboard: ${serviceUrl}`);
@@ -1102,6 +1109,41 @@ async function handleOpenServiceDashboardCommand(serviceName) {
         const message = err instanceof Error ? err.message : String(err);
         await vscode.window.showErrorMessage(`NexTraceOne: Failed to open service dashboard: ${message}`);
     }
+}
+// ═══════════════════════════════════════════════════════════════════════════════
+// Contract Migration Patch Command
+// ═══════════════════════════════════════════════════════════════════════════════
+async function handleMigrateContractCommand(chatViewProvider) {
+    const baseId = await vscode.window.showInputBox({
+        title: 'NexTraceOne: Contract Migration Patch',
+        prompt: 'Enter the BASE contract version ID (GUID)',
+        placeHolder: 'e.g. 00000000-0000-0000-0000-000000000001',
+        validateInput: (v) => (v && v.trim().length > 0 ? null : 'Base version ID is required'),
+    });
+    if (!baseId)
+        return;
+    const targetId = await vscode.window.showInputBox({
+        title: 'NexTraceOne: Contract Migration Patch',
+        prompt: 'Enter the TARGET contract version ID (GUID)',
+        placeHolder: 'e.g. 00000000-0000-0000-0000-000000000002',
+        validateInput: (v) => (v && v.trim().length > 0 ? null : 'Target version ID is required'),
+    });
+    if (!targetId)
+        return;
+    const sideChoice = await vscode.window.showQuickPick([
+        { label: 'All (Provider + Consumer)', value: 'all' },
+        { label: 'Provider only', value: 'provider' },
+        { label: 'Consumer only', value: 'consumer' },
+    ], { title: 'NexTraceOne: Migration target side', placeHolder: 'Select which side to generate for' });
+    if (!sideChoice)
+        return;
+    const langChoice = await vscode.window.showQuickPick(['C#', 'TypeScript', 'JavaScript', 'Java', 'Python'], { title: 'NexTraceOne: Implementation language', placeHolder: 'Select language for code hints' });
+    const language = langChoice ?? 'C#';
+    const prompt = `/migrate Generate contract migration patch from version ${baseId} to ${targetId}. ` +
+        `Target: ${sideChoice.value}. Language: ${language}. ` +
+        `Show code hints for breaking changes and how to update both provider implementation and consumer clients.`;
+    void chatViewProvider.sendQuery(prompt);
+    void vscode.commands.executeCommand('nextraceone.chatView.focus');
 }
 /**
  * Handles "NexTraceOne: Scaffold New Service" command.

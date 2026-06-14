@@ -26,7 +26,7 @@ public static class GetAiCostAttributionReport
         {
             var cutoff = DateTimeOffset.UtcNow.AddDays(-Math.Max(1, request.DaysBack));
 
-            var entries = await ledgerRepository.ListByPeriodAsync(cutoff, cancellationToken);
+            var entries = await ledgerRepository.ListByPeriodAsync(cutoff, ct: cancellationToken);
 
             var byUser = entries
                 .GroupBy(e => e.UserId)

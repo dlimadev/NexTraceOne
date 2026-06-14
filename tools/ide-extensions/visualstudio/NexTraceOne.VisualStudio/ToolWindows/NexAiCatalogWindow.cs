@@ -27,4 +27,14 @@ public sealed class NexAiCatalogWindow : ToolWindowPane
         _control = new NexAiCatalogControl(this);
         Content = _control;
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _control?.Dispose();
+            _control = null;
+        }
+        base.Dispose(disposing);
+    }
 }

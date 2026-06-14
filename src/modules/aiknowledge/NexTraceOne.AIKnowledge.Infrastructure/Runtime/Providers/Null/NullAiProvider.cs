@@ -42,13 +42,13 @@ public sealed class NullAiProvider : IAiProvider, IChatCompletionProvider
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         yield return new ChatStreamChunk(
-            Content: "IA está desabilitada para esta funcionalidade.",
+            Content: string.Empty,
             IsComplete: true,
             ModelId: "null",
             ProviderId: ProviderId,
             PromptTokens: 0,
             CompletionTokens: 0,
-            ErrorMessage: null);
+            ErrorMessage: "IA está desabilitada para esta funcionalidade.");
 
         await Task.CompletedTask; // Satisfy async enumerable requirement
     }

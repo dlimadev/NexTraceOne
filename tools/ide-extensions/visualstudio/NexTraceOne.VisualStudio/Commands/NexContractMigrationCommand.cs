@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using NexTraceOne.VisualStudio.ToolWindows;
 using System;
 using System.ComponentModel.Design;
 using System.Net.Http;
@@ -19,13 +20,12 @@ namespace NexTraceOne.VisualStudio.Commands;
 internal sealed class NexContractMigrationCommand
 {
     private const int CommandId = 0x0104;
+    private static readonly HttpClient SharedHttpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
     private readonly AsyncPackage _package;
-    private readonly HttpClient _httpClient;
 
     private NexContractMigrationCommand(AsyncPackage package, OleMenuCommandService commandService)
     {
         _package = package ?? throw new ArgumentNullException(nameof(package));
-        _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
 
         var menuCommandId = new CommandID(PackageGuids.CommandSetGuid, CommandId);
         var menuItem = new OleMenuCommand(Execute, menuCommandId);
@@ -44,7 +44,7 @@ internal sealed class NexContractMigrationCommand
 
     private void Execute(object sender, EventArgs e)
     {
-        _package.JoinableTaskFactory.RunAsync(async delegate
+        _ = _package.JoinableTaskFactory.RunAsync(async delegate
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
@@ -106,7 +106,7 @@ internal sealed class NexContractMigrationCommand
         try
         {
             patch = await CallMigrationPatchApiAsync(
-                options, baseVersionId, targetVersionId,
+                options, baseVersionId!, targetVersionId!,
                 "all", "C#", _package.DisposalToken);
         }
         catch (Exception ex)
@@ -150,7 +150,7 @@ internal sealed class NexContractMigrationCommand
         };
         request.Headers.Add("Authorization", $"Bearer {options.ApiKey}");
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var response = await SharedHttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -216,8 +216,11 @@ internal sealed class NexContractMigrationCommand
 
     private static Task<string?> PromptInputAsync(string title, string prompt, string? defaultValue)
     {
-        // Simple synchronous dialog — runs on UI thread via the caller
-        var result = Microsoft.VisualBasic.Interaction.InputBox(prompt, title, defaultValue ?? string.Empty);
+        // Runs on the UI thread via the caller
+        var dialog = new NexInputDialog(title, prompt, defaultValue ?? string.Empty);
+        var result = dialog.ShowDialog() == true
+            ? dialog.InputText
+            : null;
         return Task.FromResult(string.IsNullOrWhiteSpace(result) ? null : result);
     }
 
