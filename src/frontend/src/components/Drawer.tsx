@@ -135,7 +135,7 @@ export function Drawer({
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-overlay animate-fade-in"
+        className="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -144,7 +144,7 @@ export function Drawer({
       <div
         ref={panelRef}
         className={cn(
-          'absolute top-0 bottom-0 flex flex-col bg-panel border-edge shadow-floating',
+          'absolute top-0 bottom-0 flex flex-col bg-panel border-edge shadow-lg',
           side === 'right'
             ? 'right-0 border-l animate-slide-right'
             : 'left-0 border-r animate-slide-right',
@@ -162,7 +162,7 @@ export function Drawer({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-sm p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
+              className="rounded-md p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
               style={{ transitionDuration: 'var(--nto-motion-fast)' }}
               aria-label={t('common.close', 'Close')}
             >

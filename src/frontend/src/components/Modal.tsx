@@ -139,7 +139,7 @@ export function Modal({
       aria-describedby={descId}
       className={cn(
         'fixed inset-0 z-[var(--z-modal)] m-0 h-full w-full max-h-full max-w-full',
-        'bg-transparent backdrop:bg-overlay',
+        'bg-transparent backdrop:bg-overlay backdrop:backdrop-blur-sm',
         'flex items-center justify-center p-4',
       )}
       onClick={(e) => {
@@ -150,7 +150,7 @@ export function Modal({
       <div
         ref={contentRef}
         className={cn(
-          'w-full rounded-lg bg-panel border border-edge shadow-floating',
+          'w-full rounded-xl bg-panel border border-edge shadow-lg',
           'animate-slide-up',
           sizeClasses[size],
           className,
@@ -167,7 +167,7 @@ export function Modal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-sm p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
+              className="rounded-md p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
               style={{ transitionDuration: 'var(--nto-motion-fast)' }}
               aria-label={t('common.close', 'Close')}
             >
