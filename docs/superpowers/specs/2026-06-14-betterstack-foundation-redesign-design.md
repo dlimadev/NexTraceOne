@@ -80,12 +80,14 @@ Reescrever valores em `[data-theme="dark"]`, `:root`/`[data-theme="light"]` e `[
 | `--t-muted` | `#6b6b8a` | `#8b909a` |
 | `--t-faded` | `#50506a` | `#6c7079` |
 | `--t-accent` | `#adb0ff` | `#3b82f6` |
-| `--t-accent-hover` | `#c4c6ff` | `#2f6fe0` |
+| `--t-accent-hover` | `#c4c6ff` | `#5a9ef8` (hover mais claro no fundo escuro) |
 | `--t-accent-muted` | `rgba(173,176,255,.12)` | `rgba(59,130,246,.14)` |
 | `--t-focus-ring` | `rgba(173,176,255,.50)` | `rgba(59,130,246,.45)` |
 | `--t-on-accent` | `#19192c` | `#ffffff` |
 
-**Light:** `--t-canvas` `#f6f6f7`, `--t-panel/card` `#ffffff`, `--t-elevated` `#fbfbfc`, `--t-edge` `rgba(20,22,30,.08)`, `--t-edge-strong` `rgba(20,22,30,.14)`, `--t-heading` `#1a1a1a`, `--t-body` `#41464f`, `--t-muted` `#6b7280`, `--t-faded` `#9aa0aa`, `--t-accent` `#2563eb`, `--t-accent-hover` `#1d4ed8`, `--t-on-accent` `#ffffff`.
+**Light:** `--t-canvas` `#f6f6f7`, `--t-panel/card` `#ffffff`, `--t-elevated` `#ffffff`, `--t-subtle` `#f1f2f3`, `--t-edge` `rgba(20,22,30,.08)`, `--t-edge-strong` `rgba(20,22,30,.14)`, `--t-heading` `#1a1a1a`, `--t-body` `#41464f`, `--t-muted` `#60656e`, `--t-faded` `#9aa0aa`, `--t-accent` `#2563eb`, `--t-accent-hover` `#1d4ed8`, `--t-on-accent` `#ffffff`.
+
+> **Ajustes pós-review (acessibilidade/coerência):** `--t-elevated` (light) → `#ffffff` (elevação por sombra, não cor); `--t-subtle` (light) → `#f1f2f3` (distinto do canvas); `--t-muted` (light) → `#60656e` (clear WCAG AA sobre canvas); `--t-accent-hover` (dark) → `#5a9ef8` (hover mais claro no fundo escuro). Branco sobre `--t-accent` (#3b82f6) no dark é deviation aprovada no design (botões primários).
 
 **Semânticas (ambos os temas, valores dark→light):** `--t-success` `#34d399`/`#16a34a`, `--t-warning` `#fbbf24`/`#b45309`, `--t-critical`/`--t-danger` `#f87171`/`#dc2626`, `--t-info` `#60a5fa`/`#2563eb`. Atualizar `*-muted` correspondentes para rgba do mesmo hue.
 
@@ -140,6 +142,6 @@ Critério de seleção dos arquivos: priorizar os listados acima; expandir para 
 ---
 
 ## 7. Riscos e mitigações
-- **Resíduo Strato hardcoded em páginas** (hex inline em vez de utility): fora do escopo da Fundação; capturar lista no smoke test para ciclos de jornada futuros. Mitigação: grep de hex Strato no fim.
+- **Resíduo Strato hardcoded em páginas** (hex inline em vez de utility): fora do escopo da Fundação; capturar lista no smoke test para ciclos de jornada futuros. Mitigação: grep de hex Strato no fim. **Dívida medida (pós-execução):** apenas 2 arquivos em `src/features` ainda têm hex Strato — `ai-hub/components/AssistantMessageBubble.tsx` e `configuration/pages/BrandingAdminPage.tsx`. Corrigir nos ciclos de jornada.
 - **Contraste/acessibilidade** no novo dark: validar `--t-body`/`--t-muted` sobre `--t-canvas`/`--t-card` (WCAG AA) durante o smoke.
 - **Fonte não carrega offline (AirGap)**: o `@import` do Google Fonts já é o padrão atual; manter o mesmo mecanismo (sem regressão). Fallbacks de system-ui garantem degradação.
