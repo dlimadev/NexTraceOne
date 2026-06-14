@@ -35,13 +35,13 @@ export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
-  default: 'bg-card rounded-md border border-edge shadow-sm overflow-hidden',
+  default: 'bg-card rounded-xl border border-edge shadow-sm overflow-hidden',
   interactive:
-    'bg-card rounded-md border border-edge shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-edge-strong transition-all duration-[var(--nto-motion-base)]',
-  elevated: 'bg-card rounded-md border border-edge shadow-md overflow-hidden',
-  flat: 'bg-card rounded-md overflow-hidden',
-  glass: 'backdrop-blur-xl bg-white/5 rounded-md border border-white/10 shadow-sm overflow-hidden',
-  gradient: 'rounded-md border-0 shadow-md overflow-hidden text-white bg-gradient-to-br from-accent via-blue to-cyan',
+    'bg-card rounded-xl border border-edge shadow-sm overflow-hidden cursor-pointer hover:border-edge-strong transition-all duration-[var(--nto-motion-base)]',
+  elevated: 'bg-card rounded-xl border border-edge shadow-md overflow-hidden',
+  flat: 'bg-card rounded-xl overflow-hidden',
+  glass: 'backdrop-blur-xl bg-card/70 rounded-xl border border-edge shadow-sm overflow-hidden',
+  gradient: 'rounded-xl border-0 shadow-md overflow-hidden text-white bg-gradient-to-br from-accent via-blue to-cyan',
 };
 
 /**
