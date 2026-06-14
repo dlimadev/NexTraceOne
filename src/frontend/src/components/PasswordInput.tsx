@@ -41,12 +41,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             type={visible ? 'text' : 'password'}
             autoComplete={rest.autoComplete ?? 'current-password'}
             className={cn(
-              'w-full h-14 rounded-lg bg-input border text-sm text-heading placeholder:text-faded',
+              'w-full h-14 rounded-md bg-input border text-sm text-body placeholder:text-faded',
               'transition-colors pl-4 pr-12',
-              'focus:outline-none',
+              'focus:outline-none focus-visible:ring-2',
               hasError
-                ? 'border-critical/60 focus:border-critical focus:shadow-glow-danger'
-                : 'border-edge hover:border-edge-strong focus:border-edge-focus focus:shadow-glow-cyan',
+                ? 'border-critical/60 focus:border-critical focus-visible:ring-danger/40'
+                : 'border-edge hover:border-edge-strong focus:border-edge-focus focus-visible:ring-accent',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               className,
             )}

@@ -44,10 +44,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           type="search"
           aria-label={rest['aria-label'] ?? 'Search'}
           className={cn(
-            'w-full rounded-lg bg-input border border-edge pr-4 text-heading',
-            'placeholder:text-muted',
+            'w-full rounded-md bg-input border border-edge pr-4 text-body',
+            'placeholder:text-faded',
             'transition-colors',
-            'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+            'focus:outline-none focus:border-edge-focus focus-visible:ring-2 focus-visible:ring-accent',
             sizeClasses[size],
           )}
           style={{ transitionDuration: 'var(--nto-motion-fast)' }}

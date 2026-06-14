@@ -197,18 +197,18 @@ export function ComboBox({
 
       <div
         className={cn(
-          'flex flex-wrap items-center gap-1 rounded-lg bg-input border px-3 min-h-[44px]',
+          'flex flex-wrap items-center gap-1 rounded-md bg-input border px-3 min-h-[44px]',
           'transition-colors',
-          'focus-within:border-edge-focus focus-within:shadow-glow-cyan',
+          'focus-within:border-edge-focus focus-within:ring-2 focus-within:ring-accent',
           disabled && 'opacity-50 cursor-not-allowed',
-          hasError ? 'border-danger shadow-glow-danger' : 'border-edge hover:border-edge-strong',
+          hasError ? 'border-danger' : 'border-edge hover:border-edge-strong',
         )}
       >
         {/* Multi-select tags */}
         {multi && selectedLabels.map(({ value: v, label: l }) => (
           <span
             key={v}
-            className="inline-flex items-center gap-1 rounded-sm bg-accent-muted text-xs text-heading px-2 py-0.5"
+            className="inline-flex items-center gap-1 rounded-md bg-accent-muted text-xs text-heading px-2 py-0.5"
           >
             {l}
             <button
@@ -261,7 +261,7 @@ export function ComboBox({
           aria-multiselectable={multi || undefined}
           className={cn(
             'z-[var(--z-dropdown)] max-h-60 overflow-y-auto',
-            'rounded-lg bg-panel border border-edge shadow-floating animate-fade-in',
+            'rounded-md bg-panel border border-edge shadow-lg animate-fade-in',
             'py-1',
           )}
         >
@@ -286,10 +286,10 @@ export function ComboBox({
                     ? 'opacity-40 cursor-not-allowed'
                     : 'hover:bg-hover cursor-pointer',
                   i === activeIndex && 'bg-hover',
-                  isSelected && 'text-cyan font-medium',
+                  isSelected && 'text-accent font-medium',
                 )}
               >
-                {isSelected && <span className="shrink-0 text-cyan"><Check size={14} /></span>}
+                {isSelected && <span className="shrink-0 text-accent"><Check size={14} /></span>}
                 <span className={cn(!isSelected && 'pl-[22px]')}>{opt.label}</span>
               </button>
             );
