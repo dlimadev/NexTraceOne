@@ -29,7 +29,7 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
     <div className="shrink-0">
       <header
         className={cn(
-          'h-12 border-b border-edge',
+          'h-12 border-b border-edge backdrop-blur-sm',
           'flex items-center justify-between px-5 lg:px-6 gap-3',
           'sticky top-0 z-[var(--z-header)]',
         )}
