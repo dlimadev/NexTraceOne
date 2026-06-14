@@ -377,7 +377,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         </div>
 
         {/* Section tab icons */}
-        <div className="flex-1 flex flex-col py-3 px-3 overflow-y-auto">
+        <div className="flex-1 flex flex-col py-3 px-2 overflow-y-auto">
           {sectionGroups.map((group, gi) => (
             <div key={gi} className={gi === sectionGroups.length - 1 ? 'mt-auto' : undefined}>
               {gi > 0 && (
@@ -428,7 +428,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           <div className="px-3 py-2 border-t border-edge flex justify-center">
             <button
               onClick={onToggleCollapse}
-              className="flex items-center justify-center w-[48px] h-[40px] rounded-md text-faded hover:text-body hover:bg-hover transition-all duration-200"
+              className="flex items-center justify-center w-[40px] h-[40px] rounded-md text-faded hover:text-body hover:bg-hover transition-all duration-200"
               title={t('common.expand')}
               aria-label={t('common.expand')}
             >

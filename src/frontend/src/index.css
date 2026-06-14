@@ -312,8 +312,8 @@
 :root {
   /* Layout dimensions — alinhados com Template NexLink */
   --nto-header-height: 48px;
-  --nto-sidebar-width-expanded: 320px;
-  --nto-sidebar-width-collapsed: 80px;
+  --nto-sidebar-width-expanded: 308px;
+  --nto-sidebar-width-collapsed: 60px;
 
   /* Motion durations */
   --nto-motion-fast: 120ms;
