@@ -10,7 +10,7 @@ interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
 /**
  * Campo de busca padronizado com ícone de lupa integrado.
  *
- * Segue os tokens NTO: bg-input, border-edge, rounded-lg.
+ * Segue os tokens NTO: bg-input, border-edge, rounded-md.
  * Usado em filtros de tabelas, command palette e barras de filtros.
  */
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(

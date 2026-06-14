@@ -19,7 +19,7 @@ interface FilterChipProps {
 /**
  * Chip de filtro para barras de filtros rápidos.
  *
- * Ativo: bg-accent/10, border-accent/30, text-cyan.
+ * Ativo: bg-accent/10, border-accent/30, text-accent.
  * Inativo: bg-panel, border-edge, text-muted.
  *
  * Usado em filtros de status (incidents, changes, contracts).

@@ -14,7 +14,7 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
 /**
  * Campo de password com toggle mostrar/ocultar — DESIGN-SYSTEM.md §4.4
  *
- * Mesmo padrão visual de TextField: h-14, rounded-lg, bg-input.
+ * Mesmo padrão visual de TextField: h-14, rounded-md, bg-input.
  * O botão de toggle é clickável mas fora do tab order para não
  * interromper o fluxo natural do formulário.
  *
@@ -45,7 +45,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               'transition-colors pl-4 pr-12',
               'focus:outline-none focus-visible:ring-2',
               hasError
-                ? 'border-critical/60 focus:border-critical focus-visible:ring-danger/40'
+                ? 'border-critical/60 focus:border-critical focus-visible:ring-danger'
                 : 'border-edge hover:border-edge-strong focus:border-edge-focus focus-visible:ring-accent',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               className,
