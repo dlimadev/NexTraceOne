@@ -1,8 +1,8 @@
 /** Largura do icon rail — coluna fixa com ícones de secção. */
-export const SIDEBAR_RAIL_WIDTH = 80;
+export const SIDEBAR_RAIL_WIDTH = 60;
 
 /** Largura do painel de conteúdo — itens de navegação da secção activa. */
-export const SIDEBAR_CONTENT_WIDTH = 240;
+export const SIDEBAR_CONTENT_WIDTH = 248;
 
 /** Sidebar colapsada — apenas icon rail visível. */
 export const SIDEBAR_WIDTH_COLLAPSED = SIDEBAR_RAIL_WIDTH;
