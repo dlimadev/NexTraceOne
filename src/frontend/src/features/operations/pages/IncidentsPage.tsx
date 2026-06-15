@@ -270,6 +270,13 @@ export function IncidentsPage() {
         }
       />
 
+      {/* Nota informativa para utilizadores sem permissão de criação */}
+      {!canCreateIncident && (
+        <p className="text-xs text-muted px-1 mb-2">
+          {t('incidents.create.readOnlyHint', 'Your current role can review incidents but cannot create new ones.')}
+        </p>
+      )}
+
       {/* Stats de resumo */}
       <PageSection className="!mb-6">
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
