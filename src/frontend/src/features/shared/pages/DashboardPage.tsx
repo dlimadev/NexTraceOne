@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Zap, FileText, ShieldCheck, Activity, AlertTriangle,
-  ArrowRight, AlertCircle, Clock, ChevronRight,
+  ArrowRight, AlertCircle, Clock, ChevronRight, Download,
 } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody, CardFooter } from '../../../components/Card';
@@ -11,6 +11,7 @@ import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { StackedProgressBar } from '../../../components/StackedProgressBar';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
@@ -20,7 +21,6 @@ import { incidentsApi } from '../../operations/api/incidents';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import type { Persona } from '../../../auth/persona';
-import { Download } from 'lucide-react';
 
 /** Chips decorativos de persona — apresentam o perfil activo e os disponíveis. */
 const PERSONA_CHIPS: { id: Persona; labelKey: string }[] = [
@@ -187,16 +187,16 @@ export function DashboardPage() {
 
   return (
     <PageContainer>
-      {/* ── Context bar ──────────────────────────────────────────────────────── */}
-      <div className="mb-5">
-        <div className="flex items-center gap-3 mb-1.5">
-          <h1 className="text-2xl font-bold text-heading tracking-tight">{t('dashboard.title')}</h1>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue/10 text-cyan border border-cyan/15">
+      {/* ── Cabeçalho padronizado com persona badge ───────────────────────────── */}
+      <PageHeader
+        title={t('dashboard.title')}
+        subtitle={t(config.homeSubtitleKey)}
+        badge={
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/15">
             {t(`persona.${persona}.label`)}
           </span>
-        </div>
-        <p className="text-sm text-muted">{t(config.homeSubtitleKey)}</p>
-      </div>
+        }
+      />
 
       {/* ── Persona switcher decorativo ───────────────────────────────────────── */}
       <div className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-0.5 scrollbar-none">
