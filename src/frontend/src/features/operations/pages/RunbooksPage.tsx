@@ -87,7 +87,7 @@ export function RunbooksPage() {
               placeholder={t('runbooks.searchPlaceholder', 'Search runbooks...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+              className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
             />
           </div>
         </div>

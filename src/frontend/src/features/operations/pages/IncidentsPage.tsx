@@ -257,34 +257,34 @@ export function IncidentsPage() {
                   value={createForm.title}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
                   placeholder={t('incidents.create.titlePlaceholder', 'Incident title')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                   required
                 />
                 <input
                   value={createForm.serviceId}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, serviceId: e.target.value }))}
                   placeholder={t('incidents.create.serviceIdPlaceholder', 'Service ID')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                   required
                 />
                 <input
                   value={createForm.serviceDisplayName}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, serviceDisplayName: e.target.value }))}
                   placeholder={t('incidents.create.serviceNamePlaceholder', 'Service display name')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                   required
                 />
                 <input
                   value={createForm.ownerTeam}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, ownerTeam: e.target.value }))}
                   placeholder={t('incidents.create.ownerTeamPlaceholder', 'Owner team')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                   required
                 />
                 <select
                   value={createForm.incidentType}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, incidentType: e.target.value }))}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                 >
                   {['ServiceDegradation', 'AvailabilityIssue', 'DependencyFailure', 'ContractImpact', 'MessagingIssue', 'BackgroundProcessingIssue', 'OperationalRegression'].map(type => (
                     <option key={type} value={type}>{t(`incidents.type.${type}`)}</option>
@@ -293,7 +293,7 @@ export function IncidentsPage() {
                 <select
                   value={createForm.severity}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, severity: e.target.value }))}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                 >
                   {['Warning', 'Minor', 'Major', 'Critical'].map(sev => (
                     <option key={sev} value={sev}>{t(`incidents.severity.${sev}`)}</option>
@@ -303,20 +303,20 @@ export function IncidentsPage() {
                   value={createForm.environment}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, environment: e.target.value }))}
                   placeholder={t('incidents.create.environmentPlaceholder', 'Environment')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                   required
                 />
                 <input
                   value={createForm.impactedDomain}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, impactedDomain: e.target.value }))}
                   placeholder={t('incidents.create.domainPlaceholder', 'Impacted domain (optional)')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  className="px-3 py-2 text-sm rounded-md bg-input border border-edge text-body"
                 />
                 <textarea
                   value={createForm.description}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder={t('incidents.create.descriptionPlaceholder', 'Describe what happened')}
-                  className="md:col-span-2 px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body min-h-[88px]"
+                  className="md:col-span-2 px-3 py-2 text-sm rounded-md bg-input border border-edge text-body min-h-[88px]"
                   required
                 />
 
@@ -338,7 +338,7 @@ export function IncidentsPage() {
                   <button
                     type="submit"
                     disabled={!isCreateFormValid || createIncidentMutation.isPending}
-                    className="px-3 py-2 text-sm rounded-md bg-accent text-accent-contrast disabled:opacity-60"
+                    className="px-3 py-2 text-sm rounded-md bg-accent text-on-accent disabled:opacity-60"
                   >
                     {createIncidentMutation.isPending ? t('common.loading', 'Loading...') : t('incidents.create.submit', 'Create')}
                   </button>
@@ -359,7 +359,7 @@ export function IncidentsPage() {
                 setPage(1);
               }}
               placeholder={t('incidents.searchPlaceholder', 'Search incidents...')}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-input border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           {(['all', 'Open', 'Investigating', 'Mitigating', 'Monitoring', 'Resolved', 'Closed'] as StatusFilter[]).map(f => (
@@ -372,7 +372,7 @@ export function IncidentsPage() {
               className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
                 filter === f
                   ? 'bg-accent/10 text-accent border-accent/30'
-                  : 'bg-surface text-muted border-edge hover:text-body'
+                  : 'bg-card text-muted border-edge hover:text-body'
               }`}
             >
               {t(`incidents.filter.${f}`)}

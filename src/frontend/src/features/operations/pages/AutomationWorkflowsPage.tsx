@@ -105,13 +105,13 @@ export function AutomationWorkflowsPage() {
             placeholder={t('automation.searchPlaceholder', 'Search workflows...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="rounded-md border border-edge bg-surface px-3 py-2 text-sm text-body focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+          className="rounded-md border border-edge bg-input px-3 py-2 text-sm text-body focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
         >
           <option value="all">{t('common.allStatuses', 'All statuses')}</option>
           <option value="Created">{t('automation.status.created', 'Created')}</option>

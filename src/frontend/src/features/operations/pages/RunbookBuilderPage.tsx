@@ -258,7 +258,7 @@ export function RunbookBuilderPage() {
                   value={form.title}
                   onChange={(e) => updateField('title', e.target.value)}
                   placeholder={t('runbooks.builder.fieldTitlePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 />
               </div>
               <div>
@@ -270,7 +270,7 @@ export function RunbookBuilderPage() {
                   value={form.maintainedBy}
                   onChange={(e) => updateField('maintainedBy', e.target.value)}
                   placeholder={t('runbooks.builder.fieldMaintainedByPlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 />
               </div>
               <div className="md:col-span-2">
@@ -282,7 +282,7 @@ export function RunbookBuilderPage() {
                   onChange={(e) => updateField('description', e.target.value)}
                   placeholder={t('runbooks.builder.fieldDescriptionPlaceholder')}
                   rows={3}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
+                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
                 />
               </div>
               <div>
@@ -294,7 +294,7 @@ export function RunbookBuilderPage() {
                   value={form.linkedService}
                   onChange={(e) => updateField('linkedService', e.target.value)}
                   placeholder={t('runbooks.builder.fieldLinkedServicePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 />
               </div>
               <div>
@@ -306,7 +306,7 @@ export function RunbookBuilderPage() {
                   value={form.linkedIncidentType}
                   onChange={(e) => updateField('linkedIncidentType', e.target.value)}
                   placeholder={t('runbooks.builder.fieldLinkedIncidentTypePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 />
               </div>
             </div>
@@ -330,7 +330,7 @@ export function RunbookBuilderPage() {
           <CardBody>
             <div className="space-y-3">
               {form.steps.map((step, index) => (
-                <div key={index} className="flex gap-3 p-3 rounded-md border border-edge bg-surface-raised">
+                <div key={index} className="flex gap-3 p-3 rounded-md border border-edge bg-elevated">
                   <div className="flex items-center text-muted">
                     <GripVertical size={14} />
                     <span className="text-xs font-mono ml-1">{index + 1}</span>
@@ -341,14 +341,14 @@ export function RunbookBuilderPage() {
                       value={step.title}
                       onChange={(e) => updateStep(index, 'title', e.target.value)}
                       placeholder={t('runbooks.builder.stepTitlePlaceholder')}
-                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                     />
                     <textarea
                       value={step.description ?? ''}
                       onChange={(e) => updateStep(index, 'description', e.target.value)}
                       placeholder={t('runbooks.builder.stepDescriptionPlaceholder')}
                       rows={2}
-                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-surface text-xs text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
+                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-input text-xs text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
                     />
                     <label className="flex items-center gap-2 text-xs text-muted">
                       <input
@@ -402,7 +402,7 @@ export function RunbookBuilderPage() {
                       value={prereq}
                       onChange={(e) => updatePrerequisite(index, e.target.value)}
                       placeholder={t('runbooks.builder.prerequisitePlaceholder')}
-                      className="flex-1 px-3 py-1.5 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                      className="flex-1 px-3 py-1.5 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                     />
                     <button
                       onClick={() => removePrerequisite(index)}
@@ -428,7 +428,7 @@ export function RunbookBuilderPage() {
               onChange={(e) => updateField('postNotes', e.target.value)}
               placeholder={t('runbooks.builder.fieldPostNotesPlaceholder')}
               rows={3}
-              className="w-full px-3 py-2 rounded-md border border-edge bg-surface text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
+              className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
             />
           </CardBody>
         </Card>

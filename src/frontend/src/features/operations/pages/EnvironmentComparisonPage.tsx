@@ -212,7 +212,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   value={form.serviceName}
                   onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
                   placeholder={t('environmentComparison.serviceNamePlaceholder')}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -223,7 +223,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   id="ec-env"
                   value={form.environment}
                   onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   {['dev', 'test', 'qa', 'uat', 'staging', 'production'].map((env) => (
                     <option key={env} value={env}>
@@ -241,7 +241,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.beforeStart}
                   onChange={(e) => setForm((f) => ({ ...f, beforeStart: e.target.value }))}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -253,7 +253,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.beforeEnd}
                   onChange={(e) => setForm((f) => ({ ...f, beforeEnd: e.target.value }))}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -265,7 +265,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.afterStart}
                   onChange={(e) => setForm((f) => ({ ...f, afterStart: e.target.value }))}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -277,7 +277,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.afterEnd}
                   onChange={(e) => setForm((f) => ({ ...f, afterEnd: e.target.value }))}
-                  className="rounded border border-edge bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex items-end gap-2 lg:col-span-3">
