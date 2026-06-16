@@ -41,7 +41,7 @@ export function KnowledgeDocumentPage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/knowledge')}
-          className="flex items-center gap-1.5 text-sm text-content-secondary hover:text-content-primary transition-colors"
+          className="flex items-center gap-1.5 text-sm text-body hover:text-heading transition-colors"
         >
           <ArrowLeft size={16} />
           {t('knowledgeHub.backToHub')}
@@ -59,9 +59,9 @@ export function KnowledgeDocumentPage() {
                     <FileText size={20} />
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-xl font-semibold text-content-primary">{document.title}</h1>
+                    <h1 className="text-xl font-semibold text-heading">{document.title}</h1>
                     {document.summary && (
-                      <p className="text-sm text-content-secondary mt-1">{document.summary}</p>
+                      <p className="text-sm text-body mt-1">{document.summary}</p>
                     )}
                   </div>
                 </div>
@@ -77,7 +77,7 @@ export function KnowledgeDocumentPage() {
             </CardHeader>
             <CardBody>
               <div className="prose prose-invert prose-sm max-w-none">
-                <pre className="whitespace-pre-wrap font-sans text-sm text-content-primary leading-relaxed">
+                <pre className="whitespace-pre-wrap font-sans text-sm text-heading leading-relaxed">
                   {document.content}
                 </pre>
               </div>
@@ -89,43 +89,43 @@ export function KnowledgeDocumentPage() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <h3 className="text-sm font-medium text-content-primary">{t('knowledgeHub.documentMeta')}</h3>
+              <h3 className="text-sm font-medium text-heading">{t('knowledgeHub.documentMeta')}</h3>
             </CardHeader>
             <CardBody>
               <dl className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <GitBranch size={14} className="text-content-tertiary shrink-0" />
-                  <dt className="text-content-secondary shrink-0">{t('knowledgeHub.metaVersion')}</dt>
-                  <dd className="text-content-primary font-mono ml-auto">v{document.version}</dd>
+                  <GitBranch size={14} className="text-muted shrink-0" />
+                  <dt className="text-body shrink-0">{t('knowledgeHub.metaVersion')}</dt>
+                  <dd className="text-heading font-mono ml-auto">v{document.version}</dd>
                 </div>
                 <div className="flex items-start gap-2">
-                  <User size={14} className="text-content-tertiary shrink-0 mt-0.5" />
-                  <dt className="text-content-secondary shrink-0">{t('knowledgeHub.metaAuthor')}</dt>
-                  <dd className="text-content-primary ml-auto text-right text-xs font-mono truncate max-w-[120px]">
+                  <User size={14} className="text-muted shrink-0 mt-0.5" />
+                  <dt className="text-body shrink-0">{t('knowledgeHub.metaAuthor')}</dt>
+                  <dd className="text-heading ml-auto text-right text-xs font-mono truncate max-w-[120px]">
                     {document.authorId}
                   </dd>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-content-tertiary shrink-0" />
-                  <dt className="text-content-secondary shrink-0">{t('knowledgeHub.metaCreated')}</dt>
-                  <dd className="text-content-primary ml-auto">
+                  <Clock size={14} className="text-muted shrink-0" />
+                  <dt className="text-body shrink-0">{t('knowledgeHub.metaCreated')}</dt>
+                  <dd className="text-heading ml-auto">
                     {new Date(document.createdAt).toLocaleDateString()}
                   </dd>
                 </div>
                 {document.updatedAt && (
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-content-tertiary shrink-0" />
-                    <dt className="text-content-secondary shrink-0">{t('knowledgeHub.metaUpdated')}</dt>
-                    <dd className="text-content-primary ml-auto">
+                    <Clock size={14} className="text-muted shrink-0" />
+                    <dt className="text-body shrink-0">{t('knowledgeHub.metaUpdated')}</dt>
+                    <dd className="text-heading ml-auto">
                       {new Date(document.updatedAt).toLocaleDateString()}
                     </dd>
                   </div>
                 )}
                 {document.publishedAt && (
                   <div className="flex items-center gap-2">
-                    <Lock size={14} className="text-content-tertiary shrink-0" />
-                    <dt className="text-content-secondary shrink-0">{t('knowledgeHub.metaPublished')}</dt>
-                    <dd className="text-content-primary ml-auto">
+                    <Lock size={14} className="text-muted shrink-0" />
+                    <dt className="text-body shrink-0">{t('knowledgeHub.metaPublished')}</dt>
+                    <dd className="text-heading ml-auto">
                       {new Date(document.publishedAt).toLocaleDateString()}
                     </dd>
                   </div>
@@ -138,8 +138,8 @@ export function KnowledgeDocumentPage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Tag size={14} className="text-content-secondary" />
-                  <h3 className="text-sm font-medium text-content-primary">{t('knowledgeHub.tags')}</h3>
+                  <Tag size={14} className="text-body" />
+                  <h3 className="text-sm font-medium text-heading">{t('knowledgeHub.tags')}</h3>
                 </div>
               </CardHeader>
               <CardBody>
@@ -147,7 +147,7 @@ export function KnowledgeDocumentPage() {
                   {document.tags.map(tag => (
                     <span
                       key={tag}
-                      className="text-xs text-content-secondary bg-surface-raised px-2 py-1 rounded-full border border-edge"
+                      className="text-xs text-body bg-elevated px-2 py-1 rounded-full border border-edge"
                     >
                       {tag}
                     </span>

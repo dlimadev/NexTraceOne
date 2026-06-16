@@ -65,15 +65,15 @@ export function OperationalNotesPage() {
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <Filter size={14} className="text-content-tertiary" />
-          <span className="text-xs text-content-secondary font-medium">{t('operationalNotes.filterSeverity')}</span>
+          <Filter size={14} className="text-muted" />
+          <span className="text-xs text-body font-medium">{t('operationalNotes.filterSeverity')}</span>
         </div>
         <button
           onClick={() => { setSeverityFilter(''); setPage(1); }}
           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
             severityFilter === ''
               ? 'bg-accent text-white'
-              : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
+              : 'bg-elevated text-body hover:bg-hover'
           }`}
         >
           {t('operationalNotes.filterAll')}
@@ -85,7 +85,7 @@ export function OperationalNotesPage() {
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               severityFilter === s
                 ? 'bg-accent text-white'
-                : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
+                : 'bg-elevated text-body hover:bg-hover'
             }`}
           >
             {SEVERITY_ICON[s]}
@@ -99,7 +99,7 @@ export function OperationalNotesPage() {
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               resolvedFilter === undefined
                 ? 'bg-accent text-white'
-                : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
+                : 'bg-elevated text-body hover:bg-hover'
             }`}
           >
             {t('operationalNotes.filterStatusAll')}
@@ -109,7 +109,7 @@ export function OperationalNotesPage() {
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               resolvedFilter === false
                 ? 'bg-warning text-white'
-                : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
+                : 'bg-elevated text-body hover:bg-hover'
             }`}
           >
             {t('operationalNotes.filterOpen')}
@@ -119,7 +119,7 @@ export function OperationalNotesPage() {
             className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               resolvedFilter === true
                 ? 'bg-success text-white'
-                : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
+                : 'bg-elevated text-body hover:bg-hover'
             }`}
           >
             <CheckCircle2 size={12} />
@@ -132,7 +132,7 @@ export function OperationalNotesPage() {
         {data && data.items.length === 0 ? (
           <Card>
             <CardBody>
-              <div className="text-center py-10 text-content-secondary">
+              <div className="text-center py-10 text-body">
                 <StickyNote size={32} className="mx-auto mb-3 opacity-40" />
                 <p className="text-sm">{t('operationalNotes.noNotes')}</p>
               </div>
@@ -148,17 +148,17 @@ export function OperationalNotesPage() {
                       <div className="mt-0.5 shrink-0">{SEVERITY_ICON[note.severity]}</div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm text-content-primary truncate">{note.title}</p>
+                          <p className="font-medium text-sm text-heading truncate">{note.title}</p>
                           {note.isResolved && (
                             <CheckCircle2 size={13} className="text-success shrink-0" />
                           )}
                         </div>
-                        <p className="text-xs text-content-secondary mt-0.5 line-clamp-2">{note.content}</p>
+                        <p className="text-xs text-body mt-0.5 line-clamp-2">{note.content}</p>
                         {note.tags.length > 0 && (
                           <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-                            <Tag size={11} className="text-content-tertiary" />
+                            <Tag size={11} className="text-muted" />
                             {note.tags.slice(0, 4).map(tag => (
-                              <span key={tag} className="text-xs text-content-tertiary bg-surface-raised px-1.5 py-0.5 rounded">
+                              <span key={tag} className="text-xs text-muted bg-elevated px-1.5 py-0.5 rounded">
                                 {tag}
                               </span>
                             ))}
@@ -174,7 +174,7 @@ export function OperationalNotesPage() {
                         {t(`operationalNotes.noteType.${note.noteType}`)}
                       </Badge>
                       {note.createdAt && (
-                        <span className="flex items-center gap-1 text-xs text-content-tertiary">
+                        <span className="flex items-center gap-1 text-xs text-muted">
                           <Clock size={11} />
                           {new Date(note.createdAt).toLocaleDateString()}
                         </span>
@@ -190,22 +190,22 @@ export function OperationalNotesPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-1 py-2">
-            <span className="text-xs text-content-secondary">
+            <span className="text-xs text-body">
               {data?.totalCount ?? 0} {t('common.total')}
             </span>
             <div className="flex items-center gap-2">
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="p-1.5 rounded-md bg-surface-raised border border-edge text-content-secondary hover:text-content-primary disabled:opacity-40 transition-colors"
+                className="p-1.5 rounded-md bg-elevated border border-edge text-body hover:text-heading disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="text-xs text-content-secondary">{page} / {totalPages}</span>
+              <span className="text-xs text-body">{page} / {totalPages}</span>
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-md bg-surface-raised border border-edge text-content-secondary hover:text-content-primary disabled:opacity-40 transition-colors"
+                className="p-1.5 rounded-md bg-elevated border border-edge text-body hover:text-heading disabled:opacity-40 transition-colors"
               >
                 <ChevronRight size={16} />
               </button>
