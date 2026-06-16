@@ -41,8 +41,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
               leadingIcon ? 'pl-11' : 'pl-4',
               trailingIcon ? 'pr-11' : 'pr-4',
               error
-                ? 'border-critical/60 focus:border-critical focus:shadow-glow-danger'
-                : 'border-edge focus:border-edge-focus focus:shadow-glow-cyan',
+                ? 'border-critical/60 focus:border-critical focus:shadow-sm'
+                : 'border-edge focus:border-edge-focus focus:shadow-sm',
               className,
             )}
             aria-invalid={error ? true : undefined}

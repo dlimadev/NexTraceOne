@@ -67,7 +67,7 @@ export function Pagination({
     cn(
       'inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-sm text-sm font-medium transition-colors',
       p === page
-        ? 'bg-accent-muted text-cyan border border-edge-focus'
+        ? 'bg-accent-muted text-accent border border-edge-focus'
         : 'text-muted hover:bg-hover hover:text-body',
     );
 

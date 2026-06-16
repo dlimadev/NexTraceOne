@@ -112,7 +112,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-64 bg-surface border rounded shadow-lg z-50 py-1">
+        <div className="absolute right-0 mt-1 w-64 bg-card border rounded shadow-lg z-50 py-1">
           <button
             type="button"
             className="w-full text-left px-3 py-2 text-sm hover:bg-surface-2"
@@ -177,7 +177,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
 
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-surface rounded-lg shadow-xl p-6 w-80">
+          <div className="bg-card rounded-lg shadow-xl p-6 w-80">
             <h3 className="font-semibold mb-4">{t('saveModal.title')}</h3>
             <div className="mb-3">
               <label className="block text-sm font-medium mb-1">{t('saveModal.name')}</label>

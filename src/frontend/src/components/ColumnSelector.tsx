@@ -96,7 +96,7 @@ export function ColumnSelector({ context, availableColumns }: ColumnSelectorProp
         <span>{t('columns')}</span>
       </button>
       {open && (
-        <div className="absolute right-0 mt-1 w-56 bg-surface border rounded shadow-lg z-50 p-2">
+        <div className="absolute right-0 mt-1 w-56 bg-card border rounded shadow-lg z-50 p-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted">{t('title')}</span>
             <button

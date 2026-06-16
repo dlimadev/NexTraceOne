@@ -45,10 +45,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             'w-full min-h-[120px] rounded-lg bg-input border px-4 py-3 text-sm text-heading',
             'placeholder:text-muted resize-y',
             'transition-colors',
-            'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+            'focus:outline-none focus:border-edge-focus focus:shadow-sm',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             hasError
-              ? 'border-danger shadow-glow-danger'
+              ? 'border-danger shadow-sm'
               : 'border-edge hover:border-edge-strong',
           )}
           style={{ transitionDuration: 'var(--nto-motion-fast)' }}
