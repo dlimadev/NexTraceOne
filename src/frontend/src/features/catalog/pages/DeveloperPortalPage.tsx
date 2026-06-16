@@ -209,7 +209,7 @@ export function DeveloperPortalPage() {
   ];
 
   const fieldClass =
-    'w-full px-3 py-2 bg-surface border border-edge rounded-md text-sm text-body focus:outline-none focus:ring-2 focus:ring-accent/40';
+    'w-full px-3 py-2 bg-input border border-edge rounded-md text-sm text-body focus:outline-none focus:ring-2 focus:ring-accent/40';
 
   return (
     <PageContainer>

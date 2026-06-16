@@ -40,9 +40,9 @@ export function DependenciesSection({ contract, className = '' }: DependenciesSe
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.dependencies.total', 'Total')}</p>
           <p className="text-lg font-bold text-heading">{contract.dependencies.length}</p>
         </div>
-        <div className="rounded-lg border border-cyan/20 bg-cyan/5 px-4 py-3">
+        <div className="rounded-lg border border-accent/20 bg-accent/5 px-4 py-3">
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.dependencies.upstream', 'Upstream')}</p>
-          <p className="text-lg font-bold text-cyan">{upstream.length}</p>
+          <p className="text-lg font-bold text-accent">{upstream.length}</p>
         </div>
         <div className="rounded-lg border border-mint/20 bg-mint/5 px-4 py-3">
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.dependencies.downstream', 'Downstream')}</p>

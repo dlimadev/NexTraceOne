@@ -179,7 +179,7 @@ function SortableHeader({
         onClick={() => onToggle(field)}
         className={cn(
           'inline-flex items-center gap-1 font-medium transition-colors',
-          active ? 'text-cyan' : 'text-muted hover:text-body',
+          active ? 'text-accent' : 'text-muted hover:text-body',
         )}
       >
         {label}
@@ -210,7 +210,7 @@ function CatalogRow({ item }: { item: CatalogItem }) {
       {/* Name + domain */}
       <td className="px-3 py-3">
         <div className="min-w-0">
-          <p className="font-medium text-heading truncate max-w-[220px] group-hover:text-cyan transition-colors">
+          <p className="font-medium text-heading truncate max-w-[220px] group-hover:text-accent transition-colors">
             {item.name}
           </p>
           <p className="text-[10px] text-muted truncate max-w-[220px]">{item.domain}</p>

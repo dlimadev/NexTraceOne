@@ -80,14 +80,14 @@ export function CatalogToolbar({
             'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium transition-colors',
             'duration-[var(--nto-motion-fast)]',
             expanded || filterCount > 0
-              ? 'bg-accent-muted text-cyan border-edge-focus'
+              ? 'bg-accent-muted text-accent border-edge-focus'
               : 'bg-elevated text-muted border-edge hover:border-edge-strong hover:text-body',
           )}
         >
           <SlidersHorizontal size={13} />
           {t('contracts.catalog.filters.label', 'Filters')}
           {filterCount > 0 && (
-            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 text-[10px] font-semibold bg-cyan/20 text-cyan">
+            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 text-[10px] font-semibold bg-accent/20 text-accent">
               {filterCount}
             </span>
           )}

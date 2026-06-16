@@ -242,7 +242,7 @@ export function DevPortalInboxTab({
                 .map((sub: Subscription) => (
                   <div
                     key={sub.id}
-                    className="flex items-center justify-between p-3 bg-surface rounded-lg border border-edge/50"
+                    className="flex items-center justify-between p-3 bg-card rounded-lg border border-edge/50"
                   >
                     <div>
                       <span className="font-medium text-body">{sub.apiName}</span>

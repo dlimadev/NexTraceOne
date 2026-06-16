@@ -120,7 +120,7 @@ export function SchemaCompositionEditor({
               : `Variant ${idx + 1}`;
 
           return (
-            <div key={schema.id} className="border border-edge rounded bg-surface/40">
+            <div key={schema.id} className="border border-edge rounded bg-card/40">
               <div className="flex items-center gap-1.5 px-2 py-1.5">
                 <button
                   type="button"

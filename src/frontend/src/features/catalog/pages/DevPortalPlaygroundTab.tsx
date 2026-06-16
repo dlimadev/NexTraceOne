@@ -148,7 +148,7 @@ export function DevPortalPlaygroundTab({
             </div>
           </CardHeader>
           <CardBody>
-            <pre className="bg-surface p-3 rounded-md text-xs font-mono overflow-x-auto max-h-64">
+            <pre className="bg-card p-3 rounded-md text-xs font-mono overflow-x-auto max-h-64">
               {playResult.responseBody}
             </pre>
             <div className="flex gap-4 mt-2 text-xs text-muted">

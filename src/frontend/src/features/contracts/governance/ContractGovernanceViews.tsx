@@ -218,7 +218,7 @@ export const ApprovalsView = memo(function ApprovalsView({ contracts }: { contra
             </h2>
             <span className={cn(
               'text-xs font-bold',
-              pendingApproval.length > 0 ? 'text-cyan' : 'text-muted',
+              pendingApproval.length > 0 ? 'text-accent' : 'text-muted',
             )}>
               {pendingApproval.length}
             </span>

@@ -120,7 +120,7 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
             return (
               <div key={stepNum} className="flex items-center gap-1 flex-1">
                 <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0
-                  ${isDone ? 'bg-mint text-white' : isActive ? 'bg-accent text-white' : 'bg-surface border border-edge text-muted'}`}>
+                  ${isDone ? 'bg-mint text-white' : isActive ? 'bg-accent text-white' : 'bg-card border border-edge text-muted'}`}>
                   {isDone ? <Check size={14} /> : stepNum}
                 </div>
                 <span className={`text-xs truncate ${isActive ? 'text-heading font-medium' : 'text-muted'}`}>{label}</span>
@@ -313,7 +313,7 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
         {step === 5 && (
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-heading">{t('serviceCatalog.wizard.summaryTitle', 'Service Summary')}</h3>
-            <div className="rounded-lg bg-surface border border-edge p-4 space-y-2 text-sm">
+            <div className="rounded-lg bg-card border border-edge p-4 space-y-2 text-sm">
               <SummaryRow label={t('serviceCatalog.name')} value={form.name} mono />
               <SummaryRow label={t('serviceCatalog.domain', 'Domain')} value={form.domain} />
               {form.subDomain && <SummaryRow label={t('serviceCatalog.wizard.subDomain', 'Sub-Domain')} value={form.subDomain} />}

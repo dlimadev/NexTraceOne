@@ -213,7 +213,7 @@ export function SchemaPropertyEditor({
         return (
           <div
             key={prop.id}
-            className={`border border-edge rounded-md bg-surface/50 transition-all ${
+            className={`border border-edge rounded-md bg-card/50 transition-all ${
               dragOverIndex === idx ? 'border-accent/50 bg-accent/5' : ''
             }`}
             draggable={!isReadOnly}
