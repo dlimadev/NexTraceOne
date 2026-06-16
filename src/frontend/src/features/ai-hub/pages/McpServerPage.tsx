@@ -167,24 +167,24 @@ export function McpServerPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <Card>
           <CardBody>
-            <h3 className="text-sm font-semibold text-content-primary mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
               <Cpu className="w-4 h-4 text-accent" />
               {t('mcpServer.serverInfo.title')}
             </h3>
-            <p className="text-sm text-content-secondary mb-4">
+            <p className="text-sm text-body mb-4">
               {serverInfo.description}
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-content-secondary">{t('mcpServer.serverInfo.name')}</span>
-                <span className="text-content-primary font-mono">{serverInfo.serverName}</span>
+                <span className="text-body">{t('mcpServer.serverInfo.name')}</span>
+                <span className="text-heading font-mono">{serverInfo.serverName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-content-secondary">{t('mcpServer.serverInfo.protocol')}</span>
+                <span className="text-body">{t('mcpServer.serverInfo.protocol')}</span>
                 <Badge variant="success">{serverInfo.protocolVersion}</Badge>
               </div>
               <div className="flex justify-between">
-                <span className="text-content-secondary">{t('mcpServer.serverInfo.capabilities')}</span>
+                <span className="text-body">{t('mcpServer.serverInfo.capabilities')}</span>
                 <div className="flex gap-1">
                   {serverInfo.capabilities.tools && (
                     <Badge variant="info">{t('mcpServer.serverInfo.capTools')}</Badge>
@@ -197,20 +197,20 @@ export function McpServerPage() {
 
         <Card>
           <CardBody>
-            <h3 className="text-sm font-semibold text-content-primary mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
               <Plug className="w-4 h-4 text-accent" />
               {t('mcpServer.connection.title')}
             </h3>
-            <p className="text-sm text-content-secondary mb-3">
+            <p className="text-sm text-body mb-3">
               {t('mcpServer.connection.description')}
             </p>
-            <div className="flex items-center gap-2 bg-surface-elevated rounded-md p-3">
+            <div className="flex items-center gap-2 bg-elevated rounded-md p-3">
               <code className="text-xs text-accent flex-1 truncate font-mono">
                 {window.location.origin}/api/v1{serverInfo.endpointUrl}
               </code>
               <button
                 type="button"
-                className="text-content-muted hover:text-content-primary transition-colors flex-shrink-0"
+                className="text-muted hover:text-heading transition-colors flex-shrink-0"
                 onClick={handleCopyEndpoint}
                 aria-label={t('mcpServer.connection.copyAriaLabel')}
               >
@@ -219,13 +219,13 @@ export function McpServerPage() {
                   : <Copy className="w-4 h-4" />}
               </button>
             </div>
-            <div className="mt-3 space-y-1 text-xs text-content-secondary">
+            <div className="mt-3 space-y-1 text-xs text-body">
               <p className="flex items-center gap-1">
-                <span className="font-semibold text-content-primary">GET</span>
+                <span className="font-semibold text-heading">GET</span>
                 {t('mcpServer.connection.getDescription')}
               </p>
               <p className="flex items-center gap-1">
-                <span className="font-semibold text-content-primary">POST</span>
+                <span className="font-semibold text-heading">POST</span>
                 {t('mcpServer.connection.postDescription')}
               </p>
             </div>
@@ -258,7 +258,7 @@ export function McpServerPage() {
       )}
 
       {/* ── Tools list ────────────────────────────────────────────────── */}
-      <h3 className="text-sm font-semibold text-content-primary mb-3">
+      <h3 className="text-sm font-semibold text-heading mb-3">
         {t('mcpServer.tools.title', { count: tools.length })}
       </h3>
 
@@ -300,18 +300,18 @@ export function McpServerPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-content-secondary mt-1 truncate">
+                      <p className="text-sm text-body mt-1 truncate">
                         {tool.description}
                       </p>
                     </div>
                     {isExpanded
-                      ? <ChevronUp className="w-4 h-4 text-content-muted flex-shrink-0 mt-0.5" />
-                      : <ChevronDown className="w-4 h-4 text-content-muted flex-shrink-0 mt-0.5" />}
+                      ? <ChevronUp className="w-4 h-4 text-muted flex-shrink-0 mt-0.5" />
+                      : <ChevronDown className="w-4 h-4 text-muted flex-shrink-0 mt-0.5" />}
                   </button>
 
                   {isExpanded && paramKeys.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-edge">
-                      <p className="text-xs font-semibold text-content-secondary mb-2 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-body mb-2 uppercase tracking-wide">
                         {t('mcpServer.tools.parameters')}
                       </p>
                       <div className="space-y-2">
@@ -334,7 +334,7 @@ export function McpServerPage() {
                                   {t('mcpServer.tools.required')}
                                 </Badge>
                               )}
-                              <span className="text-content-secondary text-xs">
+                              <span className="text-body text-xs">
                                 {param.description}
                               </span>
                             </div>

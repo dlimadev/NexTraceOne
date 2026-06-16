@@ -158,7 +158,7 @@ export function AiAuditPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label={t('aiHub.searchAudit')}
-            className="w-full pl-9 pr-3 py-2 rounded-md bg-surface border border-edge text-body text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full pl-9 pr-3 py-2 rounded-md bg-input border border-edge text-body text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
         <div className="flex gap-1.5" role="group" aria-label={t('aiHub.filterByStatus')}>
