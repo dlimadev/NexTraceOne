@@ -40,7 +40,7 @@ function PromotionStep({ step, isLast, t }: {
     <div className="flex items-start gap-4">
       {/* Step indicator */}
       <div className="flex flex-col items-center">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-edge bg-surface">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-edge bg-card">
           {stepStatusIcon(step.status)}
         </div>
         {!isLast && (

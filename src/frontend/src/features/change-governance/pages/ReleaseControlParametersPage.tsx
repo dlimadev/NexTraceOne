@@ -125,7 +125,7 @@ export function ReleaseControlParametersPage() {
           <h3 className="text-sm font-semibold text-heading">{t('releaseControlParams.callbackInfo')}</h3>
         </CardHeader>
         <CardBody>
-          <div className="rounded-lg bg-surface border border-edge p-4 text-sm text-muted space-y-2">
+          <div className="rounded-lg bg-card border border-edge p-4 text-sm text-muted space-y-2">
             <p>{t('releaseControlParams.callbackInfoText1')}</p>
             <p className="font-mono text-xs text-heading">
               POST /api/v1/releases/{'{'}<span className="text-accent">id</span>{'}'}/approvals/{'{'}<span className="text-accent">token</span>{'}'}/respond

@@ -101,7 +101,7 @@ export function DeployReadinessPanel({ releaseId, environmentName }: DeployReadi
                 {data.checks.map((check) => (
                   <li
                     key={check.checkId}
-                    className="flex items-start gap-3 p-3 rounded-md border border-edge bg-surface"
+                    className="flex items-start gap-3 p-3 rounded-md border border-edge bg-card"
                   >
                     {check.passed ? (
                       <CheckCircle2 size={16} className="text-success mt-0.5 shrink-0" />

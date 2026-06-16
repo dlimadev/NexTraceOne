@@ -289,14 +289,14 @@ export function ReleaseRollbackPage() {
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <GitBranch size={16} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseRollback.previousVersion', 'Previous Version')}</p>
                     <p className="text-sm font-medium text-heading">{assessment.previousVersion ?? '—'}</p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <Database size={16} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseRollback.reversibleMigrations', 'Reversible Migrations')}</p>
@@ -310,7 +310,7 @@ export function ReleaseRollbackPage() {
                     </p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <Users size={16} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseRollback.consumersImpact', 'Consumers Impact')}</p>
@@ -319,7 +319,7 @@ export function ReleaseRollbackPage() {
                     </p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3">
+                <div className="bg-card rounded-lg p-3">
                   <p className="text-xs text-muted">{t('releaseRollback.assessedAt', 'Assessed At')}</p>
                   <p className="text-sm font-medium text-heading">
                     {assessment.assessedAt ? new Date(assessment.assessedAt).toLocaleDateString() : '—'}
@@ -328,7 +328,7 @@ export function ReleaseRollbackPage() {
               </div>
 
               {assessment.recommendation && (
-                <div className="bg-surface rounded-lg p-3 border border-edge mb-4">
+                <div className="bg-card rounded-lg p-3 border border-edge mb-4">
                   <p className="text-xs text-muted mb-1">{t('releaseRollback.recommendation', 'Recommendation')}</p>
                   <p className="text-sm text-heading">{assessment.recommendation}</p>
                 </div>

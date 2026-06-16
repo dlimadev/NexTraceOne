@@ -271,7 +271,7 @@ export function ReleaseChecklistExecutionPage() {
                     <span className="text-xs text-muted">{t('checklist.completion')}</span>
                     <span className="text-xs font-medium text-heading">{completionRate}%</span>
                   </div>
-                  <div className="w-full bg-surface rounded-full h-2">
+                  <div className="w-full bg-card rounded-full h-2">
                     <div
                       className="bg-accent rounded-full h-2 transition-all"
                       style={{ width: `${completionRate}%` }}

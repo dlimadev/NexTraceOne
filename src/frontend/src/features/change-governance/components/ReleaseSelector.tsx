@@ -64,7 +64,7 @@ export function ReleaseSelector({ value, onChange, placeholder }: ReleaseSelecto
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-edge bg-surface shadow-lg">
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-edge bg-card shadow-lg">
           {/* Search box */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-edge">
             <Search size={14} className="text-muted flex-shrink-0" />

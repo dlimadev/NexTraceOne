@@ -562,7 +562,7 @@ export function ChangeDetailPage() {
                     value={decisionRationale}
                     onChange={(e) => setDecisionRationale(e.target.value)}
                     placeholder={t('changeConfidence.detail.decisionRationalePlaceholder')}
-                    className="w-full px-3 py-2 rounded-md bg-surface border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[80px]"
+                    className="w-full px-3 py-2 rounded-md bg-input border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[80px]"
                     rows={3}
                   />
                 </div>
@@ -576,7 +576,7 @@ export function ChangeDetailPage() {
                       value={decisionConditions}
                       onChange={(e) => setDecisionConditions(e.target.value)}
                       placeholder={t('changeConfidence.detail.decisionConditionsPlaceholder')}
-                      className="w-full px-3 py-2 rounded-md bg-surface border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[60px]"
+                      className="w-full px-3 py-2 rounded-md bg-input border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[60px]"
                       rows={2}
                     />
                   </div>
@@ -753,7 +753,7 @@ export function ChangeDetailPage() {
                 </div>
                 <Link
                   to="/services"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-surface border border-edge text-xs text-accent hover:border-accent transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-card border border-edge text-xs text-accent hover:border-accent transition-colors"
                 >
                   <ExternalLink size={12} />
                   {t('changeConfidence.detail.viewService')}

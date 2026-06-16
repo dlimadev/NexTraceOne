@@ -87,7 +87,7 @@ export function ReleaseParameterAuditPage() {
           <button
             onClick={handleExport}
             disabled={!entries.length}
-            className="inline-flex items-center gap-2 rounded-md border border-edge bg-surface px-4 py-2 text-sm font-medium text-heading hover:bg-surface/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-md border border-edge bg-card px-4 py-2 text-sm font-medium text-heading hover:bg-card/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
             {t('releaseParameterAudit.exportButton')}
@@ -118,7 +118,7 @@ export function ReleaseParameterAuditPage() {
                     className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
                       scopeFilter === s
                         ? 'bg-accent text-white'
-                        : 'bg-surface border border-edge text-muted hover:text-heading'
+                        : 'bg-card border border-edge text-muted hover:text-heading'
                     }`}
                   >
                     {s === 'all' ? t('releaseParameterAudit.allScopes') : s}
@@ -160,7 +160,7 @@ export function ReleaseParameterAuditPage() {
                 </thead>
                 <tbody className="divide-y divide-edge">
                   {entries.map((entry, idx) => (
-                    <tr key={`${entry.key}-${idx}`} className="hover:bg-surface/50 transition-colors">
+                    <tr key={`${entry.key}-${idx}`} className="hover:bg-card/50 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs text-heading">{entry.key}</td>
                       <td className="px-4 py-3 text-muted font-mono text-xs max-w-[120px] truncate">
                         {entry.previousValue ?? '—'}
