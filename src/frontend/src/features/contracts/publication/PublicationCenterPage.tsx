@@ -54,7 +54,7 @@ export function PublicationCenterPage() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Globe size={16} className="text-accent" />
-          <h1 className="text-sm font-semibold text-primary">
+          <h1 className="text-sm font-semibold text-accent">
             {t('contracts.publication.title', 'Publication Center')}
           </h1>
         </div>
@@ -85,7 +85,7 @@ export function PublicationCenterPage() {
               'px-3 py-1 rounded text-xs font-medium transition-colors',
               statusFilter === opt.value
                 ? 'bg-accent text-bg'
-                : 'bg-card text-muted hover:text-primary border border-edge',
+                : 'bg-card text-muted hover:text-accent border border-edge',
             )}
           >
             {opt.label}
@@ -141,7 +141,7 @@ export function PublicationCenterPage() {
               <tbody>
                 {entriesQuery.data.items.map((entry) => (
                   <tr key={entry.publicationEntryId} className="border-b border-edge last:border-0 hover:bg-card/50">
-                    <td className="px-4 py-3 font-medium text-primary">{entry.contractTitle}</td>
+                    <td className="px-4 py-3 font-medium text-accent">{entry.contractTitle}</td>
                     <td className="px-4 py-3 text-muted font-mono">{entry.semVer}</td>
                     <td className="px-4 py-3">
                       <PublicationStatusBadge status={entry.status} />
@@ -153,7 +153,7 @@ export function PublicationCenterPage() {
                         <button
                           type="button"
                           onClick={() => setWithdrawTarget(entry)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-edge text-muted hover:text-primary hover:border-accent transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-edge text-muted hover:text-accent hover:border-accent transition-colors"
                         >
                           <EyeOff size={11} />
                           {t('contracts.publication.withdraw', 'Withdraw')}
@@ -172,7 +172,7 @@ export function PublicationCenterPage() {
           <div className="bg-card rounded-lg border border-edge p-6 w-full max-w-md">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle size={16} className="text-warning" />
-              <h2 className="text-sm font-semibold text-primary">
+              <h2 className="text-sm font-semibold text-accent">
                 {t('contracts.publication.withdrawModal.title', 'Withdraw Publication')}
               </h2>
             </div>
@@ -194,13 +194,13 @@ export function PublicationCenterPage() {
               value={withdrawReason}
               onChange={(e) => setWithdrawReason(e.target.value)}
               placeholder={t('contracts.publication.withdrawModal.reasonPlaceholder', 'e.g. Replaced by v2.0.0')}
-              className="w-full px-3 py-2 text-xs rounded border border-edge bg-bg text-primary mb-4"
+              className="w-full px-3 py-2 text-xs rounded border border-edge bg-bg text-accent mb-4"
             />
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => { setWithdrawTarget(null); setWithdrawReason(''); }}
-                className="px-3 py-1.5 text-xs rounded border border-edge text-muted hover:text-primary transition-colors"
+                className="px-3 py-1.5 text-xs rounded border border-edge text-muted hover:text-accent transition-colors"
               >
                 {t('common.cancel', 'Cancel')}
               </button>
