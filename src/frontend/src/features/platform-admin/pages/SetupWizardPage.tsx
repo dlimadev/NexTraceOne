@@ -61,10 +61,10 @@ function StepperItem({ label, index, status, icon }: StepperItemProps) {
     skipped: 'text-muted/50',
   };
   const circleBg = {
-    pending: 'bg-surface border border-edge text-muted',
+    pending: 'bg-card border border-edge text-muted',
     active: 'bg-accent text-white border border-accent',
     completed: 'bg-success/10 border border-success text-success',
-    skipped: 'bg-surface border border-edge/40 text-muted/40',
+    skipped: 'bg-card border border-edge/40 text-muted/40',
   };
 
   return (
@@ -109,7 +109,7 @@ function InputField({ placeholder, type = 'text', value, onChange }: InputFieldP
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-3 py-2 bg-surface border border-edge rounded-lg text-sm text-heading placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/40"
+      className="w-full px-3 py-2 bg-input border border-edge rounded-lg text-sm text-heading placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/40"
     />
   );
 }
@@ -272,7 +272,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
                     className={`flex items-start gap-3 w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
                       selected
                         ? 'border-accent bg-accent/5 text-accent'
-                        : 'border-edge bg-surface text-muted hover:border-accent/40'
+                        : 'border-edge bg-card text-muted hover:border-accent/40'
                     }`}
                     aria-pressed={selected}
                     data-testid={`ai-mode-${option.id}`}

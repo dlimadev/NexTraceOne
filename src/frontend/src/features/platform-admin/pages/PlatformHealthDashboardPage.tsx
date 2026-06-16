@@ -171,7 +171,7 @@ function ConfigHealthTab() {
           { label: t('platformHealth.config.warning'), count: counts.warning, variant: 'warning' as const },
           { label: t('platformHealth.config.degraded'), count: counts.degraded, variant: 'danger' as const },
         ].map(({ label, count, variant }) => (
-          <div key={label} className="bg-surface border border-edge rounded-md p-3 text-center">
+          <div key={label} className="bg-card border border-edge rounded-md p-3 text-center">
             <p className="text-2xl font-bold text-heading">{count}</p>
             <Badge variant={variant} className="mt-1 text-xs">{label}</Badge>
           </div>
@@ -301,7 +301,7 @@ function MigrationsTab() {
             </div>
             <div>
               <p className="text-sm font-medium text-heading">{t('platformHealth.migrations.applyTitle')}</p>
-              <code className="block text-xs font-mono text-muted mt-1 bg-surface-muted px-2 py-1.5 rounded">
+              <code className="block text-xs font-mono text-muted mt-1 bg-subtle px-2 py-1.5 rounded">
                 dotnet ef database update --project src/modules/&lt;module&gt;/...
               </code>
               <p className="text-xs text-muted mt-1">{t('platformHealth.migrations.applyHint')}</p>
@@ -349,7 +349,7 @@ export function PlatformHealthDashboardPage() {
             <a
               key={to}
               href={to}
-              className="flex items-center justify-between px-4 py-3 bg-surface border border-edge rounded-md hover:border-accent/40 transition-colors"
+              className="flex items-center justify-between px-4 py-3 bg-card border border-edge rounded-md hover:border-accent/40 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <span className={color}>{icon}</span>

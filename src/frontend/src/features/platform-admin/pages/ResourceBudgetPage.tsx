@@ -40,7 +40,7 @@ function ProgressBar({ pct }: { pct: number | null }) {
   const color =
     pct >= 100 ? 'bg-critical' : pct >= 80 ? 'bg-warning' : 'bg-success';
   return (
-    <div className="w-full bg-surface rounded-full h-1.5 overflow-hidden">
+    <div className="w-full bg-card rounded-full h-1.5 overflow-hidden">
       <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${Math.min(pct, 100)}%` }} />
     </div>
   );
@@ -85,7 +85,7 @@ function QuotaEditor({ entry, onSave, onCancel, saving }: QuotaEditorProps) {
   );
 
   return (
-    <div className="mt-4 p-3 rounded-lg border border-edge bg-surface space-y-3">
+    <div className="mt-4 p-3 rounded-lg border border-edge bg-card space-y-3">
       <p className="text-xs font-medium text-muted">{t('resourceBudget.editQuota')}</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {field('maxCpuCores', t('resourceBudget.cpu'), 'cores')}

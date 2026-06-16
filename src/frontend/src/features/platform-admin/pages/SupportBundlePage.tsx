@@ -49,7 +49,7 @@ function BundleRow({ bundle }: { bundle: SupportBundleEntry }) {
             <span className="text-sm font-medium text-heading">
               {t('supportBundle.bundleTitle', { date: formatDate(bundle.generatedAt) })}
             </span>
-            <span className="text-xs text-muted bg-surface border border-edge rounded px-1.5 py-0.5">
+            <span className="text-xs text-muted bg-card border border-edge rounded px-1.5 py-0.5">
               {formatBytes(bundle.fileSizeKb)}
             </span>
           </div>

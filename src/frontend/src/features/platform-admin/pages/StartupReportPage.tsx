@@ -108,7 +108,7 @@ function ReportCard({ report, index }: { report: StartupReportEntry; index: numb
             <p className="text-xs text-muted mb-2">{t('startupReport.corsOrigins')}</p>
             <div className="flex flex-wrap gap-1">
               {report.configuration.corsOrigins.map((o) => (
-                <code key={o} className="text-xs bg-surface px-1.5 py-0.5 rounded border border-edge">
+                <code key={o} className="text-xs bg-card px-1.5 py-0.5 rounded border border-edge">
                   {o}
                 </code>
               ))}
@@ -152,7 +152,7 @@ export function StartupReportPage() {
           <>
             {/* Summary banner */}
             {query.data.reports.length > 0 && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-edge mb-4 text-sm">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-card border border-edge mb-4 text-sm">
                 <Package size={16} className="text-muted" />
                 <span className="text-muted">{t('startupReport.showing', { count: query.data.reports.length })}</span>
               </div>
