@@ -187,7 +187,7 @@ function FourEyesForm({ onEvaluate }: { onEvaluate: (a: string, r: string, ap?: 
 
 function FourEyesResultCard({ result }: { result: FourEyesResult }) {
   return (
-    <div className="mt-4 p-3 rounded bg-surface-secondary">
+    <div className="mt-4 p-3 rounded bg-subtle">
       <div className="flex items-center gap-2 mb-2">
         {result.isCompliant ? <CheckCircle2 size={16} className="text-success" /> : <XCircle size={16} className="text-critical" />}
         <Badge variant={result.isCompliant ? 'success' : 'critical'}>{result.isCompliant ? 'Compliant' : 'Not Compliant'}</Badge>
@@ -233,7 +233,7 @@ function CabForm({ onEvaluate }: { onEvaluate: (s: string, e: string, c: string,
 
 function CabResultCard({ result }: { result: CabResult }) {
   return (
-    <div className="mt-4 p-3 rounded bg-surface-secondary">
+    <div className="mt-4 p-3 rounded bg-subtle">
       <div className="flex items-center gap-2 mb-2">
         {result.cabRequired ? <AlertTriangle size={16} className="text-warning" /> : <CheckCircle2 size={16} className="text-success" />}
         <Badge variant={result.cabRequired ? 'warning' : 'success'}>{result.cabRequired ? 'CAB Required' : 'No CAB'}</Badge>
@@ -271,7 +271,7 @@ function ErrorBudgetForm({ onEvaluate }: { onEvaluate: (s: string, e: string, b:
 
 function ErrorBudgetResultCard({ result }: { result: ErrorBudgetResult }) {
   return (
-    <div className="mt-4 p-3 rounded bg-surface-secondary">
+    <div className="mt-4 p-3 rounded bg-subtle">
       <div className="flex items-center gap-2 mb-2">
         {result.isBlocked ? <XCircle size={16} className="text-critical" /> : <CheckCircle2 size={16} className="text-success" />}
         <Badge variant={result.isBlocked ? 'critical' : 'success'}>{result.isBlocked ? 'Blocked' : 'Allowed'}</Badge>

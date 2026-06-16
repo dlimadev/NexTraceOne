@@ -111,7 +111,7 @@ export function ExecutiveDrillDownPage() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {d.keyIndicators.map((ind, idx) => (
-              <div key={idx} className="bg-surface/50 rounded-md p-4 border border-edge/50">
+              <div key={idx} className="bg-card/50 rounded-md p-4 border border-edge/50">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-xs font-medium text-heading">{ind.name}</p>
                   <Badge variant={trendBadgeVariant(ind.trend)}>
@@ -164,7 +164,7 @@ export function ExecutiveDrillDownPage() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {d.topGaps.map((gap, idx) => (
-              <div key={idx} className="bg-surface/50 rounded-md p-4 border border-edge/50">
+              <div key={idx} className="bg-card/50 rounded-md p-4 border border-edge/50">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-medium text-heading">{gap.area}</span>
                   <Badge variant={riskBadgeVariant(gap.severity)}>

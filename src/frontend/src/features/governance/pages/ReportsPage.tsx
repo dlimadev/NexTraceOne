@@ -166,7 +166,7 @@ export function ReportsPage() {
               ].map((item) => (
                 <div key={item.label}>
                   <p className="text-xs text-muted mb-1">{item.label}</p>
-                  <div className="w-full bg-surface rounded-full h-2">
+                  <div className="w-full bg-card rounded-full h-2">
                     <div
                       className="bg-accent rounded-full h-2 transition-all"
                       style={{ width: item.total === 0 ? '0%' : `${Math.round((item.count / item.total) * 100)}%` }}

@@ -81,7 +81,7 @@ export function AuditorConsolePage() {
             { label: t('auditorConsole.breakGlassHistory'), icon: <Lock size={14} />, to: '/identity-access/break-glass', color: 'text-warning' },
             { label: t('auditorConsole.accessReviews'), icon: <CheckCircle2 size={14} />, to: '/identity-access/access-reviews', color: 'text-success' },
             { label: t('auditorConsole.policyViolations'), icon: <AlertTriangle size={14} />, to: '/governance/risk', color: 'text-destructive' },
-            { label: t('auditorConsole.evidenceIntegrity'), icon: <Shield size={14} />, to: '/governance/evidence', color: 'text-primary' },
+            { label: t('auditorConsole.evidenceIntegrity'), icon: <Shield size={14} />, to: '/governance/evidence', color: 'text-accent' },
           ].map((item) => (
             <Link key={item.to} to={item.to}>
               <Card className="hover:border-accent/60 transition-colors">

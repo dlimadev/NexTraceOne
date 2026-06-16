@@ -257,7 +257,7 @@ export function ExecutiveOverviewPage() {
                       <p className="text-xs text-muted">{t(`governance.executive.${item.key}`)}</p>
                       <p className="text-xs font-medium text-heading">{item.value}%</p>
                     </div>
-                    <div className="w-full bg-surface rounded-full h-2">
+                    <div className="w-full bg-card rounded-full h-2">
                       <div
                         className={`${barColor} rounded-full h-2 transition-all`}
                         style={{ width: `${item.value}%` }}

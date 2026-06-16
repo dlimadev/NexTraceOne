@@ -189,7 +189,7 @@ export function PluginMarketplacePage() {
                 onClick={() => setSelectedPersona(p)}
                 className={`px-2 py-1 rounded text-xs transition-colors ${
                   selectedPersona === p
-                    ? 'bg-primary text-white'
+                    ? 'bg-accent text-on-accent'
                     : 'bg-muted text-muted hover:text-body'
                 }`}
               >

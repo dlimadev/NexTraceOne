@@ -72,7 +72,7 @@ export function RiskHeatmapPage() {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               dimension === dim
                 ? 'bg-accent/10 text-accent border-accent/30'
-                : 'bg-surface text-muted border-edge hover:text-body'
+                : 'bg-card text-muted border-edge hover:text-body'
             }`}
           >
             {t(`governance.executive.heatmapDimension${dim.charAt(0).toUpperCase()}${dim.slice(1)}`)}

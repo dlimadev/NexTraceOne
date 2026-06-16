@@ -44,7 +44,7 @@ const useIdeConsole = () =>
 
 const IDE_ICONS: Record<string, React.ReactNode> = {
   vscode: <Code2 size={16} className="text-info" />,
-  visualstudio: <Code2 size={16} className="text-primary" />,
+  visualstudio: <Code2 size={16} className="text-accent" />,
   jetbrains: <Code2 size={16} className="text-warning" />,
 };
 

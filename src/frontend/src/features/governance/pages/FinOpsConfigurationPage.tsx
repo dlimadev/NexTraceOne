@@ -212,7 +212,7 @@ export function FinOpsConfigurationPage() {
 
             <div className="flex flex-wrap gap-2 mb-4">
               {data.approvers.map((email) => (
-                <div key={email} className="flex items-center gap-1.5 bg-surface-hover rounded-md px-2 py-1">
+                <div key={email} className="flex items-center gap-1.5 bg-hover rounded-md px-2 py-1">
                   <span className="text-xs">{email}</span>
                   <button
                     onClick={() => handleRemoveApprover(email)}
@@ -319,7 +319,7 @@ export function FinOpsConfigurationPage() {
           <CardBody>
             <p className="text-xs text-muted mb-3">{t('finops.config.recommendations.description')}</p>
             {data.recommendationPolicy ? (
-              <pre className="text-xs bg-surface-hover rounded p-2 overflow-x-auto whitespace-pre-wrap">
+              <pre className="text-xs bg-hover rounded p-2 overflow-x-auto whitespace-pre-wrap">
                 {(() => { try { return JSON.stringify(JSON.parse(data.recommendationPolicy), null, 2); } catch { return data.recommendationPolicy; } })()}
               </pre>
             ) : (
