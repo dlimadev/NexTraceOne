@@ -89,7 +89,7 @@ export function ColumnSelector({ context, availableColumns }: ColumnSelectorProp
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-2 py-1 text-sm border rounded hover:bg-surface-2 transition-colors"
+        className="flex items-center gap-1 px-2 py-1 text-sm border border-edge rounded-md hover:bg-hover transition-colors"
         title={t('title')}
       >
         <Columns size={14} />
@@ -102,7 +102,7 @@ export function ColumnSelector({ context, availableColumns }: ColumnSelectorProp
             <button
               type="button"
               onClick={handleReset}
-              className="text-xs text-primary hover:underline"
+              className="text-xs text-accent hover:underline"
             >
               {t('reset')}
             </button>
