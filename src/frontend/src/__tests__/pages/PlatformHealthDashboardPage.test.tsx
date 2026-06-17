@@ -95,7 +95,7 @@ describe('PlatformHealthDashboardPage', () => {
 
   it('renders the overview tab by default', () => {
     render(<PlatformHealthDashboardPage />, { wrapper: createWrapper() });
-    expect(screen.getByRole('button', { name: /Overview/i })).toBeDefined();
+    expect(screen.getByRole('tab', { name: /Overview/i })).toBeDefined();
   });
 
   it('shows subsystems after loading', async () => {
@@ -109,7 +109,7 @@ describe('PlatformHealthDashboardPage', () => {
   it('switches to Config Health tab and shows checks', async () => {
     render(<PlatformHealthDashboardPage />, { wrapper: createWrapper() });
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Config Health/i }));
+    await user.click(screen.getByRole('tab', { name: /Config Health/i }));
     await waitFor(() => {
       expect(screen.getByText('Jwt__Secret')).toBeDefined();
     });
@@ -118,16 +118,16 @@ describe('PlatformHealthDashboardPage', () => {
   it('switches to Migrations tab and shows up-to-date status', async () => {
     render(<PlatformHealthDashboardPage />, { wrapper: createWrapper() });
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Migrations/i }));
+    await user.click(screen.getByRole('tab', { name: /Migrations/i }));
     await waitFor(() => {
-      expect(screen.getByText(/All migrations are up to date/i)).toBeDefined();
+      expect(screen.getAllByText(/All migrations are up to date/i).length).toBeGreaterThan(0);
     });
   });
 
   it('shows SMTP warning suggestion in config tab', async () => {
     render(<PlatformHealthDashboardPage />, { wrapper: createWrapper() });
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Config Health/i }));
+    await user.click(screen.getByRole('tab', { name: /Config Health/i }));
     await waitFor(() => {
       expect(screen.getByText(/Set Smtp__Host/i)).toBeDefined();
     });
