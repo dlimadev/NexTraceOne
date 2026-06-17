@@ -217,7 +217,7 @@ function InlineSelect({
       onChange={(e) => onChange(e.target.value)}
       className={cn(
         'h-8 text-xs rounded-lg border px-2.5 pr-7 appearance-none bg-elevated transition-colors',
-        'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+        'focus:outline-none focus:border-edge-focus focus-visible:ring-2 focus-visible:ring-accent',
         value ? 'text-heading border-edge-focus' : 'text-muted border-edge',
         'duration-[var(--nto-motion-fast)]',
       )}
