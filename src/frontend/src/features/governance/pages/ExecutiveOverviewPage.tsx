@@ -4,12 +4,13 @@ import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   TrendingUp, ShieldAlert, AlertTriangle, BarChart3, Activity,
   CheckCircle2, RefreshCw, Clock, Target, AlertCircle,
-  Zap,
+  Zap, Download,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer, PageSection } from '../../../components/shell';
+import { PageContainer, PageSection, StatsGrid, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -89,25 +90,36 @@ export function ExecutiveOverviewPage() {
       <PageHeader
         title={t('governance.executive.overviewTitle')}
         subtitle={t('governance.executive.overviewSubtitle')}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<Download size={14} />}
+          >
+            {t('common.export')}
+          </Button>
+        }
       />
 
       {/* ── Hero KPIs ─────────────────────────────────────────────────────── */}
       <PageSection>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {/* Overall Risk — primary KPI, biggest visual weight */}
-          <div className="col-span-2 md:col-span-1 bg-card border border-edge rounded-md p-5 flex flex-col gap-2">
-            <p className="text-xs font-medium text-muted uppercase tracking-wider">
-              {t('governance.executive.overallRisk')}
-            </p>
-            <div className="flex items-end gap-2">
-              <Badge variant={riskBadgeVariant(d.riskSummary.overallRisk)} size="md">
-                {t(`governance.risk.level.${d.riskSummary.overallRisk}`)}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted">
-              {d.riskSummary.criticalDomains} {t('governance.executive.criticalDomains').toLowerCase()}
-            </p>
-          </div>
+        <StatsGrid columns={4}>
+          {/* Overall Risk — KPI primário com badge semântico em vez de número */}
+          <Card>
+            <CardBody>
+              <p className="text-xs font-medium text-muted uppercase tracking-wider mb-2">
+                {t('governance.executive.overallRisk')}
+              </p>
+              <div className="mb-2">
+                <Badge variant={riskBadgeVariant(d.riskSummary.overallRisk)} size="md">
+                  {t(`governance.risk.level.${d.riskSummary.overallRisk}`)}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted">
+                {d.riskSummary.criticalDomains} {t('governance.executive.criticalDomains').toLowerCase()}
+              </p>
+            </CardBody>
+          </Card>
 
           <StatCard
             title={t('governance.executive.openIncidents')}
@@ -131,7 +143,7 @@ export function ExecutiveOverviewPage() {
             icon={<Activity size={20} />}
             color="text-accent"
           />
-        </div>
+        </StatsGrid>
       </PageSection>
 
       {/* ── Immediate Action Panel (critical focus areas) ──────────────────── */}
@@ -172,7 +184,7 @@ export function ExecutiveOverviewPage() {
 
       {/* ── Operational Trend + Risk Summary ──────────────────────────────── */}
       <PageSection>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <ContentGrid columns={2} className="mb-6">
           {/* Operational Trend */}
           <Card>
             <CardHeader>
@@ -235,7 +247,7 @@ export function ExecutiveOverviewPage() {
               </div>
             </CardBody>
           </Card>
-        </div>
+        </ContentGrid>
       </PageSection>
 
       {/* ── Maturity Summary ──────────────────────────────────────────────── */}
@@ -273,7 +285,7 @@ export function ExecutiveOverviewPage() {
 
       {/* ── Change Safety + Incident Trend ────────────────────────────────── */}
       <PageSection>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <ContentGrid columns={2} className="mb-6">
           {/* Change Safety */}
           <Card>
             <CardHeader>
@@ -349,7 +361,7 @@ export function ExecutiveOverviewPage() {
               </div>
             </CardBody>
           </Card>
-        </div>
+        </ContentGrid>
       </PageSection>
 
       {/* ── All Focus Areas + Top Domains ─────────────────────────────────── */}
