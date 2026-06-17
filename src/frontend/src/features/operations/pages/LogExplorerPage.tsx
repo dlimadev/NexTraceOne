@@ -121,7 +121,7 @@ export function LogExplorerPage() {
       <PageHeader
         title={t('telemetryExplorer.logs.title')}
         subtitle={t('telemetryExplorer.logs.subtitle')}
-        icon={<FileText className="w-6 h-6 text-primary" />}
+        icon={<FileText className="w-6 h-6 text-accent" />}
       />
 
       {/* Filters */}
@@ -262,7 +262,7 @@ export function LogExplorerPage() {
                               {log.traceId && (
                                 <button
                                   type="button"
-                                  className="font-mono text-xs text-primary hover:underline truncate max-w-[150px] flex items-center gap-1"
+                                  className="font-mono text-xs text-accent hover:underline truncate max-w-[150px] flex items-center gap-1"
                                   onClick={() => navigate(`/operations/telemetry/traces?traceId=${log.traceId}`)}
                                 >
                                   {log.traceId.substring(0, 16)}…

@@ -105,7 +105,7 @@ export function DbExplorerPage() {
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -166,7 +166,7 @@ export function DbExplorerPage() {
                       key={tab.value}
                       type="button"
                       onClick={() => setSortBy(tab.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${sortBy === tab.value ? 'bg-primary text-primary-foreground' : 'text-muted hover:bg-muted'}`}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${sortBy === tab.value ? 'bg-accent text-on-accent' : 'text-muted hover:bg-muted'}`}
                     >
                       {t(tab.labelKey)}
                     </button>

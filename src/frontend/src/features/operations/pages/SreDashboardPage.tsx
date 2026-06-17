@@ -236,19 +236,19 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
             <th className={`${thClass} text-right`} onClick={() => toggleSort('count')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.count')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => toggleSort('avgLatencyMs')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.latency')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => toggleSort('errors')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.errors')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'errors' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'errors' ? 'text-accent' : ''}`} />
               </span>
             </th>
           </tr>
@@ -267,7 +267,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
                 key={`${row.service}-${row.request}-${i}`} // eslint-disable-line react/no-array-index-key
                 className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
-                <td className={`${tdClass} font-medium text-primary`}>{row.service}</td>
+                <td className={`${tdClass} font-medium text-accent`}>{row.service}</td>
                 <td className={`${tdClass} font-mono max-w-[200px] truncate`}>{row.request}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtNumber(row.count)}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtMs(row.avgLatencyMs)}</td>
@@ -315,13 +315,13 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
             <th className={`${thClass} text-right`} onClick={() => setSort('count')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.count')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => setSort('avgLatencyMs')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.latency')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-accent' : ''}`} />
               </span>
             </th>
           </tr>
@@ -340,7 +340,7 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
                 key={`${row.database}-${row.query}-${i}`} // eslint-disable-line react/no-array-index-key
                 className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
-                <td className={`${tdClass} font-medium text-primary`}>{row.database}</td>
+                <td className={`${tdClass} font-medium text-accent`}>{row.database}</td>
                 <td className={`${tdClass} font-mono text-muted max-w-[240px] truncate`}>{row.query}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtNumber(row.count)}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtMs(row.avgLatencyMs)}</td>
@@ -471,7 +471,7 @@ export function SreDashboardPage() {
                   <button
                     key={opt.value}
                     type="button"
-                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-primary' : ''}`}
+                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
                     onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
                   >
                     {t(opt.labelKey)}
@@ -631,7 +631,7 @@ export function SreDashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-primary" />
+                <Server className="w-4 h-4 text-accent" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.serviceAnalysis.title')}</h3>
               </div>
               <p className="text-xs text-muted mt-0.5">{t('sreDashboard.serviceAnalysis.subtitle')}</p>
@@ -645,7 +645,7 @@ export function SreDashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-primary" />
+                <Database className="w-4 h-4 text-accent" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.dbAnalysis.title')}</h3>
               </div>
               <p className="text-xs text-muted mt-0.5">{t('sreDashboard.dbAnalysis.subtitle')}</p>

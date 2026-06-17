@@ -193,7 +193,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
       <PageSection>
         <Card>
           <CardHeader>
-            <span className="font-semibold text-sm text-text-primary">
+            <span className="font-semibold text-sm text-heading">
               {t('environmentComparison.compareParameters')}
             </span>
           </CardHeader>
@@ -212,7 +212,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   value={form.serviceName}
                   onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
                   placeholder={t('environmentComparison.serviceNamePlaceholder')}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -223,7 +223,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   id="ec-env"
                   value={form.environment}
                   onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   {['dev', 'test', 'qa', 'uat', 'staging', 'production'].map((env) => (
                     <option key={env} value={env}>
@@ -241,7 +241,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.beforeStart}
                   onChange={(e) => setForm((f) => ({ ...f, beforeStart: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -253,7 +253,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.beforeEnd}
                   onChange={(e) => setForm((f) => ({ ...f, beforeEnd: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -265,7 +265,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.afterStart}
                   onChange={(e) => setForm((f) => ({ ...f, afterStart: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -277,7 +277,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                   type="datetime-local"
                   value={form.afterEnd}
                   onChange={(e) => setForm((f) => ({ ...f, afterEnd: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <div className="flex items-end gap-2 lg:col-span-3">
@@ -350,7 +350,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-2xl font-semibold text-text-primary">
+                      <span className="text-2xl font-semibold text-heading">
                         {scoreQuery.data.score.toFixed(1)}
                         <span className="text-sm text-text-muted"> / 100</span>
                       </span>
@@ -362,7 +362,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                     <div className="ml-auto grid grid-cols-2 gap-3 text-xs text-text-muted">
                       {Object.entries(scoreQuery.data.breakdown).map(([key, val]) => (
                         <div key={key} className="flex flex-col items-end">
-                          <span className="font-medium text-text-primary">
+                          <span className="font-medium text-heading">
                             {(val as number).toFixed(1)}
                           </span>
                           <span>
@@ -461,7 +461,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                               delta: null as number | null,
                             },
                           ].map((row) => (
-                            <tr key={row.label} className="text-text-primary">
+                            <tr key={row.label} className="text-heading">
                               <td className="py-2 pr-4 text-text-muted">{row.label}</td>
                               <td className="py-2 pr-4">
                                 {row.before.toFixed(2)} {row.unit}
@@ -522,7 +522,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                             }
                           />
                           <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-medium text-text-primary">
+                            <span className="text-sm font-medium text-heading">
                               {finding.metricName}
                             </span>
                             <span className="text-xs text-text-muted">
@@ -539,7 +539,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                           <span className="block text-text-muted">
                             {t('environmentComparison.expected')}
                           </span>
-                          <span className="text-text-primary font-medium">
+                          <span className="text-heading font-medium">
                             {finding.expectedValue.toFixed(4)}
                           </span>
                         </div>
@@ -547,7 +547,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                           <span className="block text-text-muted">
                             {t('environmentComparison.actual')}
                           </span>
-                          <span className="text-text-primary font-medium">
+                          <span className="text-heading font-medium">
                             {finding.actualValue.toFixed(4)}
                           </span>
                         </div>
@@ -592,7 +592,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                         <div className="flex items-center gap-4 text-xs text-text-muted">
                           <span>
                             {t('environmentComparison.metrics.avgLatency')}:{' '}
-                            <span className="text-text-primary">
+                            <span className="text-heading">
                               {point.avgLatencyMs.toFixed(1)}ms
                             </span>
                           </span>
@@ -608,7 +608,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                           </span>
                           <span>
                             {t('environmentComparison.snapshots')}:{' '}
-                            <span className="text-text-primary">{point.snapshotCount}</span>
+                            <span className="text-heading">{point.snapshotCount}</span>
                           </span>
                         </div>
                       </div>
