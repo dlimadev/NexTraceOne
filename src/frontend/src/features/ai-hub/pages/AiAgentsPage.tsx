@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { EmptyState } from '../../../components/EmptyState';
-import {
-  Bot, Plus, Search, Shield, Sparkles, AlertCircle, Inbox,
-} from 'lucide-react';
+import { Bot, Plus, Shield, Sparkles, Inbox } from 'lucide-react';
 import { Button } from '../../../components/Button';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { CardListSkeleton } from '../../../components/CardListSkeleton';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { SearchInput } from '../../../components/SearchInput';
+import { Tabs } from '../../../components/Tabs';
 import { useToast } from '../../../components/Toast';
 import { aiGovernanceApi } from '../api/aiGovernance';
 import { FALLBACK_AGENT_CATEGORIES } from './AiAgentTypes';
@@ -78,130 +79,118 @@ export function AiAgentsPage() {
   const officialAgents = filteredAgents.filter(a => a.ownershipType === 'System');
   const customAgents = filteredAgents.filter(a => a.ownershipType !== 'System');
 
+  /* Itens de filtro para o DS Tabs (variante pill) */
+  const filterTabs = [
+    { id: 'all', label: t('agents.filter.all') },
+    { id: 'official', label: t('agents.filter.official') },
+    { id: 'custom', label: t('agents.filter.custom') },
+  ] as const;
+
   if (agentsQuery.isError) {
-    return <PageContainer><PageErrorState /></PageContainer>;
+    return (
+      <PageContainer>
+        <PageErrorState onRetry={() => agentsQuery.refetch()} />
+      </PageContainer>
+    );
   }
 
   return (
     <PageContainer>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
-              <Bot size={24} className="text-accent" />
-              {t('agents.title')}
-            </h1>
-            <p className="text-sm text-muted mt-1">{t('agents.subtitle')}</p>
-          </div>
-          <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)}>
-            <Plus size={14} className="mr-1" />
+      {/* Cabeçalho padronizado Betterstack */}
+      <PageHeader
+        title={t('agents.title')}
+        subtitle={t('agents.subtitle')}
+        icon={<Bot size={22} className="text-accent" />}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={14} />}
+            onClick={() => setIsCreateOpen(true)}
+          >
             {t('agents.createAgent')}
           </Button>
-        </div>
+        }
+      />
 
-        {/* Filters */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder={t('agents.searchPlaceholder')}
-              aria-label={t('agents.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 rounded-md border border-edge bg-elevated text-sm text-body placeholder-muted focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-          <div className="flex items-center gap-1 rounded-md border border-edge bg-elevated p-0.5" role="group" aria-label={t('aiHub.filterByStatus')}>
-            {(['all', 'official', 'custom'] as const).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                aria-pressed={filter === f}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                  filter === f ? 'bg-accent text-white' : 'text-muted hover:text-body'
-                }`}
-              >
-                {t(`agents.filter.${f}`)}
-              </button>
+      {/* Barra de filtros — SearchInput DS + Tabs pill */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+        <SearchInput
+          size="sm"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder={t('agents.searchPlaceholder')}
+          aria-label={t('agents.searchPlaceholder')}
+          className="w-full max-w-xs"
+        />
+        <Tabs
+          variant="pill"
+          size="sm"
+          items={filterTabs as unknown as { id: string; label: string }[]}
+          activeId={filter}
+          onChange={(id) => setFilter(id as typeof filter)}
+        />
+      </div>
+
+      {/* Estado de carregamento */}
+      {agentsQuery.isLoading && <PageLoadingState />}
+
+      {/* Estado vazio */}
+      {!agentsQuery.isLoading && !agentsQuery.isError && filteredAgents.length === 0 && (
+        <EmptyState
+          icon={<Inbox size={20} />}
+          title={t('agents.emptyTitle', 'No agents found')}
+          description={t('agents.emptyDescription', 'Try adjusting your filters or create a new agent.')}
+        />
+      )}
+
+      {/* Secção: Agents Oficiais */}
+      {!agentsQuery.isLoading && !agentsQuery.isError && officialAgents.length > 0 && (
+        <PageSection
+          title={`${t('agents.officialSection')} (${officialAgents.length})`}
+          icon={<Shield size={14} className="text-accent" />}
+        >
+          <ContentGrid columns={3}>
+            {officialAgents.map(agent => (
+              <AgentCard
+                key={agent.agentId}
+                agent={agent}
+                onView={() => navigate(`/ai/agents/${agent.agentId}`)}
+                onExecute={() => setExecuteAgent(agent)}
+                t={t}
+              />
             ))}
-          </div>
-        </div>
+          </ContentGrid>
+        </PageSection>
+      )}
 
-        {/* Loading */}
-        {agentsQuery.isLoading && (
-          <CardListSkeleton count={4} showStats={false} />
-        )}
+      {/* Secção: Agents Personalizados */}
+      {!agentsQuery.isLoading && !agentsQuery.isError && customAgents.length > 0 && (
+        <PageSection
+          title={`${t('agents.customSection')} (${customAgents.length})`}
+          icon={<Sparkles size={14} className="text-accent" />}
+        >
+          <ContentGrid columns={3}>
+            {customAgents.map(agent => (
+              <AgentCard
+                key={agent.agentId}
+                agent={agent}
+                onView={() => navigate(`/ai/agents/${agent.agentId}`)}
+                onExecute={() => setExecuteAgent(agent)}
+                t={t}
+              />
+            ))}
+          </ContentGrid>
+        </PageSection>
+      )}
 
-        {/* Error */}
-        {agentsQuery.isError && !agentsQuery.isLoading && (
-          <div className="text-center py-12">
-            <AlertCircle size={32} className="text-warning mx-auto mb-3" />
-            <p className="text-sm text-muted">{t('agents.loadError')}</p>
-            <Button variant="ghost" size="sm" className="mt-3" onClick={() => agentsQuery.refetch()}>
-              {t('common.retry')}
-            </Button>
-          </div>
-        )}
-
-        {/* Empty */}
-        {!agentsQuery.isLoading && !agentsQuery.isError && filteredAgents.length === 0 && (
-          <EmptyState
-            icon={<Inbox size={20} />}
-            title={t('agents.emptyTitle', 'No agents found')}
-            description={t('agents.emptyDescription', 'Try adjusting your filters or create a new agent.')}
-          />
-        )}
-
-        {/* Official Agents */}
-        {!agentsQuery.isLoading && !agentsQuery.isError && officialAgents.length > 0 && (
-          <div>
-            <h2 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
-              <Shield size={14} className="text-accent" />
-              {t('agents.officialSection')} ({officialAgents.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {officialAgents.map(agent => (
-                <AgentCard
-                  key={agent.agentId}
-                  agent={agent}
-                  onView={() => navigate(`/ai/agents/${agent.agentId}`)}
-                  onExecute={() => setExecuteAgent(agent)}
-                  t={t}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Custom Agents */}
-        {!agentsQuery.isLoading && !agentsQuery.isError && customAgents.length > 0 && (
-          <div>
-            <h2 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
-              <Sparkles size={14} className="text-info" />
-              {t('agents.customSection')} ({customAgents.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {customAgents.map(agent => (
-                <AgentCard
-                  key={agent.agentId}
-                  agent={agent}
-                  onView={() => navigate(`/ai/agents/${agent.agentId}`)}
-                  onExecute={() => setExecuteAgent(agent)}
-                  t={t}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Governance Notice */}
-        <div className="mt-6 px-4 py-3 rounded-md bg-accent/5 border border-accent/20 text-xs text-muted flex items-center gap-2">
+      {/* Aviso de governança */}
+      {!agentsQuery.isLoading && (
+        <div className="px-4 py-3 rounded-md bg-accent/5 border border-accent/20 text-xs text-muted flex items-center gap-2">
           <Shield size={14} className="text-accent shrink-0" />
           {t('agents.governanceNotice')}
         </div>
-      </div>
+      )}
 
       {/* Dialogs */}
       <CreateAgentDialog
