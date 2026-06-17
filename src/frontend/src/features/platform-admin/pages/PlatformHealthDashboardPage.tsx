@@ -17,10 +17,13 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
-import { PageContainer, PageSection } from '../../../components/shell';
+import { PageContainer, PageSection, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { StatCard } from '../../../components/StatCard';
+import { Tabs, TabPanel } from '../../../components/Tabs';
 import { platformAdminApi } from '../api/platformAdmin';
 import { platformOpsApi } from '../../operations/api/platformOps';
 import type { ConfigCheckStatus, MigrationRiskLevel } from '../api/platformAdmin';
@@ -83,7 +86,7 @@ function OverviewTab() {
 
   return (
     <div className="space-y-4">
-      {/* Preflight summary */}
+      {/* Sumário dos preflight checks */}
       {preflight && (
         <Card>
           <CardHeader>
@@ -110,7 +113,7 @@ function OverviewTab() {
         </Card>
       )}
 
-      {/* Subsystems */}
+      {/* Subsistemas da plataforma */}
       {health && (
         <Card>
           <CardHeader>
@@ -164,21 +167,29 @@ function ConfigHealthTab() {
 
   return (
     <div className="space-y-4">
-      {/* Summary row */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: t('platformHealth.config.ok'), count: counts.ok, variant: 'success' as const },
-          { label: t('platformHealth.config.warning'), count: counts.warning, variant: 'warning' as const },
-          { label: t('platformHealth.config.degraded'), count: counts.degraded, variant: 'danger' as const },
-        ].map(({ label, count, variant }) => (
-          <div key={label} className="bg-card border border-edge rounded-md p-3 text-center">
-            <p className="text-2xl font-bold text-heading">{count}</p>
-            <Badge variant={variant} className="mt-1 text-xs">{label}</Badge>
-          </div>
-        ))}
-      </div>
+      {/* KPIs de estado via StatCard */}
+      <StatsGrid columns={3}>
+        <StatCard
+          title={t('platformHealth.config.ok')}
+          value={counts.ok}
+          icon={<CheckCircle2 size={18} />}
+          color="text-success"
+        />
+        <StatCard
+          title={t('platformHealth.config.warning')}
+          value={counts.warning}
+          icon={<AlertTriangle size={18} />}
+          color="text-warning"
+        />
+        <StatCard
+          title={t('platformHealth.config.degraded')}
+          value={counts.degraded}
+          icon={<XCircle size={18} />}
+          color="text-critical"
+        />
+      </StatsGrid>
 
-      {/* Checks list */}
+      {/* Lista de checks detalhados */}
       <Card>
         <CardBody className="p-0">
           <ul className="divide-y divide-border">
@@ -229,7 +240,7 @@ function MigrationsTab() {
 
   return (
     <div className="space-y-4">
-      {/* Summary banner */}
+      {/* Banner de status da migration */}
       <div className={`rounded-md p-4 border ${data.totalPending === 0 ? 'bg-success/5 border-success/20' : data.isSafeToApply ? 'bg-warning/5 border-warning/20' : 'bg-critical/5 border-critical/20'}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -257,8 +268,8 @@ function MigrationsTab() {
         </div>
       </div>
 
-      {/* Migrations list */}
-      {data.migrations.length > 0 && (
+      {/* Lista de migrations pendentes ou EmptyState */}
+      {data.migrations.length > 0 ? (
         <Card>
           <CardHeader>
             <span className="text-sm font-semibold text-heading">{t('platformHealth.migrations.listTitle')}</span>
@@ -290,9 +301,16 @@ function MigrationsTab() {
             </div>
           </CardBody>
         </Card>
+      ) : (
+        <EmptyState
+          icon={<CheckCircle2 size={24} />}
+          title={t('platformHealth.migrations.upToDate', 'All migrations applied')}
+          description={t('platformHealth.migrations.noMigrationsDesc', 'No pending database migrations detected.')}
+          size="compact"
+        />
       )}
 
-      {/* Apply instructions */}
+      {/* Instruções de aplicação */}
       <Card>
         <CardBody>
           <div className="flex items-start gap-3">
@@ -319,9 +337,9 @@ export function PlatformHealthDashboardPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  const tabItems = [
     { id: 'overview', label: t('platformHealth.tabOverview'), icon: <Server size={14} /> },
-    { id: 'config', label: t('platformHealth.tabConfig'), icon: <Shield size={14} /> },
+    { id: 'config',   label: t('platformHealth.tabConfig'),   icon: <Shield size={14} /> },
     { id: 'migrations', label: t('platformHealth.tabMigrations'), icon: <Database size={14} /> },
   ];
 
@@ -331,7 +349,7 @@ export function PlatformHealthDashboardPage() {
         title={t('platformHealth.title')}
         subtitle={t('platformHealth.subtitle')}
         actions={
-          <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
             <RefreshCw size={14} />
             {t('platformHealth.refresh')}
           </Button>
@@ -339,12 +357,12 @@ export function PlatformHealthDashboardPage() {
       />
 
       <PageSection>
-        {/* Quick links */}
+        {/* Atalhos rápidos para secções relacionadas */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
           {[
             { label: t('platformHealth.quick.preflight'), to: '/preflight', icon: <Server size={16} />, color: 'text-accent' },
-            { label: t('platformHealth.quick.setup'), to: '/setup', icon: <Settings size={16} />, color: 'text-warning' },
-            { label: t('platformHealth.quick.ai'), to: '/ai/models', icon: <BrainCircuit size={16} />, color: 'text-success' },
+            { label: t('platformHealth.quick.setup'),     to: '/setup',     icon: <Settings size={16} />, color: 'text-warning' },
+            { label: t('platformHealth.quick.ai'),        to: '/ai/models', icon: <BrainCircuit size={16} />, color: 'text-success' },
           ].map(({ label, to, icon, color }) => (
             <a
               key={to}
@@ -360,28 +378,25 @@ export function PlatformHealthDashboardPage() {
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4 border-b border-edge">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                activeTab === tab.id
-                  ? 'border-accent text-accent'
-                  : 'border-transparent text-muted hover:text-heading'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {/* Navegação por abas usando o componente Tabs do DS */}
+        <Tabs
+          id="platform-health"
+          items={tabItems}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as Tab)}
+          className="mb-4"
+        />
 
-        {/* Tab content */}
-        {activeTab === 'overview' && <OverviewTab />}
-        {activeTab === 'config' && <ConfigHealthTab />}
-        {activeTab === 'migrations' && <MigrationsTab />}
+        {/* Conteúdo das abas via TabPanel para acessibilidade WCAG */}
+        <TabPanel tabId="overview"    tabsId="platform-health" active={activeTab === 'overview'}>
+          <OverviewTab />
+        </TabPanel>
+        <TabPanel tabId="config"      tabsId="platform-health" active={activeTab === 'config'}>
+          <ConfigHealthTab />
+        </TabPanel>
+        <TabPanel tabId="migrations"  tabsId="platform-health" active={activeTab === 'migrations'}>
+          <MigrationsTab />
+        </TabPanel>
       </PageSection>
     </PageContainer>
   );
