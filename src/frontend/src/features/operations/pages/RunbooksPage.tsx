@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Search, FileText, Clock, Server, AlertTriangle, Plus } from 'lucide-react';
+import { BookOpen, FileText, Clock, Server, AlertTriangle, Plus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
@@ -11,6 +11,8 @@ import { PageContainer, PageSection, StatsGrid } from '../../../components/shell
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
 import { incidentsApi } from '../api/incidents';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -54,22 +56,21 @@ export function RunbooksPage() {
 
   return (
     <PageContainer>
+      {/* CTA principal movido para actions do PageHeader (padrão DS) */}
       <PageHeader
         title={t('runbooks.title')}
         subtitle={t('runbooks.subtitle')}
-      />
-
-      <PageSection>
-        <div className="flex justify-end mb-4">
-          <button
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={14} />}
             onClick={() => navigate('/operations/runbooks/create')}
-            className="flex items-center gap-1 px-3 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
           >
-            <Plus size={14} />
             {t('runbooks.builder.createNew')}
-          </button>
-        </div>
-      </PageSection>
+          </Button>
+        }
+      />
 
       <StatsGrid columns={4}>
         <StatCard title={t('runbooks.stats.total')} value={totalCount} icon={<BookOpen size={20} />} color="text-accent" />
@@ -79,17 +80,14 @@ export function RunbooksPage() {
       </StatsGrid>
 
       <PageSection>
+        {/* SearchInput DS substitui o input raw com ícone manual */}
         <div className="mb-4">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              placeholder={t('runbooks.searchPlaceholder', 'Search runbooks...')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-            />
-          </div>
+          <SearchInput
+            size="sm"
+            placeholder={t('runbooks.searchPlaceholder', 'Search runbooks...')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
         {filtered.length === 0 ? (
