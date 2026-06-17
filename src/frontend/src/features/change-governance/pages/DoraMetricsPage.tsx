@@ -137,14 +137,16 @@ export function DoraMetricsPage() {
             value={serviceName}
             onChange={e => setServiceName(e.target.value)}
             placeholder={t('doraMetrics.allServices')}
-            className="w-44 !h-9"
+            size="sm"
+            className="w-44"
           />
           <TextField
             label={t('doraMetrics.filterTeam')}
             value={teamName}
             onChange={e => setTeamName(e.target.value)}
             placeholder={t('doraMetrics.allTeams')}
-            className="w-44 !h-9"
+            size="sm"
+            className="w-44"
           />
           <Select
             label={t('doraMetrics.filterEnvironment')}
