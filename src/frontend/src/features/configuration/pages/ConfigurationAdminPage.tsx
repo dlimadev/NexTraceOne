@@ -270,7 +270,7 @@ export function ConfigurationAdminPage() {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div className="bg-surface rounded-lg shadow-xl w-full max-w-lg mx-4">
+        <div className="bg-card rounded-lg shadow-xl w-full max-w-lg mx-4">
           <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
             <h3 className="text-sm font-semibold text-heading flex items-center gap-2">
               <Pencil size={16} className="text-accent" />
@@ -562,7 +562,7 @@ export function ConfigurationAdminPage() {
             onClick={() => setActiveView(v.key)}
             className={`px-4 py-2 text-sm rounded-t font-medium transition-colors ${
               activeView === v.key
-                ? 'bg-surface text-heading border border-edge border-b-0'
+                ? 'bg-card text-heading border border-edge border-b-0'
                 : 'text-muted hover:text-heading'
             }`}
           >

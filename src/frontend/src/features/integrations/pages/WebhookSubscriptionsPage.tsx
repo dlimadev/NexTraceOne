@@ -157,7 +157,7 @@ export function WebhookSubscriptionsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Tag size={16} className="text-accent" />
-              <span className="text-sm font-semibold text-primary">{t('webhookSubscriptions.availableEventTypes')}</span>
+              <span className="text-sm font-semibold text-accent">{t('webhookSubscriptions.availableEventTypes')}</span>
             </div>
           </CardHeader>
           <CardBody>
@@ -187,7 +187,7 @@ export function WebhookSubscriptionsPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Webhook size={16} className="text-accent" />
-                <span className="text-sm font-semibold text-primary">{t('webhookSubscriptions.registerWebhook')}</span>
+                <span className="text-sm font-semibold text-accent">{t('webhookSubscriptions.registerWebhook')}</span>
               </div>
             </CardHeader>
             <CardBody>
@@ -330,7 +330,7 @@ export function WebhookSubscriptionsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-semibold text-primary truncate">{sub.name}</span>
+                        <span className="text-sm font-semibold text-accent truncate">{sub.name}</span>
                         {sub.isActive
                           ? <Badge variant="success"><CheckCircle2 size={10} className="inline mr-0.5" />{t('integrations.active')}</Badge>
                           : <Badge variant="default"><XCircle size={10} className="inline mr-0.5" />{t('integrations.disabled')}</Badge>
