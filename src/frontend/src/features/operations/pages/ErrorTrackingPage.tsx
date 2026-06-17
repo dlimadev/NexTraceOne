@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getErrorGroups, type ErrorGroup, type ErrorGroupStatus } from '../api/telemetry';
@@ -87,32 +88,34 @@ export function ErrorTrackingPage() {
   const regressingCount = groups.filter((g) => g.status === 'regressing').length;
   const totalAffectedUsers = groups.reduce((a, g) => a + g.affectedUsers, 0);
 
+  /* Itens do Tabs DS derivados das opções de intervalo de tempo */
+  const tabItems = TIME_RANGE_OPTIONS.map((opt) => ({
+    id: opt.value,
+    label: t(opt.labelKey),
+  }));
+
   return (
     <PageContainer>
-      <div className="flex flex-col gap-1 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader
-          title={t('errorTracking.title')}
-          subtitle={t('errorTracking.subtitle')}
-        />
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
+      {/* PageHeader com tab strip e Refresh nas actions — padrão DS */}
+      <PageHeader
+        title={t('errorTracking.title')}
+        subtitle={t('errorTracking.subtitle')}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Tabs
+              variant="pill"
+              size="sm"
+              items={tabItems}
+              activeId={timeRange}
+              onChange={(id) => setTimeRange(id as TimeRange)}
+            />
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              {t('common.refresh')}
+            </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-            {t('common.refresh')}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && <PageErrorState message={t('errorTracking.loadError')} onRetry={handleRefresh} />}
       {isLoading && <PageLoadingState message={t('errorTracking.loading')} />}
