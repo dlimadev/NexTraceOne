@@ -70,7 +70,8 @@ describe('ReleasesPage', () => {
 
   it('exibe o título da página', () => {
     renderReleases();
-    expect(screen.getByRole('heading', { name: /releases/i })).toBeInTheDocument();
+    // level:1 especifica o <h1> do PageHeader, evitando ambiguidade com EmptyState (<h3>)
+    expect(screen.getByRole('heading', { level: 1, name: /releases/i })).toBeInTheDocument();
   });
 
   it('exibe o botão de Notify Deployment', () => {
