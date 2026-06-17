@@ -5,17 +5,22 @@ import {
   Rocket, Clock, AlertTriangle, Heart, TrendingUp,
   ArrowUpRight, ArrowDownRight, Minus,
 } from 'lucide-react';
-import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import { PageContainer } from '../../../components/shell';
+import { StatCard } from '../../../components/StatCard';
+import { PageContainer, ContentGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { RiskScoreTrendPanel } from '../components/RiskScoreTrendPanel';
 import type { DoraClassification } from '../api/changeConfidence';
+
+// ── Helpers de classificação ─────────────────────────────────────────────────
 
 const classificationColor = (c: DoraClassification): string => {
   switch (c) {
@@ -46,6 +51,32 @@ const classificationIcon = (c: DoraClassification) => {
       return <ArrowDownRight size={14} className="text-critical" />;
   }
 };
+
+/** Mapeia a classificação DORA para a cor de StatCard. */
+const classificationStatColor = (c: DoraClassification): string => {
+  switch (c) {
+    case 'Elite': return 'text-success';
+    case 'High': return 'text-info';
+    case 'Medium': return 'text-warning';
+    case 'Low': return 'text-critical';
+  }
+};
+
+// ── Opções de filtros ────────────────────────────────────────────────────────
+
+const ENVIRONMENT_OPTIONS = [
+  { value: 'Production', label: 'Production' },
+  { value: 'Staging', label: 'Staging' },
+  { value: 'Development', label: 'Development' },
+];
+
+const DAYS_OPTIONS = [
+  { value: '7', label: '7' },
+  { value: '14', label: '14' },
+  { value: '30', label: '30' },
+  { value: '60', label: '60' },
+  { value: '90', label: '90' },
+];
 
 /**
  * Página de métricas DORA — calcula as 4 métricas DORA a partir de dados reais
@@ -94,172 +125,114 @@ export function DoraMetricsPage() {
 
   return (
     <PageContainer>
-      <PageHeader title={t('doraMetrics.title')} subtitle={t('doraMetrics.subtitle')} />
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-3 mb-6">
-        <div>
-          <label className="block text-xs font-medium text-muted mb-1">{t('doraMetrics.filterService')}</label>
-          <input
-            type="text"
+      {/* Cabeçalho com filtros inline */}
+      <PageHeader
+        title={t('doraMetrics.title')}
+        subtitle={t('doraMetrics.subtitle')}
+      >
+        {/* Barra de filtros — abaixo do título, acima do conteúdo */}
+        <div className="flex flex-wrap items-end gap-3 mt-4">
+          <TextField
+            label={t('doraMetrics.filterService')}
             value={serviceName}
             onChange={e => setServiceName(e.target.value)}
             placeholder={t('doraMetrics.allServices')}
-            className="px-3 py-1.5 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent w-44"
+            className="w-44 !h-9"
           />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted mb-1">{t('doraMetrics.filterTeam')}</label>
-          <input
-            type="text"
+          <TextField
+            label={t('doraMetrics.filterTeam')}
             value={teamName}
             onChange={e => setTeamName(e.target.value)}
             placeholder={t('doraMetrics.allTeams')}
-            className="px-3 py-1.5 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent w-44"
+            className="w-44 !h-9"
+          />
+          <Select
+            label={t('doraMetrics.filterEnvironment')}
+            value={environment}
+            options={ENVIRONMENT_OPTIONS}
+            size="sm"
+            onChange={e => setEnvironment(e.target.value)}
+            className="w-40"
+          />
+          <Select
+            label={t('doraMetrics.filterDays')}
+            value={String(days)}
+            options={DAYS_OPTIONS}
+            size="sm"
+            onChange={e => setDays(Number(e.target.value))}
+            className="w-28"
           />
         </div>
-        <div>
-          <label className="block text-xs font-medium text-muted mb-1">{t('doraMetrics.filterEnvironment')}</label>
-          <select
-            value={environment}
-            onChange={e => setEnvironment(e.target.value)}
-            className="px-3 py-1.5 text-sm rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-          >
-            <option value="Production">{t('environment.profile.production', 'Production')}</option>
-            <option value="Staging">{t('environment.profile.staging', 'Staging')}</option>
-            <option value="Development">{t('environment.profile.development', 'Development')}</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted mb-1">{t('doraMetrics.filterDays')}</label>
-          <select
-            value={days}
-            onChange={e => setDays(Number(e.target.value))}
-            className="px-3 py-1.5 text-sm rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-          >
-            <option value={7}>7</option>
-            <option value={14}>14</option>
-            <option value={30}>30</option>
-            <option value={60}>60</option>
-            <option value={90}>90</option>
-          </select>
-        </div>
-      </div>
+      </PageHeader>
 
-      {/* Overall Classification */}
-      <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-panel border border-edge">
-        <TrendingUp size={24} className={classificationColor(data.overallClassification)} />
-        <div>
-          <p className="text-xs text-muted">{t('doraMetrics.overallPerformance')}</p>
-          <div className="flex items-center gap-2">
-            <span className={`text-xl font-bold ${classificationColor(data.overallClassification)}`}>
-              {t(`doraMetrics.classification.${data.overallClassification}`)}
-            </span>
-            <Badge variant={classificationBadge(data.overallClassification)}>
-              {t('doraMetrics.days', { count: data.periodDays })}
-            </Badge>
+      {/* Banner de classificação geral */}
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-3">
+            <TrendingUp size={24} className={classificationColor(data.overallClassification)} />
+            <div>
+              <p className="text-xs text-muted">{t('doraMetrics.overallPerformance')}</p>
+              <div className="flex items-center gap-2">
+                <span className={`text-xl font-bold ${classificationColor(data.overallClassification)}`}>
+                  {t(`doraMetrics.classification.${data.overallClassification}`)}
+                </span>
+                {classificationIcon(data.overallClassification)}
+                <Badge variant={classificationBadge(data.overallClassification)}>
+                  {t('doraMetrics.days', { count: data.periodDays })}
+                </Badge>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
 
-      {/* DORA Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      {/* 4 KPIs DORA via StatCard */}
+      <ContentGrid columns={2} className="mb-6">
         {/* Deployment Frequency */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Rocket size={16} className="text-accent" />
-              <h3 className="text-sm font-semibold text-heading">{t('doraMetrics.deploymentFrequency')}</h3>
-              {classificationIcon(data.deploymentFrequency.classification)}
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-3xl font-bold text-heading">{data.deploymentFrequency.deploysPerDay}</span>
-              <span className="text-sm text-muted">{t('doraMetrics.deploysPerDay')}</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted mb-3">
-              <span>{t('doraMetrics.totalDeploys')}: {data.deploymentFrequency.totalDeploys}</span>
-            </div>
-            <Badge variant={classificationBadge(data.deploymentFrequency.classification)}>
-              {t(`doraMetrics.classification.${data.deploymentFrequency.classification}`)}
-            </Badge>
-          </CardBody>
-        </Card>
+        <StatCard
+          title={t('doraMetrics.deploymentFrequency')}
+          value={`${data.deploymentFrequency.deploysPerDay}`}
+          icon={<Rocket size={18} />}
+          color={classificationStatColor(data.deploymentFrequency.classification)}
+          context={`${t('doraMetrics.deploysPerDay')} · ${t('doraMetrics.totalDeploys')}: ${data.deploymentFrequency.totalDeploys}`}
+          footer={t(`doraMetrics.classification.${data.deploymentFrequency.classification}`)}
+        />
 
         {/* Lead Time for Changes */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-info" />
-              <h3 className="text-sm font-semibold text-heading">{t('doraMetrics.leadTime')}</h3>
-              {classificationIcon(data.leadTimeForChanges.classification)}
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-3xl font-bold text-heading">{data.leadTimeForChanges.averageHours}</span>
-              <span className="text-sm text-muted">{t('doraMetrics.hours')}</span>
-            </div>
-            <div className="h-5" />
-            <Badge variant={classificationBadge(data.leadTimeForChanges.classification)}>
-              {t(`doraMetrics.classification.${data.leadTimeForChanges.classification}`)}
-            </Badge>
-          </CardBody>
-        </Card>
+        <StatCard
+          title={t('doraMetrics.leadTime')}
+          value={`${data.leadTimeForChanges.averageHours}h`}
+          icon={<Clock size={18} />}
+          color={classificationStatColor(data.leadTimeForChanges.classification)}
+          context={t('doraMetrics.hours')}
+          footer={t(`doraMetrics.classification.${data.leadTimeForChanges.classification}`)}
+        />
 
         {/* Change Failure Rate */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertTriangle size={16} className="text-warning" />
-              <h3 className="text-sm font-semibold text-heading">{t('doraMetrics.changeFailureRate')}</h3>
-              {classificationIcon(data.changeFailureRate.classification)}
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-3xl font-bold text-heading">{data.changeFailureRate.failurePercentage}%</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-muted mb-3">
-              <span>{t('doraMetrics.failedDeploys')}: {data.changeFailureRate.failedDeploys}</span>
-              <span>{t('doraMetrics.rolledBackDeploys')}: {data.changeFailureRate.rolledBackDeploys}</span>
-              <span>{t('doraMetrics.totalDeploysLabel')}: {data.changeFailureRate.totalDeploys}</span>
-            </div>
-            <Badge variant={classificationBadge(data.changeFailureRate.classification)}>
-              {t(`doraMetrics.classification.${data.changeFailureRate.classification}`)}
-            </Badge>
-          </CardBody>
-        </Card>
+        <StatCard
+          title={t('doraMetrics.changeFailureRate')}
+          value={`${data.changeFailureRate.failurePercentage}%`}
+          icon={<AlertTriangle size={18} />}
+          color={classificationStatColor(data.changeFailureRate.classification)}
+          context={`${t('doraMetrics.failedDeploys')}: ${data.changeFailureRate.failedDeploys} · ${t('doraMetrics.rolledBackDeploys')}: ${data.changeFailureRate.rolledBackDeploys}`}
+          footer={t(`doraMetrics.classification.${data.changeFailureRate.classification}`)}
+        />
 
         {/* Time to Restore Service */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Heart size={16} className="text-critical" />
-              <h3 className="text-sm font-semibold text-heading">{t('doraMetrics.timeToRestore')}</h3>
-              {classificationIcon(data.timeToRestoreService.classification)}
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-3xl font-bold text-heading">{data.timeToRestoreService.averageHours}</span>
-              <span className="text-sm text-muted">{t('doraMetrics.hours')}</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted mb-3">
-              <span>{t('doraMetrics.avgResolution')}</span>
-            </div>
-            <Badge variant={classificationBadge(data.timeToRestoreService.classification)}>
-              {t(`doraMetrics.classification.${data.timeToRestoreService.classification}`)}
-            </Badge>
-          </CardBody>
-        </Card>
-      </div>
+        <StatCard
+          title={t('doraMetrics.timeToRestore')}
+          value={`${data.timeToRestoreService.averageHours}h`}
+          icon={<Heart size={18} />}
+          color={classificationStatColor(data.timeToRestoreService.classification)}
+          context={t('doraMetrics.avgResolution')}
+          footer={t(`doraMetrics.classification.${data.timeToRestoreService.classification}`)}
+        />
+      </ContentGrid>
 
-      {/* Risk Score Trend (Gap 12) */}
-      <div className="mt-8">
+      {/* Tendência de risco (Gap 12) */}
+      <PageSection>
         <RiskScoreTrendPanel initialServiceName={serviceName} />
-      </div>
+      </PageSection>
     </PageContainer>
   );
 }
