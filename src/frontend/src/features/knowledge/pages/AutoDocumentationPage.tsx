@@ -10,6 +10,8 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
+import { FilterChip } from '../../../components/FilterChip';
 import client from '../../../api/client';
 
 type SectionKey = 'Overview' | 'Ownership' | 'Contracts' | 'Dependencies' | 'SLOs' | 'Runbooks' | 'RecentChanges';
@@ -84,34 +86,36 @@ export function AutoDocumentationPage() {
       {/* Search controls */}
       <Card className="mb-6">
         <CardBody className="p-4">
+          {/* Campo de pesquisa DS — substitui raw <input type="text"> */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
+            <SearchInput
+              size="sm"
+              className="flex-1"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('knowledge.autoDoc.serviceNamePlaceholder')}
-              className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
+              aria-label={t('knowledge.autoDoc.serviceNamePlaceholder')}
             />
-            <Button onClick={handleSearch} disabled={!inputValue.trim()}>
-              <Search size={14} className="mr-1" />
+            <Button
+              variant="primary"
+              icon={<Search size={14} />}
+              onClick={handleSearch}
+              disabled={!inputValue.trim()}
+            >
               {t('knowledge.autoDoc.generate')}
             </Button>
           </div>
+          {/* Chips de filtro DS — substituem raw <button> com border-indigo-* hardcoded */}
           <div className="mt-3 flex flex-wrap gap-2">
             {ALL_SECTIONS.map((key) => (
-              <button
+              <FilterChip
                 key={key}
+                label={t(`knowledge.autoDoc.sections.${key}`)}
+                icon={SECTION_ICONS[key]}
+                active={selectedSections.includes(key)}
                 onClick={() => toggleSection(key)}
-                className={`flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition-colors ${
-                  selectedSections.includes(key)
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                    : 'border-edge text-muted'
-                }`}
-              >
-                {SECTION_ICONS[key]}
-                {t(`knowledge.autoDoc.sections.${key}`)}
-              </button>
+              />
             ))}
           </div>
         </CardBody>
@@ -141,7 +145,8 @@ export function AutoDocumentationPage() {
                 <Card>
                   <CardBody className="p-4">
                     <div className="flex items-start gap-3">
-                      <span className="mt-1 text-indigo-500">{SECTION_ICONS[section.sectionKey as SectionKey]}</span>
+                      {/* text-indigo-500 → token semântico text-accent */}
+                      <span className="mt-1 text-accent">{SECTION_ICONS[section.sectionKey as SectionKey]}</span>
                       <p className="text-sm text-body whitespace-pre-line">
                         {section.content}
                       </p>
