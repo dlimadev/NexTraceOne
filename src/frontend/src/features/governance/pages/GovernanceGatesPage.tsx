@@ -5,6 +5,9 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -167,20 +170,45 @@ function FourEyesForm({ onEvaluate }: { onEvaluate: (a: string, r: string, ap?: 
   const [requester, setRequester] = useState('');
   const [approver, setApprover] = useState('');
 
+  /* Opções de ação mapeadas para o DS Select */
+  const actionOptions = [
+    { value: 'production_deploy', label: 'production_deploy' },
+    { value: 'security_config_change', label: 'security_config_change' },
+    { value: 'privileged_access_grant', label: 'privileged_access_grant' },
+    { value: 'compliance_waiver', label: 'compliance_waiver' },
+    { value: 'break_glass', label: 'break_glass' },
+  ];
+
   return (
     <div className="space-y-2">
-      <select value={action} onChange={e => setAction(e.target.value)} className="input w-full" aria-label={t('governance.gates.fourEyes.action', 'Action')}>
-        <option value="production_deploy">production_deploy</option>
-        <option value="security_config_change">security_config_change</option>
-        <option value="privileged_access_grant">privileged_access_grant</option>
-        <option value="compliance_waiver">compliance_waiver</option>
-        <option value="break_glass">break_glass</option>
-      </select>
-      <input value={requester} onChange={e => setRequester(e.target.value)} placeholder={t('governance.gates.fourEyes.requester', 'Requester')} className="input w-full" />
-      <input value={approver} onChange={e => setApprover(e.target.value)} placeholder={t('governance.gates.fourEyes.approver', 'Approver (optional)')} className="input w-full" />
-      <button onClick={() => onEvaluate(action, requester, approver || undefined)} className="btn btn-primary w-full" disabled={!requester}>
+      <Select
+        size="sm"
+        options={actionOptions}
+        value={action}
+        onChange={e => setAction(e.target.value)}
+        aria-label={t('governance.gates.fourEyes.action', 'Action')}
+      />
+      <TextField
+        size="sm"
+        value={requester}
+        onChange={e => setRequester(e.target.value)}
+        placeholder={t('governance.gates.fourEyes.requester', 'Requester')}
+      />
+      <TextField
+        size="sm"
+        value={approver}
+        onChange={e => setApprover(e.target.value)}
+        placeholder={t('governance.gates.fourEyes.approver', 'Approver (optional)')}
+      />
+      <Button
+        variant="primary"
+        size="sm"
+        className="w-full"
+        onClick={() => onEvaluate(action, requester, approver || undefined)}
+        disabled={!requester}
+      >
         {t('governance.gates.evaluate', 'Evaluate')}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -204,29 +232,63 @@ function CabForm({ onEvaluate }: { onEvaluate: (s: string, e: string, c: string,
   const [crit, setCrit] = useState('High');
   const [blast, setBlast] = useState('Medium');
 
+  /* Opções mapeadas para DS Select */
+  const envOptions = [
+    { value: 'production', label: t('environment.profile.production', 'Production') },
+    { value: 'staging', label: t('environment.profile.staging', 'Staging') },
+    { value: 'development', label: t('environment.profile.development', 'Development') },
+  ];
+  const critOptions = [
+    { value: 'Low', label: 'Low' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'High', label: 'High' },
+    { value: 'Critical', label: 'Critical' },
+  ];
+  const blastOptions = [
+    { value: 'None', label: 'None' },
+    { value: 'Low', label: 'Low' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'High', label: 'High' },
+  ];
+
   return (
     <div className="space-y-2">
-      <input value={service} onChange={e => setService(e.target.value)} placeholder={t('governance.gates.cab.serviceName', 'Service name')} className="input w-full" />
-      <select value={env} onChange={e => setEnv(e.target.value)} className="input w-full" aria-label={t('governance.gates.cab.environment', 'Environment')}>
-        <option value="production">{t('environment.profile.production', 'Production')}</option>
-        <option value="staging">{t('environment.profile.staging', 'Staging')}</option>
-        <option value="development">{t('environment.profile.development', 'Development')}</option>
-      </select>
-      <select value={crit} onChange={e => setCrit(e.target.value)} className="input w-full" aria-label={t('governance.gates.cab.criticality', 'Criticality')}>
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-        <option value="Critical">Critical</option>
-      </select>
-      <select value={blast} onChange={e => setBlast(e.target.value)} className="input w-full" aria-label={t('governance.gates.cab.blastRadius', 'Blast Radius')}>
-        <option value="None">None</option>
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-      </select>
-      <button onClick={() => onEvaluate(service, env, crit, blast)} className="btn btn-primary w-full" disabled={!service}>
+      <TextField
+        size="sm"
+        value={service}
+        onChange={e => setService(e.target.value)}
+        placeholder={t('governance.gates.cab.serviceName', 'Service name')}
+      />
+      <Select
+        size="sm"
+        options={envOptions}
+        value={env}
+        onChange={e => setEnv(e.target.value)}
+        aria-label={t('governance.gates.cab.environment', 'Environment')}
+      />
+      <Select
+        size="sm"
+        options={critOptions}
+        value={crit}
+        onChange={e => setCrit(e.target.value)}
+        aria-label={t('governance.gates.cab.criticality', 'Criticality')}
+      />
+      <Select
+        size="sm"
+        options={blastOptions}
+        value={blast}
+        onChange={e => setBlast(e.target.value)}
+        aria-label={t('governance.gates.cab.blastRadius', 'Blast Radius')}
+      />
+      <Button
+        variant="primary"
+        size="sm"
+        className="w-full"
+        onClick={() => onEvaluate(service, env, crit, blast)}
+        disabled={!service}
+      >
         {t('governance.gates.evaluate', 'Evaluate')}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -254,17 +316,45 @@ function ErrorBudgetForm({ onEvaluate }: { onEvaluate: (s: string, e: string, b:
   const [env, setEnv] = useState('production');
   const [budget, setBudget] = useState('50');
 
+  /* Opções de ambiente mapeadas para DS Select */
+  const envOptions = [
+    { value: 'production', label: t('environment.profile.production', 'Production') },
+    { value: 'staging', label: t('environment.profile.staging', 'Staging') },
+  ];
+
   return (
     <div className="space-y-2">
-      <input value={service} onChange={e => setService(e.target.value)} placeholder={t('governance.gates.errorBudget.serviceName', 'Service name')} className="input w-full" />
-      <select value={env} onChange={e => setEnv(e.target.value)} className="input w-full" aria-label={t('governance.gates.errorBudget.environment', 'Environment')}>
-        <option value="production">{t('environment.profile.production', 'Production')}</option>
-        <option value="staging">{t('environment.profile.staging', 'Staging')}</option>
-      </select>
-      <input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder={t('governance.gates.errorBudget.remainingPct', 'Budget remaining %')} className="input w-full" min="0" max="100" />
-      <button onClick={() => onEvaluate(service, env, budget)} className="btn btn-primary w-full" disabled={!service}>
+      <TextField
+        size="sm"
+        value={service}
+        onChange={e => setService(e.target.value)}
+        placeholder={t('governance.gates.errorBudget.serviceName', 'Service name')}
+      />
+      <Select
+        size="sm"
+        options={envOptions}
+        value={env}
+        onChange={e => setEnv(e.target.value)}
+        aria-label={t('governance.gates.errorBudget.environment', 'Environment')}
+      />
+      <TextField
+        size="sm"
+        type="number"
+        value={budget}
+        onChange={e => setBudget(e.target.value)}
+        placeholder={t('governance.gates.errorBudget.remainingPct', 'Budget remaining %')}
+        min={0}
+        max={100}
+      />
+      <Button
+        variant="primary"
+        size="sm"
+        className="w-full"
+        onClick={() => onEvaluate(service, env, budget)}
+        disabled={!service}
+      >
         {t('governance.gates.evaluate', 'Evaluate')}
-      </button>
+      </Button>
     </div>
   );
 }
