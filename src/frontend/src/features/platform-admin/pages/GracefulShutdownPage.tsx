@@ -5,6 +5,8 @@ import { Power, CheckCircle2, XCircle, RefreshCw, Settings } from 'lucide-react'
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Toggle } from '../../../components/Toggle';
 import { platformAdminApi, type GracefulShutdownConfigUpdate } from '../api/platformAdmin';
 
 export function GracefulShutdownPage() {
@@ -83,13 +85,14 @@ export function GracefulShutdownPage() {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-medium text-heading">{t('configTitle')}</h2>
                 {!editing && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon={<Settings size={14} />}
                     onClick={startEdit}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm text-accent border border-accent/20 rounded hover:bg-accent/10"
                   >
-                    <Settings size={14} />
                     {t('editBtn')}
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -124,19 +127,22 @@ export function GracefulShutdownPage() {
                     onChange={(v) => setForm((f) => ({ ...f, auditShutdownEvents: v }))}
                   />
                   <div className="flex gap-3 pt-2">
-                    <button
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      loading={mutation.isPending}
                       onClick={() => mutation.mutate(form)}
                       disabled={mutation.isPending}
-                      className="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90 disabled:opacity-50"
                     >
                       {mutation.isPending ? t('saving') : t('save')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setEditing(false)}
-                      className="px-4 py-2 text-sm border border-edge rounded-lg hover:bg-elevated text-muted"
                     >
                       {t('cancel')}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -208,19 +214,19 @@ function NumericField({
   max: number;
 }) {
   return (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-body">{label}</label>
-      <input
-        type="number"
-        value={value}
-        min={min}
-        max={max}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-40 px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
-        aria-label={label}
-      />
-      <p className="text-xs text-muted">{hint}</p>
-    </div>
+    /* DS TextField com type="number" e size="sm" — mantém label e hint */
+    <TextField
+      label={label}
+      helperText={hint}
+      type="number"
+      size="sm"
+      value={value}
+      min={min}
+      max={max}
+      className="w-40"
+      onChange={(e) => onChange(Number(e.target.value))}
+      aria-label={label}
+    />
   );
 }
 
@@ -236,19 +242,9 @@ function ToggleField({
   onChange: (v: boolean) => void;
 }) {
   return (
+    /* DS Toggle com hint posicionado abaixo do label */
     <div className="flex items-start gap-4">
-      <button
-        type="button"
-        role="switch"
-        aria-checked={value}
-        onClick={() => onChange(!value)}
-        className={`mt-0.5 relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${value ? 'bg-accent' : 'bg-elevated'}`}
-        aria-label={label}
-      >
-        <span
-          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${value ? 'translate-x-4' : 'translate-x-1'}`}
-        />
-      </button>
+      <Toggle checked={value} onChange={onChange} size="sm" />
       <div>
         <p className="text-sm font-medium text-body">{label}</p>
         <p className="text-xs text-muted">{hint}</p>
