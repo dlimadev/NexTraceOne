@@ -15,8 +15,11 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Select } from '../../../components/Select';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import {
   useUserAiPreferences,
   useUpsertUserAiPreference,
@@ -27,7 +30,7 @@ import {
 } from '../hooks/useAiPreferences';
 import { aiGovernanceApi } from '../api';
 
-// ── Known features that users can configure ───────────────────────────
+// ── Funcionalidades conhecidas configuráveis pelo utilizador ──────────
 
 interface KnownFeature {
   key: string;
@@ -94,14 +97,29 @@ const EXTERNAL_PRODUCT_LABELS: Record<number, string> = {
   3: 'GitHub Copilot',
 };
 
-// ── Components ────────────────────────────────────────────────────────
+// Opções para o Select de modo de IA
+const AI_MODE_OPTIONS = [
+  { value: '1', label: 'IA Interna (NexTraceOne)' },
+  { value: '2', label: 'Produto Externo' },
+  { value: '0', label: 'Desabilitado' },
+];
+
+// Opções para o Select de produto externo
+const EXTERNAL_PRODUCT_OPTIONS = [
+  { value: '0', label: 'ChatGPT (OpenAI)' },
+  { value: '1', label: 'Claude (Anthropic)' },
+  { value: '2', label: 'Gemini (Google)' },
+  { value: '3', label: 'GitHub Copilot' },
+];
+
+// ── Componentes ───────────────────────────────────────────────────────
 
 function PreferencePreview({ featureKey, requestType }: { featureKey: string; requestType: string }) {
   const { data: preview, isLoading } = useAiExecutionPreview(featureKey, requestType, true);
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
+      <div className="flex items-center gap-2 text-sm text-muted">
         <Loader2 className="w-4 h-4 animate-spin" />
         Analisando...
       </div>
@@ -110,7 +128,7 @@ function PreferencePreview({ featureKey, requestType }: { featureKey: string; re
 
   if (!preview) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-400">
+      <div className="flex items-center gap-2 text-sm text-muted">
         <AlertCircle className="w-4 h-4" />
         Preview indisponível
       </div>
@@ -121,7 +139,7 @@ function PreferencePreview({ featureKey, requestType }: { featureKey: string; re
 
   if (!plan.isAvailable) {
     return (
-      <div className="flex items-center gap-2 text-sm text-amber-600">
+      <div className="flex items-center gap-2 text-sm text-warning">
         <AlertCircle className="w-4 h-4" />
         {plan.unavailabilityReason ?? 'IA indisponível para esta funcionalidade'}
       </div>
@@ -129,10 +147,10 @@ function PreferencePreview({ featureKey, requestType }: { featureKey: string; re
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm text-emerald-700">
+    <div className="flex items-center gap-2 text-sm text-success">
       <CheckCircle2 className="w-4 h-4" />
       <span className="font-medium">{plan.modelDisplayName}</span>
-      <span className="text-slate-400">via</span>
+      <span className="text-muted">via</span>
       <Badge variant="default" size="sm">{plan.providerId}</Badge>
     </div>
   );
@@ -185,10 +203,11 @@ function FeaturePreferenceCard({
       <CardBody>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 text-slate-500">{feature.icon}</div>
+            {/* Ícone da funcionalidade com token semântico */}
+            <div className="mt-0.5 text-muted">{feature.icon}</div>
             <div>
-              <h3 className="text-base font-semibold text-slate-900">{feature.label}</h3>
-              <p className="text-sm text-slate-500 mt-0.5">{feature.description}</p>
+              <h3 className="text-base font-semibold text-heading">{feature.label}</h3>
+              <p className="text-sm text-muted mt-0.5">{feature.description}</p>
               <div className="mt-3">
                 <PreferencePreview featureKey={feature.key} requestType={feature.requestType} />
               </div>
@@ -203,37 +222,24 @@ function FeaturePreferenceCard({
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
-              Modo de IA
-            </label>
-            <select
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={preferenceType}
-              onChange={(e) => setPreferenceType(Number(e.target.value))}
-            >
-              <option value={1}>IA Interna (NexTraceOne)</option>
-              <option value={2}>Produto Externo</option>
-              <option value={0}>Desabilitado</option>
-            </select>
-          </div>
+          {/* Select DS para modo de IA */}
+          <Select
+            label={t('aiPreferences.mode', 'Modo de IA')}
+            options={AI_MODE_OPTIONS}
+            value={String(preferenceType)}
+            onChange={(e) => setPreferenceType(Number(e.target.value))}
+            size="sm"
+          />
 
           {preferenceType === 2 && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Produto Externo
-              </label>
-              <select
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={externalProduct}
-                onChange={(e) => setExternalProduct(Number(e.target.value))}
-              >
-                <option value={0}>ChatGPT (OpenAI)</option>
-                <option value={1}>Claude (Anthropic)</option>
-                <option value={2}>Gemini (Google)</option>
-                <option value={3}>GitHub Copilot</option>
-              </select>
-            </div>
+            /* Select DS para produto externo */
+            <Select
+              label={t('aiPreferences.externalProduct', 'Produto Externo')}
+              options={EXTERNAL_PRODUCT_OPTIONS}
+              value={String(externalProduct)}
+              onChange={(e) => setExternalProduct(Number(e.target.value))}
+              size="sm"
+            />
           )}
         </div>
 
@@ -242,17 +248,14 @@ function FeaturePreferenceCard({
             size="sm"
             onClick={handleSave}
             disabled={!hasChanges || isSaving || upsert.isPending}
+            icon={isSaving || upsert.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
           >
-            {isSaving || upsert.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-1.5" />
-            )}
             Aplicar
           </Button>
           {existing && (
-            <Button size="sm" variant="ghost" onClick={handleReset} disabled={remove.isPending}>
-              <TrashIcon className="w-4 h-4 mr-1.5" />
+            <Button size="sm" variant="ghost" onClick={handleReset} disabled={remove.isPending}
+              icon={<TrashIcon className="w-4 h-4" />}
+            >
               Remover preferência
             </Button>
           )}
@@ -285,7 +288,7 @@ function TrashIcon({ className }: { className?: string }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────
+// ── Página ────────────────────────────────────────────────────────────
 
 export function UserAiPreferencesPage() {
   const { t } = useTranslation();
@@ -301,9 +304,7 @@ export function UserAiPreferencesPage() {
     return (
       <PageContainer>
         <PageHeader title="Preferências de IA" subtitle="Configurar como você usa a inteligência artificial na plataforma" />
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-        </div>
+        <PageLoadingState />
       </PageContainer>
     );
   }
@@ -312,12 +313,7 @@ export function UserAiPreferencesPage() {
     return (
       <PageContainer>
         <PageHeader title="Preferências de IA" subtitle="Configurar como você usa a inteligência artificial na plataforma" />
-        <Card className="border-red-200 bg-red-50">
-          <CardBody className="flex items-center gap-3 text-red-700">
-            <AlertCircle className="w-5 h-5" />
-            Erro ao carregar preferências. Tente novamente.
-          </CardBody>
-        </Card>
+        <PageErrorState message={t('aiPreferences.loadError', 'Erro ao carregar preferências. Tente novamente.')} />
       </PageContainer>
     );
   }
@@ -330,7 +326,7 @@ export function UserAiPreferencesPage() {
       />
 
       <div className="mb-6">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Configure o comportamento da IA por funcionalidade. Você pode usar a IA interna da
           plataforma, produtos externos (ChatGPT, Claude, Gemini, GitHub Copilot) ou desabilitar
           completamente.
