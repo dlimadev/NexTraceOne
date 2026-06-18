@@ -4,20 +4,38 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   KeyRound,
   RefreshCw,
-  XCircle,
-  AlertTriangle,
   CheckCircle2,
+  AlertTriangle,
   Loader2,
   Download,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Badge } from '../../../components/Badge';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Toggle } from '../../../components/Toggle';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import {
   platformAdminApi,
   type SamlSsoStatus,
   type SamlSsoConfigUpdate,
 } from '../api/platformAdmin';
+
+// Variante de Badge por status SAML SSO
+const statusVariant: Record<SamlSsoStatus, 'success' | 'warning' | 'secondary'> = {
+  Enabled: 'success',
+  Disabled: 'warning',
+  NotConfigured: 'secondary',
+};
+
+// Opções de papel padrão JIT
+const DEFAULT_ROLE_OPTIONS = ['Engineer', 'TechLead', 'Architect', 'Product', 'Auditor'].map(
+  (role) => ({ value: role, label: role }),
+);
 
 export function SamlSsoPage() {
   const { t } = useTranslation('samlSso');
@@ -32,7 +50,7 @@ export function SamlSsoPage() {
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
 
-  // Initialise form from data once loaded
+  // Inicializa formulário a partir dos dados carregados
   const currentForm: SamlSsoConfigUpdate | null =
     form ??
     (data
@@ -72,12 +90,6 @@ export function SamlSsoPage() {
     updateMutation.mutate(currentForm);
   };
 
-  const statusStyle: Record<SamlSsoStatus, string> = {
-    Enabled: 'text-success bg-success/10 border-success/20',
-    Disabled: 'text-warning bg-warning/10 border-warning/20',
-    NotConfigured: 'text-muted bg-elevated border-edge',
-  };
-
   return (
     <PageContainer>
       <div className="space-y-6">
@@ -93,80 +105,69 @@ export function SamlSsoPage() {
           }
         />
 
-        {/* Warning banner */}
+        {/* Banner de aviso sobre impacto de alterações */}
         <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg text-sm text-warning">
           <AlertTriangle size={18} className="shrink-0 mt-0.5" />
           <span>{t('warningBanner')}</span>
         </div>
 
-        {isLoading && (
-          <div className="flex items-center justify-center h-48 text-faded text-sm">
-            {t('loading')}
-          </div>
-        )}
+        {isLoading && <PageLoadingState message={t('loading')} />}
 
         {isError && (
-          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
-            <XCircle size={18} />
-            {t('error')}
-          </div>
+          <PageErrorState message={t('error')} onRetry={() => void refetch()} />
         )}
 
         {data && currentForm && (
           <>
-            {/* Status */}
+            {/* Status atual da integração SAML */}
             <div className="flex items-center gap-3">
               <p className="text-sm font-medium text-body">{t('labelStatus')}:</p>
-              <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${statusStyle[data.status]}`}>
+              <Badge variant={statusVariant[data.status]}>
                 {t(`status.${data.status}`)}
-              </span>
+              </Badge>
             </div>
 
-            {/* Configuration Form */}
+            {/* Formulário de configuração IdP */}
             <section className="border border-edge rounded-lg p-5 bg-card space-y-4">
               <h2 className="text-base font-semibold text-heading">{t('sectionConfig')}</h2>
 
-              <FormField
+              <TextField
                 label={t('fieldEntityId')}
                 value={currentForm.entityId}
                 placeholder="https://nextraceone.example.com/saml/metadata"
-                onChange={(v) => setForm({ ...currentForm, entityId: v })}
+                onChange={(e) => setForm({ ...currentForm, entityId: e.target.value })}
               />
-              <FormField
+              <TextField
                 label={t('fieldSsoUrl')}
                 value={currentForm.ssoUrl}
                 placeholder="https://idp.example.com/saml/sso"
-                onChange={(v) => setForm({ ...currentForm, ssoUrl: v })}
+                onChange={(e) => setForm({ ...currentForm, ssoUrl: e.target.value })}
               />
-              <FormField
+              <TextField
                 label={t('fieldSloUrl')}
                 value={currentForm.sloUrl}
                 placeholder="https://idp.example.com/saml/slo"
-                onChange={(v) => setForm({ ...currentForm, sloUrl: v })}
+                onChange={(e) => setForm({ ...currentForm, sloUrl: e.target.value })}
               />
 
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('fieldIdpCert')}
-                </label>
-                <textarea
-                  rows={5}
-                  value={currentForm.idpCertificate}
-                  onChange={(e) => setForm({ ...currentForm, idpCertificate: e.target.value })}
-                  placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
-                  className="w-full text-sm border border-edge rounded-lg bg-canvas px-3 py-2 font-mono text-body focus:outline-none focus:ring-2 focus:ring-accent/40 resize-y"
-                />
-              </div>
+              <TextArea
+                label={t('fieldIdpCert')}
+                rows={5}
+                value={currentForm.idpCertificate}
+                onChange={(e) => setForm({ ...currentForm, idpCertificate: e.target.value })}
+                placeholder={"-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"}
+                className="font-mono"
+              />
 
-              <div className="flex items-center gap-3">
-                <Button variant="outline" className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Button variant="outline">
                   <Download size={14} />
                   {t('btnDownloadSpCert')}
                 </Button>
               </div>
             </section>
 
-            {/* JIT Provisioning & Default Role */}
+            {/* Provisionamento JIT e papel padrão */}
             <section className="border border-edge rounded-lg p-5 bg-card space-y-4">
               <h2 className="text-base font-semibold text-heading">{t('sectionProvisioning')}</h2>
 
@@ -175,41 +176,22 @@ export function SamlSsoPage() {
                   <p className="text-sm font-medium text-body">{t('fieldJit')}</p>
                   <p className="text-xs text-muted mt-0.5">{t('fieldJitDesc')}</p>
                 </div>
-                <button
-                  onClick={() =>
-                    setForm({ ...currentForm, jitProvisioningEnabled: !currentForm.jitProvisioningEnabled })
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    currentForm.jitProvisioningEnabled ? 'bg-accent' : 'bg-elevated'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      currentForm.jitProvisioningEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+                <Toggle
+                  checked={currentForm.jitProvisioningEnabled}
+                  onChange={(v) => setForm({ ...currentForm, jitProvisioningEnabled: v })}
+                  label={t('fieldJit')}
+                />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('fieldDefaultRole')}
-                </label>
-                <select
-                  value={currentForm.defaultRole}
-                  onChange={(e) => setForm({ ...currentForm, defaultRole: e.target.value })}
-                  className="text-sm border border-edge rounded-lg bg-canvas px-3 py-2 text-body focus:outline-none focus:ring-2 focus:ring-accent/40"
-                >
-                  {['Engineer', 'TechLead', 'Architect', 'Product', 'Auditor'].map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label={t('fieldDefaultRole')}
+                options={DEFAULT_ROLE_OPTIONS}
+                value={currentForm.defaultRole}
+                onChange={(e) => setForm({ ...currentForm, defaultRole: e.target.value })}
+              />
             </section>
 
-            {/* Attribute Mappings */}
+            {/* Mapeamentos de atributos SAML → campos NXT */}
             <section className="border border-edge rounded-lg p-5 bg-card space-y-3">
               <h2 className="text-base font-semibold text-heading">{t('sectionAttrMapping')}</h2>
               <div className="border border-edge rounded-lg overflow-hidden">
@@ -227,26 +209,26 @@ export function SamlSsoPage() {
                   <tbody className="divide-y divide-edge/50">
                     {currentForm.attributeMappings.map((mapping, idx) => (
                       <tr key={idx} className="hover:bg-elevated">
-                        <td className="px-4 py-3">
-                          <input
+                        <td className="px-4 py-2">
+                          <TextField
+                            size="sm"
                             value={mapping.samlAttr}
                             onChange={(e) => {
                               const updated = [...currentForm.attributeMappings];
                               updated[idx] = { ...mapping, samlAttr: e.target.value };
                               setForm({ ...currentForm, attributeMappings: updated });
                             }}
-                            className="text-sm border border-edge rounded bg-canvas px-2 py-1 w-full text-body focus:outline-none focus:ring-1 focus:ring-accent/40"
                           />
                         </td>
-                        <td className="px-4 py-3">
-                          <input
+                        <td className="px-4 py-2">
+                          <TextField
+                            size="sm"
                             value={mapping.nxtField}
                             onChange={(e) => {
                               const updated = [...currentForm.attributeMappings];
                               updated[idx] = { ...mapping, nxtField: e.target.value };
                               setForm({ ...currentForm, attributeMappings: updated });
                             }}
-                            className="text-sm border border-edge rounded bg-canvas px-2 py-1 w-full text-body focus:outline-none focus:ring-1 focus:ring-accent/40"
                           />
                         </td>
                       </tr>
@@ -256,17 +238,17 @@ export function SamlSsoPage() {
               </div>
             </section>
 
-            {/* Test Connection */}
+            {/* Teste de conectividade SAML */}
             <section className="border border-edge rounded-lg p-5 bg-card space-y-3">
               <h2 className="text-base font-semibold text-heading">{t('sectionTest')}</h2>
-              <button
+              <Button
+                variant="outline"
                 onClick={() => void handleTest()}
                 disabled={isTesting}
-                className="flex items-center gap-2 px-4 py-2 text-sm border border-edge rounded-lg hover:bg-elevated disabled:opacity-50 text-muted"
               >
                 {isTesting ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
                 {t('btnTestConnection')}
-              </button>
+              </Button>
               {testResult && (
                 <div
                   className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
@@ -275,22 +257,22 @@ export function SamlSsoPage() {
                       : 'bg-critical/10 text-critical border border-critical/20'
                   }`}
                 >
-                  {testResult.success ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                  {testResult.success ? <CheckCircle2 size={16} /> : null}
                   {testResult.message}
                 </div>
               )}
             </section>
 
-            {/* Actions */}
+            {/* Ações de persistência */}
             <div className="flex items-center gap-3">
-              <button
+              <Button
+                variant="primary"
                 onClick={handleSave}
                 disabled={updateMutation.isPending}
-                className="flex items-center gap-2 px-5 py-2 text-sm bg-accent text-white rounded-lg hover:bg-accent/90 font-medium disabled:opacity-50"
               >
                 {updateMutation.isPending && <Loader2 size={14} className="animate-spin" />}
                 {t('btnSave')}
-              </button>
+              </Button>
               {updateMutation.isSuccess && (
                 <span className="text-sm text-success flex items-center gap-1">
                   <CheckCircle2 size={14} />
@@ -304,30 +286,5 @@ export function SamlSsoPage() {
         )}
       </div>
     </PageContainer>
-  );
-}
-
-function FormField({
-  label,
-  value,
-  placeholder,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  placeholder?: string;
-  onChange: (val: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-body mb-1">{label}</label>
-      <input
-        type="text"
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full text-sm border border-edge rounded-lg bg-canvas px-3 py-2 text-body focus:outline-none focus:ring-2 focus:ring-accent/40"
-      />
-    </div>
   );
 }
