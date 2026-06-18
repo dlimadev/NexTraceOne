@@ -1,16 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-import {
-  AlertTriangle,
-  TrendingDown,
-  Trash2,
-  XCircle,
-  CheckCircle2,
-  Server,
-  Clock,
-} from 'lucide-react';
+import { RefreshCw, AlertTriangle, TrendingDown, Trash2, CheckCircle2, Server, Clock } from 'lucide-react';
 import { finOpsApi, type WasteSignalDetail } from '../api/finOps';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { Badge } from '../../../components/Badge';
 
 export function WasteDetectionPage() {
   const { t } = useTranslation('wasteDetection');
@@ -22,70 +21,67 @@ export function WasteDetectionPage() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{t('title')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('subtitle')}</p>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          {t('refresh')}
-        </button>
-      </div>
+    <PageContainer>
+      {/* Cabeçalho com botão refresh no slot de ações */}
+      <PageHeader
+        title={t('title')}
+        subtitle={t('subtitle')}
+        icon={<AlertTriangle size={24} />}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<RefreshCw size={14} />}
+            onClick={() => refetch()}
+          >
+            {t('refresh')}
+          </Button>
+        }
+      />
 
-      {isLoading && (
-        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
-          {t('loading')}
-        </div>
-      )}
+      {/* Estado de carregamento padronizado */}
+      {isLoading && <PageLoadingState />}
 
-      {isError && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          <XCircle size={18} />
-          {t('error')}
-        </div>
-      )}
+      {/* Estado de erro padronizado */}
+      {isError && <PageErrorState onRetry={() => refetch()} />}
 
       {data && (
         <>
-          {/* Summary Cards */}
+          {/* Cards de resumo */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">{t('totalWaste')}</p>
-              <p className="text-2xl font-bold text-amber-600 mt-1">
+            <div className="bg-card border border-edge rounded-lg p-4">
+              <p className="text-xs text-muted uppercase tracking-wide">{t('totalWaste')}</p>
+              <p className="text-2xl font-bold text-warning mt-1">
                 {Number(data.totalWaste).toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">{t('signalCount')}</p>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{data.signalCount}</p>
+            <div className="bg-card border border-edge rounded-lg p-4">
+              <p className="text-xs text-muted uppercase tracking-wide">{t('signalCount')}</p>
+              <p className="text-2xl font-bold text-heading mt-1">{data.signalCount}</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">{t('byTypeTitle')}</p>
+            <div className="bg-card border border-edge rounded-lg p-4">
+              <p className="text-xs text-muted uppercase tracking-wide">{t('byTypeTitle')}</p>
               <div className="mt-2 space-y-1">
                 {data.byType.slice(0, 3).map((bt) => (
                   <div key={bt.type} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-600">{bt.type}</span>
-                    <span className="font-medium text-slate-800">{bt.count}</span>
+                    <span className="text-body">{bt.type}</span>
+                    <span className="font-medium text-heading">{bt.count}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Signals List */}
+          {/* Lista de sinais ou estado vazio */}
           {data.signals.length === 0 ? (
-            <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
-              <CheckCircle2 size={18} />
-              {t('noWaste')}
-            </div>
+            <EmptyState
+              icon={<CheckCircle2 size={32} />}
+              title={t('noWaste')}
+              variant="default"
+            />
           ) : (
             <section>
-              <h2 className="text-base font-medium text-slate-800 mb-3">{t('signalsTitle')}</h2>
+              <h2 className="text-base font-medium text-heading mb-3">{t('signalsTitle')}</h2>
               <div className="space-y-3">
                 {data.signals.map((s) => (
                   <WasteSignalCard key={s.signalId} signal={s} t={t} />
@@ -95,17 +91,33 @@ export function WasteDetectionPage() {
           )}
 
           {data.isSimulated && (
-            <p className="text-xs text-slate-400 italic">{t('simulatedNote')}</p>
+            <p className="text-xs text-muted italic">{t('simulatedNote')}</p>
           )}
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted">
             {t('generatedAt')}: {new Date(data.generatedAt).toLocaleString()}
           </p>
         </>
       )}
-    </div>
+    </PageContainer>
   );
 }
+
+/* Mapeamento de severidade para variante do DS Badge e classe de borda do card */
+const SEVERITY_BADGE: Record<string, 'critical' | 'warning' | 'info' | 'gray'> = {
+  Critical: 'critical',
+  High:     'warning',
+  Medium:   'info',
+  Low:      'gray',
+};
+
+/* Classe de borda semântica por severidade (tokens de design) */
+const SEVERITY_CARD_CLS: Record<string, string> = {
+  Critical: 'border-critical/40 bg-critical-muted',
+  High:     'border-warning/40 bg-warning/5',
+  Medium:   'border-info/40 bg-info/5',
+  Low:      'border-edge bg-card',
+};
 
 function WasteSignalCard({
   signal,
@@ -114,45 +126,40 @@ function WasteSignalCard({
   signal: WasteSignalDetail;
   t: (key: string) => string;
 }) {
-  const severityConfig = {
-    Critical: { cls: 'border-red-300 bg-red-50', badge: 'bg-red-100 text-red-700' },
-    High:     { cls: 'border-orange-300 bg-orange-50', badge: 'bg-orange-100 text-orange-700' },
-    Medium:   { cls: 'border-amber-300 bg-amber-50', badge: 'bg-amber-100 text-amber-700' },
-    Low:      { cls: 'border-slate-200 bg-white', badge: 'bg-slate-100 text-slate-600' },
-  }[signal.severity] ?? { cls: 'border-slate-200 bg-white', badge: 'bg-slate-100 text-slate-600' };
+  const badgeVariant = SEVERITY_BADGE[signal.severity] ?? 'gray';
+  const cardCls = SEVERITY_CARD_CLS[signal.severity] ?? SEVERITY_CARD_CLS.Low;
 
   const typeIcon = signal.type.includes('Idle')
-    ? <Clock size={14} className="text-slate-400" />
+    ? <Clock size={14} className="text-muted" />
     : signal.type.includes('Cpu') || signal.type.includes('Memory')
-    ? <Server size={14} className="text-slate-400" />
-    : <Trash2 size={14} className="text-slate-400" />;
+    ? <Server size={14} className="text-muted" />
+    : <Trash2 size={14} className="text-muted" />;
 
   return (
-    <div className={`border rounded-lg p-4 ${severityConfig.cls}`}>
+    <div className={`border rounded-lg p-4 ${cardCls}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5">
-            <AlertTriangle size={16} className="text-amber-500" />
+            <AlertTriangle size={16} className="text-warning" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-sm text-slate-800">{signal.serviceName}</span>
-              <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${severityConfig.badge}`}>
+              <span className="font-medium text-sm text-heading">{signal.serviceName}</span>
+              {/* Badge de tipo com ícone embutido */}
+              <Badge variant={badgeVariant} size="sm" className="inline-flex items-center gap-1">
                 {typeIcon}
                 {signal.type}
-              </span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${severityConfig.badge}`}>
-                {signal.severity}
-              </span>
+              </Badge>
+              <Badge variant={badgeVariant} size="sm">{signal.severity}</Badge>
             </div>
-            <p className="text-xs text-slate-600 mt-1">{signal.description}</p>
-            <p className="text-xs text-slate-400 mt-1">{signal.pattern}</p>
+            <p className="text-xs text-body mt-1">{signal.description}</p>
+            <p className="text-xs text-muted mt-1">{signal.pattern}</p>
             {signal.correlatedCause && (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted mt-1">
                 {t('correlatedCause')}: {signal.correlatedCause}
               </p>
             )}
-            <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+            <div className="flex items-center gap-3 mt-2 text-xs text-muted">
               <span>{t('team')}: {signal.team}</span>
               <span>·</span>
               <span>{t('domain')}: {signal.domain}</span>
@@ -160,11 +167,11 @@ function WasteSignalCard({
           </div>
         </div>
         <div className="text-right flex-shrink-0">
-          <div className="flex items-center gap-1 text-amber-600 text-sm font-semibold">
+          <div className="flex items-center gap-1 text-warning text-sm font-semibold">
             <TrendingDown size={14} />
             {Number(signal.estimatedWaste).toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </div>
-          <p className="text-xs text-slate-400">{t('estimatedWaste')}</p>
+          <p className="text-xs text-muted">{t('estimatedWaste')}</p>
         </div>
       </div>
     </div>
