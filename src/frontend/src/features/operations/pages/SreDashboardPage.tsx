@@ -124,11 +124,12 @@ interface HeroCardProps {
 }
 
 function HeroCard({ title, items, icon }: HeroCardProps) {
+  // Mapeamento de variante semântica para token de fundo do badge hero
   const variantBg: Record<HeroCardProps['items'][0]['variant'], string> = {
-    success: 'bg-emerald-600 dark:bg-emerald-700',
-    danger: 'bg-red-600 dark:bg-red-700',
-    warning: 'bg-amber-500 dark:bg-amber-600',
-    info: 'bg-blue-600 dark:bg-blue-700',
+    success: 'bg-success',
+    danger: 'bg-critical',
+    warning: 'bg-warning',
+    info: 'bg-accent',
     neutral: 'bg-muted',
   };
 
@@ -447,45 +448,45 @@ export function SreDashboardPage() {
 
   return (
     <PageContainer>
-      {/* ── Page header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-        <PageHeader
-          title={t('sreDashboard.title')}
-          subtitle={t('sreDashboard.subtitle')}
-        />
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Time range selector */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTimeMenu((v) => !v)}
-            >
-              <Clock className="w-3.5 h-3.5 mr-1.5" />
-              {timeRangeLabel ? t(timeRangeLabel.labelKey) : timeRange}
-              <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
+      {/* Cabeçalho com seletor de janela temporal e refresh como actions */}
+      <PageHeader
+        title={t('sreDashboard.title')}
+        subtitle={t('sreDashboard.subtitle')}
+        actions={
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Seletor de janela temporal com dropdown semântico */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTimeMenu((v) => !v)}
+              >
+                <Clock className="w-3.5 h-3.5 mr-1.5" />
+                {timeRangeLabel ? t(timeRangeLabel.labelKey) : timeRange}
+                <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+              {showTimeMenu && (
+                <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
+                  {TIME_RANGE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
+                      onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
+                    >
+                      {t(opt.labelKey)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Botão de refresh */}
+            <Button variant="ghost" size="sm" onClick={refetchAll}>
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
-            {showTimeMenu && (
-              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
-                {TIME_RANGE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
-                    onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
-                  >
-                    {t(opt.labelKey)}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
-          {/* Refresh */}
-          <Button variant="ghost" size="sm" onClick={refetchAll}>
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && (
         <PageErrorState
@@ -510,7 +511,7 @@ export function SreDashboardPage() {
               <div className="flex items-baseline gap-1">
                 <span
                   className={`text-xl font-extrabold ${
-                    summary.problems.open === 0 ? 'text-emerald-500' : 'text-destructive'
+                    summary.problems.open === 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {summary.problems.open}
