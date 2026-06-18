@@ -10,6 +10,8 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Select } from '../../../components/Select';
+import { StatCard } from '../../../components/StatCard';
 import client from '../../../api/client';
 
 interface GraphNode {
@@ -50,9 +52,9 @@ export function KnowledgeGraphPage() {
   if (isError) return <PageErrorState message={t('knowledge.graph.error')} onRetry={() => refetch()} />;
 
   const stats = [
-    { label: t('knowledge.graph.totalNodes'), value: data?.totalNodes ?? 0 },
-    { label: t('knowledge.graph.totalEdges'), value: data?.totalEdges ?? 0 },
-    { label: t('knowledge.graph.connectedComponents'), value: data?.connectedComponents ?? 0 },
+    { label: t('knowledge.graph.totalNodes'), value: data?.totalNodes ?? 0, color: 'text-accent' as const },
+    { label: t('knowledge.graph.totalEdges'), value: data?.totalEdges ?? 0, color: 'text-info' as const },
+    { label: t('knowledge.graph.connectedComponents'), value: data?.connectedComponents ?? 0, color: 'text-success' as const },
   ];
 
   return (
@@ -62,33 +64,31 @@ export function KnowledgeGraphPage() {
         subtitle={t('knowledge.graph.subtitle')}
         icon={<Network size={24} />}
         actions={
+          /* Controlos de cabeçalho: Select DS substitui raw <select> */
           <div className="flex items-center gap-2">
-            <label className="text-sm text-muted">
-              {t('knowledge.graph.maxDepth')}:
-            </label>
-            <select
-              value={maxDepth}
+            <Select
+              size="sm"
+              label={t('knowledge.graph.maxDepth')}
+              value={String(maxDepth)}
+              options={[1, 2, 3, 4, 5].map((d) => ({ value: String(d), label: String(d) }))}
               onChange={(e) => setMaxDepth(Number(e.target.value))}
-              className="rounded border border-edge bg-card text-sm px-2 py-1"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              icon={<Search size={14} />}
+              onClick={() => refetch()}
             >
-              {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-            <Button size="sm" onClick={() => refetch()}>
-              <Search size={14} className="mr-1" />
               {t('common.refresh')}
             </Button>
           </div>
         }
       />
 
+      {/* KPIs via StatCard DS — substituem divs artesanais */}
       <StatsGrid>
         {stats.map((s) => (
-          <div key={s.label} className="bg-card rounded-lg border border-edge p-4">
-            <p className="text-xs text-muted mb-1">{s.label}</p>
-            <p className="text-xl font-bold text-heading">{s.value}</p>
-          </div>
+          <StatCard key={s.label} title={s.label} value={s.value} color={s.color} />
         ))}
       </StatsGrid>
 
@@ -106,7 +106,8 @@ export function KnowledgeGraphPage() {
               <Card key={node.id} className="hover:shadow-md transition-shadow">
                 <CardBody className="p-4">
                   <div className="flex items-start gap-3">
-                    <Circle size={16} className="mt-1 text-indigo-500 flex-shrink-0" />
+                    {/* text-indigo-500 → token semântico text-accent */}
+                    <Circle size={16} className="mt-1 text-accent flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="font-medium text-sm text-heading truncate">
                         {node.label}
