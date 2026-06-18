@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
-  Search,
   Server,
   Shield,
   Activity,
@@ -22,6 +21,9 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { SearchInput } from '../../../components/SearchInput';
+import { Select } from '../../../components/Select';
+import { TextField } from '../../../components/TextField';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -173,16 +175,22 @@ export function ServiceCatalogListPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-start justify-between mb-2">
-        <PageHeader
-          title={t('catalog.title')}
-          subtitle={t('catalog.subtitle')}
-          icon={<Server size={24} />}
-        />
-        <Button onClick={() => setShowServiceForm((v) => !v)}>
-          <Plus size={16} /> {t('serviceCatalog.registerService')}
-        </Button>
-      </div>
+      {/* CTA integrado ao PageHeader como actions */}
+      <PageHeader
+        title={t('catalog.title')}
+        subtitle={t('catalog.subtitle')}
+        icon={<Server size={24} />}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={14} />}
+            onClick={() => setShowServiceForm((v) => !v)}
+          >
+            {t('serviceCatalog.registerService')}
+          </Button>
+        }
+      />
 
       {/* ── Formulário de registro de serviço ── */}
       {showServiceForm && (
@@ -195,95 +203,92 @@ export function ServiceCatalogListPage() {
             >
               <div>
                 <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.basicInfo', 'Basic Information')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.name')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.name}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, name: e.target.value }))}
-                      required placeholder={t('serviceCatalog.namePlaceholder', 'e.g., payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.domain', 'Domain')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.domain}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, domain: e.target.value }))}
-                      required placeholder={t('serviceCatalog.domainPlaceholder', 'e.g., payments, identity, orders')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.team')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.team}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, team: e.target.value }))}
-                      required placeholder={t('serviceCatalog.teamPlaceholder', 'e.g., platform-team')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
+                {/* Campos básicos — DS TextField */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <TextField
+                    label={`${t('serviceCatalog.name')} *`}
+                    size="sm"
+                    value={serviceForm.name}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, name: e.target.value }))}
+                    required
+                    placeholder={t('serviceCatalog.namePlaceholder', 'e.g., payment-service')}
+                    className="font-mono"
+                  />
+                  <TextField
+                    label={`${t('serviceCatalog.domain', 'Domain')} *`}
+                    size="sm"
+                    value={serviceForm.domain}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, domain: e.target.value }))}
+                    required
+                    placeholder={t('serviceCatalog.domainPlaceholder', 'e.g., payments, identity, orders')}
+                  />
+                  <TextField
+                    label={`${t('serviceCatalog.team')} *`}
+                    size="sm"
+                    value={serviceForm.team}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, team: e.target.value }))}
+                    required
+                    placeholder={t('serviceCatalog.teamPlaceholder', 'e.g., platform-team')}
+                  />
                 </div>
               </div>
 
               <div>
                 <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.classification', 'Classification')}</h3>
+                {/* Classificação — DS Select */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.serviceType', 'Service Type')}</label>
-                    <select value={serviceForm.serviceType}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, serviceType: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <optgroup label={t('serviceCatalog.typeGroupModern', 'Modern Services')}>
-                        <option value="RestApi">{t('serviceCatalog.typeRestApi', 'REST API')}</option>
-                        <option value="GraphqlApi">{t('serviceCatalog.typeGraphqlApi', 'GraphQL API')}</option>
-                        <option value="GrpcService">{t('serviceCatalog.typeGrpcService', 'gRPC Service')}</option>
-                        <option value="SoapService">{t('serviceCatalog.typeSoapService', 'SOAP Service')}</option>
-                        <option value="KafkaProducer">{t('serviceCatalog.typeKafkaProducer', 'Kafka Producer')}</option>
-                        <option value="KafkaConsumer">{t('serviceCatalog.typeKafkaConsumer', 'Kafka Consumer')}</option>
-                        <option value="BackgroundService">{t('serviceCatalog.typeBackgroundService', 'Background Service')}</option>
-                        <option value="ScheduledProcess">{t('serviceCatalog.typeScheduledProcess', 'Scheduled Process')}</option>
-                        <option value="Gateway">{t('serviceCatalog.typeGateway', 'API Gateway')}</option>
-                      </optgroup>
-                      <optgroup label={t('serviceCatalog.typeGroupPlatform', 'Platform & Integration')}>
-                        <option value="IntegrationComponent">{t('serviceCatalog.typeIntegrationComponent', 'Integration Component')}</option>
-                        <option value="SharedPlatformService">{t('serviceCatalog.typeSharedPlatformService', 'Shared Platform Service')}</option>
-                        <option value="Framework">{t('serviceCatalog.typeFramework', 'Framework / SDK')}</option>
-                        <option value="ThirdParty">{t('serviceCatalog.typeThirdParty', 'Third-Party Service')}</option>
-                        <option value="LegacySystem">{t('serviceCatalog.typeLegacySystem', 'Legacy System')}</option>
-                      </optgroup>
-                      <optgroup label={t('serviceCatalog.typeGroupMainframe', 'Mainframe')}>
-                        <option value="CobolProgram">{t('serviceCatalog.typeCobolProgram', 'COBOL Program')}</option>
-                        <option value="CicsTransaction">{t('serviceCatalog.typeCicsTransaction', 'CICS Transaction')}</option>
-                        <option value="ImsTransaction">{t('serviceCatalog.typeImsTransaction', 'IMS Transaction')}</option>
-                        <option value="BatchJob">{t('serviceCatalog.typeBatchJob', 'Batch Job')}</option>
-                        <option value="MainframeSystem">{t('serviceCatalog.typeMainframeSystem', 'Mainframe System')}</option>
-                        <option value="MqQueueManager">{t('serviceCatalog.typeMqQueueManager', 'MQ Queue Manager')}</option>
-                        <option value="ZosConnectApi">{t('serviceCatalog.typeZosConnectApi', 'z/OS Connect API')}</option>
-                      </optgroup>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.criticality', 'Criticality')}</label>
-                    <select value={serviceForm.criticality}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, criticality: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <option value="Low">{t('serviceCatalog.criticalityLow', 'Low')}</option>
-                      <option value="Medium">{t('serviceCatalog.criticalityMedium', 'Medium')}</option>
-                      <option value="High">{t('serviceCatalog.criticalityHigh', 'High')}</option>
-                      <option value="Critical">{t('serviceCatalog.criticalityCritical', 'Critical')}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.exposure', 'Exposure')}</label>
-                    <select value={serviceForm.exposureType}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, exposureType: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <option value="Internal">{t('serviceCatalog.exposureInternal', 'Internal')}</option>
-                      <option value="Partner">{t('serviceCatalog.exposurePartner', 'Partner')}</option>
-                      <option value="External">{t('serviceCatalog.exposureExternal', 'External')}</option>
-                    </select>
-                  </div>
+                  <Select
+                    label={t('serviceCatalog.serviceType', 'Service Type')}
+                    size="sm"
+                    value={serviceForm.serviceType}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, serviceType: e.target.value }))}
+                    options={[
+                      { value: 'RestApi', label: t('serviceCatalog.typeRestApi', 'REST API') },
+                      { value: 'GraphqlApi', label: t('serviceCatalog.typeGraphqlApi', 'GraphQL API') },
+                      { value: 'GrpcService', label: t('serviceCatalog.typeGrpcService', 'gRPC Service') },
+                      { value: 'SoapService', label: t('serviceCatalog.typeSoapService', 'SOAP Service') },
+                      { value: 'KafkaProducer', label: t('serviceCatalog.typeKafkaProducer', 'Kafka Producer') },
+                      { value: 'KafkaConsumer', label: t('serviceCatalog.typeKafkaConsumer', 'Kafka Consumer') },
+                      { value: 'BackgroundService', label: t('serviceCatalog.typeBackgroundService', 'Background Service') },
+                      { value: 'ScheduledProcess', label: t('serviceCatalog.typeScheduledProcess', 'Scheduled Process') },
+                      { value: 'Gateway', label: t('serviceCatalog.typeGateway', 'API Gateway') },
+                      { value: 'IntegrationComponent', label: t('serviceCatalog.typeIntegrationComponent', 'Integration Component') },
+                      { value: 'SharedPlatformService', label: t('serviceCatalog.typeSharedPlatformService', 'Shared Platform Service') },
+                      { value: 'Framework', label: t('serviceCatalog.typeFramework', 'Framework / SDK') },
+                      { value: 'ThirdParty', label: t('serviceCatalog.typeThirdParty', 'Third-Party Service') },
+                      { value: 'LegacySystem', label: t('serviceCatalog.typeLegacySystem', 'Legacy System') },
+                      { value: 'CobolProgram', label: t('serviceCatalog.typeCobolProgram', 'COBOL Program') },
+                      { value: 'CicsTransaction', label: t('serviceCatalog.typeCicsTransaction', 'CICS Transaction') },
+                      { value: 'ImsTransaction', label: t('serviceCatalog.typeImsTransaction', 'IMS Transaction') },
+                      { value: 'BatchJob', label: t('serviceCatalog.typeBatchJob', 'Batch Job') },
+                      { value: 'MainframeSystem', label: t('serviceCatalog.typeMainframeSystem', 'Mainframe System') },
+                      { value: 'MqQueueManager', label: t('serviceCatalog.typeMqQueueManager', 'MQ Queue Manager') },
+                      { value: 'ZosConnectApi', label: t('serviceCatalog.typeZosConnectApi', 'z/OS Connect API') },
+                    ]}
+                  />
+                  <Select
+                    label={t('serviceCatalog.criticality', 'Criticality')}
+                    size="sm"
+                    value={serviceForm.criticality}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, criticality: e.target.value }))}
+                    options={[
+                      { value: 'Low', label: t('serviceCatalog.criticalityLow', 'Low') },
+                      { value: 'Medium', label: t('serviceCatalog.criticalityMedium', 'Medium') },
+                      { value: 'High', label: t('serviceCatalog.criticalityHigh', 'High') },
+                      { value: 'Critical', label: t('serviceCatalog.criticalityCritical', 'Critical') },
+                    ]}
+                  />
+                  <Select
+                    label={t('serviceCatalog.exposure', 'Exposure')}
+                    size="sm"
+                    value={serviceForm.exposureType}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, exposureType: e.target.value }))}
+                    options={[
+                      { value: 'Internal', label: t('serviceCatalog.exposureInternal', 'Internal') },
+                      { value: 'Partner', label: t('serviceCatalog.exposurePartner', 'Partner') },
+                      { value: 'External', label: t('serviceCatalog.exposureExternal', 'External') },
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -297,41 +302,46 @@ export function ServiceCatalogListPage() {
 
               <div>
                 <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.ownership', 'Ownership')}</h3>
+                {/* Propriedade — DS TextField */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.technicalOwner', 'Technical Owner')}</label>
-                    <input type="text" value={serviceForm.technicalOwner}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, technicalOwner: e.target.value }))}
-                      placeholder={t('serviceCatalog.technicalOwnerPlaceholder', 'e.g., john.smith@company.com')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.businessOwner', 'Business Owner')}</label>
-                    <input type="text" value={serviceForm.businessOwner}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, businessOwner: e.target.value }))}
-                      placeholder={t('serviceCatalog.businessOwnerPlaceholder', 'e.g., Product Manager Name')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
+                  <TextField
+                    label={t('serviceCatalog.technicalOwner', 'Technical Owner')}
+                    size="sm"
+                    value={serviceForm.technicalOwner}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, technicalOwner: e.target.value }))}
+                    placeholder={t('serviceCatalog.technicalOwnerPlaceholder', 'e.g., john.smith@company.com')}
+                  />
+                  <TextField
+                    label={t('serviceCatalog.businessOwner', 'Business Owner')}
+                    size="sm"
+                    value={serviceForm.businessOwner}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, businessOwner: e.target.value }))}
+                    placeholder={t('serviceCatalog.businessOwnerPlaceholder', 'e.g., Product Manager Name')}
+                  />
                 </div>
               </div>
 
               <div>
                 <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.references', 'References')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.documentationUrl', 'Documentation URL')}</label>
-                    <input type="url" value={serviceForm.documentationUrl}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, documentationUrl: e.target.value }))}
-                      placeholder={t('catalog.detail.placeholder.documentationUrl', 'https://docs.company.com/payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.repositoryUrl', 'Repository URL')}</label>
-                    <input type="url" value={serviceForm.repositoryUrl}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, repositoryUrl: e.target.value }))}
-                      placeholder={t('catalog.detail.placeholder.repositoryUrl', 'https://github.com/org/payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
+                  <TextField
+                    label={t('serviceCatalog.documentationUrl', 'Documentation URL')}
+                    type="url"
+                    value={serviceForm.documentationUrl}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, documentationUrl: e.target.value }))}
+                    placeholder={t('catalog.detail.placeholder.documentationUrl', 'https://docs.company.com/payment-service')}
+                    size="sm"
+                    className="font-mono"
+                  />
+                  <TextField
+                    label={t('serviceCatalog.repositoryUrl', 'Repository URL')}
+                    type="url"
+                    value={serviceForm.repositoryUrl}
+                    onChange={(e) => setServiceForm((f) => ({ ...f, repositoryUrl: e.target.value }))}
+                    placeholder={t('catalog.detail.placeholder.repositoryUrl', 'https://github.com/org/payment-service')}
+                    size="sm"
+                    className="font-mono"
+                  />
                 </div>
               </div>
 
@@ -393,58 +403,65 @@ export function ServiceCatalogListPage() {
         <Card className="mb-6">
         <CardBody>
           <div className="flex flex-col gap-4">
-            {/* Barra de pesquisa */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
-              <input
-                type="text"
-                className="w-full pl-10 pr-4 py-2 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                placeholder={t('catalog.search.placeholder')}
-                value={filters.search}
-                onChange={(e) => setFilter('search', e.target.value)}
-              />
-            </div>
+            {/* Barra de pesquisa — DS SearchInput */}
+            <SearchInput
+              size="sm"
+              placeholder={t('catalog.search.placeholder')}
+              value={filters.search}
+              onChange={(e) => setFilter('search', e.target.value)}
+              aria-label={t('catalog.search.placeholder')}
+            />
 
-            {/* Filtros dropdown */}
+            {/* Filtros dropdown — DS Select + TextField */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-              <FilterSelect
+              <Select
                 label={t('catalog.filters.serviceType')}
+                size="sm"
                 value={filters.serviceType}
-                onChange={(v) => setFilter('serviceType', v)}
-                options={SERVICE_TYPES.map((v) => ({ value: v, label: t(`catalog.badges.type.${v}`) }))}
-                allLabel={t('catalog.filters.all')}
+                onChange={(e) => setFilter('serviceType', e.target.value)}
+                options={[
+                  { value: '', label: t('catalog.filters.all') },
+                  ...SERVICE_TYPES.map((v) => ({ value: v, label: t(`catalog.badges.type.${v}`) })),
+                ]}
               />
-              <FilterSelect
+              <Select
                 label={t('catalog.filters.criticality')}
+                size="sm"
                 value={filters.criticality}
-                onChange={(v) => setFilter('criticality', v)}
-                options={CRITICALITY_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.criticality.${v}`) }))}
-                allLabel={t('catalog.filters.all')}
+                onChange={(e) => setFilter('criticality', e.target.value)}
+                options={[
+                  { value: '', label: t('catalog.filters.all') },
+                  ...CRITICALITY_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.criticality.${v}`) })),
+                ]}
               />
-              <FilterSelect
+              <Select
                 label={t('catalog.filters.lifecycleStatus')}
+                size="sm"
                 value={filters.lifecycleStatus}
-                onChange={(v) => setFilter('lifecycleStatus', v)}
-                options={LIFECYCLE_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.lifecycle.${v}`) }))}
-                allLabel={t('catalog.filters.all')}
+                onChange={(e) => setFilter('lifecycleStatus', e.target.value)}
+                options={[
+                  { value: '', label: t('catalog.filters.all') },
+                  ...LIFECYCLE_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.lifecycle.${v}`) })),
+                ]}
               />
-              <FilterSelect
+              <Select
                 label={t('catalog.filters.exposureType')}
+                size="sm"
                 value={filters.exposureType}
-                onChange={(v) => setFilter('exposureType', v)}
-                options={EXPOSURE_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.exposure.${v}`) }))}
-                allLabel={t('catalog.filters.all')}
+                onChange={(e) => setFilter('exposureType', e.target.value)}
+                options={[
+                  { value: '', label: t('catalog.filters.all') },
+                  ...EXPOSURE_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.exposure.${v}`) })),
+                ]}
               />
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-muted">{t('catalog.filters.team')}</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-1.5 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder={t('catalog.filters.team')}
-                  value={filters.teamName}
-                  onChange={(e) => setFilter('teamName', e.target.value)}
-                />
-              </div>
+              {/* Filtro de equipa como TextField size sm */}
+              <TextField
+                label={t('catalog.filters.team')}
+                size="sm"
+                placeholder={t('catalog.filters.team')}
+                value={filters.teamName}
+                onChange={(e) => setFilter('teamName', e.target.value)}
+              />
             </div>
           </div>
         </CardBody>
@@ -590,23 +607,24 @@ export function ServiceCatalogListPage() {
                   total: data.totalCount,
                 })}
               </span>
+              {/* Paginação com DS Button */}
               <div className="flex gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="xs"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 text-xs rounded-md border border-edge bg-canvas text-heading disabled:opacity-40 disabled:cursor-not-allowed hover:bg-elevated transition-colors"
                 >
                   {t('common.previous')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="xs"
                   onClick={() => setCurrentPage((p) => p + 1)}
                   disabled={currentPage * PAGE_SIZE >= data.totalCount}
-                  className="px-3 py-1 text-xs rounded-md border border-edge bg-canvas text-heading disabled:opacity-40 disabled:cursor-not-allowed hover:bg-elevated transition-colors"
                 >
                   {t('common.next')}
-                </button>
+                </Button>
               </div>
             </div>
           )}
