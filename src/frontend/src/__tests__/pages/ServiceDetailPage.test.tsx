@@ -154,8 +154,9 @@ describe('ServiceDetailPage', () => {
     await waitFor(() => {
       // teamName appears in both EntityHeader meta and Ownership card
       expect(screen.getAllByText('Payments Team').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('john.doe')).toBeInTheDocument();
-      expect(screen.getByText('jane.smith')).toBeInTheDocument();
+      // v5: technicalOwner appears in both the identity card (MetaRow) and the Ownership section (FieldRow)
+      expect(screen.getAllByText('john.doe').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('jane.smith').length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -211,7 +212,8 @@ describe('ServiceDetailPage', () => {
     const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
     if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
-      expect(screen.getByText(/no contracts linked/i)).toBeInTheDocument();
+      // v5: empty-contracts message appears in both the always-visible stacked section and the contracts tab content
+      expect(screen.getAllByText(/no contracts linked/i).length).toBeGreaterThanOrEqual(1);
     });
   });
 
