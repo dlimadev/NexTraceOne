@@ -282,7 +282,7 @@ function AgentBenchmarkPanel({ tenantId }: { tenantId: string }) {
           <h3 className="text-sm font-medium text-heading mb-3">{t('agentPerformanceBenchmark.tierSummary')}</h3>
           <div className="flex flex-wrap gap-3">
             {Object.entries(report.tierSummary).map(([tier, count]) => (
-              <div key={tier} className="flex items-center gap-2 px-3 py-1.5 rounded border border-edge bg-surface">
+              <div key={tier} className="flex items-center gap-2 px-3 py-1.5 rounded border border-edge bg-card">
                 <span className={`text-sm font-medium ${tierColors[tier] ?? ''}`}>
                   {t(`agentPerformanceBenchmark.tiers.${tier}`, { defaultValue: tier })}
                 </span>
@@ -419,7 +419,7 @@ function MaturityPanel({ tenantId }: { tenantId: string }) {
                   <span className="text-heading">{dim.dimensionName}</span>
                   <span className="text-muted">{dim.scorePct.toFixed(1)}%</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-surface">
+                <div className="w-full h-2 rounded-full bg-card">
                   <div
                     className="h-2 rounded-full bg-accent"
                     style={{ width: `${Math.min(dim.scorePct, 100)}%` }}

@@ -213,28 +213,28 @@ export function ReleaseNotesPage() {
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <Cpu size={14} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseNotes.model', 'Model')}</p>
                     <p className="text-sm font-medium text-heading truncate">{notes.modelUsed}</p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <Hash size={14} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseNotes.tokens', 'Tokens')}</p>
                     <p className="text-sm font-medium text-heading">{notes.tokensUsed?.toLocaleString()}</p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <RefreshCw size={14} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseNotes.regenerations', 'Regenerations')}</p>
                     <p className="text-sm font-medium text-heading">{notes.regenerationCount}</p>
                   </div>
                 </div>
-                <div className="bg-surface rounded-lg p-3 flex items-center gap-2">
+                <div className="bg-card rounded-lg p-3 flex items-center gap-2">
                   <Clock size={14} className="text-muted" />
                   <div>
                     <p className="text-xs text-muted">{t('releaseNotes.generatedAt', 'Generated At')}</p>
@@ -277,7 +277,7 @@ export function ReleaseNotesPage() {
               {expandedSections.has(section.key) && (
                 <CardBody>
                   <div className="prose prose-sm max-w-none text-heading">
-                    <pre className="whitespace-pre-wrap text-sm font-sans leading-relaxed bg-surface rounded-lg p-4 border border-edge">
+                    <pre className="whitespace-pre-wrap text-sm font-sans leading-relaxed bg-card rounded-lg p-4 border border-edge">
                       {section.content}
                     </pre>
                   </div>

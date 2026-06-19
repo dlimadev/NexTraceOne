@@ -11,19 +11,19 @@ describe('TrendBadge', () => {
   it('renders up trend with success styling', () => {
     render(<TrendBadge direction="up" value="+2.57%" />);
     const badge = screen.getByText('+2.57%');
-    expect(badge.closest('span')).toHaveClass('bg-success/15', 'text-success');
+    expect(badge.closest('span')).toHaveClass('bg-success-muted', 'text-success');
   });
 
   it('renders down trend with critical styling', () => {
     render(<TrendBadge direction="down" value="-1.2%" />);
     const badge = screen.getByText('-1.2%');
-    expect(badge.closest('span')).toHaveClass('bg-critical/15', 'text-critical');
+    expect(badge.closest('span')).toHaveClass('bg-critical-muted', 'text-critical');
   });
 
   it('renders neutral trend', () => {
     render(<TrendBadge direction="neutral" value="0%" />);
     const badge = screen.getByText('0%');
-    expect(badge.closest('span')).toHaveClass('bg-neutral/15', 'text-neutral');
+    expect(badge.closest('span')).toHaveClass('bg-elevated', 'text-muted');
   });
 
   it('supports sm size', () => {

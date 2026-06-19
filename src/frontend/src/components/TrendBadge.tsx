@@ -17,9 +17,9 @@ const sizeClasses = {
 };
 
 const directionClasses = {
-  up: 'bg-success/15 text-success',
-  down: 'bg-critical/15 text-critical',
-  neutral: 'bg-neutral/15 text-neutral',
+  up: 'bg-success-muted text-success',
+  down: 'bg-critical-muted text-critical',
+  neutral: 'bg-elevated text-muted',
 };
 
 const icons = {
@@ -32,7 +32,8 @@ const icons = {
  * TrendBadge — badge pill com fundo semântico sutil para indicadores de tendência.
  * Inspirado pelo padrão `bg-success-subtle text-success` do template NexLink.
  *
- * Usa fundo com 15% de opacidade + texto na cor semântica completa.
+ * Usa os tokens semânticos `-muted` (ex: `bg-success-muted`) para fundo colorido
+ * e `bg-elevated` para o neutro + texto na cor semântica completa.
  * Inclui ícone direcional (TrendingUp, TrendingDown, Minus).
  */
 export function TrendBadge({ direction, value, size = 'md', className }: TrendBadgeProps) {

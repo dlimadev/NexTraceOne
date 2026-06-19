@@ -3,12 +3,16 @@
  *
  * Extraído de DeveloperPortalPage para reduzir complexidade.
  * Agrupa My Consumption e Inbox em componentes exportados separados mas no mesmo ficheiro.
+ * Redesenhado com componentes DS: EmptyState, PageLoadingState, PageErrorState.
  */
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, AlertTriangle, Clock, ExternalLink, Code } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type { CatalogItem, Subscription } from '../../../types';
 
 // ── My Consumption Tab ──────────────────────────────────────────────────────
@@ -37,30 +41,32 @@ export function DevPortalMyConsumptionTab({
       {/* APIs que o utilizador consome */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-heading">
+          <h2 className="text-base font-semibold text-heading">
             {t('developerPortal.myConsumption.consuming')}
           </h2>
-          <Button variant="secondary" onClick={onRefreshConsuming}>
-            <RefreshCw size={16} className="mr-1" />
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<RefreshCw size={14} />}
+            onClick={onRefreshConsuming}
+          >
             {t('common.refresh')}
           </Button>
         </div>
 
-        {consumingLoading && (
-          <p className="text-muted text-sm">{t('common.loading')}</p>
-        )}
+        {consumingLoading && <PageLoadingState size="sm" />}
+
         {consumingError && (
-          <p className="text-critical text-sm">{t('common.error')}</p>
+          <PageErrorState variant="compact" onRetry={onRefreshConsuming} />
         )}
-        {consumingItems && consumingItems.length === 0 && (
-          <Card>
-            <CardBody>
-              <p className="text-muted text-sm text-center py-4">
-                {t('developerPortal.myConsumption.noConsuming')}
-              </p>
-            </CardBody>
-          </Card>
+
+        {!consumingLoading && !consumingError && consumingItems && consumingItems.length === 0 && (
+          <EmptyState
+            title={t('developerPortal.myConsumption.noConsuming')}
+            size="compact"
+          />
         )}
+
         {consumingItems && consumingItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {consumingItems.map((item: CatalogItem) => (
@@ -88,21 +94,19 @@ export function DevPortalMyConsumptionTab({
 
       {/* APIs que o utilizador é dono */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-heading">
+        <h2 className="text-base font-semibold text-heading">
           {t('developerPortal.myConsumption.myApis')}
         </h2>
-        {myApisLoading && (
-          <p className="text-muted text-sm">{t('common.loading')}</p>
+
+        {myApisLoading && <PageLoadingState size="sm" />}
+
+        {!myApisLoading && myApisItems && myApisItems.length === 0 && (
+          <EmptyState
+            title={t('developerPortal.myConsumption.noMyApis')}
+            size="compact"
+          />
         )}
-        {myApisItems && myApisItems.length === 0 && (
-          <Card>
-            <CardBody>
-              <p className="text-muted text-sm text-center py-4">
-                {t('developerPortal.myConsumption.noMyApis')}
-              </p>
-            </CardBody>
-          </Card>
-        )}
+
         {myApisItems && myApisItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {myApisItems.map((item: CatalogItem) => (
@@ -147,7 +151,7 @@ export function DevPortalInboxTab({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-heading">
+        <h2 className="text-base font-semibold text-heading">
           {t('developerPortal.inbox.title')}
         </h2>
       </div>
@@ -155,10 +159,8 @@ export function DevPortalInboxTab({
         {t('developerPortal.inbox.description')}
       </p>
 
-      {/* Painel de notificações — alimentado pelas subscriptions ativas */}
-      {subscriptionsLoading && (
-        <p className="text-muted text-sm">{t('common.loading')}</p>
-      )}
+      {/* Estado de carregamento das subscriptions */}
+      {subscriptionsLoading && <PageLoadingState size="sm" />}
 
       {/* Cards informativos sobre tipos de notificações que o utilizador receberá */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,7 +244,7 @@ export function DevPortalInboxTab({
                 .map((sub: Subscription) => (
                   <div
                     key={sub.id}
-                    className="flex items-center justify-between p-3 bg-surface rounded-lg border border-edge/50"
+                    className="flex items-center justify-between p-3 bg-card rounded-lg border border-edge/50"
                   >
                     <div>
                       <span className="font-medium text-body">{sub.apiName}</span>
@@ -262,9 +264,10 @@ export function DevPortalInboxTab({
                 ))}
             </div>
           ) : (
-            <p className="text-muted text-sm text-center py-4">
-              {t('developerPortal.inbox.noSubscriptions')}
-            </p>
+            <EmptyState
+              title={t('developerPortal.inbox.noSubscriptions')}
+              size="compact"
+            />
           )}
         </CardBody>
       </Card>

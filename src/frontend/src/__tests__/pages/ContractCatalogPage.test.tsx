@@ -14,6 +14,11 @@ vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn() },
 }));
 
+// Substituição do hook de permissões — evita dependência do AuthProvider em testes unitários
+vi.mock('../../hooks/usePermissions', () => ({
+  usePermissions: vi.fn(() => ({ can: () => true, roleName: 'Admin', permissions: [] })),
+}));
+
 import { useContractList, useContractsSummary } from '../../features/contracts/hooks/useContractList';
 
 function renderPage() {

@@ -17,11 +17,12 @@ namespace NexTraceOne.VisualStudio.ToolWindows;
 /// cada serviço para ver equipa, domínio, tipo e linguagem.
 /// Inclui acções de contexto: abrir no dashboard e consultar o AI Chat.
 /// </summary>
-public sealed partial class NexAiCatalogControl : UserControl
+public sealed partial class NexAiCatalogControl : UserControl, IDisposable
 {
     private readonly ToolWindowPane _parentWindow;
     private readonly HttpClient _httpClient;
     private CancellationTokenSource? _cts;
+    private bool _disposed;
 
     private TreeView? _treeView;
     private Button? _refreshBtn;
@@ -37,8 +38,7 @@ public sealed partial class NexAiCatalogControl : UserControl
 
     private NexTraceOneOptionsPage? GetOptions()
     {
-        return _parentWindow.GetDialogPage(typeof(NexTraceOneOptionsPage)) as NexTraceOneOptionsPage
-               ?? (_parentWindow.Package as AsyncPackage)?.GetDialogPage(typeof(NexTraceOneOptionsPage)) as NexTraceOneOptionsPage;
+        return (_parentWindow.Package as Package)?.GetDialogPage(typeof(NexTraceOneOptionsPage)) as NexTraceOneOptionsPage;
     }
 
     private void InitializeComponent()
@@ -278,7 +278,7 @@ public sealed partial class NexAiCatalogControl : UserControl
 
     private void OpenChatWithQuery(string query)
     {
-        ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+        _ = ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (_parentWindow.Package is AsyncPackage pkg)
@@ -310,37 +310,17 @@ public sealed partial class NexAiCatalogControl : UserControl
         response.EnsureSuccessStatusCode();
 
         var body = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(body);
-        var root = doc.RootElement;
-
-        var items = root.ValueKind == JsonValueKind.Array
-            ? root
-            : (root.TryGetProperty("items", out var arr) ? arr : default);
-
-        var result = new List<CatalogServiceDto>();
-        if (items.ValueKind != JsonValueKind.Array) return result;
-
-        foreach (var el in items.EnumerateArray())
-        {
-            result.Add(new CatalogServiceDto
-            {
-                Name = GetString(el, "name") ?? "(unknown)",
-                TeamName = GetString(el, "teamName"),
-                Domain = GetString(el, "domain"),
-                Type = GetString(el, "type"),
-                Language = GetString(el, "language"),
-                Status = GetString(el, "status"),
-                Description = GetString(el, "description")
-            });
-        }
-        return result;
+        return CatalogResponseParser.Parse(body).ToList();
     }
 
-    private static string? GetString(JsonElement el, string property)
+    public void Dispose()
     {
-        return el.TryGetProperty(property, out var p) && p.ValueKind == JsonValueKind.String
-            ? p.GetString()
-            : null;
+        if (_disposed) return;
+        _disposed = true;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _httpClient.Dispose();
     }
 }
 

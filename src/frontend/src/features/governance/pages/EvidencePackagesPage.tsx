@@ -95,7 +95,7 @@ export function EvidencePackagesPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t('governance.evidence.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-input border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
         {(['all', 'Sealed', 'Exported', 'Draft'] as StatusFilter[]).map(f => (
@@ -105,7 +105,7 @@ export function EvidencePackagesPage() {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               statusFilter === f
                 ? 'bg-accent/10 text-accent border-accent/30'
-                : 'bg-surface text-muted border-edge hover:text-body'
+                : 'bg-card text-muted border-edge hover:text-body'
             }`}
           >
             {f === 'all' ? t('governance.evidence.filterAll') : t(`governance.evidence.status.${f}`)}

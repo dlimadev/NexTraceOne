@@ -64,7 +64,7 @@ export function LivePreviewRenderer({
   }
 
   return (
-    <div className={`h-full overflow-y-auto bg-surface ${className}`}>
+    <div className={`h-full overflow-y-auto bg-card ${className}`}>
       <div className="max-w-2xl mx-auto p-5 space-y-5">
         {/* ── Info Header ── */}
         <InfoSection preview={preview} />

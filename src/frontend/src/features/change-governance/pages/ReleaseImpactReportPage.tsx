@@ -101,25 +101,25 @@ export function ReleaseImpactReportPage() {
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-3 rounded-md bg-surface">
+                <div className="text-center p-3 rounded-md bg-card">
                   <p className="text-2xl font-bold text-heading">
                     {report.workItemsSummary.total}
                   </p>
                   <p className="text-xs text-muted mt-1">{t('impactReport.workItems')}</p>
                 </div>
-                <div className="text-center p-3 rounded-md bg-surface">
+                <div className="text-center p-3 rounded-md bg-card">
                   <p className="text-2xl font-bold text-heading">
                     {report.commitsSummary.total}
                   </p>
                   <p className="text-xs text-muted mt-1">{t('impactReport.commits')}</p>
                 </div>
-                <div className="text-center p-3 rounded-md bg-surface">
+                <div className="text-center p-3 rounded-md bg-card">
                   <p className="text-2xl font-bold text-heading">
                     {report.blastRadius?.totalAffectedConsumers ?? 0}
                   </p>
                   <p className="text-xs text-muted mt-1">{t('impactReport.affectedConsumers')}</p>
                 </div>
-                <div className="text-center p-3 rounded-md bg-surface">
+                <div className="text-center p-3 rounded-md bg-card">
                   <p className={`text-2xl font-bold ${report.pendingApprovals > 0 ? 'text-warning' : 'text-success'}`}>
                     {report.pendingApprovals}
                   </p>

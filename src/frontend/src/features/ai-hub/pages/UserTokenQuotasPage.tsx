@@ -339,14 +339,14 @@ export function UserTokenQuotasPage() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleEdit(quota)}
-                    className="p-1.5 rounded hover:bg-surface-hover text-muted hover:text-body transition-colors"
+                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-body transition-colors"
                     title={t('common.edit', 'Editar')}
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => deleteMutation.mutate(quota.quotaId)}
-                    className="p-1.5 rounded hover:bg-surface-hover text-muted hover:text-critical transition-colors"
+                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-critical transition-colors"
                     title={t('common.delete', 'Eliminar')}
                     disabled={deleteMutation.isPending}
                   >

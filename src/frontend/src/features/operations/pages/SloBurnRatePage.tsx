@@ -59,9 +59,10 @@ function statusVariant(status: SloBurnStatus): 'danger' | 'warning' | 'success' 
   }
 }
 
+// Retorna classe semântica de cor para taxa de burn rate elevada
 function burnRateClass(rate: number): string {
-  if (rate > 10) return 'text-red-500 font-bold';
-  if (rate > 5) return 'text-amber-500 font-semibold';
+  if (rate > 10) return 'text-critical font-bold';
+  if (rate > 5) return 'text-warning font-semibold';
   return '';
 }
 
@@ -94,27 +95,32 @@ export function SloBurnRatePage() {
 
   return (
     <PageContainer>
-      <div className="flex flex-col gap-1 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader title={t('sloBurnRate.title')} subtitle={t('sloBurnRate.subtitle')} />
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
+      {/* Cabeçalho com seletor de janela temporal e refresh como actions */}
+      <PageHeader
+        title={t('sloBurnRate.title')}
+        subtitle={t('sloBurnRate.subtitle')}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Seletor de janela temporal — estilo segment com botões DS */}
+            <div className="flex rounded-md border border-edge overflow-hidden text-xs">
+              {TIME_RANGE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setTimeRange(opt.value)}
+                  className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
+                >
+                  {t(opt.labelKey)}
+                </button>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              {t('common.refresh')}
+            </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-            {t('common.refresh')}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && <PageErrorState message={t('sloBurnRate.loadError')} onRetry={handleRefresh} />}
       {isLoading && <PageLoadingState message={t('sloBurnRate.loading')} />}
@@ -172,7 +178,8 @@ export function SloBurnRatePage() {
                             <td className="px-4 py-2.5 tabular-nums">
                               <div className="flex items-center gap-2">
                                 <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                                  <div className={`h-full rounded-full ${s.budgetRemainingPercent < 20 ? 'bg-red-500' : s.budgetRemainingPercent < 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${s.budgetRemainingPercent}%` }} />
+                                  {/* Cor da barra de budget baseada em tokens semânticos */}
+                                  <div className={`h-full rounded-full ${s.budgetRemainingPercent < 20 ? 'bg-critical' : s.budgetRemainingPercent < 50 ? 'bg-warning' : 'bg-success'}`} style={{ width: `${s.budgetRemainingPercent}%` }} />
                                 </div>
                                 <span className="font-semibold">{s.budgetRemainingPercent.toFixed(1)}%</span>
                               </div>

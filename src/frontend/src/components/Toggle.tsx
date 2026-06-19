@@ -49,7 +49,7 @@ export function Toggle({ checked, onChange, label, disabled = false, size = 'md'
           'transition-colors duration-[var(--nto-motion-base)]',
           'focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
           trackSize,
-          checked ? 'bg-cyan' : 'bg-elevated',
+          checked ? 'bg-accent' : 'bg-elevated',
           disabled && 'cursor-not-allowed',
         )}
       >

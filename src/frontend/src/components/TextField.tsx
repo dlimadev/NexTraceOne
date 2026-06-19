@@ -1,12 +1,14 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
-interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
   helperText?: string;
   error?: string;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
+  /** Altura do campo: 'md' (56px, padrão) ou 'sm' (36px, p/ toolbars/filtros). */
+  size?: 'sm' | 'md';
 }
 
 /**
@@ -15,8 +17,9 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
  * Focus: border-strong + glow cyan. Error: border danger + mensagem textual.
  */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
-  ({ label, helperText, error, leadingIcon, trailingIcon, className, id, ...rest }, ref) => {
+  ({ label, helperText, error, leadingIcon, trailingIcon, size = 'md', className, id, ...rest }, ref) => {
     const fieldId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+    const isSm = size === 'sm';
 
     return (
       <div className="space-y-2">
@@ -27,7 +30,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         )}
         <div className="relative">
           {leadingIcon && (
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-faded pointer-events-none">
+            <span className={cn('absolute top-1/2 -translate-y-1/2 text-faded pointer-events-none', isSm ? 'left-3' : 'left-4')}>
               {leadingIcon}
             </span>
           )}
@@ -35,14 +38,15 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             ref={ref}
             id={fieldId}
             className={cn(
-              'w-full h-14 rounded-lg bg-input border text-sm text-heading placeholder:text-faded',
+              'w-full rounded-lg bg-input border text-sm text-heading placeholder:text-faded',
+              isSm ? 'h-9' : 'h-14',
               'transition-all duration-[var(--nto-motion-base)]',
               'focus:outline-none',
-              leadingIcon ? 'pl-11' : 'pl-4',
-              trailingIcon ? 'pr-11' : 'pr-4',
+              leadingIcon ? (isSm ? 'pl-9' : 'pl-11') : (isSm ? 'pl-3' : 'pl-4'),
+              trailingIcon ? (isSm ? 'pr-9' : 'pr-11') : (isSm ? 'pr-3' : 'pr-4'),
               error
-                ? 'border-critical/60 focus:border-critical focus:shadow-glow-danger'
-                : 'border-edge focus:border-edge-focus focus:shadow-glow-cyan',
+                ? 'border-critical/60 focus:border-critical focus:shadow-sm'
+                : 'border-edge focus:border-edge-focus focus:shadow-sm',
               className,
             )}
             aria-invalid={error ? true : undefined}

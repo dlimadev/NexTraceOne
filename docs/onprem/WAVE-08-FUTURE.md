@@ -181,20 +181,21 @@ e publicar um SDK para integração com scripts e pipelines externos.
 CLI completo + SDK .NET + SDK Python:
 
 ```bash
-# CLI
-ntrace service list --env production
-ntrace service register --name payment-api --owner platform-team
-ntrace change submit --service payment-api --env staging --type Deploy
-ntrace blast-radius --change CHG-2024-001
-ntrace contract validate --file openapi.yaml
+# CLI oficial (`nex`)
+nex service list --team platform-team
+nex service create --name payment-api --team platform-team --tier critical
+nex change summary --release-id REL-2024-001
+nex change blast-radius --release-id REL-2024-001
+nex contract verify --id contract-1 --spec ./openapi.yaml
 
-# SDK .NET
-var client = new NexTraceClient("https://nextraceone.acme.com", apiKey);
-await client.Changes.SubmitAsync(new ChangeRequest { ... });
-
-# SDK Python
-client = NexTraceClient("https://nextraceone.acme.com", api_key=key)
-client.changes.submit(service_id="payment-api", environment="staging")
+# SDK .NET oficial
+var client = new NexTraceSdkClient(new NexTraceSdkOptions
+{
+    BaseUrl = "https://nextraceone.acme.com",
+    ApiToken = apiKey
+});
+await client.Services.CreateServiceAsync(new CreateServiceRequest { Name = "payment-api", Team = "platform-team", Tier = "critical" });
+await client.Contracts.VerifyContractAsync(new VerifyContractRequest { ContractId = "contract-1", SpecContent = "..." });
 ```
 
 ### Critério de aceite

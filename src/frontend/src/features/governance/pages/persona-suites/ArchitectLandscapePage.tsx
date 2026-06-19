@@ -12,7 +12,7 @@ const SECTIONS = [
   { key: 'coupling', label: 'architecture.serviceCoupling', icon: <GitBranch size={16} />, to: '/catalog/services', color: 'text-info', description: 'architecture.couplingDesc' },
   { key: 'contract-adoption', label: 'architecture.contractAdoption', icon: <BookOpen size={16} />, to: '/contracts', color: 'text-success', description: 'architecture.contractAdoptionDesc' },
   { key: 'breaking-changes', label: 'architecture.breakingChanges', icon: <Shield size={16} />, to: '/contracts/breaking-changes', color: 'text-destructive', description: 'architecture.breakingChangesDesc' },
-  { key: 'maturity', label: 'architecture.maturityDistribution', icon: <BarChart3 size={16} />, to: '/governance/maturity', color: 'text-primary', description: 'architecture.maturityDesc' },
+  { key: 'maturity', label: 'architecture.maturityDistribution', icon: <BarChart3 size={16} />, to: '/governance/maturity', color: 'text-accent', description: 'architecture.maturityDesc' },
 ];
 
 export function ArchitectLandscapePage() {

@@ -29,6 +29,16 @@ public sealed class NexAiChatWindow : ToolWindowPane
         Content = _control;
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _control?.Dispose();
+            _control = null;
+        }
+        base.Dispose(disposing);
+    }
+
     /// <summary>Abre o tool window e envia uma query pré-preenchida.</summary>
     public void SendQuery(string query)
     {

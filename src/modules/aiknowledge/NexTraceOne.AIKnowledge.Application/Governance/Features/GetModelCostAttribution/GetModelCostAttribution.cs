@@ -31,7 +31,7 @@ public static class GetModelCostAttribution
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var cutoff = DateTimeOffset.UtcNow.AddDays(-request.PeriodDays);
-            var entries = await ledgerRepo.ListByPeriodAsync(cutoff, cancellationToken);
+            var entries = await ledgerRepo.ListByPeriodAsync(cutoff, ct: cancellationToken);
 
             var filtered = entries
                 .Where(e => request.ModelId is null || e.ModelId.Equals(request.ModelId, StringComparison.OrdinalIgnoreCase))

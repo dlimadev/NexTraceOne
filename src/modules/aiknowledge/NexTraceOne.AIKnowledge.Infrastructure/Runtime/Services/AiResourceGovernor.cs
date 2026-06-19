@@ -1,5 +1,3 @@
-using System.Threading.Channels;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +19,6 @@ public sealed class AiResourceGovernor : IDisposable
     public enum CircuitState { Closed, Open, HalfOpen }
 
     private readonly SemaphoreSlim _semaphore;
-    private readonly Channel<PendingRequest> _queue;
     private readonly ILogger<AiResourceGovernor> _logger;
     private readonly int _circuitBreakerThreshold;
     private readonly TimeSpan _circuitBreakerCooldown;
@@ -39,8 +36,6 @@ public sealed class AiResourceGovernor : IDisposable
 
         var maxConcurrency = int.TryParse(
             configuration["AIGovernor:MaxConcurrency"], out var mc) ? mc : 5;
-        var queueCapacity = int.TryParse(
-            configuration["AIGovernor:QueueCapacity"], out var qc) ? qc : 50;
         _circuitBreakerThreshold = int.TryParse(
             configuration["AIGovernor:CircuitBreakerThreshold"], out var cbt) ? cbt : 5;
         var cooldownSeconds = int.TryParse(
@@ -48,16 +43,10 @@ public sealed class AiResourceGovernor : IDisposable
 
         _circuitBreakerCooldown = TimeSpan.FromSeconds(cooldownSeconds);
         _semaphore = new SemaphoreSlim(maxConcurrency, maxConcurrency);
-        _queue = Channel.CreateBounded<PendingRequest>(new BoundedChannelOptions(queueCapacity)
-        {
-            FullMode = BoundedChannelFullMode.Wait,
-            SingleReader = false,
-            SingleWriter = false,
-        });
 
         _logger.LogInformation(
-            "AiResourceGovernor iniciado: MaxConcurrency={Max}, QueueCapacity={Queue}, CircuitBreakerThreshold={Threshold}.",
-            maxConcurrency, queueCapacity, _circuitBreakerThreshold);
+            "AiResourceGovernor iniciado: MaxConcurrency={Max}, CircuitBreakerThreshold={Threshold}.",
+            maxConcurrency, _circuitBreakerThreshold);
     }
 
     public CircuitState State
@@ -140,7 +129,6 @@ public sealed class AiResourceGovernor : IDisposable
     public void Dispose()
     {
         _semaphore.Dispose();
-        _queue.Writer.TryComplete();
     }
 
     private sealed class SemaphoreReleaser(SemaphoreSlim semaphore) : IDisposable
@@ -148,5 +136,4 @@ public sealed class AiResourceGovernor : IDisposable
         public void Dispose() => semaphore.Release();
     }
 
-    private sealed record PendingRequest(TaskCompletionSource Tcs, CancellationToken Token);
 }

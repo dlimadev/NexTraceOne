@@ -3,20 +3,24 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Server,
   Globe,
-  Search,
   Zap,
   Clock,
   ChevronRight,
   Layers,
   GitBranch,
-  X,
   BarChart3,
+  PlusCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button } from '../../../components/Button';
+import { EmptyState } from '../../../components/EmptyState';
+import { StatCard } from '../../../components/StatCard';
+import { Tabs, TabPanel } from '../../../components/Tabs';
+import { SearchInput } from '../../../components/SearchInput';
 import { serviceCatalogApi } from '../api';
 import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewTab';
 import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
@@ -122,75 +126,82 @@ export function ServiceCatalogPage() {
 
   const snapshots: GraphSnapshotSummary[] = snapshotsData?.items ?? [];
 
-  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'overview', label: t('serviceCatalog.tabs.overview'), icon: <BarChart3 size={14} /> },
-    { key: 'graph', label: t('serviceCatalog.tabs.graph'), icon: <GitBranch size={14} /> },
-    { key: 'services', label: t('serviceCatalog.tabs.services'), icon: <Server size={14} /> },
-    { key: 'apis', label: t('serviceCatalog.tabs.apis'), icon: <Globe size={14} /> },
-    { key: 'impact', label: t('serviceCatalog.tabs.impact'), icon: <Zap size={14} /> },
-    { key: 'temporal', label: t('serviceCatalog.tabs.temporal'), icon: <Clock size={14} /> },
+  // ── Definição das abas para o componente Tabs ───────────────────────
+  const tabItems = [
+    { id: 'overview', label: t('serviceCatalog.tabs.overview'), icon: <BarChart3 size={14} /> },
+    { id: 'graph',    label: t('serviceCatalog.tabs.graph'),    icon: <GitBranch size={14} /> },
+    { id: 'services', label: t('serviceCatalog.tabs.services'), icon: <Server size={14} /> },
+    { id: 'apis',     label: t('serviceCatalog.tabs.apis'),     icon: <Globe size={14} /> },
+    { id: 'impact',   label: t('serviceCatalog.tabs.impact'),   icon: <Zap size={14} /> },
+    { id: 'temporal', label: t('serviceCatalog.tabs.temporal'), icon: <Clock size={14} /> },
   ];
 
   return (
     <PageContainer>
 
+      {/* ── Cabeçalho com CTA principal no header-right ─────────────── */}
       <PageHeader
         title={t('serviceCatalog.title')}
         subtitle={t('serviceCatalog.subtitle')}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<PlusCircle size={15} />}
+          >
+            {t('serviceCatalog.registerService')}
+          </Button>
+        }
       />
 
-      {/* ── Estatísticas resumidas ──────────────────────────────────── */}
+      {/* ── KPIs com StatCard ──────────────────────────────────────── */}
       <StatsGrid columns={4}>
-        {[
-          { label: t('serviceCatalog.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-info' },
-          { label: t('serviceCatalog.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-success' },
-          { label: t('serviceCatalog.stats.edges'), value: graphStats.edges, icon: <GitBranch size={18} />, color: 'text-info' },
-          { label: t('serviceCatalog.stats.domains'), value: graphStats.domains, icon: <Layers size={18} />, color: 'text-warning' },
-        ].map((stat) => (
-          <Card key={stat.label}>
-            <CardBody className="flex items-center gap-3">
-              <div className={`${stat.color}`}>{stat.icon}</div>
-              <div>
-                <p className="text-2xl font-bold text-heading">{stat.value}</p>
-                <p className="text-xs text-muted">{stat.label}</p>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+        <StatCard
+          title={t('serviceCatalog.stats.services')}
+          value={graphStats.services}
+          icon={<Server size={18} />}
+          color="text-info"
+        />
+        <StatCard
+          title={t('serviceCatalog.stats.apis')}
+          value={graphStats.apis}
+          icon={<Globe size={18} />}
+          color="text-success"
+        />
+        <StatCard
+          title={t('serviceCatalog.stats.edges')}
+          value={graphStats.edges}
+          icon={<GitBranch size={18} />}
+          color="text-info"
+        />
+        <StatCard
+          title={t('serviceCatalog.stats.domains')}
+          value={graphStats.domains}
+          icon={<Layers size={18} />}
+          color="text-warning"
+        />
       </StatsGrid>
 
-      {/* ── Busca global ────────────────────────────────────────────── */}
-      <div className="flex items-center gap-4 mb-4">
-        <div className="relative flex-1 max-w-md">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            placeholder={t('serviceCatalog.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-          />
-          {searchTerm && (
-            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-body">
-              <X size={14} />
-            </button>
-          )}
-        </div>
+      {/* ── Barra de filtros: busca + abas lado a lado ─────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+        <SearchInput
+          size="sm"
+          placeholder={t('serviceCatalog.searchPlaceholder')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm"
+          aria-label={t('serviceCatalog.searchPlaceholder')}
+        />
 
-        {/* ── Abas de navegação ──────────────────────────────────────── */}
-        <div className="flex gap-1 bg-elevated rounded-lg p-1">
-          {tabs.map((tabItem) => (
-            <button
-              key={tabItem.key}
-              onClick={() => setTab(tabItem.key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                tab === tabItem.key ? 'bg-card shadow text-heading' : 'text-muted hover:text-body'
-              }`}
-            >
-              {tabItem.icon} {tabItem.label}
-            </button>
-          ))}
-        </div>
+        {/* ── Abas de navegação (pill variant) ──────────────────────── */}
+        <Tabs
+          id="service-catalog-tabs"
+          items={tabItems}
+          activeId={tab}
+          onChange={(id) => setTab(id as Tab)}
+          variant="pill"
+          size="sm"
+        />
       </div>
 
       {/* ── Conteúdo das abas ──────────────────────────────────────── */}
@@ -201,52 +212,67 @@ export function ServiceCatalogPage() {
       ) : (
         <>
           {/* ── Aba: Visão Operacional ──────────────────────────────── */}
-          {tab === 'overview' && (
+          <TabPanel tabsId="service-catalog-tabs" tabId="overview" active={tab === 'overview'}>
             <ServiceCatalogOverviewTab
               graph={graph}
               healthData={healthData}
               onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }}
             />
-          )}
+          </TabPanel>
 
           {/* ── Aba: Grafo Visual ──────────────────────────────────── */}
-          {tab === 'graph' && graph && (
-            <div className="relative space-y-3">
-              <DependencyGraph
-                graph={graph}
-                selectedNodeId={selectedDetailNode}
-                onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }}
-                height={560}
-              />
-              {selectedDetailNode && (
-                <ServiceDetailPanel
+          <TabPanel tabsId="service-catalog-tabs" tabId="graph" active={tab === 'graph'}>
+            {graph && (
+              <div className="relative space-y-3">
+                <DependencyGraph
                   graph={graph}
-                  nodeId={selectedDetailNode}
-                  healthData={healthData ?? null}
-                  onClose={() => setSelectedDetailNode(null)}
+                  selectedNodeId={selectedDetailNode}
+                  onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }}
+                  height={560}
                 />
-              )}
-            </div>
-          )}
+                {selectedDetailNode && (
+                  <ServiceDetailPanel
+                    graph={graph}
+                    nodeId={selectedDetailNode}
+                    healthData={healthData ?? null}
+                    onClose={() => setSelectedDetailNode(null)}
+                  />
+                )}
+              </div>
+            )}
+          </TabPanel>
 
           {/* ── Aba: Serviços ──────────────────────────────────────── */}
-          {tab === 'services' && (
+          <TabPanel tabsId="service-catalog-tabs" tabId="services" active={tab === 'services'}>
             <ServiceCatalogServicesTab
               filteredServices={filteredServices}
               onSelectNode={selectNodeForImpact}
             />
-          )}
+          </TabPanel>
 
           {/* ── Aba: APIs ──────────────────────────────────────────── */}
-          {tab === 'apis' && (
+          <TabPanel tabsId="service-catalog-tabs" tabId="apis" active={tab === 'apis'}>
             <Card>
               <CardBody className="p-0">
                 {!filteredApis.length ? (
-                  <p className="px-6 py-12 text-sm text-muted text-center">{t('serviceCatalog.noApis')}</p>
+                  <EmptyState
+                    title={t('serviceCatalog.noApis')}
+                    size="compact"
+                  />
                 ) : (
                   <ul className="divide-y divide-edge">
                     {filteredApis.map((api) => (
-                      <li key={api.apiAssetId} className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer" role="button" tabIndex={0} onClick={() => selectNodeForImpact(api.apiAssetId)} onKeyDown={(e) => { if (e.key === ' ') { e.preventDefault(); } if (e.key === 'Enter' || e.key === ' ') { selectNodeForImpact(api.apiAssetId); } }}>
+                      <li
+                        key={api.apiAssetId}
+                        className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => selectNodeForImpact(api.apiAssetId)}
+                        onKeyDown={(e) => {
+                          if (e.key === ' ') { e.preventDefault(); }
+                          if (e.key === 'Enter' || e.key === ' ') { selectNodeForImpact(api.apiAssetId); }
+                        }}
+                      >
                         <div className="w-10 h-10 rounded-lg bg-info/15 flex items-center justify-center text-info">
                           <Globe size={18} />
                         </div>
@@ -265,10 +291,10 @@ export function ServiceCatalogPage() {
                 )}
               </CardBody>
             </Card>
-          )}
+          </TabPanel>
 
           {/* ── Aba: Propagação de Impacto ──────────────────────────── */}
-          {tab === 'impact' && (
+          <TabPanel tabsId="service-catalog-tabs" tabId="impact" active={tab === 'impact'}>
             <ImpactPanel
               graph={graph}
               selectedNodeId={selectedNodeId}
@@ -278,10 +304,10 @@ export function ServiceCatalogPage() {
               onSelectNode={setSelectedNodeId}
               onChangeDepth={setImpactDepth}
             />
-          )}
+          </TabPanel>
 
           {/* ── Aba: Diff Temporal ──────────────────────────────────── */}
-          {tab === 'temporal' && (
+          <TabPanel tabsId="service-catalog-tabs" tabId="temporal" active={tab === 'temporal'}>
             <TemporalPanel
               snapshots={snapshots}
               selectedFrom={selectedFromSnapshot}
@@ -296,7 +322,7 @@ export function ServiceCatalogPage() {
               }}
               createSnapshotPending={createSnapshot.isPending}
             />
-          )}
+          </TabPanel>
         </>
       )}
     </PageContainer>

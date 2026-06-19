@@ -172,7 +172,7 @@ export function OnboardingWizardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-accent" />
       </div>
     );
   }
@@ -226,7 +226,7 @@ export function OnboardingWizardPage() {
             <Card
               key={step.id}
               className={`transition-all ${
-                isCurrent ? 'border-primary shadow-md' : ''
+                isCurrent ? 'border-accent shadow-md' : ''
               } ${isCompleted ? 'bg-muted/50' : ''}`}
             >
               <CardHeader>
@@ -236,7 +236,7 @@ export function OnboardingWizardPage() {
                       isCompleted
                         ? 'bg-green-500 text-white'
                         : isCurrent
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-accent text-on-accent'
                         : 'bg-muted text-muted'
                     }`}
                   >
@@ -250,7 +250,7 @@ export function OnboardingWizardPage() {
                     <CardTitle className="flex items-center gap-2">
                       {t(step.titleKey)}
                       {isCurrent && (
-                        <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
+                        <span className="text-xs bg-accent text-on-accent px-2 py-1 rounded">
                           {t('onboarding.step.current')}
                         </span>
                       )}

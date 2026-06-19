@@ -4,6 +4,9 @@ import { Settings2, Save } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
+import { Toggle } from '../../../components/Toggle';
+import { TextField } from '../../../components/TextField';
 
 interface ReleaseParam {
   key: string;
@@ -67,13 +70,14 @@ export function ReleaseControlParametersPage() {
         title={t('releaseControlParams.title')}
         subtitle={t('releaseControlParams.subtitle')}
         actions={
-          <button
+          /* CTA de salvar via componente DS Button */
+          <Button
+            variant="primary"
+            icon={<Save className="w-4 h-4" />}
             onClick={handleSave}
-            className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
           >
-            <Save className="w-4 h-4" />
             {saved ? t('releaseControlParams.saved') : t('releaseControlParams.saveChanges')}
-          </button>
+          </Button>
         }
       />
 
@@ -96,19 +100,18 @@ export function ReleaseControlParametersPage() {
                 </div>
                 <div className="flex-shrink-0">
                   {param.type === 'boolean' ? (
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={values[param.key] as boolean}
-                        onChange={e => handleChange(param.key, e.target.checked)}
-                      />
-                      <div className="w-10 h-5 bg-edge peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-accent after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" />
-                    </label>
+                    /* Toggle DS — substitui o raw checkbox peer customizado */
+                    <Toggle
+                      size="sm"
+                      checked={values[param.key] as boolean}
+                      onChange={(checked) => handleChange(param.key, checked)}
+                    />
                   ) : (
-                    <input
+                    /* TextField DS — substitui o raw input[type=number] */
+                    <TextField
+                      size="sm"
                       type="number"
-                      className="w-24 rounded-md bg-canvas border border-edge px-3 py-1.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                      className="w-24"
                       value={values[param.key] as number}
                       onChange={e => handleChange(param.key, Number(e.target.value))}
                     />
@@ -125,7 +128,7 @@ export function ReleaseControlParametersPage() {
           <h3 className="text-sm font-semibold text-heading">{t('releaseControlParams.callbackInfo')}</h3>
         </CardHeader>
         <CardBody>
-          <div className="rounded-lg bg-surface border border-edge p-4 text-sm text-muted space-y-2">
+          <div className="rounded-lg bg-card border border-edge p-4 text-sm text-muted space-y-2">
             <p>{t('releaseControlParams.callbackInfoText1')}</p>
             <p className="font-mono text-xs text-heading">
               POST /api/v1/releases/{'{'}<span className="text-accent">id</span>{'}'}/approvals/{'{'}<span className="text-accent">token</span>{'}'}/respond

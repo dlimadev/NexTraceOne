@@ -61,11 +61,11 @@ export const inputBaseClass =
 
 /** Borda padrão (sem erro). */
 export const inputDefaultBorderClass =
-  'border-edge hover:border-edge-strong focus:border-edge-focus focus:shadow-glow-cyan';
+  'border-edge hover:border-edge-strong focus:border-edge-focus focus-visible:ring-2 focus-visible:ring-accent';
 
 /** Borda de erro. */
 export const inputErrorBorderClass =
-  'border-critical/60 focus:border-critical focus:shadow-glow-danger';
+  'border-critical/60 focus:border-critical focus-visible:ring-2 focus-visible:ring-critical';
 
 // ── Interactive Surface ─────────────────────────────────────────────────────
 /** Padrão para superfícies clicáveis (cards interativos, list items). */

@@ -132,7 +132,7 @@ export function EnterpriseControlsPage() {
                       <p className="text-xs text-muted">{t('governance.controls.coverage')}</p>
                       <p className="text-xs font-medium text-heading">{dim.coveragePercent}%</p>
                     </div>
-                    <div className="w-full bg-surface rounded-full h-2">
+                    <div className="w-full bg-card rounded-full h-2">
                       <div className={`${coverageColor(dim.coveragePercent)} rounded-full h-2 transition-all`} style={{ width: `${dim.coveragePercent}%` }} />
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export function EnterpriseControlsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-surface rounded-full h-1.5">
+                        <div className="w-16 bg-card rounded-full h-1.5">
                           <div className={`${coverageColor(dim.coveragePercent)} rounded-full h-1.5`} style={{ width: `${dim.coveragePercent}%` }} />
                         </div>
                         <span className="text-xs text-heading font-medium">{dim.coveragePercent}%</span>

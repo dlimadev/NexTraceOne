@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getServiceMaturities, type ServiceMaturityEntry, type MaturityLevel } from '../api/telemetry';
@@ -24,12 +25,7 @@ import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type TimeRange = '1h' | '6h' | '24h' | '7d';
 
-const TIME_RANGE_OPTIONS: Array<{ value: TimeRange; labelKey: string }> = [
-  { value: '1h', labelKey: 'serviceMaturitySre.timeRange.1h' },
-  { value: '6h', labelKey: 'serviceMaturitySre.timeRange.6h' },
-  { value: '24h', labelKey: 'serviceMaturitySre.timeRange.24h' },
-  { value: '7d', labelKey: 'serviceMaturitySre.timeRange.7d' },
-];
+const TIME_RANGE_VALUES: TimeRange[] = ['1h', '6h', '24h', '7d'];
 
 function timeRangeToInterval(range: TimeRange) {
   const until = new Date();
@@ -62,7 +58,7 @@ function maturityVariant(level: MaturityLevel): 'success' | 'info' | 'warning' |
 
 function CriteriaCell({ value }: { value: boolean }) {
   return value
-    ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
+    ? <CheckCircle2 className="w-4 h-4 text-success mx-auto" />
     : <XCircle className="w-4 h-4 text-muted/40 mx-auto" />;
 }
 
@@ -71,6 +67,12 @@ export function ServiceMaturitySrePage() {
   const { activeEnvironmentId } = useEnvironment();
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Opções do seletor de intervalo de tempo para o componente Tabs
+  const timeRangeTabs = TIME_RANGE_VALUES.map((v) => ({
+    id: v,
+    label: t(`serviceMaturitySre.timeRange.${v}`),
+  }));
 
   const interval = timeRangeToInterval(timeRange);
   const environment = activeEnvironmentId ?? 'production';
@@ -95,31 +97,27 @@ export function ServiceMaturitySrePage() {
 
   return (
     <PageContainer>
-      <div className="flex flex-col gap-1 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader
-          title={t('serviceMaturitySre.title')}
-          subtitle={t('serviceMaturitySre.subtitle')}
-          icon={<Award className="w-5 h-5" />}
-        />
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
+      <PageHeader
+        title={t('serviceMaturitySre.title')}
+        subtitle={t('serviceMaturitySre.subtitle')}
+        icon={<Award className="w-5 h-5" />}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Seletor de intervalo de tempo via Tabs pill */}
+            <Tabs
+              items={timeRangeTabs}
+              activeId={timeRange}
+              onChange={(id) => setTimeRange(id as TimeRange)}
+              variant="pill"
+              size="sm"
+            />
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              {t('common.refresh')}
+            </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-            {t('common.refresh')}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && <PageErrorState message={t('serviceMaturitySre.loadError')} onRetry={handleRefresh} />}
       {isLoading && <PageLoadingState message={t('serviceMaturitySre.loading')} />}
@@ -177,7 +175,8 @@ export function ServiceMaturitySrePage() {
                             <td className="px-4 py-2.5">
                               <div className="flex items-center gap-2">
                                 <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                                  <div className={`h-full rounded-full ${e.score >= 80 ? 'bg-emerald-500' : e.score >= 60 ? 'bg-blue-500' : e.score >= 40 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${e.score}%` }} />
+                                  {/* Barra de progresso com tokens semânticos por faixa de score */}
+                                <div className={`h-full rounded-full ${e.score >= 80 ? 'bg-success' : e.score >= 60 ? 'bg-accent' : e.score >= 40 ? 'bg-warning' : 'bg-critical'}`} style={{ width: `${e.score}%` }} />
                                 </div>
                                 <span className="font-semibold tabular-nums">{e.score}</span>
                               </div>

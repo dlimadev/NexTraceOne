@@ -325,11 +325,14 @@
   },
   "scripts": {
     "build": "tsc -p .",
-    "watch": "tsc -watch -p ."
+    "watch": "tsc -watch -p .",
+    "test": "tsc -p . && mocha out/test/**/*.test.js"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/node": "^25.6.0",
     "@types/vscode": "^1.90.0",
+    "mocha": "^11.6.0",
     "typescript": "^5.0.0"
   }
 }

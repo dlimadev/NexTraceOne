@@ -60,9 +60,9 @@ public static class IncidentCommand
 
     private static Command CreateListCommand()
     {
-        var serviceOpt = new Option<string>("--service", "Filter by service name or ID.");
-        var statusOpt = new Option<string>("--status", "Filter by status (e.g., Open, Resolved, Investigating).");
-        var severityOpt = new Option<string>("--severity", "Filter by severity (e.g., Critical, High, Medium, Low).");
+        var serviceOpt = new Option<string>("--service") { Description = "Filter by service name or ID." };
+        var statusOpt = new Option<string>("--status") { Description = "Filter by status (e.g., Open, Resolved, Investigating)." };
+        var severityOpt = new Option<string>("--severity") { Description = "Filter by severity (e.g., Critical, High, Medium, Low)." };
         var limitOpt = new Option<int>("--limit")
         {
             Description = "Maximum number of records to return.",
@@ -317,16 +317,16 @@ public static class IncidentCommand
 
     private static Command CreateReportCommand()
     {
-        var titleOpt = new Option<string>("--title", "Incident title.") { Required = true };
-        var serviceOpt = new Option<string>("--service", "Affected service name or ID.") { Required = true };
+        var titleOpt = new Option<string>("--title") { Description = "Incident title.",  Required = true };
+        var serviceOpt = new Option<string>("--service") { Description = "Affected service name or ID.",  Required = true };
         var severityOpt = new Option<string>("--severity")
         {
             Description = "Severity: Critical | High | Medium | Low.",
             DefaultValueFactory = _ => "Medium"
         };
-        var envOpt = new Option<string>("--environment", "Affected environment (e.g., production, staging).");
-        var descOpt = new Option<string>("--description", "Incident description.");
-        var externalIdOpt = new Option<string>("--external-id", "External ticket/incident ID (e.g., JIRA, PagerDuty).");
+        var envOpt = new Option<string>("--environment") { Description = "Affected environment (e.g., production, staging)." };
+        var descOpt = new Option<string>("--description") { Description = "Incident description." };
+        var externalIdOpt = new Option<string>("--external-id") { Description = "External ticket/incident ID (e.g., JIRA, PagerDuty)." };
         var externalSystemOpt = new Option<string>("--external-system")
         {
             Description = "Source system of the external ID (e.g., pagerduty, jira, opsgenie).",

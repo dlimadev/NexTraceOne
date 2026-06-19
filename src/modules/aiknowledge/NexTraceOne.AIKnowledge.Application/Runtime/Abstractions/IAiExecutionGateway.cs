@@ -110,7 +110,8 @@ public enum AiAvailabilityStatus
     DisabledByPolicy = 4,
     QuotaExceeded = 5,
     NoProviderAvailable = 6,
-    GuardrailBlocked = 7
+    GuardrailBlocked = 7,
+    AccessDenied = 8
 }
 
 /// <summary>

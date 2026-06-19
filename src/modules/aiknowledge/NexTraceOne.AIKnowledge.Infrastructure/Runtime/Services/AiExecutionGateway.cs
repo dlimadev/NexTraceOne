@@ -147,7 +147,9 @@ public sealed class AiExecutionGateway : IAiExecutionGateway
             var recordedTenantId = tenantId;
             var recordedProviderId = result.ProviderId ?? resolution.ProviderId;
             var recordedModelId = result.ModelId ?? resolution.ModelId;
-            var recordedModelDisplayName = resolution.ModelDisplayName;
+            var recordedModelDisplayName = string.Equals(result.ModelId, resolution.ModelId, StringComparison.OrdinalIgnoreCase)
+                ? resolution.ModelDisplayName
+                : (result.ModelId ?? resolution.ModelDisplayName);
             var recordedPromptTokens = result.PromptTokens;
             var recordedCompletionTokens = result.CompletionTokens;
             var recordedDurationMs = stopwatch.ElapsedMilliseconds;
@@ -439,7 +441,7 @@ public sealed class AiExecutionGateway : IAiExecutionGateway
             // Try to resolve a model for this provider
             var modelId = defaultModel?.ProviderId.Equals(providerId, StringComparison.OrdinalIgnoreCase) == true
                 ? defaultModel.ModelName
-                : (await InferModelForProviderAsync(providerId, ct));
+                : (await InferModelForProviderAsync(providerId, ct, defaultModel));
 
             // Skip exact same provider+model pair being excluded
             if (string.Equals(providerId, excludeProviderId, StringComparison.OrdinalIgnoreCase)
@@ -457,11 +459,14 @@ public sealed class AiExecutionGateway : IAiExecutionGateway
         return candidates;
     }
 
-    private async Task<string?> InferModelForProviderAsync(string providerId, CancellationToken ct)
+    private async Task<string?> InferModelForProviderAsync(
+        string providerId,
+        CancellationToken ct,
+        ResolvedModel? defaultModel = null)
     {
         // Query catalog for any active chat model belonging to this provider
         // If catalog supports it, prefer catalog-backed lookup over hardcoded fallback
-        var defaultModel = await _modelCatalogService.ResolveDefaultModelAsync("chat", ct);
+        defaultModel ??= await _modelCatalogService.ResolveDefaultModelAsync("chat", ct);
         if (defaultModel is not null &&
             string.Equals(defaultModel.ProviderId, providerId, StringComparison.OrdinalIgnoreCase))
         {
@@ -577,6 +582,20 @@ public sealed class AiExecutionGateway : IAiExecutionGateway
                 {
                     var (extProviderId, extModelId, extDisplayName) = MapExternalProductToProvider(
                         userPref.ExternalProduct!.Value, userPref.ExternalProductModel);
+
+                    // Best-effort authorization: external products map to external provider/model names,
+                    // but if the model identifier happens to be a known internal GUID, enforce access policy.
+                    if (Guid.TryParse(extModelId, out var extModelGuid))
+                    {
+                        var auth = await _authorizationService.ValidateModelAccessAsync(extModelGuid, ct);
+                        if (!auth.IsAllowed)
+                        {
+                            return ResolvedExecution.Unavailable(
+                                AiAvailabilityStatus.AccessDenied,
+                                auth.DenialReason ?? "Acesso negado ao modelo externo.");
+                        }
+                    }
+
                     if (_healthMonitor.IsHealthy(extProviderId))
                     {
                         var extProvider = _providerFactory.GetChatProvider(extProviderId);

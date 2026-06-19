@@ -21,7 +21,7 @@ namespace NexTraceOne.VisualStudio;
 [ProvideToolWindow(typeof(NexAiChatWindow), Style = VsDockStyle.Tabbed, DockedWidth = 380)]
 [ProvideToolWindow(typeof(NexAiCatalogWindow), Style = VsDockStyle.Tabbed, DockedWidth = 340)]
 [ProvideOptionPage(typeof(NexTraceOneOptionsPage), "NexTraceOne", "General", 0, 0, true)]
-public sealed class NexTraceOnePackage : AsyncPackage
+public sealed class NexTraceOnePackage : AsyncPackage, IDisposable
 {
     private NexErrorListProvider? _errorListProvider;
 
@@ -64,6 +64,16 @@ public sealed class NexTraceOnePackage : AsyncPackage
             _errorListProvider?.Dispose();
         }
         base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Explicit <see cref="IDisposable"/> implementation to satisfy CA1001.
+    /// Delegates to the protected Dispose(bool) pattern.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
 

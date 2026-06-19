@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getOnCallSchedules, type OnCallSchedule } from '../api/telemetry';
@@ -77,37 +78,38 @@ export function OnCallSchedulePage() {
   const totalOverrides = schedules.reduce((a, s) => a + s.activeOverrides, 0);
   const totalEscalations = schedules.filter((s) => s.escalationLevels > 0).length;
 
+  /* Itens do Tabs DS derivados das opções de intervalo de tempo */
+  const tabItems = TIME_RANGE_OPTIONS.map((opt) => ({
+    id: opt.value,
+    label: t(opt.labelKey),
+  }));
+
   return (
     <PageContainer>
-      <div className="flex flex-col gap-1 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader
-          title={t('onCallSchedule.title')}
-          subtitle={t('onCallSchedule.subtitle')}
-          icon={<CalendarDays className="w-5 h-5" />}
-        />
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
+      {/* PageHeader com tab strip e CTAs nas actions — padrão DS */}
+      <PageHeader
+        title={t('onCallSchedule.title')}
+        subtitle={t('onCallSchedule.subtitle')}
+        icon={<CalendarDays className="w-5 h-5" />}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Tabs
+              variant="pill"
+              size="sm"
+              items={tabItems}
+              activeId={timeRange}
+              onChange={(id) => setTimeRange(id as TimeRange)}
+            />
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              {t('common.refresh')}
+            </Button>
+            <Button size="sm" icon={<Plus className="w-3.5 h-3.5" />}>
+              {t('onCallSchedule.overrides.add')}
+            </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-            {t('common.refresh')}
-          </Button>
-          <Button size="sm">
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            {t('onCallSchedule.overrides.add')}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && <PageErrorState message={t('onCallSchedule.loadError')} onRetry={handleRefresh} />}
       {isLoading && <PageLoadingState message={t('onCallSchedule.loading')} />}
@@ -162,7 +164,8 @@ export function OnCallSchedulePage() {
                             <td className="px-4 py-2.5"><Badge variant="secondary">{s.serviceName}</Badge></td>
                             <td className="px-4 py-2.5">
                               <div className="flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                {/* Token DS bg-success substitui bg-emerald-500 hardcoded */}
+                                <div className="w-2 h-2 rounded-full bg-success" />
                                 <span className="font-medium">{s.currentOnCall}</span>
                               </div>
                             </td>

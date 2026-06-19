@@ -32,7 +32,7 @@ const QUICK_LINKS = [
   { key: 'integrations', label: 'platformAdmin.integrations', icon: <Plug size={14} />, to: '/integrations', color: 'text-success' },
   { key: 'ai-budget', label: 'platformAdmin.aiTokenBudget', icon: <Brain size={14} />, to: '/ai-hub/governance', color: 'text-warning' },
   { key: 'audit', label: 'platformAdmin.auditLog', icon: <Shield size={14} />, to: '/audit-compliance/audit', color: 'text-destructive' },
-  { key: 'health', label: 'platformAdmin.systemHealth', icon: <Activity size={14} />, to: '/admin/system-health', color: 'text-primary' },
+  { key: 'health', label: 'platformAdmin.systemHealth', icon: <Activity size={14} />, to: '/admin/system-health', color: 'text-accent' },
   { key: 'api-keys', label: 'platformAdmin.apiKeys', icon: <Key size={14} />, to: '/platform/api-keys', color: 'text-secondary' },
   { key: 'access-reviews', label: 'platformAdmin.accessReviews', icon: <BarChart3 size={14} />, to: '/identity-access/access-reviews', color: 'text-muted' },
 ];

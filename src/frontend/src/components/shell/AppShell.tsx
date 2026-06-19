@@ -115,7 +115,7 @@ export function AppShell() {
         className={cn(
           'flex-1 flex flex-col min-h-0 min-w-0',
           'lg:transition-[margin] lg:duration-[var(--nto-motion-medium)] lg:ease-[var(--ease-standard)]',
-          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-[320px]',
+          sidebarCollapsed ? 'lg:ml-[60px]' : 'lg:ml-[308px]',
         )}
         data-testid="app-shell-main"
       >

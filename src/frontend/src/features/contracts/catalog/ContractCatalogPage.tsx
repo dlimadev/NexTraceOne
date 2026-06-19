@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { FilterChip } from '../../../components/FilterChip';
-import { ErrorState } from '../shared/components';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
+import { usePermissions } from '../../../hooks/usePermissions';
 import { useContractList, useContractsSummary } from '../hooks';
 import { CatalogToolbar, CatalogTable, CatalogSkeleton } from './components';
 import type { CatalogFilters, SortConfig, SortField, CatalogItem } from './types';
@@ -23,6 +24,8 @@ import { EMPTY_FILTERS, toCatalogItem, extractFilterOptions } from './types';
  */
 export function ContractCatalogPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { can } = usePermissions();
 
   // ── State ───────────────────────────────────────────────────────────────────
   const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
@@ -67,10 +70,22 @@ export function ContractCatalogPage() {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <PageContainer>
-      {/* Header */}
+      {/* Cabeçalho com CTA primário no topo — padrão Betterstack */}
       <PageHeader
         title={t('contracts.catalog.title', 'Contract Catalog')}
         subtitle={t('contracts.catalog.subtitle', 'Governed catalog of all contracts, APIs, and service definitions.')}
+        actions={
+          can('contracts:write') ? (
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Plus size={14} />}
+              onClick={() => navigate('/contracts/new')}
+            >
+              {t('contracts.catalog.actions.newContract', 'New contract')}
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Summary chips */}
@@ -140,7 +155,8 @@ export function ContractCatalogPage() {
           {listQuery.isLoading && <CatalogSkeleton />}
 
           {listQuery.isError && (
-            <ErrorState
+            <PageErrorState
+              variant="compact"
               message={t('contracts.catalog.states.errorDescription', 'An error occurred while loading the contract catalog.')}
               onRetry={() => listQuery.refetch()}
             />

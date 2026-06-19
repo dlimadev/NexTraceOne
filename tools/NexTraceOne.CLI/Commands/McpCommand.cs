@@ -158,7 +158,7 @@ public static class McpCommand
             Description = "Target to configure: vscode (default), claude-desktop, or custom path.",
             DefaultValueFactory = _ => "vscode"
         };
-        var outputOpt = new Option<string>("--output", "Custom output path for the MCP config file.");
+        var outputOpt = new Option<string>("--output") { Description = "Custom output path for the MCP config file." };
 
         var command = new Command("configure", "Generate MCP client configuration for VS Code, Claude Desktop, etc.");
         command.Add(urlOpt);

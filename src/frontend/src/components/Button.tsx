@@ -62,7 +62,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-sm font-medium',
+        'inline-flex items-center justify-center rounded-md font-medium',
         'transition-all duration-[var(--nto-motion-base)]',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
         'disabled:cursor-not-allowed select-none',

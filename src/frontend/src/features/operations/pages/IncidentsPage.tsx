@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, AlertCircle, ShieldAlert, Eye,
   Search, CheckCircle2, XCircle, Clock, Shield,
-  GitBranch, Wrench,
+  GitBranch, Wrench, Plus, CalendarClock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -16,6 +16,12 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Drawer } from '../../../components/Drawer';
 import { incidentsApi, type IncidentListItem } from '../api/incidents';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { resolveApiError } from '../../../utils/apiErrors';
@@ -24,28 +30,31 @@ import { queryKeys } from '../../../shared/api/queryKeys';
 
 type StatusFilter = 'all' | 'Open' | 'Investigating' | 'Mitigating' | 'Monitoring' | 'Resolved' | 'Closed';
 
+/** Mapeia severidade para variante de Badge + ícone. */
 const severityBadge = (severity: string): { variant: 'success' | 'warning' | 'danger' | 'default' | 'info'; icon: React.ReactNode } => {
   switch (severity) {
     case 'Critical': return { variant: 'danger', icon: <ShieldAlert size={14} /> };
-    case 'Major': return { variant: 'warning', icon: <AlertCircle size={14} /> };
-    case 'Minor': return { variant: 'info', icon: <AlertTriangle size={14} /> };
-    case 'Warning': return { variant: 'default', icon: <Eye size={14} /> };
-    default: return { variant: 'default', icon: <AlertTriangle size={14} /> };
+    case 'Major':    return { variant: 'warning', icon: <AlertCircle size={14} /> };
+    case 'Minor':    return { variant: 'info', icon: <AlertTriangle size={14} /> };
+    case 'Warning':  return { variant: 'default', icon: <Eye size={14} /> };
+    default:         return { variant: 'default', icon: <AlertTriangle size={14} /> };
   }
 };
 
+/** Ícone de status por estado. */
 const statusIcon = (status: string) => {
   switch (status) {
-    case 'Open': return <AlertCircle size={14} className="text-critical" />;
-    case 'Investigating': return <Search size={14} className="text-warning" />;
-    case 'Mitigating': return <Wrench size={14} className="text-warning" />;
-    case 'Monitoring': return <Eye size={14} className="text-info" />;
-    case 'Resolved': return <CheckCircle2 size={14} className="text-success" />;
-    case 'Closed': return <XCircle size={14} className="text-muted" />;
-    default: return <Clock size={14} className="text-muted" />;
+    case 'Open':         return <AlertCircle size={14} className="text-critical" />;
+    case 'Investigating':return <Search size={14} className="text-warning" />;
+    case 'Mitigating':  return <Wrench size={14} className="text-warning" />;
+    case 'Monitoring':  return <Eye size={14} className="text-info" />;
+    case 'Resolved':    return <CheckCircle2 size={14} className="text-success" />;
+    case 'Closed':      return <XCircle size={14} className="text-muted" />;
+    default:            return <Clock size={14} className="text-muted" />;
   }
 };
 
+/** Formata diferença temporal em string localizada. */
 function timeAgo(dateStr: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -55,6 +64,7 @@ function timeAgo(dateStr: string, t: (key: string, options?: Record<string, unkn
   return t('common.timeAgo.days', { count: days });
 }
 
+/** Estado inicial do formulário de criação de incidente. */
 const defaultCreateForm = {
   title: '',
   description: '',
@@ -67,10 +77,30 @@ const defaultCreateForm = {
   environment: 'Production',
 };
 
+/** Opções de tipo de incidente para o Select. */
+const INCIDENT_TYPE_OPTIONS = [
+  'ServiceDegradation',
+  'AvailabilityIssue',
+  'DependencyFailure',
+  'ContractImpact',
+  'MessagingIssue',
+  'BackgroundProcessingIssue',
+  'OperationalRegression',
+];
+
+/** Opções de severidade para o Select. */
+const SEVERITY_OPTIONS = ['Warning', 'Minor', 'Major', 'Critical'];
+
+/** Filtros de status disponíveis na barra de filtros. */
+const STATUS_FILTERS: StatusFilter[] = ['all', 'Open', 'Investigating', 'Mitigating', 'Monitoring', 'Resolved', 'Closed'];
+
 /**
  * Página de Incidentes — visão consolidada de incidentes com correlação contextualizada.
  * Correlaciona incidentes com serviços, mudanças, contratos, ownership e mitigação.
  * Persona-aware: Engineer vê por serviço, Tech Lead vê por equipa.
+ *
+ * Redesign Betterstack: ação primária no header, form em Drawer lateral,
+ * controles de filtro/busca e paginação com componentes do DS.
  */
 export function IncidentsPage() {
   const { t } = useTranslation();
@@ -78,15 +108,20 @@ export function IncidentsPage() {
   const { can } = usePermissions();
   const { activeEnvironmentId } = useEnvironment();
   const canCreateIncident = can('operations:incidents:write');
+
+  // Estado de filtros e paginação
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
+
+  // Estado do Drawer de criação
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState<{ incidentId: string; reference: string } | null>(null);
   const [createForm, setCreateForm] = useState(defaultCreateForm);
 
+  // Queries
   const incidentsQuery = useQuery({
     queryKey: queryKeys.incidents.list({ filter, search, page, pageSize }, activeEnvironmentId),
     queryFn: () => incidentsApi.listIncidents({
@@ -102,13 +137,16 @@ export function IncidentsPage() {
     queryFn: () => incidentsApi.getIncidentSummary(),
   });
 
+  // Dados derivados
   const incidents: IncidentListItem[] = incidentsQuery.data?.items ?? [];
   const totalCount = incidentsQuery.data?.totalCount ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const canGoToPreviousPage = page > 1;
   const canGoToNextPage = page < totalPages;
   const currentRangeStart = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
-  const currentRangeEnd = totalCount === 0 ? 0 : Math.min(page * pageSize, totalCount);
+  const currentRangeEnd   = totalCount === 0 ? 0 : Math.min(page * pageSize, totalCount);
+
+  /** Valida se o formulário tem os campos obrigatórios preenchidos. */
   const isCreateFormValid = useMemo(() => (
     createForm.title.trim().length > 0
     && createForm.description.trim().length > 0
@@ -118,6 +156,7 @@ export function IncidentsPage() {
     && createForm.environment.trim().length > 0
   ), [createForm]);
 
+  // Mutation: resolver incidente
   const resolveIncidentMutation = useMutation({
     mutationFn: (incidentId: string) => incidentsApi.resolveIncident(incidentId),
     onSuccess: async () => {
@@ -129,6 +168,7 @@ export function IncidentsPage() {
     },
   });
 
+  // Mutation: criar incidente
   const createIncidentMutation = useMutation({
     mutationFn: () => incidentsApi.createIncident({
       ...createForm,
@@ -156,6 +196,27 @@ export function IncidentsPage() {
     },
   });
 
+  /** Abre o Drawer limpando estado anterior de erro/sucesso. */
+  const handleOpenCreate = () => {
+    setCreateSuccess(null);
+    setCreateError(null);
+    setIsCreateOpen(true);
+  };
+
+  /** Fecha o Drawer e limpa erro inline. */
+  const handleCloseCreate = () => {
+    setCreateError(null);
+    setIsCreateOpen(false);
+  };
+
+  /** Submete o formulário de criação. */
+  const handleCreateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError(null);
+    setCreateSuccess(null);
+    createIncidentMutation.mutate();
+  };
+
   const stats = summaryQuery.data ?? {
     totalOpen: 0,
     criticalIncidents: 0,
@@ -164,62 +225,193 @@ export function IncidentsPage() {
     servicesImpacted: 0,
   };
 
+  // Opções localizadas para selects do formulário
+  const incidentTypeOptions = INCIDENT_TYPE_OPTIONS.map(type => ({
+    value: type,
+    label: t(`incidents.type.${type}`),
+  }));
+
+  const severityOptions = SEVERITY_OPTIONS.map(sev => ({
+    value: sev,
+    label: t(`incidents.severity.${sev}`),
+  }));
+
   return (
     <PageContainer>
+      {/* Cabeçalho com ações primárias — CTA de criação e link de timeline */}
       <PageHeader
         title={t('incidents.title')}
         subtitle={t('incidents.subtitle')}
+        actions={
+          <>
+            {/* Link para vista de timeline como ação secundária */}
+            <NavLink to="/operations/incidents/timeline">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={<CalendarClock size={15} />}
+              >
+                {t('incidents.timelineView.open')}
+              </Button>
+            </NavLink>
+
+            {/* CTA principal — visível apenas para quem tem permissão de escrita */}
+            {canCreateIncident && (
+              <Button
+                variant="primary"
+                size="sm"
+                icon={<Plus size={15} />}
+                onClick={handleOpenCreate}
+              >
+                {t('incidents.create.button', 'Create Incident')}
+              </Button>
+            )}
+          </>
+        }
       />
 
-      <div className="mb-4 flex justify-end">
-        <NavLink
-          to="/operations/incidents/timeline"
-          className="px-3 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body"
-        >
-          {t('incidents.timelineView.open')}
-        </NavLink>
-      </div>
+      {/* Nota informativa para utilizadores sem permissão de criação */}
+      {!canCreateIncident && (
+        <p className="text-xs text-muted px-1 mb-2">
+          {t('incidents.create.readOnlyHint', 'Your current role can review incidents but cannot create new ones.')}
+        </p>
+      )}
 
-      {/* Stats */}
+      {/* Stats de resumo */}
       <PageSection className="!mb-6">
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
-          <StatCard title={t('incidents.totalOpen')} value={stats.totalOpen} icon={<AlertTriangle size={20} />} color="text-critical" />
-          <StatCard title={t('incidents.critical')} value={stats.criticalIncidents} icon={<ShieldAlert size={20} />} color="text-critical" />
-          <StatCard title={t('incidents.withCorrelation')} value={stats.withCorrelatedChanges} icon={<GitBranch size={20} />} color="text-warning" />
-          <StatCard title={t('incidents.withMitigation')} value={stats.withMitigationAvailable} icon={<Wrench size={20} />} color="text-info" />
-          <StatCard title={t('incidents.servicesImpacted')} value={stats.servicesImpacted} icon={<Shield size={20} />} color="text-accent" />
+          <StatCard title={t('incidents.totalOpen')}        value={stats.totalOpen}                icon={<AlertTriangle size={20} />} color="text-critical" />
+          <StatCard title={t('incidents.critical')}         value={stats.criticalIncidents}         icon={<ShieldAlert size={20} />}   color="text-critical" />
+          <StatCard title={t('incidents.withCorrelation')}  value={stats.withCorrelatedChanges}    icon={<GitBranch size={20} />}     color="text-warning"  />
+          <StatCard title={t('incidents.withMitigation')}   value={stats.withMitigationAvailable}  icon={<Wrench size={20} />}        color="text-info"     />
+          <StatCard title={t('incidents.servicesImpacted')} value={stats.servicesImpacted}          icon={<Shield size={20} />}        color="text-accent"   />
         </ContentGrid>
       </PageSection>
 
-      {/* Filters + Incident list */}
-      <PageSection>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs text-muted">
-            {t('incidents.list.countSummary', 'Showing {{start}}-{{end}} of {{total}} incidents', {
-              start: currentRangeStart,
-              end: currentRangeEnd,
-              total: totalCount,
-            })}
-          </div>
-          {canCreateIncident ? (
-            <button
-              type="button"
-              onClick={() => {
-                setCreateSuccess(null);
-                setCreateError(null);
-                setIsCreateOpen(prev => !prev);
-              }}
-              className="px-3 py-2 text-sm rounded-md border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
+      {/* Drawer lateral de criação de incidente */}
+      <Drawer
+        open={isCreateOpen}
+        onClose={handleCloseCreate}
+        title={t('incidents.create.title', 'Create Incident')}
+        description={t('incidents.subtitle')}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCloseCreate}
             >
-              {t('incidents.create.button', 'Create Incident')}
-            </button>
-          ) : (
-            <p className="text-xs text-muted">
-              {t('incidents.create.readOnlyHint', 'Your current role can review incidents but cannot create new ones.')}
-            </p>
-          )}
-        </div>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              form="create-incident-form"
+              type="submit"
+              disabled={!isCreateFormValid}
+              loading={createIncidentMutation.isPending}
+            >
+              {t('incidents.create.submit', 'Create')}
+            </Button>
+          </>
+        }
+      >
+        <form
+          id="create-incident-form"
+          className="flex flex-col gap-4"
+          onSubmit={handleCreateSubmit}
+        >
+          {/* Título do incidente */}
+          <TextField
+            label={t('incidents.create.titlePlaceholder', 'Incident title')}
+            value={createForm.title}
+            onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
+            placeholder={t('incidents.create.titlePlaceholder', 'Incident title')}
+            required
+          />
 
+          {/* Serviço afetado */}
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              label={t('incidents.create.serviceIdPlaceholder', 'Service ID')}
+              value={createForm.serviceId}
+              onChange={e => setCreateForm(prev => ({ ...prev, serviceId: e.target.value }))}
+              placeholder={t('incidents.create.serviceIdPlaceholder', 'Service ID')}
+              required
+            />
+            <TextField
+              label={t('incidents.create.serviceNamePlaceholder', 'Service display name')}
+              value={createForm.serviceDisplayName}
+              onChange={e => setCreateForm(prev => ({ ...prev, serviceDisplayName: e.target.value }))}
+              placeholder={t('incidents.create.serviceNamePlaceholder', 'Service display name')}
+              required
+            />
+          </div>
+
+          {/* Equipa e ambiente */}
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              label={t('incidents.create.ownerTeamPlaceholder', 'Owner team')}
+              value={createForm.ownerTeam}
+              onChange={e => setCreateForm(prev => ({ ...prev, ownerTeam: e.target.value }))}
+              placeholder={t('incidents.create.ownerTeamPlaceholder', 'Owner team')}
+              required
+            />
+            <TextField
+              label={t('incidents.create.environmentPlaceholder', 'Environment')}
+              value={createForm.environment}
+              onChange={e => setCreateForm(prev => ({ ...prev, environment: e.target.value }))}
+              placeholder={t('incidents.create.environmentPlaceholder', 'Environment')}
+              required
+            />
+          </div>
+
+          {/* Tipo e severidade */}
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label={t('incidents.create.incidentType', 'Type')}
+              value={createForm.incidentType}
+              onChange={e => setCreateForm(prev => ({ ...prev, incidentType: e.target.value }))}
+              options={incidentTypeOptions}
+              size="md"
+            />
+            <Select
+              label={t('incidents.create.severity', 'Severity')}
+              value={createForm.severity}
+              onChange={e => setCreateForm(prev => ({ ...prev, severity: e.target.value }))}
+              options={severityOptions}
+              size="md"
+            />
+          </div>
+
+          {/* Domínio impactado (opcional) */}
+          <TextField
+            label={t('incidents.create.domainPlaceholder', 'Impacted domain (optional)')}
+            value={createForm.impactedDomain}
+            onChange={e => setCreateForm(prev => ({ ...prev, impactedDomain: e.target.value }))}
+            placeholder={t('incidents.create.domainPlaceholder', 'Impacted domain (optional)')}
+          />
+
+          {/* Descrição */}
+          <TextArea
+            label={t('incidents.create.descriptionPlaceholder', 'Describe what happened')}
+            value={createForm.description}
+            onChange={e => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
+            placeholder={t('incidents.create.descriptionPlaceholder', 'Describe what happened')}
+            required
+          />
+
+          {/* Erro de criação inline no formulário */}
+          {createError && (
+            <p className="text-sm text-critical" role="alert">{createError}</p>
+          )}
+        </form>
+      </Drawer>
+
+      {/* Lista de incidentes + filtros */}
+      <PageSection>
+        {/* Banner de sucesso após criação */}
         {createSuccess && (
           <Card className="mb-4 border border-success/25">
             <CardBody className="flex flex-wrap items-center justify-between gap-3">
@@ -238,148 +430,39 @@ export function IncidentsPage() {
           </Card>
         )}
 
-        {isCreateOpen && canCreateIncident && (
-          <Card className="mb-4">
-            <CardHeader>
-              <h2 className="text-sm font-semibold text-heading">{t('incidents.create.title', 'Create Incident')}</h2>
-            </CardHeader>
-            <CardBody>
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setCreateError(null);
-                  setCreateSuccess(null);
-                  createIncidentMutation.mutate();
-                }}
-              >
-                <input
-                  value={createForm.title}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder={t('incidents.create.titlePlaceholder', 'Incident title')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                  required
-                />
-                <input
-                  value={createForm.serviceId}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, serviceId: e.target.value }))}
-                  placeholder={t('incidents.create.serviceIdPlaceholder', 'Service ID')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                  required
-                />
-                <input
-                  value={createForm.serviceDisplayName}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, serviceDisplayName: e.target.value }))}
-                  placeholder={t('incidents.create.serviceNamePlaceholder', 'Service display name')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                  required
-                />
-                <input
-                  value={createForm.ownerTeam}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, ownerTeam: e.target.value }))}
-                  placeholder={t('incidents.create.ownerTeamPlaceholder', 'Owner team')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                  required
-                />
-                <select
-                  value={createForm.incidentType}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, incidentType: e.target.value }))}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                >
-                  {['ServiceDegradation', 'AvailabilityIssue', 'DependencyFailure', 'ContractImpact', 'MessagingIssue', 'BackgroundProcessingIssue', 'OperationalRegression'].map(type => (
-                    <option key={type} value={type}>{t(`incidents.type.${type}`)}</option>
-                  ))}
-                </select>
-                <select
-                  value={createForm.severity}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, severity: e.target.value }))}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                >
-                  {['Warning', 'Minor', 'Major', 'Critical'].map(sev => (
-                    <option key={sev} value={sev}>{t(`incidents.severity.${sev}`)}</option>
-                  ))}
-                </select>
-                <input
-                  value={createForm.environment}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, environment: e.target.value }))}
-                  placeholder={t('incidents.create.environmentPlaceholder', 'Environment')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                  required
-                />
-                <input
-                  value={createForm.impactedDomain}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, impactedDomain: e.target.value }))}
-                  placeholder={t('incidents.create.domainPlaceholder', 'Impacted domain (optional)')}
-                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
-                />
-                <textarea
-                  value={createForm.description}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder={t('incidents.create.descriptionPlaceholder', 'Describe what happened')}
-                  className="md:col-span-2 px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body min-h-[88px]"
-                  required
-                />
-
-                {createError && (
-                  <p className="md:col-span-2 text-sm text-critical">{createError}</p>
-                )}
-
-                <div className="md:col-span-2 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCreateError(null);
-                      setIsCreateOpen(false);
-                    }}
-                    className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body"
-                  >
-                    {t('common.cancel', 'Cancel')}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!isCreateFormValid || createIncidentMutation.isPending}
-                    className="px-3 py-2 text-sm rounded-md bg-accent text-accent-contrast disabled:opacity-60"
-                  >
-                    {createIncidentMutation.isPending ? t('common.loading', 'Loading...') : t('incidents.create.submit', 'Create')}
-                  </button>
-                </div>
-              </form>
-            </CardBody>
-          </Card>
-        )}
-
+        {/* Barra de filtros: busca + filtros de status */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="relative flex-1 max-w-xs">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder={t('incidents.searchPlaceholder', 'Search incidents...')}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-          {(['all', 'Open', 'Investigating', 'Mitigating', 'Monitoring', 'Resolved', 'Closed'] as StatusFilter[]).map(f => (
-            <button
+          {/* Campo de busca com componente DS */}
+          <SearchInput
+            className="flex-1 max-w-xs"
+            size="sm"
+            value={search}
+            onChange={e => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder={t('incidents.searchPlaceholder', 'Search incidents...')}
+            aria-label={t('incidents.searchPlaceholder', 'Search incidents...')}
+          />
+
+          {/* Filtros de status — variant toggleado por estado ativo */}
+          {STATUS_FILTERS.map(f => (
+            <Button
               key={f}
+              variant={filter === f ? 'subtle' : 'ghost'}
+              size="xs"
               onClick={() => {
                 setFilter(f);
                 setPage(1);
               }}
-              className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
-                filter === f
-                  ? 'bg-accent/10 text-accent border-accent/30'
-                  : 'bg-surface text-muted border-edge hover:text-body'
-              }`}
+              className={filter === f ? 'text-accent' : undefined}
             >
               {t(`incidents.filter.${f}`)}
-            </button>
+            </Button>
           ))}
         </div>
 
+        {/* Card principal de listagem */}
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -474,15 +557,17 @@ export function IncidentsPage() {
           </CardBody>
         </Card>
 
+        {/* Paginação com componentes Button do DS */}
         <div className="mt-4 flex items-center justify-between gap-3">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setPage(prev => Math.max(1, prev - 1))}
             disabled={!canGoToPreviousPage || incidentsQuery.isFetching}
-            className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body disabled:opacity-50"
           >
             {t('common.back', 'Back')}
-          </button>
+          </Button>
+
           <span className="text-xs text-muted">
             {t('incidents.list.countSummary', 'Showing {{start}}-{{end}} of {{total}} incidents', {
               start: currentRangeStart,
@@ -490,14 +575,15 @@ export function IncidentsPage() {
               total: totalCount,
             })}
           </span>
-          <button
-            type="button"
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
             disabled={!canGoToNextPage || incidentsQuery.isFetching}
-            className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body disabled:opacity-50"
           >
             {t('common.next', 'Next')}
-          </button>
+          </Button>
         </div>
       </PageSection>
     </PageContainer>

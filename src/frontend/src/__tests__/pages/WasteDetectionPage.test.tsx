@@ -98,7 +98,8 @@ describe('WasteDetectionPage', () => {
       () => new Promise(() => {})
     );
     render(<WasteDetectionPage />, { wrapper: Wrapper });
-    expect(screen.getByText('loading')).toBeDefined();
+    // PageLoadingState usa a chave i18n 'common.loading' internamente
+    expect(screen.getByText('common.loading')).toBeDefined();
   });
 
   it('shows no waste state when no signals', async () => {
@@ -131,6 +132,7 @@ describe('WasteDetectionPage', () => {
   it('shows error state on API failure', async () => {
     vi.mocked(finOpsApi.getWasteSignals).mockRejectedValue(new Error('Network error'));
     render(<WasteDetectionPage />, { wrapper: Wrapper });
-    await waitFor(() => expect(screen.getByText('error')).toBeDefined());
+    // PageErrorState usa a chave i18n 'common.error' internamente
+    await waitFor(() => expect(screen.getByText('common.error')).toBeDefined());
   });
 });

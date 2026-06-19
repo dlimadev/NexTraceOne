@@ -122,6 +122,7 @@
   },
   "agentMarketplace": {
     "category": "Categoria",
+    "publishAgent": "Publicar agente",
     "error": "Falha ao carregar o marketplace de agents. Tente novamente.",
     "executions": "{{count}} execuções",
     "filterAll": "Todos",

@@ -19,16 +19,15 @@ namespace NexTraceOne.VisualStudio.ToolWindows;
 /// botão de limpar histórico e cópia de mensagens do assistente.
 /// Respostas com blocos de código são renderizadas com botões "Insert at Cursor" e "Copy".
 /// </summary>
-public sealed partial class NexAiChatControl : UserControl
+public sealed partial class NexAiChatControl : UserControl, IDisposable
 {
     private readonly ToolWindowPane _parentWindow;
     private readonly HttpClient _httpClient;
     private CancellationTokenSource? _cts;
+    private bool _disposed;
 
     private static readonly Regex CodeBlockPattern =
         new(@"```([a-zA-Z0-9_\-]*)\n?([\s\S]*?)```", RegexOptions.Compiled);
-
-    private string? _pendingQuery;
 
     public NexAiChatControl(ToolWindowPane parentWindow)
     {
@@ -40,7 +39,7 @@ public sealed partial class NexAiChatControl : UserControl
     /// <summary>Enfileira uma query para envio assim que o controlo estiver pronto.</summary>
     public void EnqueueQuery(string query)
     {
-        ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+        _ = ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             InputBox.Text = query;
@@ -144,7 +143,7 @@ public sealed partial class NexAiChatControl : UserControl
         var text = InputBox.Text.Trim();
         if (string.IsNullOrEmpty(text)) return;
         InputBox.Text = string.Empty;
-        ThreadHelper.JoinableTaskFactory.RunAsync(() => SendQueryAsync(text));
+        _ = ThreadHelper.JoinableTaskFactory.RunAsync(() => SendQueryAsync(text));
     }
 
     private void OnInputKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -242,18 +241,7 @@ public sealed partial class NexAiChatControl : UserControl
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Server returned {(int)response.StatusCode}: {body}");
 
-        try
-        {
-            var parsed = JsonSerializer.Deserialize<JsonElement>(body);
-            foreach (var key in new[] { "content", "output", "message", "response", "result" })
-            {
-                if (parsed.TryGetProperty(key, out var prop))
-                    return prop.GetString() ?? body;
-            }
-        }
-        catch { /* fallback to raw body */ }
-
-        return body;
+        return IdeQueryResponseParser.ExtractMessage(body);
     }
 
     private void AppendUserMessage(string text)
@@ -459,7 +447,7 @@ public sealed partial class NexAiChatControl : UserControl
     /// <summary>Insere código na posição do cursor do editor activo no Visual Studio.</summary>
     private static void InsertCodeAtCursor(string code)
     {
-        ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+        _ = ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             try
@@ -537,6 +525,16 @@ public sealed partial class NexAiChatControl : UserControl
     // Code block parsing
     // ─────────────────────────────────────────────────────────────────────────
 
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _httpClient.Dispose();
+    }
+
     private sealed record MessageSegment(bool IsCode, string Language, string Content);
 
     private static IReadOnlyList<MessageSegment> ParseCodeBlocks(string text)
@@ -547,17 +545,18 @@ public sealed partial class NexAiChatControl : UserControl
         foreach (Match match in CodeBlockPattern.Matches(text))
         {
             if (match.Index > last)
-                segments.Add(new MessageSegment(false, string.Empty, text[last..match.Index]));
+                segments.Add(new MessageSegment(false, string.Empty, text.Substring(last, match.Index - last)));
 
             var lang = match.Groups[1].Value;
             var code = match.Groups[2].Value;
-            if (code.EndsWith('\n')) code = code[..^1]; // trim trailing newline
+            if (code.Length > 0 && code[code.Length - 1] == '\n')
+                code = code.Substring(0, code.Length - 1); // trim trailing newline
             segments.Add(new MessageSegment(true, lang, code));
             last = match.Index + match.Length;
         }
 
         if (last < text.Length)
-            segments.Add(new MessageSegment(false, string.Empty, text[last..]));
+            segments.Add(new MessageSegment(false, string.Empty, text.Substring(last)));
 
         return segments;
     }

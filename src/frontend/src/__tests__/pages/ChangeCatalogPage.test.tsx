@@ -8,6 +8,8 @@ vi.mock('../../features/change-governance/api/changeConfidence', () => ({
   changeConfidenceApi: {
     listChanges: vi.fn(),
     getSummary: vi.fn(),
+    // getFilterOptions adicionado após migração para DS Select (requer mock para evitar rejeição não tratada)
+    getFilterOptions: vi.fn().mockResolvedValue({ changeTypes: [], environments: [] }),
   },
 }));
 

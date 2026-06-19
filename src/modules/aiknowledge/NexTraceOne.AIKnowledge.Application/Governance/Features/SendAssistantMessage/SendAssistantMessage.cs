@@ -27,9 +27,6 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantM
 /// </summary>
 public static class SendAssistantMessage
 {
-    private const string DegradedProviderId = "system-fallback";
-    private const string DegradedModelName = "deterministic-fallback";
-
     private static string ResolveConversationOwner(ICurrentUser currentUser)
         => !string.IsNullOrWhiteSpace(currentUser.Email)
             ? currentUser.Email
@@ -90,6 +87,11 @@ public static class SendAssistantMessage
     {
         private const string DegradedProviderId = "system-fallback";
         private const string DegradedModelName = "deterministic-fallback";
+
+        private static readonly JsonSerializerOptions ContextBundleSerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -202,32 +204,6 @@ public static class SendAssistantMessage
             }
 
             // 5. Build message list with conversation history
-            var messages = await BuildMessageListAsync(
-                conversation.Id.Value,
-                request.Message,
-                groundingResult.SystemPrompt,
-                cancellationToken);
-
-            // 5b. Pre-validate token quota (now includes full message history)
-            var estimatedTokens = contextWindow.EstimateTotalTokens(messages);
-
-            var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
-                currentUser.Id,
-                currentTenant.Id,
-                routingResult.SelectedProvider,
-                routingResult.SelectedModel,
-                estimatedTokens,
-                cancellationToken);
-
-            if (!quotaResult.IsAllowed)
-            {
-                logger.LogWarning(
-                    "Token quota exceeded for user {UserId}, tenant {TenantId}: {BlockReason}",
-                    currentUser.Id, currentTenant.Id, quotaResult.BlockReason);
-
-                return AiGovernanceErrors.QuotaExceeded("user", currentUser.Id);
-            }
-
             // 6. Execute inference
             // Note: Prompt cache is intentionally DISABLED for stateful assistant chat.
             // Caching responses with conversation history is unreliable — the same user message
@@ -239,9 +215,36 @@ public static class SendAssistantMessage
             string? degradedReason = null;
             int promptTokens;
             int completionTokens;
+            List<ChatMessage>? messages = null;
 
             try
             {
+                messages = await BuildMessageListAsync(
+                    conversation.Id.Value,
+                    request.Message,
+                    groundingResult.SystemPrompt,
+                    cancellationToken);
+
+                // 5b. Pre-validate token quota (now includes full message history)
+                var estimatedTokens = contextWindow.EstimateTotalTokens(messages);
+
+                var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
+                    currentUser.Id,
+                    currentTenant.Id,
+                    routingResult.SelectedProvider,
+                    routingResult.SelectedModel,
+                    estimatedTokens,
+                    cancellationToken);
+
+                if (!quotaResult.IsAllowed)
+                {
+                    logger.LogWarning(
+                        "Token quota exceeded for user {UserId}, tenant {TenantId}: {BlockReason}",
+                        currentUser.Id, currentTenant.Id, quotaResult.BlockReason);
+
+                    return AiGovernanceErrors.QuotaExceeded("user", currentUser.Id);
+                }
+
                 var chatProvider = providerFactory.GetChatProvider(selectedProvider);
                 if (chatProvider is not null)
                 {
@@ -307,7 +310,8 @@ public static class SendAssistantMessage
                 selectedModel = DegradedModelName;
                 selectedProvider = DegradedProviderId;
                 isInternal = true;
-                promptTokens = contextWindow.EstimateTotalTokens(messages);
+                var fallbackMessages = messages ?? new List<ChatMessage> { new("user", request.Message) };
+                promptTokens = contextWindow.EstimateTotalTokens(fallbackMessages);
                 completionTokens = contextWindow.EstimateTokens(grounded);
             }
 
@@ -326,8 +330,8 @@ public static class SendAssistantMessage
             {
                 try
                 {
-                    var bundle = System.Text.Json.JsonSerializer.Deserialize<ContextBundleData>(
-                        request.ContextBundle, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var bundle = JsonSerializer.Deserialize<ContextBundleData>(
+                        request.ContextBundle, ContextBundleSerializerOptions);
                     if (bundle?.Relations is { Count: > 0 })
                         foreach (var rel in bundle.Relations)
                         {
@@ -486,18 +490,15 @@ public static class SendAssistantMessage
             // Apply sliding window if needed
             var (trimmed, wasTruncated) = contextWindow.TrimToFit(messages, defaultMaxContextTokens, reserveForCompletion);
 
-            // Defensive: ensure we never return null (protects against faulty implementations or test mocks)
-            var result = trimmed ?? messages;
-
             if (wasTruncated)
             {
                 logger.LogInformation(
                     "Conversation {ConversationId} history truncated to fit context window. " +
                     "Original={OriginalCount}, Trimmed={TrimmedCount}",
-                    conversationId, messages.Count, result.Count);
+                    conversationId, messages.Count, trimmed.Count);
             }
 
-            return result.ToList();
+            return trimmed.ToList();
         }
 
         private static string BuildExplicitProviderUnavailableResponse(string query, string groundingContext, string errorMessage)

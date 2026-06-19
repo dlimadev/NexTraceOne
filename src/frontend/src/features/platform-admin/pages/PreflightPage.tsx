@@ -78,7 +78,7 @@ export function PreflightPage() {
   const report = query.data;
 
   const overallBg = !report
-    ? 'bg-surface-muted'
+    ? 'bg-subtle'
     : report.overallStatus === 'Ok'
       ? 'bg-success/10 border border-success/20'
       : report.overallStatus === 'Warning'

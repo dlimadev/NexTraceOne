@@ -536,7 +536,7 @@ function CalendarTab({
                         {dayReleases.map((r) => (
                           <div
                             key={r.releaseId}
-                            className="flex items-center justify-between p-2.5 rounded-md bg-surface border border-edge/50 hover:border-edge transition-colors"
+                            className="flex items-center justify-between p-2.5 rounded-md bg-card border border-edge/50 hover:border-edge transition-colors"
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <Zap size={14} className="text-accent shrink-0" />
@@ -760,7 +760,7 @@ function FreezeWindowsTab({
                               <>
                                 <button
                                   onClick={() => onEdit(fw)}
-                                  className="p-1.5 rounded hover:bg-surface text-muted hover:text-heading transition-colors"
+                                  className="p-1.5 rounded hover:bg-hover text-muted hover:text-heading transition-colors"
                                   title={t('common.edit')}
                                 >
                                   <Edit size={14} />

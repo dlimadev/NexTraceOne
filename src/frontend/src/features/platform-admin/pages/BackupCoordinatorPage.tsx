@@ -143,7 +143,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
           <label className="block text-xs text-muted mb-1">{t('backup.cronLabel')}</label>
           <input
             type="text"
-            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="0 3 * * *"
             {...field('cronExpression')}
           />
@@ -155,7 +155,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
             type="number"
             min={1}
             max={365}
-            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading focus:outline-none focus:border-accent"
             {...field('retentionDays')}
           />
           <p className="text-xs text-muted mt-1">{t('backup.retentionHint')}</p>
@@ -164,7 +164,7 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
           <label className="block text-xs text-muted mb-1">{t('backup.destinationLabel')}</label>
           <input
             type="text"
-            className="w-full px-3 py-2 text-sm bg-surface border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="/data/backups"
             {...field('destination')}
           />

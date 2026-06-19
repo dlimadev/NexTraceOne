@@ -20,6 +20,9 @@ public sealed class AiRoutingMetricsService : IAiRoutingMetricsService
     // Mínimo de execuções para considerar métricas confiáveis
     private const int MinExecutionThreshold = 3;
 
+    // Limite de entradas do ledger carregadas por consulta de métricas (evita OOM em alto volume)
+    private const int MaxEntriesPerQuery = 10_000;
+
     public AiRoutingMetricsService(
         IAiTokenUsageLedgerRepository ledgerRepository,
         ILogger<AiRoutingMetricsService> logger)
@@ -146,7 +149,7 @@ public sealed class AiRoutingMetricsService : IAiRoutingMetricsService
         var cutoff = DateTimeOffset.UtcNow.Subtract(MetricsLookbackWindow);
         try
         {
-            return await _ledgerRepository.ListByPeriodAsync(cutoff, ct);
+            return await _ledgerRepository.ListByPeriodAsync(cutoff, MaxEntriesPerQuery, ct);
         }
         catch (Exception ex)
         {

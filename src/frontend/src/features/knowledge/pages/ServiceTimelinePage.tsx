@@ -83,7 +83,7 @@ function TimelineEntryCard({ entry }: { entry: ServiceTimelineEntryDto }) {
             <div className="flex items-center gap-1">
               <Tag size={11} />
               {entry.tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="bg-surface-raised px-1.5 py-0.5 rounded text-xs">{tag}</span>
+                <span key={tag} className="bg-elevated px-1.5 py-0.5 rounded text-xs">{tag}</span>
               ))}
               {entry.tags.length > 3 && (
                 <span className="text-muted">+{entry.tags.length - 3}</span>
@@ -168,7 +168,7 @@ export function ServiceTimelinePage() {
                 );
                 setPage(1);
               }}
-              className="text-xs border border-edge rounded px-2 py-1 bg-surface"
+              className="text-xs border border-edge rounded px-2 py-1 bg-input"
             >
               <option value="">{t('common.all')}</option>
               <option value="open">{t('knowledge.serviceTimeline.open')}</option>

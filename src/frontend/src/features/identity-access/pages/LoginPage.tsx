@@ -10,7 +10,6 @@ import { Button, TextField, PasswordInput, Checkbox } from '../../../shared/ui';
 import { identityApi } from '../api';
 import { resolveApiError } from '../../../utils/apiErrors';
 import { AuthShell } from '../components/AuthShell';
-import { AuthCard } from '../components/AuthCard';
 import { AuthDivider } from '../components/AuthDivider';
 import { AuthFeedback } from '../components/AuthFeedback';
 import { loginSchema, type LoginFormData } from '../schemas/auth';
@@ -18,20 +17,20 @@ import { loginSchema, type LoginFormData } from '../schemas/auth';
 const DEFAULT_LOGO_ICON = '/brand/logo-icon.svg';
 
 /**
- * Página de login — Auth Shell enterprise inspirada no NexLink template.
+ * Página de login — coluna única centrada no estilo Betterstack.
  *
- * Layout: split 50/50 com ilustração à esquerda e card à direita.
- * Logo centrado no card, heading "Welcome to NexTraceOne", campos de
- * email/password, remember me, forgot password, botão de login, SSO abaixo.
- * Pill theme toggle no canto superior direito (via AuthShell).
+ * Layout minimalista: logo, heading "Welcome back", prompt de signup,
+ * formulário email/password, botão primário full-width, divisor "or",
+ * botão SSO secundário e rodapé legal. Sem painel lateral.
  *
- * Agora suporta customização via branding parameters:
- * - branding.login_logo_url — logo custom na auth card
+ * Mantém o fluxo real (email + password + SSO) — não há magic link no backend.
+ *
+ * Suporta customização via branding parameters:
+ * - branding.login_logo_url — logo custom
  * - branding.login_heading — heading custom
  * - branding.login_subheading — subheading custom
  * - branding.login_sso_button_text — texto do botão SSO
  * - branding.login_help_text — texto de ajuda abaixo do form
- * A identidade visual do NexTraceOne é preservada no painel esquerdo.
  */
 export function LoginPage() {
   const { t } = useTranslation();
@@ -90,122 +89,104 @@ export function LoginPage() {
 
   return (
     <AuthShell>
-      <AuthCard>
-        {/* Logo centrado — custom login logo ou default globe icon */}
-        <div className="flex justify-center mb-6">
-          {loginLogoUrl ? (
-            <img
-              src={loginLogoUrl}
-              alt={t('auth.logoAlt', 'Logo')}
-              className="h-12 w-auto max-w-[200px] object-contain"
-              onError={(e) => {
-                // Fallback to default logo on broken URL
-                (e.target as HTMLImageElement).src = DEFAULT_LOGO_ICON;
-              }}
-            />
-          ) : (
-            <img src={DEFAULT_LOGO_ICON} alt="NexTraceOne" className="h-12 w-auto" />
-          )}
-        </div>
-
-        {/* Heading — custom or default "Welcome to NexTraceOne" */}
-        <div className="text-center mb-8">
-          <h2 className="text-xl font-semibold text-heading mb-1">
-            {loginHeading || t('auth.welcomeTitle')}
-          </h2>
-          <p className="text-sm text-muted">
-            {loginSubheading || t('auth.signInSubtitle')}
-          </p>
-        </div>
-
-        {serverError && <AuthFeedback variant="error" message={serverError} className="mb-6" />}
-
-        {/* Credentials form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-          <TextField
-            label={t('auth.email')}
-            type="email"
-            placeholder={t('auth.emailPlaceholder')}
-            autoComplete="username"
-            spellCheck={false}
-            maxLength={254}
-            leadingIcon={<Mail size={16} />}
-            error={errors.email?.message ? t(errors.email.message) : undefined}
-            {...register('email')}
+      {/* Logo + heading + signup prompt — centrados */}
+      <div className="flex flex-col items-center text-center mb-8">
+        {loginLogoUrl ? (
+          <img
+            src={loginLogoUrl}
+            alt={t('auth.logoAlt', 'Logo')}
+            className="h-11 w-auto max-w-[180px] object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = DEFAULT_LOGO_ICON;
+            }}
           />
+        ) : (
+          <img src={DEFAULT_LOGO_ICON} alt="NexTraceOne" className="h-11 w-auto" />
+        )}
 
-          <div>
-            <PasswordInput
-              label={t('auth.password')}
-              placeholder={t('auth.passwordPlaceholder')}
-              autoComplete="current-password"
-              maxLength={128}
-              error={errors.password?.message ? t(errors.password.message) : undefined}
-              {...register('password')}
-            />
-          </div>
-
-          {/* Remember me + Forgot password row */}
-          <div className="flex items-center justify-between">
-            <Checkbox label={t('auth.rememberMe')} />
-            <Link
-              to="/forgot-password"
-              className="text-xs text-cyan hover:text-cyan-hover transition-colors"
-            >
-              {t('auth.forgotPasswordLink')}
-            </Link>
-          </div>
-
-          <Button type="submit" loading={isSubmitting} className="w-full" size="lg">
-            {t('auth.signInButton')}
-          </Button>
-        </form>
-
-        {/* SSO section */}
-        <AuthDivider labelKey="auth.orContinueWith" />
-
-        <Button
-          type="button"
-          variant="institutional"
-          size="lg"
-          className="w-full"
-          loading={ssoLoading}
-          onClick={handleSsoLogin}
-        >
-          <ShieldCheck size={18} />
-          {ssoLoading
-            ? t('auth.ssoRedirecting')
-            : (loginSsoButtonText || t('auth.ssoSignIn'))}
-        </Button>
-        <p className="text-xs text-muted text-center mt-2.5">{t('auth.ssoDescription')}</p>
-
-        {/* Self-service signup */}
-        <p className="text-center text-xs text-muted mt-4">
-          {t('auth.noAccount', "Don't have an account?")}{' '}
-          <Link to="/signup" className="text-cyan hover:text-cyan-hover transition-colors font-medium">
-            {t('auth.createWorkspace', 'Create your workspace')}
-          </Link>
-        </p>
-
-        {/* Help link — custom or default */}
-        <p className="text-center text-xs text-faded mt-6">
-          {loginHelpText ? (
-            <span>{loginHelpText}</span>
-          ) : (
+        <h1 className="text-3xl font-bold text-heading tracking-tight mt-6">
+          {loginHeading || t('auth.welcomeTitle')}
+        </h1>
+        <p className="text-sm text-muted mt-2">
+          {loginSubheading || (
             <>
-              {t('auth.needHelp')}{' '}
-              <button type="button" className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
-                {t('auth.contactSupport')}
-              </button>
+              {t('auth.noAccount', "Don't have an account?")}{' '}
+              <Link to="/signup" className="text-accent hover:text-accent-hover font-medium transition-colors">
+                {t('auth.createWorkspace', 'Create your workspace')}
+              </Link>
             </>
           )}
         </p>
-      </AuthCard>
-
-      {/* Footer trust signals */}
-      <div className="mt-6 flex items-center justify-center gap-3 text-xs text-faded flex-wrap">
-        <span>{t('auth.selfHosted')}</span>
       </div>
+
+      {serverError && <AuthFeedback variant="error" message={serverError} className="mb-5" />}
+
+      {/* Credentials form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left" noValidate>
+        <TextField
+          label={t('auth.email')}
+          type="email"
+          placeholder={t('auth.emailPlaceholder')}
+          autoComplete="username"
+          spellCheck={false}
+          maxLength={254}
+          leadingIcon={<Mail size={16} />}
+          error={errors.email?.message ? t(errors.email.message) : undefined}
+          {...register('email')}
+        />
+
+        <PasswordInput
+          label={t('auth.password')}
+          placeholder={t('auth.passwordPlaceholder')}
+          autoComplete="current-password"
+          maxLength={128}
+          error={errors.password?.message ? t(errors.password.message) : undefined}
+          {...register('password')}
+        />
+
+        <div className="flex items-center justify-between">
+          <Checkbox label={t('auth.rememberMe')} />
+          <Link
+            to="/forgot-password"
+            className="text-xs text-accent hover:text-accent-hover transition-colors"
+          >
+            {t('auth.forgotPasswordLink')}
+          </Link>
+        </div>
+
+        <Button type="submit" loading={isSubmitting} className="w-full" size="lg">
+          {t('auth.signInButton')}
+        </Button>
+      </form>
+
+      {/* SSO */}
+      <AuthDivider labelKey="auth.orContinueWith" />
+
+      <Button
+        type="button"
+        variant="secondary"
+        size="lg"
+        className="w-full"
+        loading={ssoLoading}
+        onClick={handleSsoLogin}
+      >
+        <ShieldCheck size={18} />
+        {ssoLoading
+          ? t('auth.ssoRedirecting')
+          : (loginSsoButtonText || t('auth.ssoSignIn'))}
+      </Button>
+
+      {loginHelpText && (
+        <p className="text-center text-xs text-faded mt-6">{loginHelpText}</p>
+      )}
+
+      {/* Rodapé legal */}
+      <p className="text-center text-xs text-faded mt-10 leading-relaxed">
+        {t('auth.legalAcknowledgePrefix', 'You acknowledge that you read, and agree to our')}{' '}
+        <span className="text-body font-medium">{t('auth.termsOfService', 'Terms of Service')}</span>
+        {' '}{t('auth.legalAnd', 'and our')}{' '}
+        <span className="text-body font-medium">{t('auth.privacyPolicy', 'Privacy Policy')}</span>.
+      </p>
     </AuthShell>
   );
 }

@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
-  Scale, Search, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle2,
+  Scale, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle2, Download,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { Tabs } from '../../../components/Tabs';
+import { SearchInput } from '../../../components/SearchInput';
+import { Button } from '../../../components/Button';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -15,7 +18,9 @@ import { EmptyState } from '../../../components/EmptyState';
 import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
-import { useEnvironment } from '../../../contexts/EnvironmentContext';type ComplianceFilter = 'all' | 'NonCompliant' | 'PartiallyCompliant';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
+
+type ComplianceFilter = 'all' | 'NonCompliant' | 'PartiallyCompliant';
 
 const statusBadgeVariant = (status: ComplianceStatusType): 'success' | 'warning' | 'danger' | 'default' => {
   switch (status) {
@@ -80,6 +85,15 @@ export function CompliancePage() {
       <PageHeader
         title={t('governance.complianceTitle')}
         subtitle={t('governance.complianceSubtitle')}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<Download size={14} />}
+          >
+            {t('governance.compliance.exportEvidence', 'Export evidence')}
+          </Button>
+        }
       />
 
       {/* Score + Stats */}
@@ -115,7 +129,7 @@ export function CompliancePage() {
                       <p className="text-xs text-muted">{t(`governance.compliance.${item.key}`)}</p>
                       <p className="text-xs font-medium text-heading">{item.value}%</p>
                     </div>
-                    <div className="w-full bg-surface rounded-full h-2">
+                    <div className="w-full bg-card rounded-full h-2">
                       <div
                         className={`${barColor} rounded-full h-2 transition-all`}
                         style={{ width: `${item.value}%` }}
@@ -131,34 +145,27 @@ export function CompliancePage() {
 
       {/* Filters + Gaps list */}
       <PageSection>
+        {/* Barra de filtros — SearchInput + Tabs (pill) para consistência DS */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="relative flex-1 max-w-xs">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('governance.compliance.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-          {(['all', 'NonCompliant', 'PartiallyCompliant'] as ComplianceFilter[]).map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
-                filter === f
-                  ? 'bg-accent/10 text-accent border-accent/30'
-                  : 'bg-surface text-muted border-edge hover:text-body'
-              }`}
-            >
-              {f === 'all'
-                ? t('governance.compliance.filterAll')
-                : f === 'NonCompliant'
-                  ? t('governance.compliance.filterNonCompliant')
-                  : t('governance.compliance.filterPartially')}
-            </button>
-          ))}
+          <SearchInput
+            size="sm"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={t('governance.compliance.searchPlaceholder')}
+            aria-label={t('governance.compliance.searchPlaceholder')}
+            className="flex-1 max-w-xs"
+          />
+          <Tabs
+            variant="pill"
+            size="sm"
+            activeId={filter}
+            onChange={id => setFilter(id as ComplianceFilter)}
+            items={[
+              { id: 'all', label: t('governance.compliance.filterAll') },
+              { id: 'NonCompliant', label: t('governance.compliance.filterNonCompliant') },
+              { id: 'PartiallyCompliant', label: t('governance.compliance.filterPartially') },
+            ]}
+          />
         </div>
 
         <Card>

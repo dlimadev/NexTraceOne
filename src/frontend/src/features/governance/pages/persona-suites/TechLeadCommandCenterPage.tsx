@@ -67,7 +67,7 @@ export function TechLeadCommandCenterPage() {
                 { label: t('personaSuite.techLead.teamVelocity'), icon: <TrendingUp size={14} />, to: '/governance/dora-metrics', color: 'text-success' },
                 { label: t('personaSuite.techLead.ownershipGaps'), icon: <AlertTriangle size={14} />, to: '/catalog/services', color: 'text-warning' },
                 { label: t('personaSuite.techLead.promotionBlockers'), icon: <GitBranch size={14} />, to: '/changes/promotion-readiness', color: 'text-info' },
-                { label: t('personaSuite.techLead.changeVelocity'), icon: <BarChart3 size={14} />, to: '/changes', color: 'text-primary' },
+                { label: t('personaSuite.techLead.changeVelocity'), icon: <BarChart3 size={14} />, to: '/changes', color: 'text-accent' },
                 { label: t('personaSuite.techLead.sloCompliance'), icon: <Shield size={14} />, to: '/operations/slos', color: 'text-accent' },
                 { label: t('personaSuite.techLead.windowConformance'), icon: <Users size={14} />, to: '/governance/gates', color: 'text-secondary' },
               ].map((item) => (

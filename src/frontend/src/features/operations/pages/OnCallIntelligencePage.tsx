@@ -9,6 +9,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { SearchInput, Select } from '../../../shared/ui';
 import client from '../../../api/client';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -83,26 +84,25 @@ export function OnCallIntelligencePage() {
         icon={<Phone size={24} />}
         actions={
           <div className="flex items-center gap-2">
-            <input
-              type="text"
+            {/* Filtro por time on-call */}
+            <SearchInput
+              size="sm"
+              className="w-36"
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
               placeholder={t('operations.onCall.filterByTeam')}
-              className="rounded border border-edge bg-card text-sm px-2 py-1 w-36"
             />
-            <label className="text-sm text-muted">
-              {t('operations.onCall.period')}:
-            </label>
-            <select
-              value={periodDays}
+            {/* Seleção de janela de período */}
+            <Select
+              size="sm"
+              value={String(periodDays)}
               onChange={(e) => setPeriodDays(Number(e.target.value))}
-              className="rounded border border-edge bg-card text-sm px-2 py-1"
-            >
-              {[7, 14, 30, 60, 90].map((d) => (
-                <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
-              ))}
-            </select>
-            <Button size="sm" onClick={() => refetch()}>
+              options={[7, 14, 30, 60, 90].map((d) => ({
+                value: String(d),
+                label: t('common.daysN', { count: d }),
+              }))}
+            />
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
               <BarChart2 size={14} className="mr-1" />
               {t('common.refresh')}
             </Button>
@@ -119,12 +119,12 @@ export function OnCallIntelligencePage() {
         ))}
       </StatsGrid>
 
-      {/* Fatigue severity banner */}
+      {/* Banner de alerta de fadiga on-call — usa tokens semânticos de warning */}
       {data?.fatigueSeverity && data.fatigueSeverity !== 'Low' && (
-        <Card className="mb-4 border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20">
+        <Card className="mb-4 border-warning/40 bg-warning-muted">
           <CardBody className="p-3 flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400" />
-            <span className="text-sm text-amber-700 dark:text-amber-300">
+            <AlertTriangle size={16} className="text-warning" />
+            <span className="text-sm text-warning">
               {t('operations.onCall.fatigueAlert', { level: data.fatigueSeverity })}
             </span>
             <Badge variant={FATIGUE_VARIANT[data.fatigueSeverity] ?? 'secondary'} className="ml-auto">
@@ -140,7 +140,7 @@ export function OnCallIntelligencePage() {
           <div className="space-y-2">
             {data.recommendations.map((rec, idx) => (
               <div key={idx} className="flex items-start gap-2 text-sm text-body">
-                <TrendingDown size={14} className="mt-0.5 text-indigo-500 flex-shrink-0" />
+                <TrendingDown size={14} className="mt-0.5 text-accent flex-shrink-0" />
                 {rec}
               </div>
             ))}

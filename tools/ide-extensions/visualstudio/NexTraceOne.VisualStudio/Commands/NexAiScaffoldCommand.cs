@@ -21,13 +21,12 @@ namespace NexTraceOne.VisualStudio.Commands;
 internal sealed class NexAiScaffoldCommand
 {
     private const int CommandId = 0x0102;
+    private static readonly HttpClient SharedHttpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
     private readonly AsyncPackage _package;
-    private readonly HttpClient _httpClient;
 
     private NexAiScaffoldCommand(AsyncPackage package, OleMenuCommandService commandService)
     {
         _package = package ?? throw new ArgumentNullException(nameof(package));
-        _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
 
         var menuCommandId = new CommandID(PackageGuids.CommandSetGuid, CommandId);
         var menuItem = new OleMenuCommand(Execute, menuCommandId);
@@ -46,7 +45,7 @@ internal sealed class NexAiScaffoldCommand
 
     private void Execute(object sender, EventArgs e)
     {
-        _package.JoinableTaskFactory.RunAsync(async delegate
+        _ = _package.JoinableTaskFactory.RunAsync(async delegate
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
@@ -151,8 +150,7 @@ internal sealed class NexAiScaffoldCommand
 
                 var fileDir = System.IO.Path.GetDirectoryName(fullPath);
                 if (fileDir is not null) Directory.CreateDirectory(fileDir);
-                await File.WriteAllTextAsync(fullPath, file.Content ?? string.Empty, Encoding.UTF8, _package.DisposalToken)
-                    .ConfigureAwait(false);
+                File.WriteAllText(fullPath, file.Content ?? string.Empty, Encoding.UTF8);
                 filesWritten++;
             }
             catch { /* skip individual file errors */ }
@@ -171,8 +169,7 @@ internal sealed class NexAiScaffoldCommand
             var contractPath = System.IO.Path.Combine(outputDir, $"{serviceName}-{ext}");
             try
             {
-                await File.WriteAllTextAsync(contractPath, plan.BaseContractSpec, Encoding.UTF8, _package.DisposalToken)
-                    .ConfigureAwait(false);
+                File.WriteAllText(contractPath, plan.BaseContractSpec, Encoding.UTF8);
                 filesWritten++;
             }
             catch { /* non-fatal */ }
@@ -208,7 +205,7 @@ internal sealed class NexAiScaffoldCommand
             new Uri(options.ServerUrl.TrimEnd('/') + "/api/v1/catalog/templates?isActive=true"));
         request.Headers.Add("Authorization", $"Bearer {options.ApiKey}");
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var response = await SharedHttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -233,7 +230,7 @@ internal sealed class NexAiScaffoldCommand
         };
         request.Headers.Add("Authorization", $"Bearer {options.ApiKey}");
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var response = await SharedHttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound)

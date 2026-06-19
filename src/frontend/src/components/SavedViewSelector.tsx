@@ -104,7 +104,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded hover:bg-surface-2 transition-colors"
+        className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded hover:bg-hover transition-colors"
       >
         <Bookmark size={14} />
         <span>{t('title')}</span>
@@ -112,17 +112,17 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-64 bg-surface border rounded shadow-lg z-50 py-1">
+        <div className="absolute right-0 mt-1 w-64 bg-card border rounded shadow-lg z-50 py-1">
           <button
             type="button"
-            className="w-full text-left px-3 py-2 text-sm hover:bg-surface-2"
+            className="w-full text-left px-3 py-2 text-sm hover:bg-hover"
             onClick={() => { onApply({}); setOpen(false); }}
           >
             {t('default')}
           </button>
 
           {ownViews.map(view => (
-            <div key={view.id} className="flex items-center justify-between px-3 py-1 hover:bg-surface-2 group">
+            <div key={view.id} className="flex items-center justify-between px-3 py-1 hover:bg-hover group">
               <button
                 type="button"
                 className="flex-1 text-left text-sm truncate"
@@ -150,7 +150,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
                 <button
                   key={view.id}
                   type="button"
-                  className="w-full text-left px-3 py-1 text-sm hover:bg-surface-2"
+                  className="w-full text-left px-3 py-1 text-sm hover:bg-hover"
                   onClick={() => handleApply(view)}
                 >
                   {view.name}
@@ -166,7 +166,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
           <div className="border-t mt-1">
             <button
               type="button"
-              className="w-full text-left px-3 py-2 text-sm text-primary hover:bg-surface-2"
+              className="w-full text-left px-3 py-2 text-sm text-accent hover:bg-hover"
               onClick={() => { setShowSaveModal(true); setOpen(false); }}
             >
               {t('save')}
@@ -177,7 +177,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
 
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-surface rounded-lg shadow-xl p-6 w-80">
+          <div className="bg-card rounded-lg shadow-xl p-6 w-80">
             <h3 className="font-semibold mb-4">{t('saveModal.title')}</h3>
             <div className="mb-3">
               <label className="block text-sm font-medium mb-1">{t('saveModal.name')}</label>
@@ -203,7 +203,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
               <button
                 type="button"
                 onClick={() => setShowSaveModal(false)}
-                className="px-3 py-1.5 text-sm border rounded hover:bg-surface-2"
+                className="px-3 py-1.5 text-sm border rounded hover:bg-hover"
               >
                 {t('saveModal.cancel')}
               </button>
@@ -211,7 +211,7 @@ export function SavedViewSelector({ context, currentFilters, onApply }: SavedVie
                 type="button"
                 onClick={() => createMutation.mutate()}
                 disabled={!newViewName.trim() || createMutation.isPending}
-                className="px-3 py-1.5 text-sm bg-primary text-white rounded disabled:opacity-50"
+                className="px-3 py-1.5 text-sm bg-accent text-on-accent rounded-md disabled:opacity-50"
               >
                 {t('saveModal.confirm')}
               </button>

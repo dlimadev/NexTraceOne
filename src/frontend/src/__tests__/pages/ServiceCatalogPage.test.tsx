@@ -82,17 +82,19 @@ describe('ServiceCatalogPage', () => {
   it('exibe as abas de navegação incluindo novas abas', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    expect(screen.getByRole('button', { name: /services/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /apis/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /graph/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /impact/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /temporal/i })).toBeInTheDocument();
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    expect(screen.getByRole('tab', { name: /services/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /apis/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /graph/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /impact/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /temporal/i })).toBeInTheDocument();
   });
 
   it('exibe os serviços carregados na aba Services', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    await userEvent.click(screen.getByRole('button', { name: /services/i }));
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    await userEvent.click(screen.getByRole('tab', { name: /services/i }));
     await waitFor(() => {
       expect(screen.getByText('payments-service')).toBeInTheDocument();
       expect(screen.getByText('auth-service')).toBeInTheDocument();
@@ -102,7 +104,8 @@ describe('ServiceCatalogPage', () => {
   it('navega para a aba APIs e exibe as APIs', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    await userEvent.click(screen.getByRole('button', { name: /apis/i }));
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    await userEvent.click(screen.getByRole('tab', { name: /apis/i }));
     await waitFor(() => {
       expect(screen.getByText('Payments API')).toBeInTheDocument();
       expect(screen.getByText('/api/payments')).toBeInTheDocument();
@@ -122,7 +125,8 @@ describe('ServiceCatalogPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     vi.mocked(serviceCatalogApi.getImpactPropagation).mockResolvedValue({ nodes: [], edges: [] });
     renderGraph();
-    const impactBtn = screen.getByRole('button', { name: /impact/i });
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    const impactBtn = screen.getByRole('tab', { name: /impact/i });
     await userEvent.click(impactBtn);
     await waitFor(() => {
       // Clicking impact tab should not throw
@@ -134,7 +138,8 @@ describe('ServiceCatalogPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     vi.mocked(serviceCatalogApi.listSnapshots).mockResolvedValue([]);
     renderGraph();
-    const temporalBtn = screen.getByRole('button', { name: /temporal/i });
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    const temporalBtn = screen.getByRole('tab', { name: /temporal/i });
     await userEvent.click(temporalBtn);
     await waitFor(() => {
       expect(temporalBtn).toBeInTheDocument();
@@ -144,7 +149,8 @@ describe('ServiceCatalogPage', () => {
   it('exibe mensagem quando não há serviços registados', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({ services: [], apis: [] });
     renderGraph();
-    await userEvent.click(screen.getByRole('button', { name: /services/i }));
+    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
+    await userEvent.click(screen.getByRole('tab', { name: /services/i }));
     await waitFor(() => {
       expect(screen.getByText(/no services registered/i)).toBeInTheDocument();
     });

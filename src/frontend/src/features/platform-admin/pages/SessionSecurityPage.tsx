@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Shield, Settings, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { Shield, Settings, CheckCircle2, RefreshCw } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Badge } from '../../../components/Badge';
+import { TextField } from '../../../components/TextField';
+import { Toggle } from '../../../components/Toggle';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { platformAdminApi, type SessionSecurityConfigUpdate } from '../api/platformAdmin';
 
 export function SessionSecurityPage() {
@@ -58,22 +63,15 @@ export function SessionSecurityPage() {
           }
         />
 
-        {isLoading && (
-          <div className="flex items-center justify-center h-48 text-faded text-sm">
-            {t('loading')}
-          </div>
-        )}
+        {isLoading && <PageLoadingState message={t('loading')} />}
 
         {isError && (
-          <div className="flex items-center gap-3 p-4 bg-critical/10 border border-critical/20 rounded-lg text-critical text-sm">
-            <XCircle size={18} />
-            {t('error')}
-          </div>
+          <PageErrorState message={t('error')} onRetry={() => void refetch()} />
         )}
 
         {data && (
           <>
-            {/* Summary cards */}
+            {/* Cards de resumo das configurações actuais */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <SummaryCard
                 label={t('inactivityLabel')}
@@ -97,65 +95,91 @@ export function SessionSecurityPage() {
               />
             </div>
 
-            {/* Config */}
+            {/* Secção de configuração editável */}
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-medium text-heading">{t('configTitle')}</h2>
                 {!editing && (
-                  <button
-                    onClick={startEdit}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm text-accent border border-accent/20 rounded hover:bg-accent/10"
-                  >
+                  <Button variant="outline" size="sm" onClick={startEdit}>
                     <Settings size={14} />
                     {t('editBtn')}
-                  </button>
+                  </Button>
                 )}
               </div>
 
               {editing ? (
                 <div className="border border-edge rounded-lg p-5 space-y-4">
-                  <NumericField
-                    label={t('inactivityLabel')}
-                    hint={t('inactivityHint')}
-                    value={form.inactivityTimeoutMinutes}
-                    onChange={(v) => setForm((f) => ({ ...f, inactivityTimeoutMinutes: v }))}
-                    min={5}
-                    max={2880}
-                  />
-                  <NumericField
-                    label={t('maxSessionsLabel')}
-                    hint={t('maxSessionsHint')}
-                    value={form.maxConcurrentSessions}
-                    onChange={(v) => setForm((f) => ({ ...f, maxConcurrentSessions: v }))}
-                    min={1}
-                    max={20}
-                  />
-                  <ToggleField
-                    label={t('reauthLabel')}
-                    hint={t('reauthHint')}
-                    value={form.requireReauthForSensitiveActions}
-                    onChange={(v) => setForm((f) => ({ ...f, requireReauthForSensitiveActions: v }))}
-                  />
-                  <ToggleField
-                    label={t('ipChangeLabel')}
-                    hint={t('ipChangeHint')}
-                    value={form.detectAnomalousIpChange}
-                    onChange={(v) => setForm((f) => ({ ...f, detectAnomalousIpChange: v }))}
-                  />
+                  {/* Campo numérico: timeout de inatividade */}
+                  <div className="space-y-1">
+                    <TextField
+                      type="number"
+                      label={t('inactivityLabel')}
+                      helperText={t('inactivityHint')}
+                      value={String(form.inactivityTimeoutMinutes)}
+                      min={5}
+                      max={2880}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, inactivityTimeoutMinutes: Number(e.target.value) }))
+                      }
+                      className="w-40"
+                      size="sm"
+                    />
+                  </div>
+
+                  {/* Campo numérico: sessões concorrentes máximas */}
+                  <div className="space-y-1">
+                    <TextField
+                      type="number"
+                      label={t('maxSessionsLabel')}
+                      helperText={t('maxSessionsHint')}
+                      value={String(form.maxConcurrentSessions)}
+                      min={1}
+                      max={20}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, maxConcurrentSessions: Number(e.target.value) }))
+                      }
+                      className="w-40"
+                      size="sm"
+                    />
+                  </div>
+
+                  {/* Toggle: reautenticação para ações sensíveis */}
+                  <div className="flex items-start gap-4">
+                    <Toggle
+                      checked={form.requireReauthForSensitiveActions}
+                      onChange={(v) => setForm((f) => ({ ...f, requireReauthForSensitiveActions: v }))}
+                      size="sm"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-body">{t('reauthLabel')}</p>
+                      <p className="text-xs text-muted">{t('reauthHint')}</p>
+                    </div>
+                  </div>
+
+                  {/* Toggle: deteção de mudança anómala de IP */}
+                  <div className="flex items-start gap-4">
+                    <Toggle
+                      checked={form.detectAnomalousIpChange}
+                      onChange={(v) => setForm((f) => ({ ...f, detectAnomalousIpChange: v }))}
+                      size="sm"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-body">{t('ipChangeLabel')}</p>
+                      <p className="text-xs text-muted">{t('ipChangeHint')}</p>
+                    </div>
+                  </div>
+
                   <div className="flex gap-3 pt-2">
-                    <button
+                    <Button
+                      variant="primary"
                       onClick={() => mutation.mutate(form)}
                       disabled={mutation.isPending}
-                      className="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90 disabled:opacity-50"
                     >
                       {mutation.isPending ? t('saving') : t('save')}
-                    </button>
-                    <button
-                      onClick={() => setEditing(false)}
-                      className="px-4 py-2 text-sm border border-edge rounded-lg hover:bg-elevated text-muted"
-                    >
+                    </Button>
+                    <Button variant="outline" onClick={() => setEditing(false)}>
                       {t('cancel')}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -174,18 +198,15 @@ export function SessionSecurityPage() {
               )}
             </section>
 
-            {/* Sensitive actions */}
+            {/* Ações sensíveis que requerem reautenticação */}
             {data.sensitiveActions.length > 0 && (
               <section>
                 <h2 className="text-lg font-medium text-heading mb-3">{t('sensitiveActionsTitle')}</h2>
                 <div className="flex flex-wrap gap-2">
                   {data.sensitiveActions.map((action) => (
-                    <span
-                      key={action}
-                      className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full border border-accent/20"
-                    >
+                    <Badge key={action} variant="info">
                       {action}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </section>
@@ -231,71 +252,6 @@ function ConfigRow({ label, value }: { label: string; value: string }) {
     <div className="flex px-4 py-3 gap-4">
       <span className="text-sm text-muted w-56 shrink-0">{label}</span>
       <span className="text-sm font-medium text-heading">{value}</span>
-    </div>
-  );
-}
-
-function NumericField({
-  label,
-  hint,
-  value,
-  onChange,
-  min,
-  max,
-}: {
-  label: string;
-  hint: string;
-  value: number;
-  onChange: (v: number) => void;
-  min: number;
-  max: number;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-body">{label}</label>
-      <input
-        type="number"
-        value={value}
-        min={min}
-        max={max}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-40 px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
-        aria-label={label}
-      />
-      <p className="text-xs text-muted">{hint}</p>
-    </div>
-  );
-}
-
-function ToggleField({
-  label,
-  hint,
-  value,
-  onChange,
-}: {
-  label: string;
-  hint: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="flex items-start gap-4">
-      <button
-        type="button"
-        role="switch"
-        aria-checked={value}
-        onClick={() => onChange(!value)}
-        className={`mt-0.5 relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${value ? 'bg-accent' : 'bg-elevated'}`}
-        aria-label={label}
-      >
-        <span
-          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${value ? 'translate-x-4' : 'translate-x-1'}`}
-        />
-      </button>
-      <div>
-        <p className="text-sm font-medium text-body">{label}</p>
-        <p className="text-xs text-muted">{hint}</p>
-      </div>
     </div>
   );
 }

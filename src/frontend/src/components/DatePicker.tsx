@@ -44,11 +44,11 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             value={value ?? ''}
             onChange={(e) => onChange?.(e.target.value)}
             className={cn(
-              'w-full rounded-lg border border-edge bg-elevated text-body',
-              'pl-9 pr-8 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent',
+              'w-full rounded-md border border-edge bg-input text-body',
+              'pl-9 pr-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent',
               'transition-colors duration-[var(--nto-motion-base)]',
               size === 'sm' ? 'h-8 text-xs' : 'h-10 text-sm',
-              error && 'border-danger focus:ring-danger/40 focus:border-danger',
+              error && 'border-danger focus-visible:ring-danger focus-visible:border-danger',
             )}
             aria-invalid={!!error}
             aria-describedby={error ? `${inputId}-error` : undefined}

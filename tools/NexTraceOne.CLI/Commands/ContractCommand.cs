@@ -63,23 +63,23 @@ public static class ContractCommand
 
     private static Command CreateVerifyCommand()
     {
-        var specOpt = new Option<FileInfo>("--spec", "Path to the spec file (OpenAPI, WSDL, AsyncAPI).") { Required = true };
-        var serviceOpt = new Option<string>("--service", "Service name in NexTraceOne.") { Required = true };
+        var specOpt = new Option<FileInfo>("--spec") { Description = "Path to the spec file (OpenAPI, WSDL, AsyncAPI).",  Required = true };
+        var serviceOpt = new Option<string>("--service") { Description = "Service name in NexTraceOne.",  Required = true };
         var urlOpt = CreateUrlOption();
-        var apiAssetOpt = new Option<string>("--api-asset-id", "API asset identifier (defaults to service name).");
-        var envOpt = new Option<string>("--environment", "Target environment name.");
+        var apiAssetOpt = new Option<string>("--api-asset-id") { Description = "API asset identifier (defaults to service name)." };
+        var envOpt = new Option<string>("--environment") { Description = "Target environment name." };
         var sourceSystemOpt = new Option<string>("--source-system") { DefaultValueFactory = _ => "cli", Description = "Source system identifier." };
-        var commitShaOpt = new Option<string>("--commit-sha", "Git commit SHA.");
-        var branchOpt = new Option<string>("--branch", "Git branch name.");
-        var pipelineIdOpt = new Option<string>("--pipeline-id", "CI/CD pipeline run identifier.");
+        var commitShaOpt = new Option<string>("--commit-sha") { Description = "Git commit SHA." };
+        var branchOpt = new Option<string>("--branch") { Description = "Git branch name." };
+        var pipelineIdOpt = new Option<string>("--pipeline-id") { Description = "CI/CD pipeline run identifier." };
         var formatOpt = CreateFormatOption();
         var tokenOpt = CreateTokenOption();
-        var strictOpt = new Option<bool>("--strict", "Follow server-side compliance policy.");
-        var failOnBreakingOpt = new Option<bool>("--fail-on-breaking", "Exit 1 on breaking changes.");
-        var failOnAnyOpt = new Option<bool>("--fail-on-any-change", "Exit 1 on any change.");
-        var failOnMissingOpt = new Option<bool>("--fail-on-missing", "Exit 1 if contract not found.");
-        var dryRunOpt = new Option<bool>("--dry-run", "Don't persist results.");
-        var outputOpt = new Option<string>("--output", "Output file path.");
+        var strictOpt = new Option<bool>("--strict") { Description = "Follow server-side compliance policy." };
+        var failOnBreakingOpt = new Option<bool>("--fail-on-breaking") { Description = "Exit 1 on breaking changes." };
+        var failOnAnyOpt = new Option<bool>("--fail-on-any-change") { Description = "Exit 1 on any change." };
+        var failOnMissingOpt = new Option<bool>("--fail-on-missing") { Description = "Exit 1 if contract not found." };
+        var dryRunOpt = new Option<bool>("--dry-run") { Description = "Don't persist results." };
+        var outputOpt = new Option<string>("--output") { Description = "Output file path." };
 
         var command = new Command("verify", "Verify contract compliance against NexTraceOne.");
         command.Add(specOpt);
@@ -224,14 +224,14 @@ public static class ContractCommand
 
     private static Command CreateDiffCommand()
     {
-        var specOpt = new Option<FileInfo>("--spec", "Path to local spec file.");
-        var serviceOpt = new Option<string>("--service", "Service name.") { Required = true };
+        var specOpt = new Option<FileInfo>("--spec") { Description = "Path to local spec file." };
+        var serviceOpt = new Option<string>("--service") { Description = "Service name.",  Required = true };
         var urlOpt = CreateUrlOption();
-        var fromOpt = new Option<string>("--from", "Source version (e.g., 1.2.0).");
-        var toOpt = new Option<string>("--to", "Target version (e.g., 1.3.0).");
+        var fromOpt = new Option<string>("--from") { Description = "Source version (e.g., 1.2.0)." };
+        var toOpt = new Option<string>("--to") { Description = "Target version (e.g., 1.3.0)." };
         var formatOpt = CreateFormatOption();
         var tokenOpt = CreateTokenOption();
-        var outputOpt = new Option<string>("--output", "Output file path.");
+        var outputOpt = new Option<string>("--output") { Description = "Output file path." };
 
         var command = new Command("diff", "Compare contract versions or local spec against NexTraceOne.");
         command.Add(specOpt);
@@ -399,11 +399,11 @@ public static class ContractCommand
 
     private static Command CreateChangelogCommand()
     {
-        var serviceOpt = new Option<string>("--service", "Service name.") { Required = true };
+        var serviceOpt = new Option<string>("--service") { Description = "Service name.",  Required = true };
         var urlOpt = CreateUrlOption();
         var formatOpt = CreateFormatOption();
         var tokenOpt = CreateTokenOption();
-        var outputOpt = new Option<string>("--output", "Output file path.");
+        var outputOpt = new Option<string>("--output") { Description = "Output file path." };
 
         var command = new Command("changelog", "Generate contract changelog.");
         command.Add(serviceOpt);
@@ -461,9 +461,9 @@ public static class ContractCommand
 
     private static Command CreateSyncCommand()
     {
-        var specOpt = new Option<FileInfo>("--spec", "Path to spec file.") { Required = true };
-        var serviceOpt = new Option<string>("--service", "Service name.") { Required = true };
-        var versionOpt = new Option<string>("--version", "Semantic version (e.g., 1.3.0).") { Required = true };
+        var specOpt = new Option<FileInfo>("--spec") { Description = "Path to spec file.",  Required = true };
+        var serviceOpt = new Option<string>("--service") { Description = "Service name.",  Required = true };
+        var versionOpt = new Option<string>("--version") { Description = "Semantic version (e.g., 1.3.0).",  Required = true };
         var urlOpt = CreateUrlOption();
         var sourceSystemOpt = new Option<string>("--source-system") { DefaultValueFactory = _ => "cli", Description = "Source system identifier." };
         var formatOpt = CreateFormatOption();
@@ -733,9 +733,9 @@ public static class ContractCommand
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();
-        var protocolOpt = new Option<string>("--protocol", "Filter by protocol: REST, SOAP, Kafka, AsyncAPI.");
-        var stateOpt = new Option<string>("--state", "Filter by lifecycle state: Active, Deprecated, Draft.");
-        var searchOpt = new Option<string>("--search", "Free-text search term.");
+        var protocolOpt = new Option<string>("--protocol") { Description = "Filter by protocol: REST, SOAP, Kafka, AsyncAPI." };
+        var stateOpt = new Option<string>("--state") { Description = "Filter by lifecycle state: Active, Deprecated, Draft." };
+        var searchOpt = new Option<string>("--search") { Description = "Free-text search term." };
         var pageOpt = new Option<int>("--page") { DefaultValueFactory = _ => 1, Description = "Page number (default: 1)." };
         var pageSizeOpt = new Option<int>("--page-size") { DefaultValueFactory = _ => 20, Description = "Results per page (default: 20)." };
 

@@ -135,7 +135,7 @@ export function FinOpsBudgetApprovalsPage() {
                 </div>
 
                 {item.justification && (
-                  <div className="mb-4 p-3 bg-surface-hover rounded text-xs">
+                  <div className="mb-4 p-3 bg-hover rounded text-xs">
                     <p className="text-muted mb-1">{t('finops.approvals.justification')}</p>
                     <p>{item.justification}</p>
                   </div>

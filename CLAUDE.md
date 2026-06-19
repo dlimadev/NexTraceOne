@@ -808,12 +808,18 @@ Ver `deploy/MIGRATION-GUIDE.md` para guia completo de deploy K8s.
 
 ```
 tools/
-├── NexTrace.Sdk/          ← cliente .NET para consumidores da API
-├── NexTraceOne.CLI/       ← CLI para administração da plataforma
-├── sdk-cli/               ← implementação CLI alternativa
+├── NexTrace.Sdk/          ← cliente .NET oficial para consumidores da API
+├── NexTraceOne.CLI/       ← CLI oficial (`nex`) para administração da plataforma
+├── github-action/         ← composite actions para CI/CD
 └── ide-extensions/
-    └── visualstudio/      ← extensão Visual Studio
+    ├── vscode/            ← extensão Visual Studio Code
+    └── visualstudio/      ← extensão Visual Studio 2022
 ```
+
+**Aceleração de integrações:**
+- SDK: `NexTraceSdkClient.Integrations.GenerateConsumerClientAsync(...)` gera clientes tipados a partir dos contratos do catálogo.
+- CLI: `nex integration scaffold --provider <svc> --consumer <svc> --output ./generated` gera DTOs, endpoints e manifesto `nexone-integration.json`.
+- CLI: `nex integration register --provider-api <guid> --consumer <svc>` regista a relação de consumo no catálogo.
 
 Documentação da plataforma em `docs/` (71 arquivos, 20k+ linhas), incluindo:
 - `docs/adr/` — Architecture Decision Records

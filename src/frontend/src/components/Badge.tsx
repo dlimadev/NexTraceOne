@@ -29,23 +29,23 @@ export interface BadgeProps {
 const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
   default: 'bg-elevated text-muted',
   neutral: 'bg-elevated text-muted',
-  success: 'bg-success/15 text-success',
-  warning: 'bg-warning/15 text-warning',
-  danger: 'bg-critical/15 text-critical',
-  info: 'bg-info/15 text-info',
+  success: 'bg-success-muted text-success',
+  warning: 'bg-warning-muted text-warning',
+  danger: 'bg-critical-muted text-critical',
+  info: 'bg-info-muted text-info',
   // Aliases
   secondary: 'bg-elevated text-muted',
-  error: 'bg-critical/15 text-critical',
-  destructive: 'bg-critical/15 text-critical',
-  critical: 'bg-critical/15 text-critical',
+  error: 'bg-critical-muted text-critical',
+  destructive: 'bg-critical-muted text-critical',
+  critical: 'bg-critical-muted text-critical',
   outline: 'bg-transparent text-body border border-edge',
   muted: 'bg-elevated text-muted',
-  primary: 'bg-accent/15 text-accent',
-  blue: 'bg-accent/15 text-accent',
+  primary: 'bg-accent-muted text-accent',
+  blue: 'bg-accent-muted text-accent',
   gray: 'bg-elevated text-muted',
-  green: 'bg-success/15 text-success',
-  yellow: 'bg-warning/15 text-warning',
-  purple: 'bg-accent/15 text-accent',
+  green: 'bg-success-muted text-success',
+  yellow: 'bg-warning-muted text-warning',
+  purple: 'bg-accent-muted text-accent',
 };
 
 const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {
@@ -58,7 +58,7 @@ export const Badge = memo(function Badge({ children, variant = 'default', size =
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-[3px] font-medium tracking-wide',
+        'inline-flex items-center gap-1 rounded-full font-medium tracking-wide',
         sizeClasses[size],
         variantClasses[variant],
         className,

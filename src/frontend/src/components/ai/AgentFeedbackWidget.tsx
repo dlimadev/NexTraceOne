@@ -83,8 +83,8 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
             onClick={() => setOutcome(o)}
             className={`px-2 py-1 text-xs rounded border transition-colors ${
               outcome === o
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-edge hover:border-primary/50'
+                ? 'bg-accent text-on-accent border-accent'
+                : 'border-edge hover:border-accent/50'
             }`}
           >
             {t(`ai.feedback.outcome.${o}`)}
@@ -105,7 +105,7 @@ export function AgentFeedbackWidget({ executionId, onFeedbackSubmitted }: AgentF
         type="button"
         onClick={handleSubmit}
         disabled={rating === 0 || !outcome || submitting}
-        className="self-start px-3 py-1 text-xs rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="self-start px-3 py-1 text-xs rounded bg-accent text-on-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? t('common.saving') : t('ai.feedback.submit')}
       </button>

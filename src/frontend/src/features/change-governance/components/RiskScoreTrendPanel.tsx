@@ -35,7 +35,7 @@ function ScoreBar({ score }: { score: number | null }) {
     score < 0.4 ? 'bg-success' : score < 0.7 ? 'bg-warning' : 'bg-critical';
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 bg-surface rounded-full h-1.5">
+      <div className="w-20 bg-card rounded-full h-1.5">
         <div className={`${color} rounded-full h-1.5 transition-all`} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs font-mono text-heading">{score.toFixed(3)}</span>
@@ -249,7 +249,7 @@ export function RiskScoreTrendPanel({ initialServiceName }: { initialServiceName
                         return (
                           <tr
                             key={point.releaseId}
-                            className="border-t border-edge hover:bg-surface/50 transition-colors"
+                            className="border-t border-edge hover:bg-card/50 transition-colors"
                           >
                             <td className="px-4 py-3 font-mono text-xs">{point.version}</td>
                             <td className="px-4 py-3">

@@ -195,9 +195,28 @@ public sealed class ContextWindowManagerTests
 
         var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 10);
 
-        // When system prompt itself is too large, returns last user message
+        // When the available budget is too small for even a truncated system prompt,
+        // preserve only the last user message to avoid exceeding the window.
         wasTruncated.Should().BeTrue();
         result.Should().HaveCount(1);
         result[0].Content.Should().Contain("Final question");
+    }
+
+    [Fact]
+    public void TrimToFit_WhenSystemPromptExceedsWindow_ShouldTruncateSystemAndPreserveLastUserMessage()
+    {
+        var manager = CreateManager();
+        var messages = new List<ChatMessage>
+        {
+            new("system", new string('s', 10_000)),
+            new("user", "Final question?"),
+        };
+
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 200, reserveForCompletion: 100);
+
+        // There is enough budget to keep a truncated system prompt plus the last user message.
+        wasTruncated.Should().BeTrue();
+        result.Should().Contain(m => m.Role == "system");
+        result.Should().Contain(m => m.Role == "user" && m.Content.Contains("Final question"));
     }
 }

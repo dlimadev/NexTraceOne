@@ -567,7 +567,7 @@ export function TraceExplorerPage() {
       <PageHeader
         title={t('telemetryExplorer.traces.title')}
         subtitle={t('telemetryExplorer.traces.subtitle')}
-        icon={<Activity className="w-6 h-6 text-primary" />}
+        icon={<Activity className="w-6 h-6 text-accent" />}
       />
 
       <PageSection>
@@ -842,10 +842,10 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           </div>
           <div className="flex flex-wrap items-center gap-x-1.5 mt-0.5 text-xs text-muted">
             <span>{t('telemetryExplorer.traces.detail.endpoint')}:</span>
-            <span className="text-primary font-medium truncate max-w-[120px]">{span.operationName}</span>
+            <span className="text-accent font-medium truncate max-w-[120px]">{span.operationName}</span>
             <span className="opacity-40">|</span>
             <span>{t('telemetryExplorer.traces.detail.serviceName')}:</span>
-            <span className="text-primary font-medium truncate max-w-[120px]">{span.serviceName}</span>
+            <span className="text-accent font-medium truncate max-w-[120px]">{span.serviceName}</span>
           </div>
         </div>
         <button
@@ -972,7 +972,7 @@ function SpanDetailPanel({ span, t, onClose }: SpanDetailPanelProps) {
           <ExpandableSection title={t('telemetryExplorer.traces.detail.events')}>
             {span.events.map((evt, idx) => (
               // eslint-disable-next-line react/no-array-index-key
-              <div key={idx} className="border-l-2 border-primary/30 pl-2 mb-2">
+              <div key={idx} className="border-l-2 border-accent/30 pl-2 mb-2">
                 <div className="text-xs font-medium">{evt.name}</div>
                 <div className="text-xs text-muted">{new Date(evt.timestamp).toLocaleString()}</div>
                 {evt.attributes &&

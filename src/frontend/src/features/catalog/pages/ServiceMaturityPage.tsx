@@ -92,14 +92,14 @@ export function ServiceMaturityPage() {
           placeholder={t('serviceMaturity.filterTeam')}
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
-          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-surface text-body placeholder:text-muted w-48"
+          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-input text-body placeholder:text-muted w-48"
         />
         <input
           type="text"
           placeholder={t('serviceMaturity.filterDomain')}
           value={domainFilter}
           onChange={(e) => setDomainFilter(e.target.value)}
-          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-surface text-body placeholder:text-muted w-48"
+          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-input text-body placeholder:text-muted w-48"
         />
       </div>
 
@@ -176,7 +176,7 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
               return (
                 <div key={level} className="flex flex-col items-center flex-1">
                   <span className="text-xs text-muted mb-1">{count}</span>
-                  <div className="w-full bg-surface rounded" style={{ height: `${Math.max(pct, 4)}%` }}>
+                  <div className="w-full bg-card rounded" style={{ height: `${Math.max(pct, 4)}%` }}>
                     <div className={`w-full h-full rounded ${
                       level === 'Optimizing' ? 'bg-success'
                       : level === 'Managed' ? 'bg-success/15'
@@ -222,7 +222,7 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-24 bg-surface rounded-full h-1.5">
+                      <div className="w-24 bg-card rounded-full h-1.5">
                         <div
                           className={`${scoreBarColor(svc.overallScore)} rounded-full h-1.5 transition-all`}
                           style={{ width: `${svc.overallScore * 100}%` }}
@@ -305,7 +305,7 @@ function AuditTab({ teamName, domain }: { teamName?: string; domain?: string }) 
                   </div>
                   <div className="flex flex-wrap gap-1.5 pl-1">
                     {f.findings.map((finding, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded bg-surface border border-edge text-muted">
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded bg-card border border-edge text-muted">
                         <AlertTriangle size={10} className="text-warning" />
                         {t(`serviceMaturity.audit.finding.${finding.split(':')[0]}`, { count: finding.split(':')[1] ?? '' })}
                       </span>
@@ -335,7 +335,7 @@ function SummaryCard({ icon, label, value, variant = 'default' }: {
     : 'text-accent';
 
   return (
-    <div className="bg-surface border border-edge rounded-lg p-3">
+    <div className="bg-card border border-edge rounded-lg p-3">
       <div className={`mb-1 ${colorClass}`}>{icon}</div>
       <p className="text-lg font-semibold text-heading">{value}</p>
       <p className="text-[11px] text-muted">{label}</p>
@@ -348,7 +348,7 @@ function DimensionPill({ icon, label, ok }: { icon: React.ReactNode; label: stri
     <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] border ${
       ok
         ? 'bg-success/5 border-success/25 text-success'
-        : 'bg-surface border-edge text-muted'
+        : 'bg-card border-edge text-muted'
     }`}>
       {icon}
       <span>{label}</span>

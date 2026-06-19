@@ -88,7 +88,7 @@ export function ReleaseGatesDashboardPage() {
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 selectedPair.from === pair.from && selectedPair.to === pair.to
                   ? 'bg-accent text-white'
-                  : 'bg-canvas border border-edge text-heading hover:bg-surface'
+                  : 'bg-canvas border border-edge text-heading hover:bg-hover'
               }`}
             >
               <span>{pair.from}</span>

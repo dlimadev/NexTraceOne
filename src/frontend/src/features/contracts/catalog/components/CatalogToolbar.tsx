@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { SearchInput } from '../../../../components/SearchInput';
+import { Button } from '../../../../components/Button';
 import { cn } from '../../../../lib/cn';
 import { PROTOCOLS, LIFECYCLE_STATES, CONTRACT_TYPES } from '../../shared/constants';
 import type { CatalogFilters, CatalogServiceType } from '../types';
@@ -73,35 +74,33 @@ export function CatalogToolbar({
           className="flex-1 max-w-md"
         />
 
-        <button
+        {/* Botão de expansão de filtros — subtle quando inativo, accent-muted quando activo */}
+        <Button
           type="button"
+          variant={expanded || filterCount > 0 ? 'subtle' : 'secondary'}
+          size="sm"
+          icon={<SlidersHorizontal size={13} />}
           onClick={() => setExpanded((v) => !v)}
-          className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium transition-colors',
-            'duration-[var(--nto-motion-fast)]',
-            expanded || filterCount > 0
-              ? 'bg-accent-muted text-cyan border-edge-focus'
-              : 'bg-elevated text-muted border-edge hover:border-edge-strong hover:text-body',
-          )}
+          className={expanded || filterCount > 0 ? 'text-accent border-edge-focus' : undefined}
         >
-          <SlidersHorizontal size={13} />
           {t('contracts.catalog.filters.label', 'Filters')}
           {filterCount > 0 && (
-            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 text-[10px] font-semibold bg-cyan/20 text-cyan">
+            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 text-[10px] font-semibold bg-accent/20 text-accent ml-1">
               {filterCount}
             </span>
           )}
-        </button>
+        </Button>
 
         {filterCount > 0 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
+            icon={<X size={12} />}
             onClick={clearAll}
-            className="inline-flex items-center gap-1 text-xs text-muted hover:text-body transition-colors"
           >
-            <X size={12} />
             {t('contracts.catalog.filters.clearAll', 'Clear')}
-          </button>
+          </Button>
         )}
 
         <span className="ml-auto text-xs text-muted tabular-nums">
@@ -218,7 +217,7 @@ function InlineSelect({
       onChange={(e) => onChange(e.target.value)}
       className={cn(
         'h-8 text-xs rounded-lg border px-2.5 pr-7 appearance-none bg-elevated transition-colors',
-        'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+        'focus:outline-none focus:border-edge-focus focus-visible:ring-2 focus-visible:ring-accent',
         value ? 'text-heading border-edge-focus' : 'text-muted border-edge',
         'duration-[var(--nto-motion-fast)]',
       )}

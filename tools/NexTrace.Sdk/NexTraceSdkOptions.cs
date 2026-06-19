@@ -17,4 +17,7 @@ public sealed class NexTraceSdkOptions
 
     /// <summary>Número de tentativas automáticas em falha transitória. Padrão: 2.</summary>
     public int RetryCount { get; set; } = 2;
+
+    /// <summary>Delay inicial em segundos entre retries. Padrão: 1.</summary>
+    public int RetryDelaySeconds { get; set; } = 1;
 }

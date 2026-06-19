@@ -13,6 +13,8 @@ import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { FormattedTimestamp } from '../../../components/FormattedTimestamp';
 import { AiComposeDashboardModal } from '../components/AiComposeDashboardModal';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 const STATUS_COLORS: Record<string, 'blue' | 'green' | 'gray'> = {
   Draft: 'blue',
@@ -39,50 +41,44 @@ export function NotebooksPage() {
   const notebooks = data?.items ?? [];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-indigo-500" />
-            {t('notebook.title')}
-          </h1>
-          <p className="text-sm text-muted mt-1">
-            {t('notebook.emptyHint')}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setComposeOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Bot className="h-4 w-4" />
-            {t('aiCompose.title')}
-          </Button>
-          <Button asChild size="sm" className="flex items-center gap-2">
+    <PageContainer>
+      {/* Cabeçalho com CTAs no slot de ações do PageHeader */}
+      <PageHeader
+        title={t('notebook.title')}
+        subtitle={t('notebook.emptyHint')}
+        icon={<BookOpen className="h-6 w-6" />}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<Bot className="h-4 w-4" />}
+              onClick={() => setComposeOpen(true)}
+            >
+              {t('aiCompose.title')}
+            </Button>
+            {/* Link envolve o Button — asChild não suportado neste DS Button */}
             <Link to="/governance/notebooks/new">
-              <Plus className="h-4 w-4" />
-              {t('notebook.new')}
+              <Button size="sm" icon={<Plus className="h-4 w-4" />}>
+                {t('notebook.new')}
+              </Button>
             </Link>
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      {/* Notebooks list */}
+      {/* Lista de notebooks */}
       {notebooks.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="h-10 w-10" />}
           title={t('notebook.empty')}
           description={t('notebook.emptyHint')}
           action={
-            <Button asChild size="sm">
-              <Link to="/governance/notebooks/new">
-                <Plus className="h-4 w-4 mr-1" />
+            <Link to="/governance/notebooks/new">
+              <Button size="sm" icon={<Plus className="h-4 w-4" />}>
                 {t('notebook.new')}
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           }
         />
       ) : (
@@ -114,7 +110,8 @@ export function NotebooksPage() {
                     <Clock className="h-3 w-3" />
                     <FormattedTimestamp value={nb.updatedAt} format="relative" />
                   </span>
-                  <span className="capitalize text-indigo-500">{nb.persona}</span>
+                  {/* Persona badge com token semântico em vez de text-indigo-500 */}
+                  <span className="capitalize text-accent">{nb.persona}</span>
                 </div>
               </Link>
             </Card>
@@ -122,7 +119,7 @@ export function NotebooksPage() {
         </div>
       )}
 
-      {/* AI Compose modal */}
+      {/* Modal AI Compose */}
       <AiComposeDashboardModal
         open={composeOpen}
         onClose={() => setComposeOpen(false)}
@@ -130,6 +127,6 @@ export function NotebooksPage() {
         userId={user?.id ?? ''}
         persona={user?.persona ?? 'Engineer'}
       />
-    </div>
+    </PageContainer>
   );
 }

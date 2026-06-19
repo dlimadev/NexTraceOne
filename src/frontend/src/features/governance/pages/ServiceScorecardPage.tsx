@@ -12,6 +12,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { SearchInput, Select, TextField } from '../../../shared/ui';
 import client from '../../../api/client';
 
 interface ScorecardDimension {
@@ -80,10 +81,11 @@ const LEVEL_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'secondar
 };
 
 const ScoreBar = ({ score }: { score: number }) => {
+  // Mapeia score para token semântico de cor
   const color =
-    score >= 90 ? 'bg-emerald-500' :
-    score >= 75 ? 'bg-green-400' :
-    score >= 60 ? 'bg-amber-400' : 'bg-red-400';
+    score >= 90 ? 'bg-success' :
+    score >= 75 ? 'bg-success/70' :
+    score >= 60 ? 'bg-warning' : 'bg-critical';
 
   return (
     <div className="relative h-2 w-full rounded-full bg-elevated">
@@ -149,24 +151,28 @@ export function ServiceScorecardPage() {
           <Card className="mb-4">
             <CardBody className="p-4">
               <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
+                {/* Filtro por time */}
+                <SearchInput
+                  size="sm"
+                  className="flex-1"
                   value={teamFilter}
                   onChange={(e) => setTeamFilter(e.target.value)}
                   placeholder={t('governance.scorecard.filterByTeam')}
-                  className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
                 />
-                <select
+                {/* Filtro por nível de maturidade */}
+                <Select
+                  size="sm"
                   value={levelFilter}
                   onChange={(e) => setLevelFilter(e.target.value)}
-                  className="rounded border border-edge bg-card text-sm px-2 py-2"
-                >
-                  <option value="">{t('governance.scorecard.allLevels')}</option>
-                  {['Gold', 'Silver', 'Bronze', 'Below Standard'].map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-                <Button onClick={() => { setPage(1); listQuery.refetch(); }}>
+                  options={[
+                    { value: 'Gold', label: 'Gold' },
+                    { value: 'Silver', label: 'Silver' },
+                    { value: 'Bronze', label: 'Bronze' },
+                    { value: 'Below Standard', label: 'Below Standard' },
+                  ]}
+                  placeholder={t('governance.scorecard.allLevels')}
+                />
+                <Button size="sm" variant="outline" onClick={() => { setPage(1); listQuery.refetch(); }}>
                   <RefreshCw size={14} className="mr-1" />
                   {t('common.refresh')}
                 </Button>
@@ -267,24 +273,26 @@ export function ServiceScorecardPage() {
           <Card className="mb-4">
             <CardBody className="p-4">
               <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
+                {/* Campo de busca por nome do serviço */}
+                <TextField
+                  size="sm"
+                  className="flex-1"
                   value={serviceInput}
                   onChange={(e) => setServiceInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder={t('governance.scorecard.serviceNamePlaceholder')}
-                  className="flex-1 rounded border border-edge bg-card px-3 py-2 text-sm"
                 />
-                <select
-                  value={periodDays}
+                {/* Seleção de janela de período */}
+                <Select
+                  size="sm"
+                  value={String(periodDays)}
                   onChange={(e) => setPeriodDays(Number(e.target.value))}
-                  className="rounded border border-edge bg-card text-sm px-2 py-2"
-                >
-                  {[7, 30, 60, 90].map((d) => (
-                    <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
-                  ))}
-                </select>
-                <Button onClick={handleSearch} disabled={!serviceInput.trim()}>
+                  options={[7, 30, 60, 90].map((d) => ({
+                    value: String(d),
+                    label: t('common.daysN', { count: d }),
+                  }))}
+                />
+                <Button size="sm" onClick={handleSearch} disabled={!serviceInput.trim()}>
                   <Search size={14} className="mr-1" />
                   {t('governance.scorecard.compute')}
                 </Button>

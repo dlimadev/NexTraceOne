@@ -46,12 +46,25 @@ public sealed class ContextWindowManager : IContextWindowManager
 
         if (systemTokens >= available)
         {
-            // System prompt itself exceeds window — return only last user message
+            // System prompt itself exceeds window — truncate system messages to fit
+            // while preserving at least the most recent user message, but only if there
+            // is enough budget for a meaningful truncated system prompt.
+            var systemBudget = (int)(available * 0.6);
             var lastUser = nonSystemMessages.LastOrDefault();
-            var minimal = lastUser is not null
+
+            if (systemBudget >= MessageOverheadTokens + 20)
+            {
+                var truncatedSystem = TruncateSystemMessages(systemMessages, systemBudget);
+                var minimal = new List<ChatMessage>(truncatedSystem);
+                if (lastUser is not null) minimal.Add(lastUser);
+                return (minimal, true);
+            }
+
+            // Budget is too small to fit even a truncated system prompt safely.
+            var fallback = lastUser is not null
                 ? new List<ChatMessage> { lastUser }
                 : new List<ChatMessage>();
-            return (minimal, true);
+            return (fallback, true);
         }
 
         var remainingTokens = available - systemTokens;
@@ -68,10 +81,11 @@ public sealed class ContextWindowManager : IContextWindowManager
             if (tokenCount + tokens > remainingTokens)
                 break;
 
-            selected.Insert(0, msg);
+            selected.Add(msg);
             tokenCount += tokens;
         }
 
+        selected.Reverse();
         var wasTruncated = selected.Count < nonSystemMessages.Count;
         var result = new List<ChatMessage>(systemMessages.Count + selected.Count);
         result.AddRange(systemMessages);
@@ -97,4 +111,40 @@ public sealed class ContextWindowManager : IContextWindowManager
     /// </summary>
     public int EstimateTotalTokens(IReadOnlyList<ChatMessage> messages)
         => messages.Sum(EstimateTokens);
+
+    private List<ChatMessage> TruncateSystemMessages(IReadOnlyList<ChatMessage> systemMessages, int maxTokens)
+    {
+        var result = new List<ChatMessage>();
+        var usedTokens = 0;
+        var budgetPerMessage = maxTokens / Math.Max(systemMessages.Count, 1);
+
+        foreach (var msg in systemMessages)
+        {
+            var msgTokens = EstimateTokens(msg);
+            if (usedTokens + msgTokens <= maxTokens)
+            {
+                result.Add(msg);
+                usedTokens += msgTokens;
+                continue;
+            }
+
+            var remaining = maxTokens - usedTokens;
+            if (remaining <= MessageOverheadTokens + 20)
+                break;
+
+            // Approximate chars per token from current message
+            var contentTokens = Math.Max(msgTokens - MessageOverheadTokens, 1);
+            var charsPerToken = (double)msg.Content.Length / contentTokens;
+            var maxChars = Math.Max(50, (int)((remaining - MessageOverheadTokens) * charsPerToken));
+            var truncated = maxChars < msg.Content.Length
+                ? string.Concat(msg.Content.AsSpan(0, maxChars), "... [truncated]")
+                : msg.Content;
+
+            var truncatedMsg = new ChatMessage(msg.Role, truncated);
+            result.Add(truncatedMsg);
+            break;
+        }
+
+        return result;
+    }
 }

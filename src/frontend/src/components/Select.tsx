@@ -68,11 +68,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={cn(
               'w-full appearance-none rounded-lg bg-input border px-4 pr-10 text-heading',
               'transition-colors',
-              'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+              'focus:outline-none focus:border-edge-focus focus:shadow-sm',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               sizeClasses[size],
               hasError
-                ? 'border-danger shadow-glow-danger'
+                ? 'border-danger shadow-sm'
                 : 'border-edge hover:border-edge-strong',
             )}
             style={{ transitionDuration: 'var(--nto-motion-fast)' }}

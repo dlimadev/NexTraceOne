@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { URL } from 'url';
+import { type CatalogServiceItem, parseCatalogResponse, buildServiceDashboardUrl } from './utils';
 
 let outputChannel: vscode.OutputChannel;
 
@@ -194,7 +195,7 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
       const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
         queryText: text,
         clientType: 'vscode',
-        clientVersion: '0.2.0',
+        clientVersion: '0.6.0',
         queryType: 'GeneralQuery',
         context,
         persona: config.persona,
@@ -665,7 +666,7 @@ function registerChatParticipant(context: vscode.ExtensionContext): void {
           const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
             queryText,
             clientType: 'vscode-chat',
-            clientVersion: '0.2.0',
+            clientVersion: '0.6.0',
             queryType,
             persona: config.persona,
           });
@@ -726,16 +727,6 @@ function updateStatusBar(): void {
 // ═══════════════════════════════════════════════════════════════════════════════
 // Service Catalog Tree View
 // ═══════════════════════════════════════════════════════════════════════════════
-
-interface CatalogServiceItem {
-  name: string;
-  teamName?: string;
-  domain?: string;
-  type?: string;
-  language?: string;
-  status?: string;
-  description?: string;
-}
 
 class CatalogNode extends vscode.TreeItem {
   constructor(
@@ -864,10 +855,7 @@ function fetchCatalogServices(serverUrl: string, apiKey: string): Promise<Catalo
             return;
           }
           try {
-            const parsed = JSON.parse(body) as
-              | { items?: CatalogServiceItem[] }
-              | CatalogServiceItem[];
-            resolve(Array.isArray(parsed) ? parsed : (parsed.items ?? []));
+            resolve(parseCatalogResponse(body));
           } catch {
             reject(new Error('Invalid catalog response'));
           }
@@ -1033,7 +1021,7 @@ async function handleChatCommand(_context: vscode.ExtensionContext): Promise<voi
     const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
       queryText: query,
       clientType: 'vscode',
-      clientVersion: '0.2.0',
+      clientVersion: '0.6.0',
       queryType: 'GeneralQuery',
       persona: config.persona,
     });
@@ -1078,7 +1066,7 @@ async function handleInspectServiceCommand(): Promise<void> {
     const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
       queryText: `Show service context, recent changes, contracts and reliability for: ${service}`,
       clientType: 'vscode',
-      clientVersion: '0.2.0',
+      clientVersion: '0.6.0',
       queryType: 'OwnershipLookup',
       serviceContext: service,
       persona: config.persona,
@@ -1128,7 +1116,7 @@ async function handleAskAboutSelectionCommand(): Promise<void> {
     const response = await callIdeQueryApi(config.serverUrl, config.apiKey, {
       queryText: `Analyse and explain this code in the context of NexTraceOne services and contracts:\n\n${selectedText}`,
       clientType: 'vscode',
-      clientVersion: '0.2.0',
+      clientVersion: '0.6.0',
       queryType: 'CodeGeneration',
       context: selectedText,
       persona: config.persona,
@@ -1230,7 +1218,7 @@ async function handleOpenDashboardCommand(): Promise<void> {
 /** Handles opening a specific service page in the NexTraceOne dashboard. */
 async function handleOpenServiceDashboardCommand(serviceName: string): Promise<void> {
   const config = getConfig();
-  const serviceUrl = `${config.serverUrl.replace(/\/$/, '')}/services/${encodeURIComponent(serviceName)}`;
+  const serviceUrl = buildServiceDashboardUrl(config.serverUrl, serviceName);
   try {
     await vscode.env.openExternal(vscode.Uri.parse(serviceUrl));
     outputChannel.appendLine(`Opened service dashboard: ${serviceUrl}`);

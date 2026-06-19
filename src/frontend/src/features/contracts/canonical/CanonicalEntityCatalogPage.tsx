@@ -184,7 +184,7 @@ function CanonicalEntityCard({
               </span>
             )}
             {entity.category && (
-              <span className="px-2 py-0.5 text-[10px] rounded-full bg-cyan/10 text-cyan border border-cyan/20">
+              <span className="px-2 py-0.5 text-[10px] rounded-full bg-accent/10 text-accent border border-accent/20">
                 {entity.category}
               </span>
             )}

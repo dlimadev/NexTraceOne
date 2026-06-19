@@ -35,8 +35,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           className={cn(
             'mt-0.5 h-5 w-5 rounded-xs border border-edge bg-input',
-            'accent-cyan',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+            'accent-accent',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             'disabled:cursor-not-allowed',
           )}
           style={{ transitionDuration: 'var(--nto-motion-fast)' }}

@@ -255,7 +255,7 @@ export function ReleaseParameterEnvironmentOverridePage() {
                 </thead>
                 <tbody className="divide-y divide-edge">
                   {overrides.map(entry => (
-                    <tr key={entry.id} className="hover:bg-surface/50 transition-colors">
+                    <tr key={entry.id} className="hover:bg-card/50 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs text-heading">{entry.definitionKey}</td>
                       <td className="px-4 py-3">
                         <Badge variant={envBadgeVariant(entry.scopeReferenceId ?? '')} size="sm">
@@ -273,7 +273,7 @@ export function ReleaseParameterEnvironmentOverridePage() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEdit(entry)}
-                            className="rounded p-1.5 text-muted hover:text-heading hover:bg-surface transition-colors"
+                            className="rounded p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
                             title={t('releaseParameterOverride.editOverride')}
                           >
                             <Pencil className="w-3.5 h-3.5" />

@@ -134,7 +134,7 @@ export function RuntimeIntelligenceDashboardPage() {
   if (loadingSnapshots || loadingScores || loadingDrifts) {
     return (
       <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        <RefreshCw className="h-8 w-8 animate-spin text-accent" />
       </div>
     );
   }

@@ -8,16 +8,21 @@ import {
   AlertTriangle,
   XCircle,
   AlertOctagon,
-  Search,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { StatCard } from '../../../components/StatCard';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
+import { Select } from '../../../components/Select';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { ChangesFilterParams } from '../api/changeConfidence';
 import type { ChangeDto } from '../../../types';
@@ -102,7 +107,7 @@ export function ChangeCatalogPage() {
 
   // Reset de página ao mudar filtros
   useEffect(() => {
-     
+
     setPage(1);
   }, [serviceName, environment, changeType, confidenceStatus, debouncedSearch]);
 
@@ -168,181 +173,239 @@ export function ChangeCatalogPage() {
     return Array.from(set);
   }, [filterOptionsQuery.data?.changeTypes, changes, changeType]);
 
-  /** Configuração dos cards de resumo. */
+  /** Opções de ambiente para o Select DS. */
+  const environmentSelectOptions = useMemo(
+    () => environmentOptions.map((env) => ({ value: env, label: env })),
+    [environmentOptions],
+  );
+
+  /** Opções de tipo de mudança para o Select DS. */
+  const changeTypeSelectOptions = useMemo(
+    () => changeTypeOptions.map((ct) => ({ value: ct, label: t(`changeConfidence.changeType.${ct}`) || ct })),
+    [changeTypeOptions, t],
+  );
+
+  /** Opções de status de confiança para o Select DS. */
+  const confidenceStatusSelectOptions = useMemo(
+    () =>
+      CONFIDENCE_STATUSES.map((cs) => ({
+        value: cs,
+        label: t(`changeConfidence.confidenceStatus.${cs}`) || cs,
+      })),
+    [t],
+  );
+
+  /** Configuração dos StatCards de resumo. */
   const summaryCards = [
-    { key: 'totalChanges', value: summary?.totalChanges, icon: Activity, color: 'text-accent' },
-    { key: 'validatedChanges', value: summary?.validatedChanges, icon: CheckCircle2, color: 'text-success' },
-    { key: 'changesNeedingAttention', value: summary?.changesNeedingAttention, icon: AlertTriangle, color: 'text-warning' },
-    { key: 'suspectedRegressions', value: summary?.suspectedRegressions, icon: XCircle, color: 'text-critical' },
-    { key: 'correlatedWithIncidents', value: summary?.changesCorrelatedWithIncidents, icon: AlertOctagon, color: 'text-critical' },
+    {
+      key: 'totalChanges',
+      value: summaryQuery.isLoading ? '—' : String(summary?.totalChanges ?? 0),
+      icon: <Activity size={18} />,
+      color: 'text-accent' as const,
+    },
+    {
+      key: 'validatedChanges',
+      value: summaryQuery.isLoading ? '—' : String(summary?.validatedChanges ?? 0),
+      icon: <CheckCircle2 size={18} />,
+      color: 'text-success' as const,
+    },
+    {
+      key: 'changesNeedingAttention',
+      value: summaryQuery.isLoading ? '—' : String(summary?.changesNeedingAttention ?? 0),
+      icon: <AlertTriangle size={18} />,
+      color: 'text-warning' as const,
+    },
+    {
+      key: 'suspectedRegressions',
+      value: summaryQuery.isLoading ? '—' : String(summary?.suspectedRegressions ?? 0),
+      icon: <XCircle size={18} />,
+      color: 'text-critical' as const,
+    },
+    {
+      key: 'correlatedWithIncidents',
+      value: summaryQuery.isLoading ? '—' : String(summary?.changesCorrelatedWithIncidents ?? 0),
+      icon: <AlertOctagon size={18} />,
+      color: 'text-critical' as const,
+    },
   ];
 
   return (
     <PageContainer>
+      {/* ── Cabeçalho da página com CTA primário ── */}
       <PageHeader
         title={t('changeConfidence.title')}
         subtitle={t('changeConfidence.subtitle')}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={14} />}
+            onClick={() => navigate('/changes/new')}
+          >
+            {t('common.register') ?? 'Register Change'}
+          </Button>
+        }
       />
 
-      {/* ── Summary cards ── */}
+      {/* ── KPI Cards de resumo ── */}
       <PageSection>
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
-          {summaryCards.map(({ key, value, icon: Icon, color }) => (
-            <Card key={key}>
-              <CardBody className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg bg-elevated ${color}`}>
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <p className="text-xs text-muted">{t(`changeConfidence.summary.${key}`)}</p>
-                  <p className="text-lg font-semibold text-heading">
-                    {summaryQuery.isLoading ? '—' : (value ?? 0)}
-                  </p>
-                </div>
-              </CardBody>
-            </Card>
+          {summaryCards.map(({ key, value, icon, color }) => (
+            <StatCard
+              key={key}
+              title={t(`changeConfidence.summary.${key}`)}
+              value={value}
+              icon={icon}
+              color={color}
+            />
           ))}
         </ContentGrid>
       </PageSection>
 
-      {/* ── Filters + Table ── */}
+      {/* ── Filtros + Tabela ── */}
       <PageSection>
-      <Card>
-        <CardBody>
-          <div className="flex flex-wrap gap-3 items-center">
-            {/* Pesquisa textual */}
-            <div className="relative flex-1 min-w-[200px]">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input
-                type="text"
+        {/* Barra de filtros */}
+        <Card>
+          <CardBody>
+            <div className="flex flex-wrap gap-3 items-center">
+              {/* Pesquisa textual */}
+              <SearchInput
+                size="sm"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t('changeConfidence.filters.searchPlaceholder')}
-                className="w-full pl-9 pr-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors"
+                className="flex-1 min-w-[200px]"
+              />
+
+              {/* Serviço */}
+              <SearchInput
+                size="sm"
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
+                placeholder={t('changeConfidence.filters.serviceName')}
+                className="w-44"
+              />
+
+              {/* Ambiente */}
+              <Select
+                size="sm"
+                value={environment}
+                onChange={(e) => setEnvironment(e.target.value)}
+                placeholder={t('changeConfidence.filters.allEnvironments')}
+                options={environmentSelectOptions}
+                className="w-44"
+              />
+
+              {/* Tipo de mudança */}
+              <Select
+                size="sm"
+                value={changeType}
+                onChange={(e) => setChangeType(e.target.value)}
+                placeholder={t('changeConfidence.filters.allTypes')}
+                options={changeTypeSelectOptions}
+                className="w-48"
+              />
+
+              {/* Status de confiança */}
+              <Select
+                size="sm"
+                value={confidenceStatus}
+                onChange={(e) => setConfidenceStatus(e.target.value)}
+                placeholder={t('changeConfidence.filters.allStatuses')}
+                options={confidenceStatusSelectOptions}
+                className="w-48"
               />
             </div>
+          </CardBody>
+        </Card>
 
-            {/* Serviço */}
-            <input
-              type="text"
-              value={serviceName}
-              onChange={(e) => setServiceName(e.target.value)}
-              placeholder={t('changeConfidence.filters.serviceName')}
-              className="w-40 px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors"
-            />
-
-            {/* Ambiente */}
-            <select
-              value={environment}
-              onChange={(e) => setEnvironment(e.target.value)}
-              className="px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading outline-none focus:border-accent transition-colors"
-            >
-              <option value="">{t('changeConfidence.filters.allEnvironments')}</option>
-              {environmentOptions.map((env) => (
-                <option key={env} value={env}>{env}</option>
-              ))}
-            </select>
-
-            {/* Tipo de mudança */}
-            <select
-              value={changeType}
-              onChange={(e) => setChangeType(e.target.value)}
-              className="px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading outline-none focus:border-accent transition-colors"
-            >
-              <option value="">{t('changeConfidence.filters.allTypes')}</option>
-              {changeTypeOptions.map((ct) => (
-                <option key={ct} value={ct}>{t(`changeConfidence.changeType.${ct}`)}</option>
-              ))}
-            </select>
-
-            {/* Status de confiança */}
-            <select
-              value={confidenceStatus}
-              onChange={(e) => setConfidenceStatus(e.target.value)}
-              className="px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading outline-none focus:border-accent transition-colors"
-            >
-              <option value="">{t('changeConfidence.filters.allStatuses')}</option>
-              {CONFIDENCE_STATUSES.map((cs) => (
-                <option key={cs} value={cs}>{t(`changeConfidence.confidenceStatus.${cs}`)}</option>
-              ))}
-            </select>
+        {/* Tabela de mudanças */}
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-edge text-left text-muted">
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.service')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.version')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.environment')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.changeType')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.deploymentStatus')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.confidence')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.score')}</th>
+                  <th className="px-4 py-3 font-medium">{t('changeConfidence.table.date')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {changesQuery.isLoading ? (
+                  <tr>
+                    <td colSpan={8}>
+                      <PageLoadingState size="sm" />
+                    </td>
+                  </tr>
+                ) : changesQuery.isError ? (
+                  <tr>
+                    <td colSpan={8}>
+                      <PageErrorState className="py-8" />
+                    </td>
+                  </tr>
+                ) : changes.length === 0 ? (
+                  <tr>
+                    <td colSpan={8}>
+                      <EmptyState
+                        title={t('changeConfidence.table.noChanges')}
+                        description={t('changeConfidence.table.noChangesDescription')}
+                        size="compact"
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  changes.map((change: ChangeDto) => (
+                    <ChangeRow
+                      key={change.changeId}
+                      change={change}
+                      onClick={() => navigate(`/changes/${change.changeId}`)}
+                      t={t}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        </CardBody>
-      </Card>
 
-      {/* ── Table ── */}
-      <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-edge text-left text-muted">
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.service')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.version')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.environment')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.changeType')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.deploymentStatus')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.confidence')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.score')}</th>
-                <th className="px-4 py-3 font-medium">{t('changeConfidence.table.date')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {changesQuery.isLoading ? (
-                <tr>
-                  <td colSpan={8}>
-                    <PageLoadingState size="sm" />
-                  </td>
-                </tr>
-              ) : changesQuery.isError ? (
-                <tr>
-                  <td colSpan={8}>
-                    <PageErrorState className="py-8" />
-                  </td>
-                </tr>
-              ) : changes.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
-                    <p className="text-muted font-medium">{t('changeConfidence.table.noChanges')}</p>
-                    <p className="text-xs text-faded mt-1">{t('changeConfidence.table.noChangesDescription')}</p>
-                  </td>
-                </tr>
-              ) : (
-                changes.map((change: ChangeDto) => (
-                  <ChangeRow key={change.changeId} change={change} onClick={() => navigate(`/changes/${change.changeId}`)} t={t} />
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ── Paginação ── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-edge">
-            <span className="text-xs text-muted">
-              {totalCount} {t('common.total')}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="p-1.5 rounded-md bg-elevated border border-edge text-muted hover:text-heading disabled:opacity-40 transition-colors"
-              >
-                <ChevronLeft size={16} />
-              </button>
+          {/* ── Paginação ── */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-edge">
               <span className="text-xs text-muted">
-                {page} / {totalPages}
+                {totalCount} {t('common.total')}
               </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-md bg-elevated border border-edge text-muted hover:text-heading disabled:opacity-40 transition-colors"
-              >
-                <ChevronRight size={16} />
-              </button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  icon={<ChevronLeft size={14} />}
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  aria-label="Previous page"
+                >
+                  {''}
+                </Button>
+                <span className="text-xs text-muted px-2">
+                  {page} / {totalPages}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  icon={<ChevronRight size={14} />}
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  aria-label="Next page"
+                >
+                  {''}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-      </Card>
+          )}
+        </Card>
       </PageSection>
     </PageContainer>
   );

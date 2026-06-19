@@ -7,6 +7,9 @@ import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { TextArea } from '../../../components/TextArea';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -110,11 +113,6 @@ export function ApiPolicyAsCodePage() {
     onSuccess: (data) => setSimulateResult(data),
   });
 
-  const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
-  const labelClass = 'mb-1 block text-xs font-medium text-body';
-  const codeClass = `${inputClass} font-mono text-xs`;
-
   return (
     <PageContainer>
       <PageHeader
@@ -130,16 +128,14 @@ export function ApiPolicyAsCodePage() {
             <p className="text-sm text-body leading-relaxed">
               {t('apiPolicyAsCode.subtitle')}
             </p>
+            {/* Badges de modo de aplicação — substituem spans artesanais */}
             <div className="mt-3 flex flex-wrap gap-2">
               {ENFORCEMENT_MODES.map((mode) => (
-                <span
-                  key={mode}
-                  className="rounded-full border border-edge px-3 py-0.5 text-xs text-muted"
-                >
+                <Badge key={mode} variant="secondary">
                   {t(`apiPolicyAsCode.${mode.charAt(0).toLowerCase() + mode.slice(1)}` as never, {
                     defaultValue: mode,
                   })}
-                </span>
+                </Badge>
               ))}
             </div>
           </CardBody>
@@ -148,10 +144,11 @@ export function ApiPolicyAsCodePage() {
 
       {/* Register Policy */}
       <PageSection title={t('apiPolicyAsCode.registerPolicy')}>
+        {/* Banner de sucesso com tokens semânticos */}
         {registeredPolicy && (
-          <div className="mb-4 flex items-center gap-2 rounded border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 px-4 py-2">
+          <div className="mb-4 flex items-center gap-2 rounded border border-success/30 bg-success/10 px-4 py-2">
             <Badge variant="success">{t('apiPolicyAsCode.createSuccess')}</Badge>
-            <span className="text-sm font-medium text-green-800 dark:text-green-300">{registeredPolicy.name}</span>
+            <span className="text-sm font-medium text-success">{registeredPolicy.name}</span>
           </div>
         )}
 
@@ -164,94 +161,74 @@ export function ApiPolicyAsCodePage() {
               }}
               className="space-y-4"
             >
+              {/* Campos de registo — raw inputs substituídos por DS TextField/Select/TextArea */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.policyName')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={registerForm.name}
-                    placeholder={t('governance.policyAsCode.placeholder.policyName', 'my-api-policy')}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, name: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.displayName')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={registerForm.displayName}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, displayName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.version')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={registerForm.version}
-                    placeholder={t('governance.policyAsCode.placeholder.version', '1.0.0')}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, version: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.format')}</label>
-                  <select
-                    className={inputClass}
-                    value={registerForm.format}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, format: e.target.value }))}
-                  >
-                    {FORMATS.map((fmt) => (
-                      <option key={fmt} value={fmt}>
-                        {t(`apiPolicyAsCode.${fmt.toLowerCase()}` as never, { defaultValue: fmt })}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.enforcementMode')}</label>
-                  <select
-                    className={inputClass}
-                    value={registerForm.enforcementMode}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, enforcementMode: e.target.value }))}
-                  >
-                    {ENFORCEMENT_MODES.map((mode) => (
-                      <option key={mode} value={mode}>
-                        {t(`apiPolicyAsCode.${mode.charAt(0).toLowerCase() + mode.slice(1)}` as never, {
-                          defaultValue: mode,
-                        })}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.registeredBy')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={registerForm.registeredBy}
-                    onChange={(e) => setRegisterForm((f) => ({ ...f, registeredBy: e.target.value }))}
-                    required
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.policyName')}
+                  value={registerForm.name}
+                  placeholder={t('governance.policyAsCode.placeholder.policyName', 'my-api-policy')}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, name: e.target.value }))}
+                  required
+                />
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.displayName')}
+                  value={registerForm.displayName}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, displayName: e.target.value }))}
+                  required
+                />
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.version')}
+                  value={registerForm.version}
+                  placeholder={t('governance.policyAsCode.placeholder.version', '1.0.0')}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, version: e.target.value }))}
+                  required
+                />
+                <Select
+                  size="sm"
+                  label={t('apiPolicyAsCode.format')}
+                  value={registerForm.format}
+                  options={FORMATS.map((fmt) => ({
+                    value: fmt,
+                    label: t(`apiPolicyAsCode.${fmt.toLowerCase()}` as never, { defaultValue: fmt }),
+                  }))}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, format: e.target.value }))}
+                />
+                <Select
+                  size="sm"
+                  label={t('apiPolicyAsCode.enforcementMode')}
+                  value={registerForm.enforcementMode}
+                  options={ENFORCEMENT_MODES.map((mode) => ({
+                    value: mode,
+                    label: t(`apiPolicyAsCode.${mode.charAt(0).toLowerCase() + mode.slice(1)}` as never, {
+                      defaultValue: mode,
+                    }),
+                  }))}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, enforcementMode: e.target.value }))}
+                />
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.registeredBy')}
+                  value={registerForm.registeredBy}
+                  onChange={(e) => setRegisterForm((f) => ({ ...f, registeredBy: e.target.value }))}
+                  required
+                />
                 <div className="sm:col-span-2">
-                  <label className={labelClass}>{t('apiPolicyAsCode.description')}</label>
-                  <textarea
-                    className={inputClass}
+                  <TextArea
+                    label={t('apiPolicyAsCode.description')}
                     value={registerForm.description}
                     rows={2}
                     onChange={(e) => setRegisterForm((f) => ({ ...f, description: e.target.value }))}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className={labelClass}>{t('apiPolicyAsCode.definitionContent')}</label>
-                  <textarea
-                    className={codeClass}
+                  <TextArea
+                    label={t('apiPolicyAsCode.definitionContent')}
                     value={registerForm.definitionContent}
                     rows={10}
+                    className="font-mono text-xs"
                     onChange={(e) => setRegisterForm((f) => ({ ...f, definitionContent: e.target.value }))}
                     required
                   />
@@ -259,7 +236,7 @@ export function ApiPolicyAsCodePage() {
               </div>
 
               {registerMutation.isError && (
-                <p className="text-sm text-red-600 dark:text-red-400">{t('apiPolicyAsCode.createError')}</p>
+                <p className="text-sm text-critical">{t('apiPolicyAsCode.createError')}</p>
               )}
 
               <div className="flex justify-end">
@@ -286,50 +263,42 @@ export function ApiPolicyAsCodePage() {
               }}
               className="space-y-4"
             >
+              {/* Campos de simulação — raw inputs substituídos por DS TextField/TextArea */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.policyName')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={simulatePolicyName}
-                    onChange={(e) => setSimulatePolicyName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.resourceType')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={simulateForm.resourceType}
-                    onChange={(e) => setSimulateForm((f) => ({ ...f, resourceType: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('apiPolicyAsCode.resourceId')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={simulateForm.resourceId}
-                    onChange={(e) => setSimulateForm((f) => ({ ...f, resourceId: e.target.value }))}
-                    required
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.policyName')}
+                  value={simulatePolicyName}
+                  onChange={(e) => setSimulatePolicyName(e.target.value)}
+                  required
+                />
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.resourceType')}
+                  value={simulateForm.resourceType}
+                  onChange={(e) => setSimulateForm((f) => ({ ...f, resourceType: e.target.value }))}
+                  required
+                />
+                <TextField
+                  size="sm"
+                  label={t('apiPolicyAsCode.resourceId')}
+                  value={simulateForm.resourceId}
+                  onChange={(e) => setSimulateForm((f) => ({ ...f, resourceId: e.target.value }))}
+                  required
+                />
                 <div className="sm:col-span-2">
-                  <label className={labelClass}>{t('apiPolicyAsCode.context')}</label>
-                  <textarea
-                    className={codeClass}
+                  <TextArea
+                    label={t('apiPolicyAsCode.context')}
                     value={simulateForm.context}
                     rows={4}
+                    className="font-mono text-xs"
                     onChange={(e) => setSimulateForm((f) => ({ ...f, context: e.target.value }))}
                   />
                 </div>
               </div>
 
               {simulateMutation.isError && (
-                <p className="text-sm text-red-600 dark:text-red-400">{t('apiPolicyAsCode.error')}</p>
+                <p className="text-sm text-critical">{t('apiPolicyAsCode.error')}</p>
               )}
 
               <div className="flex justify-end">
@@ -354,8 +323,9 @@ export function ApiPolicyAsCodePage() {
               </div>
             </CardHeader>
             <CardBody>
+              {/* Resultado de violações com tokens semânticos */}
               {simulateResult.violationMessages.length === 0 ? (
-                <p className="text-sm text-green-600 dark:text-green-400">{t('apiPolicyAsCode.noViolations')}</p>
+                <p className="text-sm text-success">{t('apiPolicyAsCode.noViolations')}</p>
               ) : (
                 <div>
                   <p className="mb-2 text-xs font-medium text-body">
@@ -365,10 +335,10 @@ export function ApiPolicyAsCodePage() {
                     {simulateResult.violationMessages.map((msg, i) => (
                       <li
                         key={i}
-                        className="flex items-center gap-2 rounded bg-red-50 dark:bg-red-900/20 px-3 py-1.5"
+                        className="flex items-center gap-2 rounded bg-critical/10 px-3 py-1.5"
                       >
-                        <span className="h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                        <span className="text-xs text-red-700 dark:text-red-300">{msg}</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-critical shrink-0" />
+                        <span className="text-xs text-critical">{msg}</span>
                       </li>
                     ))}
                   </ul>

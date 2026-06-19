@@ -220,7 +220,7 @@ export function ReleaseApprovalGatewayPage() {
                 {approvals.map((a) => (
                   <div
                     key={a.id}
-                    className="flex items-start gap-3 p-3 rounded-md bg-surface border border-edge"
+                    className="flex items-start gap-3 p-3 rounded-md bg-card border border-edge"
                   >
                     <ShieldCheck className="w-4 h-4 text-muted mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">

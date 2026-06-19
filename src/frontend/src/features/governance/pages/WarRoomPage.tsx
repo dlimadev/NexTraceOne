@@ -86,7 +86,7 @@ function PresenceBar({ users }: { users: PresenceUser[] }) {
   if (!users.length) return null;
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-surface-elevated rounded-lg border border-edge">
+    <div className="flex items-center gap-2 px-4 py-2 bg-elevated rounded-lg border border-edge">
       <Users size={14} className="text-muted" />
       <span className="text-xs text-muted">{t('warRoom.activeNow', { count: users.length })}</span>
       <div className="flex -space-x-2">
@@ -121,7 +121,7 @@ function CommentItem({
 }) {
   const { t } = useTranslation();
   return (
-    <div className={`p-3 rounded-lg border ${comment.isResolved ? 'opacity-60 bg-muted/30' : 'bg-surface-elevated'}`}>
+    <div className={`p-3 rounded-lg border ${comment.isResolved ? 'opacity-60 bg-muted/30' : 'bg-elevated'}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-xs font-semibold text-white shrink-0">

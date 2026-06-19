@@ -144,9 +144,9 @@ export function ConsumersSection({ contract, className = '' }: ConsumersSectionP
 
       {/* ── Summary ── */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg border border-cyan/20 bg-cyan/5 px-4 py-3">
+        <div className="rounded-lg border border-accent/20 bg-accent/5 px-4 py-3">
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.consumers.totalConsumers', 'Total Consumers')}</p>
-          <p className="text-lg font-bold text-cyan">{contract.consumers.length}</p>
+          <p className="text-lg font-bold text-accent">{contract.consumers.length}</p>
         </div>
         <div className="rounded-lg border border-mint/20 bg-mint/5 px-4 py-3">
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.consumers.totalProducers', 'Total Producers')}</p>

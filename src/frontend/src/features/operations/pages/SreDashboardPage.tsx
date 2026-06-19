@@ -124,11 +124,12 @@ interface HeroCardProps {
 }
 
 function HeroCard({ title, items, icon }: HeroCardProps) {
+  // Mapeamento de variante semântica para token de fundo do badge hero
   const variantBg: Record<HeroCardProps['items'][0]['variant'], string> = {
-    success: 'bg-emerald-600 dark:bg-emerald-700',
-    danger: 'bg-red-600 dark:bg-red-700',
-    warning: 'bg-amber-500 dark:bg-amber-600',
-    info: 'bg-blue-600 dark:bg-blue-700',
+    success: 'bg-success',
+    danger: 'bg-critical',
+    warning: 'bg-warning',
+    info: 'bg-accent',
     neutral: 'bg-muted',
   };
 
@@ -236,19 +237,19 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
             <th className={`${thClass} text-right`} onClick={() => toggleSort('count')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.count')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => toggleSort('avgLatencyMs')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.latency')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => toggleSort('errors')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.errors')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'errors' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'errors' ? 'text-accent' : ''}`} />
               </span>
             </th>
           </tr>
@@ -267,7 +268,7 @@ function TopRequestsTable({ rows, isLoading }: { rows: SreTopRequest[]; isLoadin
                 key={`${row.service}-${row.request}-${i}`} // eslint-disable-line react/no-array-index-key
                 className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
-                <td className={`${tdClass} font-medium text-primary`}>{row.service}</td>
+                <td className={`${tdClass} font-medium text-accent`}>{row.service}</td>
                 <td className={`${tdClass} font-mono max-w-[200px] truncate`}>{row.request}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtNumber(row.count)}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtMs(row.avgLatencyMs)}</td>
@@ -315,13 +316,13 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
             <th className={`${thClass} text-right`} onClick={() => setSort('count')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.count')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'count' ? 'text-accent' : ''}`} />
               </span>
             </th>
             <th className={`${thClass} text-right`} onClick={() => setSort('avgLatencyMs')}>
               <span className="flex items-center justify-end gap-1">
                 {t('sreDashboard.table.latency')}
-                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-primary' : ''}`} />
+                <ArrowUpDown className={`w-3 h-3 ${sort === 'avgLatencyMs' ? 'text-accent' : ''}`} />
               </span>
             </th>
           </tr>
@@ -340,7 +341,7 @@ function TopQueriesTable({ rows, isLoading }: { rows: SreTopQuery[]; isLoading: 
                 key={`${row.database}-${row.query}-${i}`} // eslint-disable-line react/no-array-index-key
                 className="border-b border-edge/40 hover:bg-muted/20 transition-colors"
               >
-                <td className={`${tdClass} font-medium text-primary`}>{row.database}</td>
+                <td className={`${tdClass} font-medium text-accent`}>{row.database}</td>
                 <td className={`${tdClass} font-mono text-muted max-w-[240px] truncate`}>{row.query}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtNumber(row.count)}</td>
                 <td className={`${tdClass} text-right tabular-nums`}>{fmtMs(row.avgLatencyMs)}</td>
@@ -447,45 +448,45 @@ export function SreDashboardPage() {
 
   return (
     <PageContainer>
-      {/* ── Page header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-        <PageHeader
-          title={t('sreDashboard.title')}
-          subtitle={t('sreDashboard.subtitle')}
-        />
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Time range selector */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTimeMenu((v) => !v)}
-            >
-              <Clock className="w-3.5 h-3.5 mr-1.5" />
-              {timeRangeLabel ? t(timeRangeLabel.labelKey) : timeRange}
-              <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
+      {/* Cabeçalho com seletor de janela temporal e refresh como actions */}
+      <PageHeader
+        title={t('sreDashboard.title')}
+        subtitle={t('sreDashboard.subtitle')}
+        actions={
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Seletor de janela temporal com dropdown semântico */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTimeMenu((v) => !v)}
+              >
+                <Clock className="w-3.5 h-3.5 mr-1.5" />
+                {timeRangeLabel ? t(timeRangeLabel.labelKey) : timeRange}
+                <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+              {showTimeMenu && (
+                <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
+                  {TIME_RANGE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
+                      onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
+                    >
+                      {t(opt.labelKey)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Botão de refresh */}
+            <Button variant="ghost" size="sm" onClick={refetchAll}>
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
-            {showTimeMenu && (
-              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
-                {TIME_RANGE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-primary' : ''}`}
-                    onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
-                  >
-                    {t(opt.labelKey)}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
-          {/* Refresh */}
-          <Button variant="ghost" size="sm" onClick={refetchAll}>
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isError && (
         <PageErrorState
@@ -510,7 +511,7 @@ export function SreDashboardPage() {
               <div className="flex items-baseline gap-1">
                 <span
                   className={`text-xl font-extrabold ${
-                    summary.problems.open === 0 ? 'text-emerald-500' : 'text-destructive'
+                    summary.problems.open === 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {summary.problems.open}
@@ -631,7 +632,7 @@ export function SreDashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-primary" />
+                <Server className="w-4 h-4 text-accent" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.serviceAnalysis.title')}</h3>
               </div>
               <p className="text-xs text-muted mt-0.5">{t('sreDashboard.serviceAnalysis.subtitle')}</p>
@@ -645,7 +646,7 @@ export function SreDashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-primary" />
+                <Database className="w-4 h-4 text-accent" />
                 <h3 className="text-sm font-semibold">{t('sreDashboard.dbAnalysis.title')}</h3>
               </div>
               <p className="text-xs text-muted mt-0.5">{t('sreDashboard.dbAnalysis.subtitle')}</p>

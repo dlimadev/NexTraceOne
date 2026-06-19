@@ -54,12 +54,12 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: /sign in$/i })).toBeInTheDocument();
   });
 
-  it('exibe o título e subtítulo da plataforma', () => {
+  it('exibe o logo e o heading da plataforma', () => {
     renderLoginPage();
-    // Split layout has NexTraceOne logo in left panel and mobile header
+    // Layout centrado renderiza o logo NexTraceOne
     expect(screen.getAllByAltText('NexTraceOne').length).toBeGreaterThanOrEqual(1);
-    // Tagline appears in mobile header
-    expect(screen.getAllByText(/sovereign/i).length).toBeGreaterThanOrEqual(1);
+    // Heading principal "Welcome back" / título da plataforma
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
   });
 
   it('chama login com as credenciais corretas ao submeter', async () => {
@@ -126,9 +126,9 @@ describe('LoginPage', () => {
     });
   });
 
-  it('exibe o rodapé indicando self-hosted', () => {
+  it('exibe o rodapé de termos e privacidade', () => {
     renderLoginPage();
-    expect(screen.getByText(/self-hosted/i)).toBeInTheDocument();
+    expect(screen.getByText(/terms of service/i)).toBeInTheDocument();
   });
 
   it('exibe botão de toggle de visibilidade de password', () => {

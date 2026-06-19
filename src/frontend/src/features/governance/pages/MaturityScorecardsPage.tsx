@@ -68,7 +68,7 @@ export function MaturityScorecardsPage() {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               dimension === dim
                 ? 'bg-accent/10 text-accent border-accent/30'
-                : 'bg-surface text-muted border-edge hover:text-body'
+                : 'bg-card text-muted border-edge hover:text-body'
             }`}
           >
             {t(`governance.executive.scorecardsDimension${dim.charAt(0).toUpperCase()}${dim.slice(1)}`)}
@@ -105,7 +105,7 @@ export function MaturityScorecardsPage() {
               <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {sc.dimensions.map(dim => (
-                    <div key={dim.dimension} className="bg-surface/50 rounded-md p-3 border border-edge/50">
+                    <div key={dim.dimension} className="bg-card/50 rounded-md p-3 border border-edge/50">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-xs font-medium text-heading">
                           {t(`governance.executive.scorecards${dim.dimension.charAt(0).toUpperCase()}${dim.dimension.slice(1)}`)}
@@ -119,7 +119,7 @@ export function MaturityScorecardsPage() {
                           {dim.score}/{dim.maxScore}
                         </span>
                       </div>
-                      <div className="w-full bg-surface rounded-full h-1.5 mb-2">
+                      <div className="w-full bg-card rounded-full h-1.5 mb-2">
                         <div
                           className={`${scoreBarColor(dim.score, dim.maxScore)} rounded-full h-1.5 transition-all`}
                           style={{ width: `${dim.maxScore === 0 ? 0 : (dim.score / dim.maxScore) * 100}%` }}

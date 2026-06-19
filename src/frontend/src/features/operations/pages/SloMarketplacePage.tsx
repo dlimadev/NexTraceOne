@@ -88,7 +88,7 @@ export function SloMarketplacePage() {
                 key={opt.value}
                 type="button"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted text-muted'}`}
+                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
               </button>
@@ -132,7 +132,7 @@ export function SloMarketplacePage() {
                       key={cat.value}
                       type="button"
                       onClick={() => setCategory(cat.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${category === cat.value ? 'bg-primary text-primary-foreground' : 'text-muted hover:bg-muted'}`}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${category === cat.value ? 'bg-accent text-on-accent' : 'text-muted hover:bg-muted'}`}
                     >
                       {t(cat.labelKey)}
                     </button>

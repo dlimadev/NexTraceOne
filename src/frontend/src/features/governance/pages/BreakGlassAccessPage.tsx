@@ -7,6 +7,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField, Select, TextArea } from '../../../shared/ui';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import client from '../../../api/client';
 
@@ -103,37 +104,47 @@ export function BreakGlassAccessPage() {
                   <h3 className="text-sm font-semibold">{t('breakGlass.requestAccess')}</h3>
                 </div>
                 <div className="space-y-3">
-                  <div>
-                    <label className="text-xs text-muted">{t('breakGlass.resource')}</label>
-                    <input value={resource} onChange={(e) => setResource(e.target.value)} placeholder="e.g. prod-database" className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted">{t('breakGlass.role')}</label>
-                    <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
-                      <option value="">-- select --</option>
-                      <option value="readonly">Read Only</option>
-                      <option value="admin">Admin</option>
-                      <option value="break-glass">Break Glass</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted">{t('breakGlass.environment')}</label>
-                    <select value={env} onChange={(e) => setEnv(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated">
-                      <option value="production">Production</option>
-                      <option value="staging">Staging</option>
-                      <option value="development">Development</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted">{t('breakGlass.justification')}</label>
-                    <textarea
-                      value={justification}
-                      onChange={(e) => setJustification(e.target.value)}
-                      rows={3}
-                      placeholder={t('breakGlass.justificationPlaceholder')}
-                      className="w-full mt-1 px-2 py-1.5 text-sm border rounded bg-elevated"
-                    />
-                  </div>
+                  {/* Campo: recurso alvo do acesso temporário */}
+                  <TextField
+                    size="sm"
+                    label={t('breakGlass.resource')}
+                    value={resource}
+                    onChange={(e) => setResource(e.target.value)}
+                    placeholder="e.g. prod-database"
+                  />
+                  {/* Seleção de papel de acesso */}
+                  <Select
+                    size="sm"
+                    label={t('breakGlass.role')}
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    placeholder={t('breakGlass.rolePlaceholder', '-- selecionar --')}
+                    options={[
+                      { value: 'readonly', label: 'Read Only' },
+                      { value: 'admin', label: 'Admin' },
+                      { value: 'break-glass', label: 'Break Glass' },
+                    ]}
+                  />
+                  {/* Seleção de ambiente */}
+                  <Select
+                    size="sm"
+                    label={t('breakGlass.environment')}
+                    value={env}
+                    onChange={(e) => setEnv(e.target.value)}
+                    options={[
+                      { value: 'production', label: 'Production' },
+                      { value: 'staging', label: 'Staging' },
+                      { value: 'development', label: 'Development' },
+                    ]}
+                  />
+                  {/* Justificativa obrigatória para auditoria */}
+                  <TextArea
+                    label={t('breakGlass.justification')}
+                    value={justification}
+                    onChange={(e) => setJustification(e.target.value)}
+                    rows={3}
+                    placeholder={t('breakGlass.justificationPlaceholder')}
+                  />
                   <Button
                     className="w-full"
                     disabled={!resource || !role || !justification || requestAccess.isPending}

@@ -1,7 +1,7 @@
 /**
  * Página do Developer Portal — catálogo de APIs, subscriptions, playground e analytics.
  *
- * Organizada em tabs seguindo o padrão de ServiceCatalogPage e ContractCatalogPage.
+ * Organizada em tabs seguindo o padrão Betterstack: PageHeader + DS Tabs + TabPanel.
  * Todo texto visível usa i18n via t('developerPortal.*').
  * Mutations invalidam as queries relacionadas para manter a UI consistente.
  *
@@ -14,19 +14,25 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
-  Search,
   Bell,
   Play,
   BarChart3,
   RefreshCw,
   Package,
   Inbox,
+  Search as SearchIcon,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
+import { Tabs, TabPanel } from '../../../components/Tabs';
+import { SearchInput } from '../../../components/SearchInput';
+import { StatCard } from '../../../components/StatCard';
+import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { developerPortalApi } from '../api';
 import type {
   CatalogItem,
@@ -84,6 +90,9 @@ const emptyPlayForm: PlaygroundForm = {
   requestHeaders: '',
   environment: '',
 };
+
+/** ID do grupo de tabs para aria-controls. */
+const TABS_ID = 'developer-portal-tabs';
 
 export function DeveloperPortalPage() {
   const { t } = useTranslation();
@@ -197,90 +206,91 @@ export function DeveloperPortalPage() {
     executeMutation.mutate(payload);
   };
 
-  // ── Tab rendering ───────────────────────────────────────────────────────────
+  // ── Definição de tabs ────────────────────────────────────────────────────────
 
-  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'catalog', label: t('developerPortal.tabs.catalog'), icon: <Search size={16} /> },
-    { key: 'subscriptions', label: t('developerPortal.tabs.subscriptions'), icon: <Bell size={16} /> },
-    { key: 'playground', label: t('developerPortal.tabs.playground'), icon: <Play size={16} /> },
-    { key: 'myConsumption', label: t('developerPortal.tabs.myConsumption'), icon: <Package size={16} /> },
-    { key: 'inbox', label: t('developerPortal.tabs.inbox'), icon: <Inbox size={16} /> },
-    { key: 'analytics', label: t('developerPortal.tabs.analytics'), icon: <BarChart3 size={16} /> },
+  const tabItems = [
+    { id: 'catalog', label: t('developerPortal.tabs.catalog'), icon: <SearchIcon size={14} /> },
+    { id: 'subscriptions', label: t('developerPortal.tabs.subscriptions'), icon: <Bell size={14} /> },
+    { id: 'playground', label: t('developerPortal.tabs.playground'), icon: <Play size={14} /> },
+    { id: 'myConsumption', label: t('developerPortal.tabs.myConsumption'), icon: <Package size={14} /> },
+    { id: 'inbox', label: t('developerPortal.tabs.inbox'), icon: <Inbox size={14} /> },
+    { id: 'analytics', label: t('developerPortal.tabs.analytics'), icon: <BarChart3 size={14} /> },
   ];
-
-  const fieldClass =
-    'w-full px-3 py-2 bg-surface border border-edge rounded-md text-sm text-body focus:outline-none focus:ring-2 focus:ring-accent/40';
 
   return (
     <PageContainer>
+      {/* Cabeçalho da página — sem CTA global (ações ficam dentro das abas) */}
       <PageHeader
         title={t('developerPortal.title')}
         subtitle={t('developerPortal.description')}
       />
 
-      {/* Tabs */}
-      <div className="flex gap-1 border-b border-edge">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? 'border-accent text-accent'
-                : 'border-transparent text-muted hover:text-body'
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Navegação por abas — DS Tabs com role=tablist + aria-controls */}
+      <Tabs
+        id={TABS_ID}
+        items={tabItems}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as Tab)}
+        className="mb-6"
+      />
 
-      {/* ── Tab: Catalog ─────────────────────────────────────────────────────── */}
-      {activeTab === 'catalog' && (
+      {/* ── Tab: Catalog ────────────────────────────────────────────────────── */}
+      <TabPanel tabId="catalog" tabsId={TABS_ID} active={activeTab === 'catalog'}>
         <div className="space-y-4">
-          <input
-            type="text"
+          {/* Campo de busca DS */}
+          <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('developerPortal.catalog.searchPlaceholder')}
-            className={fieldClass}
+            aria-label={t('developerPortal.catalog.searchPlaceholder')}
           />
-          {catalogQuery.isLoading && (
-            <p className="text-muted text-sm">{t('common.loading')}</p>
-          )}
-          {catalogQuery.isError && (
-            <p className="text-critical text-sm">{t('common.error')}</p>
-          )}
-          {catalogQuery.data && catalogQuery.data.items.length === 0 && (
-            <p className="text-muted text-sm">{t('developerPortal.catalog.noResults')}</p>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {catalogQuery.data?.items.map((item: CatalogItem) => (
-              <Card key={item.apiAssetId}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-heading">{item.apiName}</h3>
-                    <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
-                      {item.healthStatus}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <p className="text-sm text-muted mb-2">{item.description}</p>
-                  <div className="flex justify-between text-xs text-muted">
-                    <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
-                    <span>{t('developerPortal.catalog.version')}: {item.version}</span>
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* ── Tab: Subscriptions ───────────────────────────────────────────────── */}
-      {activeTab === 'subscriptions' && (
+          {catalogQuery.isLoading && <PageLoadingState size="sm" />}
+
+          {catalogQuery.isError && (
+            <PageErrorState
+              variant="compact"
+              onRetry={() =>
+                queryClient.invalidateQueries({ queryKey: ['developerPortal', 'catalog'] })
+              }
+            />
+          )}
+
+          {catalogQuery.data && catalogQuery.data.items.length === 0 && (
+            <EmptyState
+              title={t('developerPortal.catalog.noResults')}
+              size="compact"
+            />
+          )}
+
+          {catalogQuery.data && catalogQuery.data.items.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {catalogQuery.data.items.map((item: CatalogItem) => (
+                <Card key={item.apiAssetId}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-heading">{item.apiName}</h3>
+                      <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
+                        {item.healthStatus}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <p className="text-sm text-muted mb-2">{item.description}</p>
+                    <div className="flex justify-between text-xs text-muted">
+                      <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
+                      <span>{t('developerPortal.catalog.version')}: {item.version}</span>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </TabPanel>
+
+      {/* ── Tab: Subscriptions ──────────────────────────────────────────────── */}
+      <TabPanel tabId="subscriptions" tabsId={TABS_ID} active={activeTab === 'subscriptions'}>
         <DevPortalSubscriptionsTab
           showSubForm={showSubForm}
           onToggleForm={() => setShowSubForm(!showSubForm)}
@@ -291,12 +301,11 @@ export function DeveloperPortalPage() {
           subscriptions={subscriptionsQuery.data}
           isLoading={subscriptionsQuery.isLoading}
           onDeleteSubscription={(id) => deleteSubMutation.mutate(id)}
-          fieldClass={fieldClass}
         />
-      )}
+      </TabPanel>
 
-      {/* ── Tab: Playground ──────────────────────────────────────────────────── */}
-      {activeTab === 'playground' && (
+      {/* ── Tab: Playground ─────────────────────────────────────────────────── */}
+      <TabPanel tabId="playground" tabsId={TABS_ID} active={activeTab === 'playground'}>
         <DevPortalPlaygroundTab
           playForm={playForm}
           onPlayFormChange={setPlayForm}
@@ -305,66 +314,68 @@ export function DeveloperPortalPage() {
           playResult={playResult}
           historyItems={historyQuery.data?.items}
           historyLoading={historyQuery.isLoading}
-          fieldClass={fieldClass}
         />
-      )}
+      </TabPanel>
 
-      {/* ── Tab: Analytics ───────────────────────────────────────────────────── */}
-      {activeTab === 'analytics' && (
-        <div className="space-y-4">
+      {/* ── Tab: Analytics ──────────────────────────────────────────────────── */}
+      <TabPanel tabId="analytics" tabsId={TABS_ID} active={activeTab === 'analytics'}>
+        <div className="space-y-6">
+          {/* Cabeçalho de secção com refresh */}
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-heading">
+            <h2 className="text-base font-semibold text-heading">
               {t('developerPortal.analytics.title')}
             </h2>
             <Button
-              variant="secondary"
+              variant="outline"
+              size="sm"
+              icon={<RefreshCw size={14} />}
               onClick={() =>
                 queryClient.invalidateQueries({ queryKey: ['developerPortal', 'analytics'] })
               }
             >
-              <RefreshCw size={16} className="mr-1" />
               {t('common.refresh')}
             </Button>
           </div>
 
-          {analyticsQuery.isLoading && (
-            <p className="text-muted text-sm">{t('common.loading')}</p>
-          )}
+          {analyticsQuery.isLoading && <PageLoadingState size="sm" />}
+
           {analyticsQuery.isError && (
-            <p className="text-critical text-sm">{t('common.error')}</p>
+            <PageErrorState
+              variant="compact"
+              onRetry={() =>
+                queryClient.invalidateQueries({ queryKey: ['developerPortal', 'analytics'] })
+              }
+            />
           )}
 
           {analyticsQuery.data && (
             <>
+              {/* KPIs via StatCard */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  {
-                    label: t('developerPortal.analytics.totalSearches'),
-                    value: analyticsQuery.data.totalSearches,
-                  },
-                  {
-                    label: t('developerPortal.analytics.totalApiViews'),
-                    value: analyticsQuery.data.totalApiViews,
-                  },
-                  {
-                    label: t('developerPortal.analytics.totalPlaygroundExecutions'),
-                    value: analyticsQuery.data.totalPlaygroundExecutions,
-                  },
-                  {
-                    label: t('developerPortal.analytics.totalCodeGenerations'),
-                    value: analyticsQuery.data.totalCodeGenerations,
-                  },
-                ].map((stat) => (
-                  <Card key={stat.label}>
-                    <CardBody>
-                      <p className="text-xs text-muted uppercase tracking-wide">{stat.label}</p>
-                      <p className="text-2xl font-bold text-heading mt-1">{stat.value}</p>
-                    </CardBody>
-                  </Card>
-                ))}
+                <StatCard
+                  title={t('developerPortal.analytics.totalSearches')}
+                  value={analyticsQuery.data.totalSearches ?? 0}
+                  color="text-accent"
+                />
+                <StatCard
+                  title={t('developerPortal.analytics.totalApiViews')}
+                  value={analyticsQuery.data.totalApiViews ?? 0}
+                  color="text-info"
+                />
+                <StatCard
+                  title={t('developerPortal.analytics.totalPlaygroundExecutions')}
+                  value={analyticsQuery.data.totalPlaygroundExecutions ?? 0}
+                  color="text-success"
+                />
+                <StatCard
+                  title={t('developerPortal.analytics.totalCodeGenerations')}
+                  value={analyticsQuery.data.totalCodeGenerations ?? 0}
+                  color="text-warning"
+                />
               </div>
 
-              {(analyticsQuery.data.topSearches ?? []).length > 0 && (
+              {/* Tabela de top searches */}
+              {(analyticsQuery.data.topSearches ?? []).length > 0 ? (
                 <Card>
                   <CardHeader>
                     <h3 className="font-semibold text-heading">
@@ -390,18 +401,19 @@ export function DeveloperPortalPage() {
                     </table>
                   </CardBody>
                 </Card>
-              )}
-
-              {(analyticsQuery.data.topSearches ?? []).length === 0 && (
-                <p className="text-muted text-sm">{t('developerPortal.analytics.noData')}</p>
+              ) : (
+                <EmptyState
+                  title={t('developerPortal.analytics.noData')}
+                  size="compact"
+                />
               )}
             </>
           )}
         </div>
-      )}
+      </TabPanel>
 
-      {/* ── Tab: My Consumption ────────────────────────────────────────────── */}
-      {activeTab === 'myConsumption' && (
+      {/* ── Tab: My Consumption ─────────────────────────────────────────────── */}
+      <TabPanel tabId="myConsumption" tabsId={TABS_ID} active={activeTab === 'myConsumption'}>
         <DevPortalMyConsumptionTab
           consumingItems={consumingQuery.data?.items}
           consumingLoading={consumingQuery.isLoading}
@@ -412,15 +424,15 @@ export function DeveloperPortalPage() {
             queryClient.invalidateQueries({ queryKey: ['developerPortal', 'consuming'] })
           }
         />
-      )}
+      </TabPanel>
 
-      {/* ── Tab: Inbox / Change Awareness ──────────────────────────────────── */}
-      {activeTab === 'inbox' && (
+      {/* ── Tab: Inbox / Change Awareness ───────────────────────────────────── */}
+      <TabPanel tabId="inbox" tabsId={TABS_ID} active={activeTab === 'inbox'}>
         <DevPortalInboxTab
           subscriptions={subscriptionsQuery.data}
           subscriptionsLoading={subscriptionsQuery.isLoading}
         />
-      )}
+      </TabPanel>
     </PageContainer>
   );
 }

@@ -165,7 +165,7 @@ export function ReleaseCommitPoolPage() {
                     {commits.map((c) => (
                       <div
                         key={c.id}
-                        className="flex items-start gap-3 p-3 rounded-md bg-surface border border-edge"
+                        className="flex items-start gap-3 p-3 rounded-md bg-card border border-edge"
                       >
                         <GitCommit className="w-4 h-4 text-muted mt-0.5 shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -291,7 +291,7 @@ export function ReleaseCommitPoolPage() {
                     {workItems.map((wi) => (
                       <div
                         key={wi.id}
-                        className="flex items-center gap-3 p-3 rounded-md bg-surface border border-edge"
+                        className="flex items-center gap-3 p-3 rounded-md bg-card border border-edge"
                       >
                         <Tag className="w-4 h-4 text-muted shrink-0" />
                         <div className="flex-1 min-w-0">

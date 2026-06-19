@@ -27,6 +27,10 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button } from '../../../components/Button';
+import { Select } from '../../../components/Select';
+import { TextField } from '../../../components/TextField';
+import { Checkbox } from '../../../components/Checkbox';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 /**
@@ -132,11 +136,11 @@ export function UserPreferencesPage() {
     queryFn: fetchPreferences,
   });
 
-  // ── Sidebar & Dashboard State ──
+  // ── Estado Sidebar & Dashboard ──
   const [pinnedItems, setPinnedItems] = useState<string[]>([]);
   const [activeWidgets, setActiveWidgets] = useState<string[]>([]);
 
-  // ── Appearance State ──
+  // ── Estado Aparência ──
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
   const [selectedTimezone, setSelectedTimezone] = useState('UTC');
   const [selectedDateFormat, setSelectedDateFormat] = useState('relative');
@@ -145,12 +149,12 @@ export function UserPreferencesPage() {
   const [tableRowsPerPage, setTableRowsPerPage] = useState(25);
   const [codeFontSize, setCodeFontSize] = useState(13);
 
-  // ── Accessibility State ──
+  // ── Estado Acessibilidade ──
   const [highContrastEnabled, setHighContrastEnabled] = useState(false);
   const [reducedMotionEnabled, setReducedMotionEnabled] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
 
-  // ── Notifications State ──
+  // ── Estado Notificações ──
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [inAppNotifications, setInAppNotifications] = useState(true);
   const [digestEnabled, setDigestEnabled] = useState(false);
@@ -170,7 +174,7 @@ export function UserPreferencesPage() {
 
   const DIGEST_SECTION_OPTIONS = ['changes', 'incidents', 'contracts', 'compliance', 'finops', 'ai-usage'];
 
-  // ── AI Preferences state ──────────────────────────────────────────────────
+  // ── Estado Preferências de IA ─────────────────────────────────────────────
   const [aiVerbosity, setAiVerbosity] = useState('standard');
   const [aiLanguage, setAiLanguage] = useState('en');
   const [aiContextScope, setAiContextScope] = useState('team');
@@ -181,7 +185,7 @@ export function UserPreferencesPage() {
   const [defaultTeam, setDefaultTeam] = useState('');
   const [defaultService, setDefaultService] = useState('');
 
-  // Sync server preferences into local state once data arrives
+  // Sincroniza preferências do servidor no estado local após carregamento
   const [prefsInitialized, setPrefsInitialized] = useState(false);
   if (data?.preferences && !prefsInitialized) {
     setPrefsInitialized(true);
@@ -189,8 +193,8 @@ export function UserPreferencesPage() {
     const find = (k: string) => prefs.find(p => p.key === k)?.value;
     const sidebar = find('platform.sidebar.pinned_items');
     const widgets = find('platform.home.active_widgets');
-    if (sidebar) { try { setPinnedItems(JSON.parse(sidebar)); } catch { /* keep default */ } }
-    if (widgets) { try { setActiveWidgets(JSON.parse(widgets)); } catch { /* keep default */ } }
+    if (sidebar) { try { setPinnedItems(JSON.parse(sidebar)); } catch { /* manter padrão */ } }
+    if (widgets) { try { setActiveWidgets(JSON.parse(widgets)); } catch { /* manter padrão */ } }
     const tz = find('user.timezone');
     const df = find('user.date_format');
     const tf = find('user.time_format');
@@ -216,7 +220,7 @@ export function UserPreferencesPage() {
     if (qhend) setQuietHoursEnd(qhend);
     if (qhtz) setQuietHoursTimezone(qhtz);
     if (df2) setDigestFrequency(df2);
-    if (dsec) { try { setDigestSections(JSON.parse(dsec)); } catch { /* keep default */ } }
+    if (dsec) { try { setDigestSections(JSON.parse(dsec)); } catch { /* manter padrão */ } }
     const aiVerb = find('user.ai.response_verbosity');
     const aiLang = find('user.ai.preferred_language');
     const aiScope = find('user.ai.auto_context_scope');
@@ -224,7 +228,7 @@ export function UserPreferencesPage() {
     if (aiVerb) setAiVerbosity(aiVerb);
     if (aiLang) setAiLanguage(aiLang);
     if (aiScope) setAiContextScope(aiScope);
-    if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow)); } catch { /* keep default */ } }
+    if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow)); } catch { /* manter padrão */ } }
   }
 
   const saveMutation = useMutation({
@@ -298,183 +302,137 @@ export function UserPreferencesPage() {
       />
 
       <div className="space-y-6 mt-6">
-        {/* Row 1: Appearance & Theme */}
+        {/* Linha 1: Aparência e Tema */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Appearance */}
+          {/* Aparência */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Eye size={18} />
               <span>{t('userPreferences.appearance.title')}</span>
             </CardHeader>
             <CardBody className="space-y-4">
-              {/* Theme Toggle */}
+              {/* Toggle de Tema */}
               <div>
                 <label className="text-sm font-medium text-heading block mb-2">
                   {t('userPreferences.appearance.theme')}
                 </label>
                 <div className="flex items-center gap-2">
-                  <button
+                  {/* Botões de tema usando DS Button com estado ativo via variant */}
+                  <Button
                     type="button"
+                    size="sm"
+                    variant={theme === 'light' ? 'subtle' : 'ghost'}
                     onClick={() => setTheme('light')}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-colors ${
-                      theme === 'light'
-                        ? 'border-accent bg-accent/10 text-accent'
-                        : 'border-edge text-muted hover:text-heading'
-                    }`}
+                    icon={<Sun size={14} />}
                   >
-                    <Sun size={14} />
                     {t('userPreferences.appearance.light')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    size="sm"
+                    variant={theme === 'dark' ? 'subtle' : 'ghost'}
                     onClick={() => setTheme('dark')}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-colors ${
-                      theme === 'dark'
-                        ? 'border-accent bg-accent/10 text-accent'
-                        : 'border-edge text-muted hover:text-heading'
-                    }`}
+                    icon={<Moon size={14} />}
                   >
-                    <Moon size={14} />
                     {t('userPreferences.appearance.dark')}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
-              {/* Density */}
+              {/* Densidade */}
               <div>
                 <label className="text-sm font-medium text-heading block mb-2">
                   {t('userPreferences.appearance.density')}
                 </label>
                 <div className="flex items-center gap-2">
                   {DENSITY_OPTIONS.map(opt => (
-                    <button
+                    <Button
                       key={opt.value}
                       type="button"
+                      size="sm"
+                      variant={selectedDensity === opt.value ? 'subtle' : 'ghost'}
                       onClick={() => setSelectedDensity(opt.value)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-colors ${
-                        selectedDensity === opt.value
-                          ? 'border-accent bg-accent/10 text-accent'
-                          : 'border-edge text-muted hover:text-heading'
-                      }`}
+                      icon={opt.icon}
                     >
-                      {opt.icon}
                       {t(`userPreferences.appearance.density_${opt.value}`)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
-              {/* Animations */}
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={animationsEnabled}
-                  onChange={(e) => setAnimationsEnabled(e.target.checked)}
-                  className="rounded"
-                />
-                <span className="text-sm text-heading">
-                  {t('userPreferences.appearance.animations')}
-                </span>
-              </label>
+              {/* Animações — Checkbox DS */}
+              <Checkbox
+                checked={animationsEnabled}
+                onChange={(e) => setAnimationsEnabled(e.target.checked)}
+                label={t('userPreferences.appearance.animations')}
+              />
             </CardBody>
           </Card>
 
-          {/* Language & Regional */}
+          {/* Idioma e Regional */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Globe size={18} />
               <span>{t('userPreferences.regional.title')}</span>
             </CardHeader>
             <CardBody className="space-y-4">
-              {/* Language */}
-              <div>
-                <label className="text-sm font-medium text-heading block mb-2">
-                  {t('userPreferences.regional.language')}
-                </label>
-                <select
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="w-full rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading"
-                >
-                  {LANGUAGES.map(lang => (
-                    <option key={lang.value} value={lang.value}>{lang.label}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Select DS de idioma */}
+              <Select
+                label={t('userPreferences.regional.language')}
+                options={LANGUAGES}
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                size="sm"
+              />
 
-              {/* Timezone */}
-              <div>
-                <label className="text-sm font-medium text-heading block mb-2">
-                  <Clock size={14} className="inline mr-1.5" />
-                  {t('userPreferences.regional.timezone')}
-                </label>
-                <select
-                  value={selectedTimezone}
-                  onChange={(e) => setSelectedTimezone(e.target.value)}
-                  className="w-full rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading"
-                >
-                  {TIMEZONES.map(tz => (
-                    <option key={tz.value} value={tz.value}>{tz.label}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Select DS de fuso horário */}
+              <Select
+                label={t('userPreferences.regional.timezone')}
+                options={TIMEZONES}
+                value={selectedTimezone}
+                onChange={(e) => setSelectedTimezone(e.target.value)}
+                size="sm"
+              />
 
-              {/* Date Format */}
-              <div>
-                <label className="text-sm font-medium text-heading block mb-2">
-                  {t('userPreferences.regional.dateFormat')}
-                </label>
-                <select
-                  value={selectedDateFormat}
-                  onChange={(e) => setSelectedDateFormat(e.target.value)}
-                  className="w-full rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading"
-                >
-                  {DATE_FORMATS.map(fmt => (
-                    <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Select DS de formato de data */}
+              <Select
+                label={t('userPreferences.regional.dateFormat')}
+                options={DATE_FORMATS}
+                value={selectedDateFormat}
+                onChange={(e) => setSelectedDateFormat(e.target.value)}
+                size="sm"
+              />
 
-              {/* Table rows per page */}
-              <div>
-                <label className="text-sm font-medium text-heading block mb-2">
-                  <Table size={14} className="inline mr-1.5" />
-                  {t('userPreferences.regional.tableRows')}
-                </label>
-                <select
-                  value={tableRowsPerPage}
-                  onChange={(e) => setTableRowsPerPage(parseInt(e.target.value, 10))}
-                  className="w-full rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading"
-                >
-                  {TABLE_ROWS_OPTIONS.map(n => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Select DS de linhas por página */}
+              <Select
+                label={t('userPreferences.regional.tableRows')}
+                options={TABLE_ROWS_OPTIONS.map(n => ({ value: String(n), label: String(n) }))}
+                value={String(tableRowsPerPage)}
+                onChange={(e) => setTableRowsPerPage(parseInt(e.target.value, 10))}
+                size="sm"
+              />
 
-              {/* Code Font Size */}
-              <div>
-                <label className="text-sm font-medium text-heading block mb-2">
-                  <Type size={14} className="inline mr-1.5" />
-                  {t('userPreferences.regional.codeFontSize')}
-                </label>
-                <input
+              {/* TextField DS para tamanho de fonte de código */}
+              <div className="flex items-end gap-2">
+                <TextField
+                  label={t('userPreferences.regional.codeFontSize')}
                   type="number"
                   value={codeFontSize}
                   onChange={(e) => setCodeFontSize(Math.max(10, Math.min(24, parseInt(e.target.value, 10) || 13)))}
                   min={10}
                   max={24}
-                  className="w-24 rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading"
+                  size="sm"
+                  className="w-24"
                 />
-                <span className="text-xs text-muted ml-2">px</span>
+                <span className="text-xs text-muted mb-2">px</span>
               </div>
             </CardBody>
           </Card>
         </div>
 
-        {/* Row 2: Sidebar & Dashboard */}
+        {/* Linha 2: Sidebar e Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sidebar Customization */}
+          {/* Customização da Sidebar */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Sidebar size={18} />
@@ -490,16 +448,14 @@ export function UserPreferencesPage() {
                   </p>
                   <div className="space-y-2">
                     {SIDEBAR_MODULES.map(mod => (
-                      <label key={mod} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={pinnedItems.includes(mod)}
-                          onChange={() => togglePinned(mod)}
-                          disabled={!pinnedItems.includes(mod) && pinnedItems.length >= maxPinned}
-                          className="rounded"
-                        />
-                        <span className="text-sm">{t(`userPreferences.sidebar.module_${mod}`, mod.replace('-', ' '))}</span>
-                      </label>
+                      /* Checkbox DS para módulos fixados na sidebar */
+                      <Checkbox
+                        key={mod}
+                        checked={pinnedItems.includes(mod)}
+                        onChange={() => togglePinned(mod)}
+                        disabled={!pinnedItems.includes(mod) && pinnedItems.length >= maxPinned}
+                        label={t(`userPreferences.sidebar.module_${mod}`, mod.replace('-', ' '))}
+                      />
                     ))}
                   </div>
                 </>
@@ -507,7 +463,7 @@ export function UserPreferencesPage() {
             </CardBody>
           </Card>
 
-          {/* Home Dashboard Widgets */}
+          {/* Widgets do Dashboard Home */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <LayoutDashboard size={18} />
@@ -519,110 +475,88 @@ export function UserPreferencesPage() {
               </p>
               <div className="space-y-2">
                 {AVAILABLE_WIDGETS.map(wid => (
-                  <label key={wid} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={activeWidgets.includes(wid)}
-                      onChange={() => toggleWidget(wid)}
-                      disabled={!activeWidgets.includes(wid) && activeWidgets.length >= maxW}
-                      className="rounded"
-                    />
-                    <span className="text-sm">{t(`userPreferences.home.widget_${wid}`, wid.replace(/([A-Z])/g, ' $1').trim())}</span>
-                  </label>
+                  /* Checkbox DS para widgets do dashboard */
+                  <Checkbox
+                    key={wid}
+                    checked={activeWidgets.includes(wid)}
+                    onChange={() => toggleWidget(wid)}
+                    disabled={!activeWidgets.includes(wid) && activeWidgets.length >= maxW}
+                    label={t(`userPreferences.home.widget_${wid}`, wid.replace(/([A-Z])/g, ' $1').trim())}
+                  />
                 ))}
               </div>
             </CardBody>
           </Card>
         </div>
 
-        {/* Row 3: Notifications & Accessibility */}
+        {/* Linha 3: Notificações e Acessibilidade */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Notification Preferences */}
+          {/* Preferências de Notificação */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Bell size={18} />
               <span>{t('userPreferences.notifications.title')}</span>
             </CardHeader>
             <CardBody className="space-y-4">
-              {/* Email Notifications */}
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={emailNotifications}
-                  onChange={(e) => setEmailNotifications(e.target.checked)}
-                  className="rounded"
-                />
-                <span className="text-sm text-heading">
-                  {t('userPreferences.notifications.email')}
-                </span>
-              </label>
+              {/* Notificações por email — Checkbox DS */}
+              <Checkbox
+                checked={emailNotifications}
+                onChange={(e) => setEmailNotifications(e.target.checked)}
+                label={t('userPreferences.notifications.email')}
+              />
 
-              {/* In-App Notifications */}
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={inAppNotifications}
-                  onChange={(e) => setInAppNotifications(e.target.checked)}
-                  className="rounded"
-                />
-                <span className="text-sm text-heading">
-                  {t('userPreferences.notifications.inApp')}
-                </span>
-              </label>
+              {/* Notificações in-app — Checkbox DS */}
+              <Checkbox
+                checked={inAppNotifications}
+                onChange={(e) => setInAppNotifications(e.target.checked)}
+                label={t('userPreferences.notifications.inApp')}
+              />
 
               {/* Digest */}
               <div className="border-t border-edge pt-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={digestEnabled}
-                    onChange={(e) => setDigestEnabled(e.target.checked)}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-heading">
-                    {t('userPreferences.notifications.digest')}
-                  </span>
-                </label>
+                <Checkbox
+                  checked={digestEnabled}
+                  onChange={(e) => setDigestEnabled(e.target.checked)}
+                  label={t('userPreferences.notifications.digest')}
+                />
                 {digestEnabled && (
-                  <div className="mt-2 ml-7">
-                    <label className="text-xs text-muted block mb-1">
-                      {t('userPreferences.notifications.digestFrequency')}
-                    </label>
-                    <select
-                      value={digestFrequency}
+                  <div className="mt-2 ml-8">
+                    {/* Select DS de frequência de digest */}
+                    <Select
+                      label={t('userPreferences.notifications.digestFrequency')}
+                      options={[
+                        { value: '6', label: '6h' },
+                        { value: '12', label: '12h' },
+                        { value: '24', label: '24h' },
+                        { value: '48', label: '48h' },
+                      ]}
+                      value={String(digestFrequency)}
                       onChange={(e) => setDigestFrequency(e.target.value)}
-                      className="rounded-md border border-edge bg-input px-3 py-1.5 text-sm text-heading"
-                    >
-                      <option value={6}>6h</option>
-                      <option value={12}>12h</option>
-                      <option value={24}>24h</option>
-                      <option value={48}>48h</option>
-                    </select>
+                      size="sm"
+                    />
                   </div>
                 )}
               </div>
 
-              {/* Categories */}
+              {/* Categorias */}
               <div className="border-t border-edge pt-3">
                 <p className="text-sm font-medium text-heading mb-2">
                   {t('userPreferences.notifications.categories')}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {NOTIFICATION_CATEGORIES.map(cat => (
-                    <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={subscribedCategories.includes(cat)}
-                        onChange={() => toggleCategory(cat)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">{t(`userPreferences.notifications.category_${cat}`, cat)}</span>
-                    </label>
+                    /* Checkbox DS para categorias de notificação */
+                    <Checkbox
+                      key={cat}
+                      checked={subscribedCategories.includes(cat)}
+                      onChange={() => toggleCategory(cat)}
+                      label={t(`userPreferences.notifications.category_${cat}`, cat)}
+                    />
                   ))}
                 </div>
               </div>
 
-              {/* Mute All */}
+              {/* Aviso de mudo total */}
               {!emailNotifications && !inAppNotifications && (
                 <div className="flex items-center gap-2 text-xs text-warning">
                   <BellOff size={14} />
@@ -632,69 +566,42 @@ export function UserPreferencesPage() {
             </CardBody>
           </Card>
 
-          {/* Accessibility */}
+          {/* Acessibilidade */}
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Accessibility size={18} />
               <span>{t('userPreferences.accessibility.title')}</span>
             </CardHeader>
             <CardBody className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={highContrastEnabled}
-                  onChange={(e) => setHighContrastEnabled(e.target.checked)}
-                  className="rounded"
-                />
-                <div>
-                  <span className="text-sm text-heading block">
-                    {t('userPreferences.accessibility.highContrast')}
-                  </span>
-                  <span className="text-xs text-muted">
-                    {t('userPreferences.accessibility.highContrastDesc')}
-                  </span>
-                </div>
-              </label>
+              {/* Checkbox DS com descrição para alto contraste */}
+              <Checkbox
+                checked={highContrastEnabled}
+                onChange={(e) => setHighContrastEnabled(e.target.checked)}
+                label={t('userPreferences.accessibility.highContrast')}
+                description={t('userPreferences.accessibility.highContrastDesc')}
+              />
 
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reducedMotionEnabled}
-                  onChange={(e) => setReducedMotionEnabled(e.target.checked)}
-                  className="rounded"
-                />
-                <div>
-                  <span className="text-sm text-heading block">
-                    {t('userPreferences.accessibility.reducedMotion')}
-                  </span>
-                  <span className="text-xs text-muted">
-                    {t('userPreferences.accessibility.reducedMotionDesc')}
-                  </span>
-                </div>
-              </label>
+              {/* Checkbox DS com descrição para movimento reduzido */}
+              <Checkbox
+                checked={reducedMotionEnabled}
+                onChange={(e) => setReducedMotionEnabled(e.target.checked)}
+                label={t('userPreferences.accessibility.reducedMotion')}
+                description={t('userPreferences.accessibility.reducedMotionDesc')}
+              />
 
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={keyboardShortcutsEnabled}
-                  onChange={(e) => setKeyboardShortcutsEnabled(e.target.checked)}
-                  className="rounded"
-                />
-                <div>
-                  <span className="text-sm text-heading block">
-                    {t('userPreferences.accessibility.keyboardShortcuts')}
-                  </span>
-                  <span className="text-xs text-muted">
-                    {t('userPreferences.accessibility.keyboardShortcutsDesc')}
-                  </span>
-                </div>
-              </label>
+              {/* Checkbox DS com descrição para atalhos de teclado */}
+              <Checkbox
+                checked={keyboardShortcutsEnabled}
+                onChange={(e) => setKeyboardShortcutsEnabled(e.target.checked)}
+                label={t('userPreferences.accessibility.keyboardShortcuts')}
+                description={t('userPreferences.accessibility.keyboardShortcutsDesc')}
+              />
             </CardBody>
           </Card>
         </div>
       </div>
 
-      {/* Timezone & Date Format */}
+      {/* Fuso Horário e Formato de Data */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -703,35 +610,45 @@ export function UserPreferencesPage() {
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.timezone')}</label>
-                <select value={timezone} onChange={e => setTimezone(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
-                  {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.dateFormat')}</label>
-                <select value={dateFormat} onChange={e => setDateFormat(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
-                  <option value="yyyy-MM-dd">yyyy-MM-dd (ISO)</option>
-                  <option value="MM/dd/yyyy">MM/dd/yyyy (US)</option>
-                  <option value="dd/MM/yyyy">dd/MM/yyyy (EU)</option>
-                  <option value="dd.MM.yyyy">dd.MM.yyyy</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.timeFormat')}</label>
-                <select value={timeFormat} onChange={e => setTimeFormat(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
-                  <option value="HH:mm:ss">HH:mm:ss (24h)</option>
-                  <option value="hh:mm:ss a">hh:mm:ss a (12h)</option>
-                  <option value="HH:mm">HH:mm (Short)</option>
-                </select>
-              </div>
+              {/* Select DS de timezone */}
+              <Select
+                label={t('userPreferences.timezone.timezone')}
+                options={TIMEZONES}
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                size="sm"
+              />
+              {/* Select DS de formato de data */}
+              <Select
+                label={t('userPreferences.timezone.dateFormat')}
+                options={[
+                  { value: 'yyyy-MM-dd', label: 'yyyy-MM-dd (ISO)' },
+                  { value: 'MM/dd/yyyy', label: 'MM/dd/yyyy (US)' },
+                  { value: 'dd/MM/yyyy', label: 'dd/MM/yyyy (EU)' },
+                  { value: 'dd.MM.yyyy', label: 'dd.MM.yyyy' },
+                ]}
+                value={dateFormat}
+                onChange={e => setDateFormat(e.target.value)}
+                size="sm"
+              />
+              {/* Select DS de formato de hora */}
+              <Select
+                label={t('userPreferences.timezone.timeFormat')}
+                options={[
+                  { value: 'HH:mm:ss', label: 'HH:mm:ss (24h)' },
+                  { value: 'hh:mm:ss a', label: 'hh:mm:ss a (12h)' },
+                  { value: 'HH:mm', label: 'HH:mm (Short)' },
+                ]}
+                value={timeFormat}
+                onChange={e => setTimeFormat(e.target.value)}
+                size="sm"
+              />
             </div>
           </CardBody>
         </Card>
       </div>
 
-      {/* Default Scope */}
+      {/* Escopo Padrão */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -741,24 +658,39 @@ export function UserPreferencesPage() {
           <CardBody>
             <p className="text-sm text-muted mb-4">{t('userPreferences.defaultScope.description')}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.environment')}</label>
-                <input type="text" value={defaultEnv} onChange={e => setDefaultEnv(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. production" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.team')}</label>
-                <input type="text" value={defaultTeam} onChange={e => setDefaultTeam(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. platform" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.service')}</label>
-                <input type="text" value={defaultService} onChange={e => setDefaultService(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. api-gateway" />
-              </div>
+              {/* TextField DS para ambiente padrão */}
+              <TextField
+                label={t('userPreferences.defaultScope.environment')}
+                type="text"
+                value={defaultEnv}
+                onChange={e => setDefaultEnv(e.target.value)}
+                placeholder="e.g. production"
+                size="sm"
+              />
+              {/* TextField DS para equipe padrão */}
+              <TextField
+                label={t('userPreferences.defaultScope.team')}
+                type="text"
+                value={defaultTeam}
+                onChange={e => setDefaultTeam(e.target.value)}
+                placeholder="e.g. platform"
+                size="sm"
+              />
+              {/* TextField DS para serviço padrão */}
+              <TextField
+                label={t('userPreferences.defaultScope.service')}
+                type="text"
+                value={defaultService}
+                onChange={e => setDefaultService(e.target.value)}
+                placeholder="e.g. api-gateway"
+                size="sm"
+              />
             </div>
           </CardBody>
         </Card>
       </div>
 
-      {/* Items Per Page */}
+      {/* Itens por Página */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -767,17 +699,24 @@ export function UserPreferencesPage() {
           </CardHeader>
           <CardBody>
             <p className="text-sm text-muted mb-3">{t('userPreferences.itemsPerPage.description')}</p>
-            <select value={itemsPerPage} onChange={e => setItemsPerPage(e.target.value)} className="w-40 px-3 py-1.5 text-sm border rounded">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
+            {/* Select DS para itens por página */}
+            <Select
+              options={[
+                { value: '10', label: '10' },
+                { value: '25', label: '25' },
+                { value: '50', label: '50' },
+                { value: '100', label: '100' },
+              ]}
+              value={itemsPerPage}
+              onChange={e => setItemsPerPage(e.target.value)}
+              size="sm"
+              className="w-40"
+            />
           </CardBody>
         </Card>
       </div>
 
-      {/* Quiet Hours */}
+      {/* Horas de Silêncio */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -787,45 +726,38 @@ export function UserPreferencesPage() {
           <CardBody>
             <p className="text-sm text-muted mb-4">{t('quietHours.subtitle')}</p>
             <div className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={quietHoursEnabled}
-                  onChange={e => setQuietHoursEnabled(e.target.checked)}
-                  className="w-4 h-4 accent-accent"
-                />
-                <span className="text-sm">{t('quietHours.enabled')}</span>
-              </label>
+              {/* Checkbox DS para habilitar horas de silêncio */}
+              <Checkbox
+                checked={quietHoursEnabled}
+                onChange={e => setQuietHoursEnabled(e.target.checked)}
+                label={t('quietHours.enabled')}
+              />
               {quietHoursEnabled && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pl-7">
-                  <div>
-                    <label className="block text-xs text-muted mb-1">{t('quietHours.start')}</label>
-                    <input
-                      type="time"
-                      value={quietHoursStart}
-                      onChange={e => setQuietHoursStart(e.target.value)}
-                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-muted mb-1">{t('quietHours.end')}</label>
-                    <input
-                      type="time"
-                      value={quietHoursEnd}
-                      onChange={e => setQuietHoursEnd(e.target.value)}
-                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-muted mb-1">{t('quietHours.timezone')}</label>
-                    <select
-                      value={quietHoursTimezone}
-                      onChange={e => setQuietHoursTimezone(e.target.value)}
-                      className="w-full px-3 py-1.5 text-sm border rounded bg-elevated"
-                    >
-                      {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
-                    </select>
-                  </div>
+                  {/* TextField DS tipo time para início */}
+                  <TextField
+                    label={t('quietHours.start')}
+                    type="time"
+                    value={quietHoursStart}
+                    onChange={e => setQuietHoursStart(e.target.value)}
+                    size="sm"
+                  />
+                  {/* TextField DS tipo time para fim */}
+                  <TextField
+                    label={t('quietHours.end')}
+                    type="time"
+                    value={quietHoursEnd}
+                    onChange={e => setQuietHoursEnd(e.target.value)}
+                    size="sm"
+                  />
+                  {/* Select DS de fuso horário para horas de silêncio */}
+                  <Select
+                    label={t('quietHours.timezone')}
+                    options={TIMEZONES}
+                    value={quietHoursTimezone}
+                    onChange={e => setQuietHoursTimezone(e.target.value)}
+                    size="sm"
+                  />
                 </div>
               )}
             </div>
@@ -833,7 +765,7 @@ export function UserPreferencesPage() {
         </Card>
       </div>
 
-      {/* Digest Settings */}
+      {/* Configurações de Digest */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -842,38 +774,38 @@ export function UserPreferencesPage() {
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('digestSettings.frequency')}</label>
-                <select
-                  value={digestFrequency}
-                  onChange={e => setDigestFrequency(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
-                >
-                  <option value="daily">{t('digestSettings.frequencyOptions.daily')}</option>
-                  <option value="weekly">{t('digestSettings.frequencyOptions.weekly')}</option>
-                  <option value="none">{t('digestSettings.frequencyOptions.none')}</option>
-                </select>
-              </div>
+              {/* Select DS de frequência */}
+              <Select
+                label={t('digestSettings.frequency')}
+                options={[
+                  { value: 'daily', label: t('digestSettings.frequencyOptions.daily') },
+                  { value: 'weekly', label: t('digestSettings.frequencyOptions.weekly') },
+                  { value: 'none', label: t('digestSettings.frequencyOptions.none') },
+                ]}
+                value={digestFrequency}
+                onChange={e => setDigestFrequency(e.target.value)}
+                size="sm"
+                className="w-48"
+              />
               {digestFrequency !== 'none' && (
                 <div>
-                  <label className="block text-sm font-medium mb-2">{t('digestSettings.sections')}</label>
+                  <p className="text-sm font-medium text-heading mb-2">{t('digestSettings.sections')}</p>
                   <div className="flex flex-wrap gap-2">
                     {DIGEST_SECTION_OPTIONS.map(sec => (
-                      <button
+                      /* Botão-chip de seleção de secções do digest — DS Button */
+                      <Button
                         key={sec}
+                        type="button"
+                        size="xs"
+                        variant={digestSections.includes(sec) ? 'subtle' : 'outline'}
                         onClick={() =>
                           setDigestSections(prev =>
                             prev.includes(sec) ? prev.filter(s => s !== sec) : [...prev, sec]
                           )
                         }
-                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                          digestSections.includes(sec)
-                            ? 'border-accent bg-accent/10 text-accent font-medium'
-                            : 'border-edge text-muted hover:border-accent/50'
-                        }`}
                       >
                         {sec}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -883,16 +815,16 @@ export function UserPreferencesPage() {
         </Card>
       </div>
 
-      {/* Save button */}
+      {/* Botão Salvar */}
       <div className="mt-6 flex items-center gap-3">
-        <button
-          className="btn btn-primary flex items-center gap-2"
+        <Button
+          variant="primary"
           onClick={() => saveMutation.mutate()}
           disabled={saveStatus === 'saving'}
+          icon={<Save size={16} />}
         >
-          <Save size={16} />
           {saveStatus === 'saving' ? t('common.saving', 'Saving...') : t('userPreferences.save')}
-        </button>
+        </Button>
         {saveStatus === 'saved' && (
           <span className="flex items-center gap-1 text-success text-sm">
             <CheckCircle2 size={14} /> {t('userPreferences.saved')}
@@ -905,7 +837,7 @@ export function UserPreferencesPage() {
         )}
       </div>
 
-      {/* AI Preferences */}
+      {/* Preferências de IA */}
       <div className="mt-6">
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -914,70 +846,65 @@ export function UserPreferencesPage() {
           </CardHeader>
           <CardBody>
             <div className="space-y-5">
-              {/* Response Verbosity */}
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('aiPreferences.verbosity')}</label>
-                <select
-                  value={aiVerbosity}
-                  onChange={e => setAiVerbosity(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
-                >
-                  <option value="concise">{t('aiPreferences.verbosityOptions.concise')}</option>
-                  <option value="standard">{t('aiPreferences.verbosityOptions.standard')}</option>
-                  <option value="detailed">{t('aiPreferences.verbosityOptions.detailed')}</option>
-                </select>
-              </div>
+              {/* Verbosidade da Resposta — Select DS */}
+              <Select
+                label={t('aiPreferences.verbosity')}
+                options={[
+                  { value: 'concise', label: t('aiPreferences.verbosityOptions.concise') },
+                  { value: 'standard', label: t('aiPreferences.verbosityOptions.standard') },
+                  { value: 'detailed', label: t('aiPreferences.verbosityOptions.detailed') },
+                ]}
+                value={aiVerbosity}
+                onChange={e => setAiVerbosity(e.target.value)}
+                size="sm"
+                className="w-48"
+              />
 
-              {/* Preferred Language */}
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('aiPreferences.language')}</label>
-                <input
-                  type="text"
-                  value={aiLanguage}
-                  onChange={e => setAiLanguage(e.target.value)}
-                  className="w-32 px-3 py-1.5 text-sm border rounded bg-transparent"
-                  placeholder="en"
-                />
-              </div>
+              {/* Idioma Preferido — TextField DS */}
+              <TextField
+                label={t('aiPreferences.language')}
+                type="text"
+                value={aiLanguage}
+                onChange={e => setAiLanguage(e.target.value)}
+                placeholder="en"
+                size="sm"
+                className="w-32"
+              />
 
-              {/* Auto Context Scope */}
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('aiPreferences.contextScope')}</label>
-                <select
-                  value={aiContextScope}
-                  onChange={e => setAiContextScope(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-elevated"
-                >
-                  <option value="service">{t('aiPreferences.scopeOptions.service')}</option>
-                  <option value="team">{t('aiPreferences.scopeOptions.team')}</option>
-                  <option value="all">{t('aiPreferences.scopeOptions.all')}</option>
-                </select>
-              </div>
+              {/* Escopo de Contexto Automático — Select DS */}
+              <Select
+                label={t('aiPreferences.contextScope')}
+                options={[
+                  { value: 'service', label: t('aiPreferences.scopeOptions.service') },
+                  { value: 'team', label: t('aiPreferences.scopeOptions.team') },
+                  { value: 'all', label: t('aiPreferences.scopeOptions.all') },
+                ]}
+                value={aiContextScope}
+                onChange={e => setAiContextScope(e.target.value)}
+                size="sm"
+                className="w-48"
+              />
 
-              {/* Knowledge Sources */}
+              {/* Fontes de Conhecimento */}
               <div>
-                <label className="block text-sm font-medium mb-2">{t('aiPreferences.knowledgeSources')}</label>
+                <p className="text-sm font-medium text-heading mb-2">{t('aiPreferences.knowledgeSources')}</p>
                 <div className="flex flex-wrap gap-2">
-                  {AI_KNOWLEDGE_OPTIONS.map(src => {
-                    return (
-                      <button
-                        key={src}
-                        type="button"
-                        onClick={() =>
-                          setAiKnowledgeSources(prev =>
-                            prev.includes(src) ? prev.filter(s => s !== src) : [...prev, src]
-                          )
-                        }
-                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                          aiKnowledgeSources.includes(src)
-                            ? 'border-accent bg-accent/10 text-accent font-medium'
-                            : 'border-edge text-muted hover:border-accent/50'
-                        }`}
-                      >
-                        {t(`aiPreferences.knowledgeSourceOptions.${src === 'knowledge-articles' ? 'knowledgeArticles' : src === 'operational-notes' ? 'operationalNotes' : src}`)}
-                      </button>
-                    );
-                  })}
+                  {AI_KNOWLEDGE_OPTIONS.map(src => (
+                    /* Botão-chip de seleção de fontes — DS Button */
+                    <Button
+                      key={src}
+                      type="button"
+                      size="xs"
+                      variant={aiKnowledgeSources.includes(src) ? 'subtle' : 'outline'}
+                      onClick={() =>
+                        setAiKnowledgeSources(prev =>
+                          prev.includes(src) ? prev.filter(s => s !== src) : [...prev, src]
+                        )
+                      }
+                    >
+                      {t(`aiPreferences.knowledgeSourceOptions.${src === 'knowledge-articles' ? 'knowledgeArticles' : src === 'operational-notes' ? 'operationalNotes' : src}`)}
+                    </Button>
+                  ))}
                 </div>
               </div>
             </div>

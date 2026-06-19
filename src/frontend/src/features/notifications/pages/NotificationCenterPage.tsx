@@ -20,6 +20,8 @@ import { EmptyState } from '../../../components/EmptyState';
 import { ErrorState } from '../../../components/ErrorState';
 import { FilterChip } from '../../../components/FilterChip';
 import { Button } from '../../../components/Button';
+import { Badge } from '../../../components/Badge';
+import { IconButton } from '../../../components/IconButton';
 import {
   useNotificationList,
   useMarkAsRead,
@@ -183,10 +185,10 @@ export function NotificationCenterPage() {
 
       {/* Content */}
       <div className="mt-6 space-y-2">
-        {/* Loading */}
+        {/* Spinner de carregamento com token semântico */}
         {isLoading && (
           <div className="flex items-center justify-center py-16">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-edge border-t-cyan" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-edge border-t-accent" />
           </div>
         )}
 
@@ -251,15 +253,16 @@ export function NotificationCenterPage() {
                       }`}
                     >
                       {n.title}
+                      {/* Badge DS substitui spans artesanais com cores hardcoded */}
                       {isEscalated && (
-                        <span className="ml-2 inline-flex items-center rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-red-400 border border-red-500/20">
+                        <Badge variant="danger" className="ml-2 uppercase tracking-wide text-[10px]">
                           {t('notifications.escalated')}
-                        </span>
+                        </Badge>
                       )}
                       {isSnoozed && (
-                        <span className="ml-2 inline-flex items-center rounded bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-yellow-400 border border-yellow-500/20">
+                        <Badge variant="warning" className="ml-2 uppercase tracking-wide text-[10px]">
                           {t('notifications.snoozed')}
-                        </span>
+                        </Badge>
                       )}
                       {n.occurrenceCount > 1 && (
                         <span className="ml-2 inline-flex items-center rounded bg-panel px-1.5 py-0.5 text-[10px] font-medium text-muted border border-edge">
@@ -290,99 +293,85 @@ export function NotificationCenterPage() {
                       </span>
                     )}
                     {isAcknowledged && (
-                      <span className="text-[10px] text-emerald-400">
+                      <span className="text-[10px] text-success">
                         {t('notifications.acknowledged')}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Actions */}
+                {/* Ações de notificação — raw <button> substituídos por IconButton DS */}
                 <div className="flex shrink-0 items-center gap-1">
                   {n.actionUrl && !isClosed && (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<ExternalLink className="h-3.5 w-3.5" />}
+                      label={t('common.open', 'Open')}
                       onClick={() => navigate(n.actionUrl!)}
-                      className="p-1.5 rounded text-muted hover:text-body hover:bg-hover transition-all"
-                      title={t('common.open', 'Open')}
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   )}
 
-                  {/* Acknowledge — only for unread/read ActionRequired */}
+                  {/* Confirmar — apenas para não-lidas/lidas com ActionRequired */}
                   {!isClosed && !isAcknowledged && n.requiresAction && (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                      label={t('notifications.acknowledge')}
                       onClick={() => acknowledge.mutate({ id: n.id })}
                       disabled={acknowledge.isPending}
-                      className="p-1.5 rounded text-muted hover:text-emerald-400 hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.acknowledge')}
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   )}
 
                   {/* Snooze 1h */}
                   {!isClosed && !isSnoozed && (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<Clock className="h-3.5 w-3.5" />}
+                      label={t('notifications.snooze1h')}
                       onClick={() => handleSnooze1h(n.id)}
                       disabled={snooze.isPending}
-                      className="p-1.5 rounded text-muted hover:text-yellow-400 hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.snooze1h')}
-                    >
-                      <Clock className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   )}
 
-                  {/* Archive */}
+                  {/* Arquivar */}
                   {!isClosed && !isDismissed && (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<Archive className="h-3.5 w-3.5" />}
+                      label={t('notifications.archive')}
                       onClick={() => archive.mutate(n.id)}
                       disabled={archive.isPending}
-                      className="p-1.5 rounded text-muted hover:text-body hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.archive')}
-                    >
-                      <Archive className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   )}
 
-                  {/* Dismiss — only for unread/read */}
+                  {/* Descartar — apenas não-lidas/lidas */}
                   {(unread || n.status === 'Read') && (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<X className="h-3.5 w-3.5" />}
+                      label={t('notifications.dismiss')}
                       onClick={() => dismiss.mutate(n.id)}
                       disabled={dismiss.isPending}
-                      className="p-1.5 rounded text-muted hover:text-red-400 hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.dismiss')}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   )}
 
-                  {/* Read / Unread toggle */}
+                  {/* Alternar lido/não-lido */}
                   {unread && !isClosed ? (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<Eye className="h-3.5 w-3.5" />}
+                      label={t('notifications.markRead')}
                       onClick={() => markAsRead.mutate(n.id)}
                       disabled={markAsRead.isPending}
-                      className="p-1.5 rounded text-muted hover:text-body hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.markRead')}
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   ) : !isClosed && !isAcknowledged ? (
-                    <button
-                      type="button"
+                    <IconButton
+                      size="sm"
+                      icon={<EyeOff className="h-3.5 w-3.5" />}
+                      label={t('notifications.markUnread')}
                       onClick={() => markAsUnread.mutate(n.id)}
                       disabled={markAsUnread.isPending}
-                      className="p-1.5 rounded text-muted hover:text-body hover:bg-hover transition-all disabled:opacity-50"
-                      title={t('notifications.markUnread')}
-                    >
-                      <EyeOff className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   ) : null}
                 </div>
               </div>

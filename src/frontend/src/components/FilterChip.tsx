@@ -19,7 +19,7 @@ interface FilterChipProps {
 /**
  * Chip de filtro para barras de filtros rápidos.
  *
- * Ativo: bg-accent/10, border-accent/30, text-cyan.
+ * Ativo: bg-accent/10, border-accent/30, text-accent.
  * Inativo: bg-panel, border-edge, text-muted.
  *
  * Usado em filtros de status (incidents, changes, contracts).
@@ -39,10 +39,10 @@ export function FilterChip({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-medium',
+        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium',
         'transition-colors',
         active
-          ? 'bg-accent-muted text-cyan border-edge-focus'
+          ? 'bg-accent-muted text-accent border-edge-focus'
           : 'bg-panel text-muted border-edge hover:text-body hover:border-edge-strong',
         disabled && 'opacity-50 cursor-not-allowed',
         className,
@@ -55,7 +55,7 @@ export function FilterChip({
         <span
           className={cn(
             'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 type-micro font-semibold',
-            active ? 'bg-cyan/20 text-cyan' : 'bg-elevated text-faded',
+            active ? 'bg-accent-muted text-accent' : 'bg-elevated text-faded',
           )}
         >
           {count}

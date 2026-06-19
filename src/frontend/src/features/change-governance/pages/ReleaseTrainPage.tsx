@@ -88,7 +88,7 @@ function deltaBadgeVariant(value: number | null, invertGood = false): 'success' 
 
 function TrainReleaseRow({ item, t }: { item: TrainReleaseItem; t: (k: string) => string }) {
   return (
-    <tr className="border-t border-edge hover:bg-surface/50 transition-colors">
+    <tr className="border-t border-edge hover:bg-card/50 transition-colors">
       <td className="px-4 py-3">
         <div className="font-medium text-heading text-sm">{item.serviceName}</div>
         <div className="text-xs text-muted font-mono">{item.version}</div>
@@ -218,7 +218,7 @@ function PromotionReadinessDeltaSection() {
         {data && (
           <div className="mt-4 space-y-3">
             {data.simulatedNote && (
-              <div className="flex items-start gap-2 rounded-md bg-surface border border-warning/30 px-3 py-2">
+              <div className="flex items-start gap-2 rounded-md bg-card border border-warning/30 px-3 py-2">
                 <AlertTriangle size={14} className="text-warning mt-0.5 shrink-0" />
                 <p className="text-xs text-muted italic">{data.simulatedNote}</p>
               </div>
@@ -237,19 +237,19 @@ function PromotionReadinessDeltaSection() {
 
             {/* Delta cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-surface rounded-md p-3">
+              <div className="bg-card rounded-md p-3">
                 <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.errorRateDelta')}</p>
                 <Badge variant={deltaBadgeVariant(data.errorRateDelta)}>
                   {formatDelta(data.errorRateDelta, '%', noData)}
                 </Badge>
               </div>
-              <div className="bg-surface rounded-md p-3">
+              <div className="bg-card rounded-md p-3">
                 <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.latencyDelta')}</p>
                 <Badge variant={deltaBadgeVariant(data.latencyP95DeltaMs)}>
                   {formatDelta(data.latencyP95DeltaMs, t('promotionReadinessDelta.ms'), noData)}
                 </Badge>
               </div>
-              <div className="bg-surface rounded-md p-3">
+              <div className="bg-card rounded-md p-3">
                 <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.incidentsDelta')}</p>
                 <Badge variant={deltaBadgeVariant(data.incidentsDelta)}>
                   {data.incidentsDelta !== null
@@ -257,7 +257,7 @@ function PromotionReadinessDeltaSection() {
                     : noData}
                 </Badge>
               </div>
-              <div className="bg-surface rounded-md p-3">
+              <div className="bg-card rounded-md p-3">
                 <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.throughputDelta')}</p>
                 <Badge variant={deltaBadgeVariant(data.throughputDelta, true)}>
                   {formatDelta(data.throughputDelta, '%', noData)}
@@ -391,7 +391,7 @@ export function ReleaseTrainPage() {
                 {releaseIds.map((id) => (
                   <div
                     key={id}
-                    className="flex items-center justify-between bg-surface rounded-md px-3 py-2"
+                    className="flex items-center justify-between bg-card rounded-md px-3 py-2"
                   >
                     <span className="font-mono text-xs text-heading">{id}</span>
                     <button

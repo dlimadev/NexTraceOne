@@ -160,7 +160,7 @@ export function DataTable<T>({
 
   if (!loading && data.length === 0) {
     return (
-      <div className={cn('bg-card rounded-md border border-edge shadow-surface overflow-hidden', className)}>
+      <div className={cn('bg-card rounded-xl border border-edge shadow-sm overflow-hidden', className)}>
         <EmptyState
           title={emptyTitle ?? ''}
           description={emptyDescription}
@@ -171,7 +171,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn('bg-card rounded-md border border-edge shadow-surface overflow-hidden', className)}>
+    <div className={cn('bg-card rounded-xl border border-edge shadow-sm overflow-hidden', className)}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm" role="grid" aria-labelledby={`${tableId}-caption`}>
           <thead className={cn(stickyHeader && 'sticky top-0 z-10')}>
@@ -214,7 +214,7 @@ export function DataTable<T>({
           <tbody>
             {loading
               ? Array.from({ length: skeletonRows }).map((_, i) => (
-                  <tr key={`skeleton-${i}`} className="border-b border-edge/40">
+                  <tr key={`skeleton-${i}`} className="border-b border-edge/60">
                     {selectable && (
                       <td className="px-3 py-3">
                         <div className="skeleton h-4 w-4 rounded" />
@@ -234,7 +234,7 @@ export function DataTable<T>({
                     <tr
                       key={key}
                       className={cn(
-                        'border-b border-edge/40 transition-colors',
+                        'border-b border-edge/60 transition-colors',
                         onRowClick && 'cursor-pointer hover:bg-hover',
                         isSelected && 'bg-accent-muted',
                       )}

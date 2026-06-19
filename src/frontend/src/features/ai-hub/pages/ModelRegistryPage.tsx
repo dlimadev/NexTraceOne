@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   Database,
-  Search,
   Cpu,
   Shield,
   Globe,
@@ -15,6 +14,8 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
@@ -137,35 +138,27 @@ export function ModelRegistryPage() {
         <StatCard title={t('aiHub.externalModels')} value={models.filter(m => m.isExternal).length} icon={<Globe size={20} />} color="text-warning" />
       </StatsGrid>
 
-      {/* Filter bar */}
+      {/* Barra de filtros — SearchInput DS + Tabs pill para status */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t('aiHub.searchModels')}
-            aria-label={t('aiHub.searchModels')}
-            className="w-full bg-elevated border border-edge rounded-lg pl-9 pr-4 py-2 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-        <div className="flex items-center gap-1" role="group" aria-label={t('aiHub.filterByStatus')}>
-          {statusFilters.map(f => (
-            <button
-              key={f}
-              onClick={() => setStatusFilter(f)}
-              aria-pressed={statusFilter === f}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                statusFilter === f
-                  ? 'bg-accent text-heading'
-                  : 'bg-elevated text-muted hover:text-body'
-              }`}
-            >
-              {t(`aiHub.filter${f}`)}
-            </button>
-          ))}
-        </div>
+        <SearchInput
+          size="sm"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder={t('aiHub.searchModels')}
+          aria-label={t('aiHub.searchModels')}
+          className="flex-1 max-w-md"
+        />
+        <Tabs
+          variant="pill"
+          size="sm"
+          id="model-status-filter"
+          activeId={statusFilter}
+          onChange={(id) => setStatusFilter(id)}
+          items={statusFilters.map(f => ({
+            id: f,
+            label: t(`aiHub.filter${f}`, f),
+          }))}
+        />
       </div>
 
       {/* Model list */}

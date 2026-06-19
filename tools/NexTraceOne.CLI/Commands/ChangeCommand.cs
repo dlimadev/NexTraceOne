@@ -61,19 +61,19 @@ public static class ChangeCommand
 
     private static Command CreateReportCommand()
     {
-        var serviceOpt = new Option<string>("--service", "Service name.") { Required = true };
-        var versionOpt = new Option<string>("--version", "Semantic version (e.g., 1.2.0).") { Required = true };
-        var envOpt = new Option<string>("--environment", "Target environment name (e.g., production, staging).") { Required = true };
+        var serviceOpt = new Option<string>("--service") { Description = "Service name.",  Required = true };
+        var versionOpt = new Option<string>("--version") { Description = "Semantic version (e.g., 1.2.0).",  Required = true };
+        var envOpt = new Option<string>("--environment") { Description = "Target environment name (e.g., production, staging).",  Required = true };
         var changeTypeOpt = new Option<string>("--type")
         {
             Description = "Change type: Deploy | ConfigChange | SchemaChange | Rollback.",
             DefaultValueFactory = _ => "Deploy"
         };
-        var commitShaOpt = new Option<string>("--commit-sha", "Git commit SHA.");
-        var branchOpt = new Option<string>("--branch", "Git branch name.");
-        var pipelineIdOpt = new Option<string>("--pipeline-id", "CI/CD pipeline run identifier.");
-        var notesOpt = new Option<string>("--notes", "Additional release notes.");
-        var externalIdOpt = new Option<string>("--external-id", "External release/deployment identifier (e.g., GitHub run ID, GitLab pipeline ID).");
+        var commitShaOpt = new Option<string>("--commit-sha") { Description = "Git commit SHA." };
+        var branchOpt = new Option<string>("--branch") { Description = "Git branch name." };
+        var pipelineIdOpt = new Option<string>("--pipeline-id") { Description = "CI/CD pipeline run identifier." };
+        var notesOpt = new Option<string>("--notes") { Description = "Additional release notes." };
+        var externalIdOpt = new Option<string>("--external-id") { Description = "External release/deployment identifier (e.g., GitHub run ID, GitLab pipeline ID)." };
         var externalSystemOpt = new Option<string>("--external-system")
         {
             Description = "Source system that owns the external ID (e.g., github, gitlab, jenkins, azuredevops).",
@@ -187,8 +187,8 @@ public static class ChangeCommand
 
     private static Command CreateBlastRadiusCommand()
     {
-        var serviceOpt = new Option<string>("--service", "Service name.") { Required = true };
-        var versionOpt = new Option<string>("--version", "Semantic version to analyse.");
+        var serviceOpt = new Option<string>("--service") { Description = "Service name.",  Required = true };
+        var versionOpt = new Option<string>("--version") { Description = "Semantic version to analyse." };
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();
@@ -304,8 +304,8 @@ public static class ChangeCommand
 
     private static Command CreateListCommand()
     {
-        var serviceOpt = new Option<string>("--service", "Filter by service name.");
-        var envOpt = new Option<string>("--environment", "Filter by environment.");
+        var serviceOpt = new Option<string>("--service") { Description = "Filter by service name." };
+        var envOpt = new Option<string>("--environment") { Description = "Filter by environment." };
         var limitOpt = new Option<int>("--limit")
         {
             Description = "Maximum number of records to return.",
@@ -427,10 +427,10 @@ public static class ChangeCommand
 
     private static Command CreatePromoteCommand()
     {
-        var releaseIdOpt = new Option<string>("--release-id", "The release/change ID (UUID) to promote.") { Required = true };
-        var targetEnvOpt = new Option<string>("--target-environment", "Target environment to promote to (e.g., staging, production).") { Required = true };
-        var justificationOpt = new Option<string>("--justification", "Justification/notes for the promotion.");
-        var requestedByOpt = new Option<string>("--requested-by", "Identity of the requester (defaults to current user).");
+        var releaseIdOpt = new Option<string>("--release-id") { Description = "The release/change ID (UUID) to promote.",  Required = true };
+        var targetEnvOpt = new Option<string>("--target-environment") { Description = "Target environment to promote to (e.g., staging, production).",  Required = true };
+        var justificationOpt = new Option<string>("--justification") { Description = "Justification/notes for the promotion." };
+        var requestedByOpt = new Option<string>("--requested-by") { Description = "Identity of the requester (defaults to current user)." };
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();

@@ -1,13 +1,19 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AlertTriangle, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Plus, RefreshCw, Gauge, Clock, Flame } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import { PageContainer } from '../../../components/shell';
+import { StatCard } from '../../../components/StatCard';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Drawer } from '../../../components/Drawer';
 import { reliabilityApi, type BurnRateWindow, type ServiceSloItem, type SloType } from '../api/reliability';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -37,6 +43,9 @@ export function ReliabilitySloManagementPage() {
   const [selectedSloId, setSelectedSloId] = useState('');
   const [burnWindow, setBurnWindow] = useState<BurnRateWindow>('SixHours');
   const [createForm, setCreateForm] = useState(defaultCreateForm);
+
+  // Estado do Drawer de criação
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const servicesQuery = useQuery({
     queryKey: ['reliability-services-for-slo', activeEnvironmentId],
@@ -90,6 +99,7 @@ export function ReliabilitySloManagementPage() {
     onSuccess: () => {
       slosQuery.refetch();
       setCreateForm(defaultCreateForm);
+      setIsCreateOpen(false);
     },
   });
 
@@ -106,6 +116,9 @@ export function ReliabilitySloManagementPage() {
       burnRateQuery.refetch();
     },
   });
+
+  // Valida campos obrigatórios do formulário
+  const isFormValid = createForm.name.trim().length > 0 && !!resolvedSelectedService;
 
   if (servicesQuery.isLoading) {
     return (
@@ -127,182 +140,268 @@ export function ReliabilitySloManagementPage() {
   const burnRateValue = burnRateQuery.data?.burnRate ?? null;
   const atRisk = (burnRateValue !== null && burnRateValue >= 1) || burnRateQuery.data?.status === 'AtRisk' || burnRateQuery.data?.status === 'Violated';
 
+  // Opções do Select de serviço
+  const serviceOptions = (servicesQuery.data?.items ?? []).map((s) => ({
+    value: s.serviceName,
+    label: s.displayName,
+  }));
+
+  // Opções do Select de tipo de SLO
+  const sloTypeOptions = SLO_TYPES.map((type) => ({ value: type, label: type }));
+
+  // Opções do Select de janela de burn rate
+  const windowOptions = WINDOWS.map((w) => ({ value: w, label: w }));
+
   return (
     <PageContainer>
+      {/* Cabeçalho com CTA de criação de SLO */}
       <PageHeader
         title={t('reliability.slo.title')}
         subtitle={t('reliability.slo.subtitle')}
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={15} />}
+            onClick={() => setIsCreateOpen(true)}
+            disabled={!resolvedSelectedService}
+          >
+            {t('reliability.slo.createAction')}
+          </Button>
+        }
       />
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="xl:col-span-1">
-          <CardHeader>
-            <h2 className="text-sm font-semibold text-heading">{t('reliability.slo.serviceAndDefinitions')}</h2>
-          </CardHeader>
-          <CardBody className="space-y-4">
-            <div>
-              <label className="block text-xs text-muted mb-1">{t('reliability.slo.service')}</label>
-              <select
+      {/* Drawer lateral de criação de SLO */}
+      <Drawer
+        open={isCreateOpen}
+        onClose={() => {
+          setIsCreateOpen(false);
+          setCreateForm(defaultCreateForm);
+        }}
+        title={t('reliability.slo.create')}
+        description={t('reliability.slo.subtitle')}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsCreateOpen(false);
+                setCreateForm(defaultCreateForm);
+              }}
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!isFormValid}
+              loading={createSloMutation.isPending}
+              onClick={() => createSloMutation.mutate()}
+            >
+              {t('reliability.slo.createAction')}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          {/* Nome do SLO */}
+          <TextField
+            label={t('reliability.slo.namePlaceholder')}
+            value={createForm.name}
+            onChange={(e) => setCreateForm((c) => ({ ...c, name: e.target.value }))}
+            placeholder={t('reliability.slo.namePlaceholder')}
+          />
+
+          {/* Ambiente */}
+          <TextField
+            label={t('reliability.slo.environment')}
+            value={createForm.environment}
+            onChange={(e) => setCreateForm((c) => ({ ...c, environment: e.target.value }))}
+            placeholder={t('reliability.slo.environment')}
+          />
+
+          {/* Tipo de SLO */}
+          <Select
+            label="Type"
+            value={createForm.type}
+            onChange={(e) => setCreateForm((c) => ({ ...c, type: e.target.value as SloType }))}
+            options={sloTypeOptions}
+            size="md"
+          />
+
+          {/* Target % */}
+          <TextField
+            label="Target %"
+            type="number"
+            value={String(createForm.targetPercent)}
+            onChange={(e) => setCreateForm((c) => ({ ...c, targetPercent: Number(e.target.value) }))}
+          />
+        </div>
+      </Drawer>
+
+      {/* Grelha principal: seleção de serviço/SLO à esquerda, painel de saúde à direita */}
+      <PageSection>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Coluna de seleção — serviço + lista de SLOs */}
+          <Card className="xl:col-span-1">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading">{t('reliability.slo.serviceAndDefinitions')}</h2>
+            </CardHeader>
+            <CardBody className="space-y-4">
+              {/* Selector de serviço com componente DS */}
+              <Select
+                label={t('reliability.slo.service')}
                 value={resolvedSelectedService}
                 onChange={(e) => {
                   setSelectedService(e.target.value);
                   setSelectedSloId('');
                 }}
-                className="w-full px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-              >
-                {(servicesQuery.data?.items ?? []).map((service) => (
-                  <option key={service.serviceName} value={service.serviceName}>
-                    {service.displayName}
-                  </option>
-                ))}
-              </select>
-            </div>
+                options={serviceOptions}
+                size="md"
+              />
 
-            <div className="space-y-2">
-              {slosQuery.isLoading ? (
-                <p className="text-sm text-muted">{t('common.loading')}</p>
-              ) : slos.length === 0 ? (
-                <p className="text-sm text-muted">{t('reliability.slo.noSlo')}</p>
-              ) : (
-                slos.map((slo: ServiceSloItem) => (
-                  <button
-                    key={slo.id}
-                    type="button"
-                    onClick={() => setSelectedSloId(slo.id)}
-                    className={`w-full text-left rounded-md border px-3 py-2 ${resolvedSelectedSloId === slo.id ? 'border-accent bg-accent/10' : 'border-edge bg-elevated'}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-heading font-medium">{slo.name}</span>
-                      <Badge variant={slo.isActive ? 'success' : 'default'}>{slo.isActive ? t('reliability.slo.active') : t('reliability.slo.inactive')}</Badge>
-                    </div>
-                    <p className="text-xs text-muted mt-1">{slo.type} • {slo.targetPercent}% • {slo.environment}</p>
-                  </button>
-                ))
-              )}
-            </div>
-
-            <div className="pt-3 border-t border-edge">
-              <h3 className="text-xs uppercase tracking-wide text-muted mb-2">{t('reliability.slo.create')}</h3>
+              {/* Lista de SLOs do serviço selecionado */}
               <div className="space-y-2">
-                <input
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm((c) => ({ ...c, name: e.target.value }))}
-                  placeholder={t('reliability.slo.namePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-                />
-                <input
-                  value={createForm.environment}
-                  onChange={(e) => setCreateForm((c) => ({ ...c, environment: e.target.value }))}
-                  placeholder={t('reliability.slo.environment')}
-                  className="w-full px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-                />
-                <select
-                  value={createForm.type}
-                  onChange={(e) => setCreateForm((c) => ({ ...c, type: e.target.value as SloType }))}
-                  className="w-full px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-                >
-                  {SLO_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-                </select>
-                <input
-                  type="number"
-                  value={createForm.targetPercent}
-                  onChange={(e) => setCreateForm((c) => ({ ...c, targetPercent: Number(e.target.value) }))}
-                  className="w-full px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-                />
-                <button
-                  type="button"
-                  onClick={() => createSloMutation.mutate()}
-                  disabled={!resolvedSelectedService || !createForm.name || createSloMutation.isPending}
-                  className="w-full px-3 py-2 rounded-md bg-accent/15 text-accent border border-accent/40 text-sm disabled:opacity-60"
-                >
-                  {createSloMutation.isPending ? t('common.loading') : t('reliability.slo.createAction')}
-                </button>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="xl:col-span-2">
-          <CardHeader>
-            <h2 className="text-sm font-semibold text-heading">{t('reliability.slo.health')}</h2>
-          </CardHeader>
-          <CardBody>
-            {!selectedSlo ? (
-              <p className="text-sm text-muted">{t('reliability.slo.selectSlo')}</p>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-heading">{selectedSlo.name}</p>
-                    <p className="text-xs text-muted">{selectedSlo.environment} • {selectedSlo.type} • {selectedSlo.targetPercent}%</p>
-                  </div>
-                  <Badge variant={statusVariant(errorBudgetQuery.data?.status ?? 'Healthy')}>
-                    {errorBudgetQuery.data?.status ?? 'Healthy'}
-                  </Badge>
-                </div>
-
-                {atRisk && (
-                  <div className="p-3 rounded-md border border-warning/30 bg-warning/10 flex items-center gap-2">
-                    <AlertTriangle size={14} className="text-warning" />
-                    <span className="text-sm text-warning">{t('reliability.slo.burnRateAlert')}</span>
-                  </div>
+                {slosQuery.isLoading ? (
+                  <p className="text-sm text-muted">{t('common.loading')}</p>
+                ) : slos.length === 0 ? (
+                  <EmptyState
+                    size="compact"
+                    title={t('reliability.slo.noSlo')}
+                    variant="onboarding"
+                    action={
+                      <Button
+                        variant="subtle"
+                        size="xs"
+                        icon={<Plus size={13} />}
+                        onClick={() => setIsCreateOpen(true)}
+                        disabled={!resolvedSelectedService}
+                      >
+                        {t('reliability.slo.createAction')}
+                      </Button>
+                    }
+                  />
+                ) : (
+                  slos.map((slo: ServiceSloItem) => (
+                    <button
+                      key={slo.id}
+                      type="button"
+                      onClick={() => setSelectedSloId(slo.id)}
+                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${resolvedSelectedSloId === slo.id ? 'border-accent bg-accent/10' : 'border-edge bg-elevated hover:border-edge-strong hover:bg-hover'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-heading font-medium">{slo.name}</span>
+                        <Badge variant={slo.isActive ? 'success' : 'default'}>
+                          {slo.isActive ? t('reliability.slo.active') : t('reliability.slo.inactive')}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted mt-1">{slo.type} • {slo.targetPercent}% • {slo.environment}</p>
+                    </button>
+                  ))
                 )}
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="p-3 rounded-md border border-edge bg-elevated">
-                    <p className="text-xs text-muted">{t('reliability.slo.errorBudgetConsumed')}</p>
-                    <p className="text-lg font-semibold text-heading">{errorBudgetQuery.data?.consumedPercent?.toFixed(1) ?? '0'}%</p>
-                  </div>
-                  <div className="p-3 rounded-md border border-edge bg-elevated">
-                    <p className="text-xs text-muted">{t('reliability.slo.remainingBudget')}</p>
-                    <p className="text-lg font-semibold text-heading">{errorBudgetQuery.data?.remainingBudgetMinutes?.toFixed(0) ?? '0'} min</p>
-                  </div>
-                  <div className="p-3 rounded-md border border-edge bg-elevated">
-                    <p className="text-xs text-muted">{t('reliability.slo.burnRate')}</p>
-                    <p className="text-lg font-semibold text-heading">{burnRateValue?.toFixed(2) ?? '0.00'}x</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    value={burnWindow}
-                    onChange={(e) => setBurnWindow(e.target.value as BurnRateWindow)}
-                    className="px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-                  >
-                    {WINDOWS.map((window) => (
-                      <option key={window} value={window}>{window}</option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => recomputeBudgetMutation.mutate()}
-                    disabled={recomputeBudgetMutation.isPending}
-                    className="px-3 py-2 rounded-md border border-edge text-sm text-muted hover:text-body"
-                  >
-                    {t('reliability.slo.recomputeBudget')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => recomputeBurnMutation.mutate()}
-                    disabled={recomputeBurnMutation.isPending}
-                    className="px-3 py-2 rounded-md border border-edge text-sm text-muted hover:text-body"
-                  >
-                    {t('reliability.slo.recomputeBurn')}
-                  </button>
-                </div>
-
-                <div className="p-3 rounded-md border border-edge bg-elevated">
-                  <p className="text-xs text-muted mb-1">{t('reliability.slo.linkedSlas')}</p>
-                  <p className="text-sm text-body flex items-center gap-2">
-                    <ShieldCheck size={14} className="text-accent" />
-                    {slasQuery.data?.items?.length ?? 0} {t('reliability.slo.slaCount')}
-                  </p>
-                </div>
               </div>
-            )}
-          </CardBody>
-        </Card>
-      </div>
+            </CardBody>
+          </Card>
+
+          {/* Coluna de saúde do SLO selecionado */}
+          <Card className="xl:col-span-2">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading">{t('reliability.slo.health')}</h2>
+            </CardHeader>
+            <CardBody>
+              {!selectedSlo ? (
+                <EmptyState
+                  title={t('reliability.slo.selectSlo')}
+                  variant="default"
+                />
+              ) : (
+                <div className="space-y-4">
+                  {/* Identidade do SLO + status */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-heading">{selectedSlo.name}</p>
+                      <p className="text-xs text-muted">{selectedSlo.environment} • {selectedSlo.type} • {selectedSlo.targetPercent}%</p>
+                    </div>
+                    <Badge variant={statusVariant(errorBudgetQuery.data?.status ?? 'Healthy')}>
+                      {errorBudgetQuery.data?.status ?? 'Healthy'}
+                    </Badge>
+                  </div>
+
+                  {/* Banner de alerta de burn rate elevado */}
+                  {atRisk && (
+                    <div className="p-3 rounded-md border border-warning/30 bg-warning/10 flex items-center gap-2">
+                      <AlertTriangle size={14} className="text-warning shrink-0" />
+                      <span className="text-sm text-warning">{t('reliability.slo.burnRateAlert')}</span>
+                    </div>
+                  )}
+
+                  {/* KPIs via StatCard + ContentGrid */}
+                  <ContentGrid columns={3}>
+                    <StatCard
+                      title={t('reliability.slo.errorBudgetConsumed')}
+                      value={`${errorBudgetQuery.data?.consumedPercent?.toFixed(1) ?? '0'}%`}
+                      icon={<Gauge size={18} />}
+                      color={atRisk ? 'text-critical' : 'text-accent'}
+                    />
+                    <StatCard
+                      title={t('reliability.slo.remainingBudget')}
+                      value={`${errorBudgetQuery.data?.remainingBudgetMinutes?.toFixed(0) ?? '0'} min`}
+                      icon={<Clock size={18} />}
+                      color="text-success"
+                    />
+                    <StatCard
+                      title={t('reliability.slo.burnRate')}
+                      value={`${burnRateValue?.toFixed(2) ?? '0.00'}x`}
+                      icon={<Flame size={18} />}
+                      color={atRisk ? 'text-warning' : 'text-info'}
+                    />
+                  </ContentGrid>
+
+                  {/* Controles de janela temporal e recomputo */}
+                  <div className="flex flex-wrap items-end gap-3">
+                    <Select
+                      value={burnWindow}
+                      onChange={(e) => setBurnWindow(e.target.value as BurnRateWindow)}
+                      options={windowOptions}
+                      size="sm"
+                      className="w-44"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={<RefreshCw size={14} />}
+                      onClick={() => recomputeBudgetMutation.mutate()}
+                      loading={recomputeBudgetMutation.isPending}
+                    >
+                      {t('reliability.slo.recomputeBudget')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={<RefreshCw size={14} />}
+                      onClick={() => recomputeBurnMutation.mutate()}
+                      loading={recomputeBurnMutation.isPending}
+                    >
+                      {t('reliability.slo.recomputeBurn')}
+                    </Button>
+                  </div>
+
+                  {/* SLAs vinculados */}
+                  <div className="p-3 rounded-md border border-edge bg-elevated">
+                    <p className="text-xs text-muted mb-1">{t('reliability.slo.linkedSlas')}</p>
+                    <p className="text-sm text-body flex items-center gap-2">
+                      <ShieldCheck size={14} className="text-accent" />
+                      {slasQuery.data?.items?.length ?? 0} {t('reliability.slo.slaCount')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+      </PageSection>
     </PageContainer>
   );
 }

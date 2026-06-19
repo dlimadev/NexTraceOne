@@ -179,25 +179,25 @@ export function PostReleaseReviewPage() {
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="bg-surface rounded-lg p-3">
+                <div className="bg-card rounded-lg p-3">
                   <p className="text-xs text-muted">{t('postReleaseReview.confidence', 'Confidence Score')}</p>
                   <p className="text-xl font-bold text-heading mt-1">
                     {(review.confidenceScore * 100).toFixed(0)}%
                   </p>
                 </div>
-                <div className="bg-surface rounded-lg p-3">
+                <div className="bg-card rounded-lg p-3">
                   <p className="text-xs text-muted">{t('postReleaseReview.observationWindows', 'Observation Windows')}</p>
                   <p className="text-xl font-bold text-heading mt-1">
                     {review.observationWindows?.length ?? 0}
                   </p>
                 </div>
-                <div className="bg-surface rounded-lg p-3">
+                <div className="bg-card rounded-lg p-3">
                   <p className="text-xs text-muted">{t('postReleaseReview.startedAt', 'Started At')}</p>
                   <p className="text-sm font-medium text-heading mt-1">
                     {new Date(review.startedAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="bg-surface rounded-lg p-3">
+                <div className="bg-card rounded-lg p-3">
                   <p className="text-xs text-muted">{t('postReleaseReview.completedAt', 'Completed At')}</p>
                   <p className="text-sm font-medium text-heading mt-1">
                     {review.completedAt
@@ -208,7 +208,7 @@ export function PostReleaseReviewPage() {
               </div>
 
               {review.summary && (
-                <div className="bg-surface rounded-lg p-3 border border-edge">
+                <div className="bg-card rounded-lg p-3 border border-edge">
                   <p className="text-xs text-muted mb-1">{t('postReleaseReview.summary', 'Summary')}</p>
                   <p className="text-sm text-heading">{review.summary}</p>
                 </div>
@@ -254,7 +254,7 @@ export function PostReleaseReviewPage() {
                     </thead>
                     <tbody>
                       {review.observationWindows.map((w: any) => (
-                        <tr key={w.id} className="border-b border-edge/50 hover:bg-surface transition-colors">
+                        <tr key={w.id} className="border-b border-edge/50 hover:bg-hover transition-colors">
                           <td className="py-2 pr-4 font-medium">{w.phase}</td>
                           <td className="py-2 pr-4 text-muted">
                             {new Date(w.startsAt).toLocaleTimeString()} –{' '}
@@ -303,7 +303,7 @@ export function PostReleaseReviewPage() {
                     { label: 'P99', value: `${review.baseline.p99LatencyMs}ms` },
                     { label: 'Throughput', value: review.baseline.throughput?.toFixed(1) },
                   ].map((m) => (
-                    <div key={m.label} className="bg-surface rounded-lg p-3">
+                    <div key={m.label} className="bg-card rounded-lg p-3">
                       <p className="text-xs text-muted">{m.label}</p>
                       <p className="text-sm font-bold text-heading mt-0.5">{m.value}</p>
                     </div>
