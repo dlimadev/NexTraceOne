@@ -83,6 +83,15 @@ export function CatalogRoutes() {
           </ProtectedRoute>
         }
       />
+      {/* Rota para criar novo serviço — workspace em modo create */}
+      <Route
+        path="/services/new"
+        element={
+          <ProtectedRoute permission="catalog:assets:write" redirectTo="/unauthorized">
+            <ServiceDetailPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/services/:serviceId"
         element={

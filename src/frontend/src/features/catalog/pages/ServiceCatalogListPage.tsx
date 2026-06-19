@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Server,
   Shield,
@@ -24,7 +24,6 @@ import { PageHeader } from '../../../components/PageHeader';
 import { SearchInput } from '../../../components/SearchInput';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
-import { ServiceRegistrationWizard } from '../components/ServiceRegistrationWizard';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -105,36 +104,17 @@ const SEARCH_DEBOUNCE_MS = 350;
 export function ServiceCatalogListPage() {
   const { t } = useTranslation();
   const { activeEnvironmentId } = useEnvironment();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<ServiceFilters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [showServiceForm, setShowServiceForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 50;
-  const [serviceForm, setServiceForm] = useState({
-    name: '', team: '', description: '', domain: '',
-    serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-    technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
-  });
 
   /** Debounce da pesquisa para evitar chamadas excessivas à API. */
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(filters.search), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [filters.search]);
-
-  const registerService = useMutation({
-    mutationFn: serviceCatalogApi.registerService,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['catalog-services'] });
-      setShowServiceForm(false);
-      setServiceForm({
-        name: '', team: '', description: '', domain: '',
-        serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-        technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
-      });
-    },
-  });
 
   /** Parâmetros enviados à API — omite chaves vazias. */
   const queryParams = useMemo(() => {
@@ -186,33 +166,12 @@ export function ServiceCatalogListPage() {
             variant="primary"
             size="sm"
             icon={<Plus size={14} />}
-            onClick={() => setShowServiceForm((v) => !v)}
+            onClick={() => navigate('/services/new')}
           >
             {t('serviceCatalog.registerService')}
           </Button>
         }
       />
-
-      {/* ── Formulário de registro de serviço ── */}
-      {showServiceForm && (
-        <ServiceRegistrationWizard
-          onSubmit={(data) => registerService.mutate({
-            name: data.name,
-            team: data.team,
-            description: data.description,
-            domain: data.domain,
-            serviceType: data.serviceType,
-            criticality: data.criticality,
-            exposureType: data.exposureType,
-            technicalOwner: data.technicalOwner,
-            businessOwner: data.businessOwner,
-            documentationUrl: data.documentationUrl,
-            repositoryUrl: data.repositoryUrl,
-          })}
-          onCancel={() => setShowServiceForm(false)}
-          isSubmitting={registerService.isPending}
-        />
-      )}
 
       {/* ── Métricas de resumo ── */}
       {summary && (
