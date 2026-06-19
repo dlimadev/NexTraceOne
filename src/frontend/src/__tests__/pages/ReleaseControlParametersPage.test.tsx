@@ -67,8 +67,9 @@ describe('ReleaseControlParametersPage', () => {
 
   it('renders boolean toggles for boolean params', () => {
     renderPage();
-    const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes.length).toBeGreaterThanOrEqual(5);
+    // Booleanos agora usam o DS Toggle (role="switch") em vez de checkbox.
+    const toggles = screen.getAllByRole('switch');
+    expect(toggles.length).toBeGreaterThanOrEqual(5);
   });
 
   it('renders number input for expiry hours param', () => {
