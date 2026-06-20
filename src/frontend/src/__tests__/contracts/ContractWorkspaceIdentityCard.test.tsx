@@ -19,6 +19,7 @@ describe('ContractWorkspaceIdentityCard', () => {
     expect(screen.getByText(/2\.1\.0/)).toBeInTheDocument();
     // "Payments" appears in both the friendlyName ("Payments API") and the Team row — use getAllByText
     expect(screen.getAllByText(/Payments/).length).toBeGreaterThan(0);
+    expect(screen.getByText('@ana')).toBeInTheDocument();
   });
   it('shows approvals count from checklist (1/2)', () => {
     render(<ContractWorkspaceIdentityCard contract={contract} />);
@@ -27,5 +28,10 @@ describe('ContractWorkspaceIdentityCard', () => {
   it('shows compliance percentage', () => {
     render(<ContractWorkspaceIdentityCard contract={contract} />);
     expect(screen.getByText('92%')).toBeInTheDocument();
+  });
+  it('shows Locked and Signed badges when applicable', () => {
+    render(<ContractWorkspaceIdentityCard contract={{ ...contract, isLocked: true, signedBy: 'bob' } as unknown as StudioContract} />);
+    expect(screen.getByText('Locked')).toBeInTheDocument();
+    expect(screen.getByText('Signed')).toBeInTheDocument();
   });
 });

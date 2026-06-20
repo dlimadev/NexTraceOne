@@ -1,24 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { Globe, Server, Zap, Cog, Database, Lock, FileSignature } from 'lucide-react';
+import { Globe, Lock, FileSignature } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
 import { Badge } from '../../../../shared/ui';
 import { LifecycleBadge } from '../../shared/components/LifecycleBadge';
 import { IdentityMiniStat, IdentityMetaRow } from '../../shared/components/identityCardPrimitives';
 import { PROTOCOL_COLORS } from '../../shared/constants';
 import type { StudioContract } from '../studioTypes';
-
-const TYPE_ICON: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  RestApi: Globe,
-  Soap: Server,
-  Event: Zap,
-  BackgroundService: Cog,
-  SharedSchema: Database,
-};
+import { TYPE_ICONS } from '../../create/contractCreateConstants';
 
 /** Cartão de identidade sticky do workspace de contrato (padrão v5). Apresentacional. */
 export function ContractWorkspaceIdentityCard({ contract }: { contract: StudioContract }) {
   const { t } = useTranslation();
-  const Icon = TYPE_ICON[contract.serviceType] ?? Globe;
+  const Icon = TYPE_ICONS[contract.serviceType] ?? Globe;
   const approved = contract.approvalChecklist.filter((a) => a.state === 'Approved').length;
   const totalApprovals = contract.approvalChecklist.length;
   const passedPolicies = contract.policyChecks.filter((p) => p.passed).length;
@@ -62,10 +55,12 @@ export function ContractWorkspaceIdentityCard({ contract }: { contract: StudioCo
         <IdentityMiniStat
           value={totalApprovals ? `${approved}/${totalApprovals}` : '—'}
           label={t('contracts.workspace.approvals', 'Approvals')}
+          muted={totalApprovals === 0}
         />
         <IdentityMiniStat
           value={totalPolicies ? `${passedPolicies}/${totalPolicies}` : '—'}
           label={t('contracts.workspace.compliance', 'Policies')}
+          muted={totalPolicies === 0}
         />
         <IdentityMiniStat
           value={compliance == null ? '—' : `${compliance}%`}
