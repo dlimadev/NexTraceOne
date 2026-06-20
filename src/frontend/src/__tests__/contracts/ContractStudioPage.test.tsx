@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -76,5 +76,13 @@ describe('ContractStudioPage', () => {
     wrap(<ContractStudioPage />);
     const link = screen.getByTestId('type-card-rest-openapi');
     expect(link).toBeInTheDocument();
+  });
+
+  it('shows a best-for line on the REST card', () => {
+    wrap(<ContractStudioPage />);
+    const card = screen.getByTestId('type-card-rest-openapi');
+    expect(card).toBeInTheDocument();
+    // graphql + protobuf also map to RestApi, so scope to this card
+    expect(within(card).getByText('contracts.create.bestFor.RestApi')).toBeInTheDocument();
   });
 });

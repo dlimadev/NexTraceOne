@@ -21,6 +21,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Badge } from '../../../components/Badge';
 import { useContractsSummary, useContractList } from '../hooks';
 import type { ContractListItem } from '../../../types';
+import { HUB_KEY_TO_CONTRACT_TYPE, BEST_FOR_KEY } from '../create/contractCreateConstants';
 
 // ── Contract Type Registry ────────────────────────────────────────────────────
 
@@ -33,7 +34,6 @@ interface ContractType {
   borderClass: string;
   badge: string;
   features: string[];
-  route: string;
 }
 
 const CONTRACT_TYPES: ContractType[] = [
@@ -46,7 +46,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-accent',
     badge: 'OpenAPI 3.1',
     features: ['Live schema diff', 'Mock generation', 'Client SDK export'],
-    route: '/contracts/studio/rest',
   },
   {
     key: 'asyncapi',
@@ -57,7 +56,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-success',
     badge: 'AsyncAPI 3.x',
     features: ['Channel bindings', 'Payload schemas', 'Broker metadata'],
-    route: '/contracts/studio/async',
   },
   {
     key: 'soap-wsdl',
@@ -68,7 +66,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-warning',
     badge: 'WSDL 1.1 / 2.0',
     features: ['Operation builder', 'Message types', 'XSD validation'],
-    route: '/contracts/studio/soap',
   },
   {
     key: 'graphql',
@@ -79,7 +76,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-info',
     badge: 'SDL',
     features: ['Type explorer', 'Directive support', 'Breaking changes'],
-    route: '/contracts/studio/graphql',
   },
   {
     key: 'protobuf',
@@ -90,7 +86,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-accent',
     badge: '.proto',
     features: ['Field numbering', 'Reserved ranges', 'Compatibility check'],
-    route: '/contracts/studio/protobuf',
   },
   {
     key: 'shared-schema',
@@ -101,7 +96,6 @@ const CONTRACT_TYPES: ContractType[] = [
     borderClass: 'border-l-edge',
     badge: 'Multi-format',
     features: ['JSON Schema', 'Avro / XSD', 'Cross-contract refs'],
-    route: '/contracts/studio/shared-schema',
   },
 ];
 
@@ -164,12 +158,24 @@ function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () =>
 
 // ── Contract Type Card ────────────────────────────────────────────────────────
 
-function ContractTypeCard({ type, onSelect }: { type: ContractType; onSelect: () => void }) {
+interface ContractTypeCardProps {
+  type: ContractType;
+  onSelect: () => void;
+  onDesign: () => void;
+  onImport: () => void;
+}
+
+function ContractTypeCard({ type, onSelect, onDesign, onImport }: ContractTypeCardProps) {
+  const { t } = useTranslation();
+  const contractType = HUB_KEY_TO_CONTRACT_TYPE[type.key];
+
   return (
-    <button
-      type="button"
+    <div
       data-testid={`type-card-${type.key}`}
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
       className={`
         group w-full text-left rounded-md border-l-2 border border-edge
         bg-card hover:bg-elevated hover:border-edge-strong
@@ -189,9 +195,13 @@ function ContractTypeCard({ type, onSelect }: { type: ContractType; onSelect: ()
           </Badge>
         </div>
 
-        {/* Label + description */}
+        {/* Label */}
         <h3 className="text-sm font-semibold text-heading mb-1">{type.label}</h3>
-        <p className="text-xs text-muted leading-relaxed mb-3">{type.description}</p>
+
+        {/* Best-for line */}
+        <p className="text-xs text-muted leading-relaxed mb-3">
+          {t(BEST_FOR_KEY(contractType))}
+        </p>
 
         {/* Feature list */}
         <ul className="space-y-1 mb-4">
@@ -212,7 +222,28 @@ function ContractTypeCard({ type, onSelect }: { type: ContractType; onSelect: ()
           <ArrowRight size={11} />
         </div>
       </div>
-    </button>
+
+      {/* Footer: Design / Import deep links */}
+      <div
+        className="px-4 pb-3 flex items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDesign(); }}
+          className="text-[11px] font-medium text-muted hover:text-heading px-2 py-1 rounded border border-edge hover:border-edge-strong transition-colors"
+        >
+          {t('contracts.create.modeVisual', 'Design')}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onImport(); }}
+          className="text-[11px] font-medium text-muted hover:text-heading px-2 py-1 rounded border border-edge hover:border-edge-strong transition-colors"
+        >
+          {t('contracts.create.modeImport', 'Import')}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -239,7 +270,7 @@ export function ContractStudioPage() {
         actions={
           <button
             type="button"
-            onClick={() => navigate('/contracts/studio/new')}
+            onClick={() => navigate('/contracts/new')}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 transition-colors"
           >
             <Plus size={13} />
@@ -333,13 +364,18 @@ export function ContractStudioPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {CONTRACT_TYPES.map(type => (
-            <ContractTypeCard
-              key={type.key}
-              type={type}
-              onSelect={() => navigate(type.route)}
-            />
-          ))}
+          {CONTRACT_TYPES.map(type => {
+            const contractType = HUB_KEY_TO_CONTRACT_TYPE[type.key];
+            return (
+              <ContractTypeCard
+                key={type.key}
+                type={type}
+                onSelect={() => navigate(`/contracts/new?type=${contractType}`)}
+                onDesign={() => navigate(`/contracts/new?type=${contractType}&mode=visual`)}
+                onImport={() => navigate(`/contracts/new?type=${contractType}&mode=import`)}
+              />
+            );
+          })}
         </div>
       </PageSection>
     </PageContainer>
