@@ -1,9 +1,12 @@
-import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { CreateContractPage } from '../../features/contracts/create/CreateContractPage';
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (k: string, d?: string) => d ?? k }),
+}));
 
 vi.mock('../../features/contracts/api/contractStudio', () => ({
   contractStudioApi: {
@@ -35,7 +38,8 @@ vi.mock('../../api/client', () => ({
 import { serviceCatalogApi } from '../../features/catalog/api/serviceCatalog';
 
 function renderPage() {
-  vi.mocked(serviceCatalogApi.listServices).mockResolvedValue({ services: [], totalCount: 0 } as never);
+  // O hook lê `.items` da resposta de listServices.
+  vi.mocked(serviceCatalogApi.listServices).mockResolvedValue({ items: [], totalCount: 0 } as never);
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
@@ -56,9 +60,12 @@ describe('CreateContractPage', () => {
     expect(container).toBeDefined();
   });
 
-  it('shows loading state while fetching services', () => {
-    vi.mocked(serviceCatalogApi.listServices).mockReturnValue(new Promise(() => {}));
+  it('renders the live identity card and the four form tabs', async () => {
     renderPage();
-    expect(document.body).toBeDefined();
+    expect(await screen.findByText('Resumo atualiza ao vivo')).toBeInTheDocument();
+    expect(screen.getByText('Serviço')).toBeInTheDocument();
+    expect(screen.getByText('Tipo & Modo')).toBeInTheDocument();
+    expect(screen.getByText('Detalhes')).toBeInTheDocument();
+    expect(screen.getByText('Confirmar')).toBeInTheDocument();
   });
 });
