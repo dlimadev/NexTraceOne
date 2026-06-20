@@ -5,6 +5,7 @@ import { PROTOCOL_COLORS } from '../shared/constants';
 import { TYPE_ICONS } from './contractCreateConstants';
 import type { ContractTypeValue } from '../shared/constants';
 import type { CreationMode } from './contractCreateConstants';
+import { IdentityMiniStat, IdentityMetaRow } from '../shared/components/identityCardPrimitives';
 
 export interface ContractSummary {
   title: string;
@@ -44,37 +45,19 @@ export function ContractIdentityCard({ summary }: { summary: ContractSummary }) 
       </div>
 
       <div className="grid grid-cols-3 gap-px bg-edge border-t border-b border-edge">
-        <MiniStat value={summary.proposedVersion} label={t('contracts.create.cardVersion', 'Version')} mono />
-        <MiniStat value="0" label={t('contracts.create.cardOperations', 'Operations')} />
-        <MiniStat value="—" label={t('contracts.create.cardValidation', 'Validation')} muted />
+        <IdentityMiniStat value={summary.proposedVersion} label={t('contracts.create.cardVersion', 'Version')} mono />
+        <IdentityMiniStat value="0" label={t('contracts.create.cardOperations', 'Operations')} />
+        <IdentityMiniStat value="—" label={t('contracts.create.cardValidation', 'Validation')} muted />
       </div>
 
       <div className="px-4 py-2 divide-y divide-edge/60">
-        <MetaRow label={t('contracts.create.cardProtocol', 'Protocol')} value={summary.protocol || '—'} />
-        <MetaRow label={t('contracts.create.cardAuthor', 'Author')} value={summary.author || '—'} />
+        <IdentityMetaRow label={t('contracts.create.cardProtocol', 'Protocol')} value={summary.protocol || '—'} />
+        <IdentityMetaRow label={t('contracts.create.cardAuthor', 'Author')} value={summary.author || '—'} />
       </div>
 
       <p className="text-[11px] text-muted text-center py-2 px-4 border-t border-edge">
         {t('contracts.create.livePreviewHint', 'Resumo atualiza ao vivo')}
       </p>
-    </div>
-  );
-}
-
-function MiniStat({ value, label, mono, muted }: { value: string; label: string; mono?: boolean; muted?: boolean }) {
-  return (
-    <div className="bg-deep text-center py-3">
-      <p className={cn('text-sm font-bold', muted ? 'text-muted' : 'text-heading', mono && 'font-mono')}>{value}</p>
-      <p className="text-[10px] text-muted mt-0.5">{label}</p>
-    </div>
-  );
-}
-
-function MetaRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between py-2 text-xs">
-      <span className="text-muted">{label}</span>
-      <span className="text-heading font-medium truncate ml-2">{value}</span>
     </div>
   );
 }
