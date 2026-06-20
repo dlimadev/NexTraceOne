@@ -8,6 +8,8 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   helperText?: string;
   /** Mensagem de erro — ativa estilo danger. */
   error?: string;
+  /** Classes aplicadas directamente ao elemento &lt;textarea&gt; interno (não ao wrapper). */
+  textareaClassName?: string;
 }
 
 /**
@@ -19,7 +21,7 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
  * @see docs/DESIGN-SYSTEM.md §4.4
  */
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  function TextArea({ label, helperText, error, className, id, ...rest }, ref) {
+  function TextArea({ label, helperText, error, className, textareaClassName, id, ...rest }, ref) {
     const fieldId = id ?? (label ? `textarea-${label.toLowerCase().replace(/\s/g, '-')}` : undefined);
     const hasError = Boolean(error);
 
@@ -50,6 +52,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             hasError
               ? 'border-danger shadow-sm'
               : 'border-edge hover:border-edge-strong',
+            textareaClassName,
           )}
           style={{ transitionDuration: 'var(--nto-motion-fast)' }}
           {...rest}

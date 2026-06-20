@@ -60,7 +60,7 @@ export function DetailsTab({ form }: DetailsTabProps) {
             value={form.importContent}
             onChange={form.setField('importContent')}
             rows={10}
-            className="font-mono text-xs"
+            textareaClassName="font-mono text-xs"
             helperText={
               form.isSoapType
                 ? t('contracts.create.wsdlXmlHint', 'WSDL XML')

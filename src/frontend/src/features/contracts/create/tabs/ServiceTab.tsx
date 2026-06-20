@@ -81,6 +81,7 @@ export function ServiceTab({
             return (
               <button
                 key={svc.serviceId}
+                type="button"
                 onClick={() => {
                   if (!supported) return;
                   onSelectService({ serviceId: svc.serviceId, serviceType: svc.serviceType });

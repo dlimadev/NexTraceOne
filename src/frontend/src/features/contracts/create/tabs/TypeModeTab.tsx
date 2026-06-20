@@ -70,6 +70,7 @@ export function TypeModeTab({
             return (
               <button
                 key={ct.value}
+                type="button"
                 onClick={() => onSelectType(ct.value as ContractTypeValue)}
                 className={`text-left rounded-xl border p-4 transition-all
                   ${isSelected
@@ -128,6 +129,7 @@ export function TypeModeTab({
               return (
                 <button
                   key={mode.id}
+                  type="button"
                   onClick={() => onSelectMode(mode.id)}
                   className={`text-left rounded-xl border p-4 transition-all
                     ${isSelected
