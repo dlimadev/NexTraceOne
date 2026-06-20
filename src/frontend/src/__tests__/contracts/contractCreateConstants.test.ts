@@ -7,6 +7,9 @@ describe('contractCreateConstants', () => {
     expect(HUB_KEY_TO_CONTRACT_TYPE['asyncapi']).toBe('Event');
     expect(HUB_KEY_TO_CONTRACT_TYPE['soap-wsdl']).toBe('Soap');
     expect(HUB_KEY_TO_CONTRACT_TYPE['shared-schema']).toBe('SharedSchema');
+    // GraphQL e Protobuf caem intencionalmente em RestApi (protocolos reservados)
+    expect(HUB_KEY_TO_CONTRACT_TYPE['graphql']).toBe('RestApi');
+    expect(HUB_KEY_TO_CONTRACT_TYPE['protobuf']).toBe('RestApi');
   });
 
   it('has a best-for key for each contract type', () => {

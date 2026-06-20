@@ -7,8 +7,8 @@ export const HUB_KEY_TO_CONTRACT_TYPE: Record<string, ContractTypeValue> = {
   'rest-openapi': 'RestApi',
   'asyncapi': 'Event',
   'soap-wsdl': 'Soap',
-  'graphql': 'RestApi',
-  'protobuf': 'RestApi',
+  'graphql': 'RestApi',   // GraphQL ainda mapeado p/ RestApi (protocolo GraphQl reservado)
+  'protobuf': 'RestApi',  // Protobuf reservado — entra como RestApi até builder dedicado
   'shared-schema': 'SharedSchema',
 };
 
