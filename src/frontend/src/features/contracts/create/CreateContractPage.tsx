@@ -150,7 +150,7 @@ export function CreateContractPage() {
               <TypeModeTab
                 filteredContractTypes={form.filteredContractTypes}
                 selectedType={form.selectedType}
-                onSelectType={form.setSelectedType}
+                onSelectType={form.selectType}
                 selectedMode={form.selectedMode}
                 onSelectMode={form.setSelectedMode}
               />

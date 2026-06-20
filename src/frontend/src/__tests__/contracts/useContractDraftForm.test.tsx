@@ -39,4 +39,21 @@ describe('useContractDraftForm', () => {
     expect(result.current.selectedType).toBe('RestApi');
     expect(result.current.selectedMode).toBe('import');
   });
+
+  it('auto-sets the protocol when selecting a single-protocol type', () => {
+    const { result } = renderHook(() => useContractDraftForm({}), { wrapper });
+    act(() => result.current.selectType('Soap'));
+    expect(result.current.selectedProtocol).toBe('Wsdl');
+  });
+
+  it('clears the protocol when selecting a multi-protocol type', () => {
+    const { result } = renderHook(() => useContractDraftForm({}), { wrapper });
+    act(() => result.current.selectType('RestApi'));
+    expect(result.current.selectedProtocol).toBe('');
+  });
+
+  it('seeds the protocol from a single-protocol initialType', () => {
+    const { result } = renderHook(() => useContractDraftForm({ initialType: 'Event' }), { wrapper });
+    expect(result.current.selectedProtocol).toBe('AsyncApi');
+  });
 });

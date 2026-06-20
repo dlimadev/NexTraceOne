@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -38,7 +38,10 @@ export function useContractDraftForm(args: UseContractDraftFormArgs) {
 
   const [selectedType, setSelectedType] = useState<ContractTypeValue | null>(args.initialType ?? null);
   const [selectedMode, setSelectedMode] = useState<CreationMode | null>(args.initialMode ?? null);
-  const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>('');
+  const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>(() => {
+    const protos = args.initialType ? (PROTOCOL_BY_TYPE[args.initialType] ?? []) : [];
+    return protos.length === 1 ? protos[0]! : '';
+  });
   const [linkedServiceId, setLinkedServiceId] = useState(prefilledServiceId);
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | null>(null);
   const [serviceSearch, setServiceSearch] = useState('');
@@ -67,6 +70,13 @@ export function useContractDraftForm(args: UseContractDraftFormArgs) {
   const isSoapType = selectedType === 'Soap';
   const isEventType = selectedType === 'Event';
   const isBackgroundServiceType = selectedType === 'BackgroundService';
+
+  // Seleciona o tipo e deriva o protocolo: tipo de protocolo único auto-seleciona; múltiplos limpam.
+  const selectType = useCallback((type: ContractTypeValue) => {
+    setSelectedType(type);
+    const protos = PROTOCOL_BY_TYPE[type] ?? [];
+    setSelectedProtocol(protos.length === 1 ? protos[0]! : '');
+  }, []);
 
   // ── Queries ─────────────────────────────────────────────────────────────────
 
@@ -272,6 +282,7 @@ export function useContractDraftForm(args: UseContractDraftFormArgs) {
     // type + mode + protocol
     selectedType,
     setSelectedType,
+    selectType,
     selectedMode,
     setSelectedMode,
     selectedProtocol,
