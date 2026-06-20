@@ -28,7 +28,6 @@ import { HUB_KEY_TO_CONTRACT_TYPE, BEST_FOR_KEY } from '../create/contractCreate
 interface ContractType {
   key: string;
   label: string;
-  description: string;
   icon: React.ReactNode;
   accentClass: string;
   borderClass: string;
@@ -40,7 +39,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'rest-openapi',
     label: 'REST / OpenAPI',
-    description: 'Design REST APIs with OpenAPI 3.1 YAML/JSON. Visual editor with live diff and breaking-change detection.',
     icon: <Globe size={18} />,
     accentClass: 'text-accent',
     borderClass: 'border-l-accent',
@@ -50,7 +48,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'asyncapi',
     label: 'AsyncAPI 3.x',
-    description: 'Design event-driven APIs — Kafka, AMQP, SNS, WebSocket with channel schemas and payload definitions.',
     icon: <Zap size={18} />,
     accentClass: 'text-success',
     borderClass: 'border-l-success',
@@ -60,7 +57,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'soap-wsdl',
     label: 'SOAP / WSDL',
-    description: 'Design SOAP services with visual operation, message and binding editor. WSDL 1.1 and 2.0 supported.',
     icon: <Code2 size={18} />,
     accentClass: 'text-warning',
     borderClass: 'border-l-warning',
@@ -70,7 +66,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'graphql',
     label: 'GraphQL',
-    description: 'Design GraphQL schemas with SDL editor, type explorer and breaking-change detection across versions.',
     icon: <Hash size={18} />,
     accentClass: 'text-info',
     borderClass: 'border-l-info',
@@ -80,7 +75,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'protobuf',
     label: 'Protobuf / gRPC',
-    description: 'Design .proto files and gRPC services with field numbering, reserved ranges and compatibility checks.',
     icon: <FileCode2 size={18} />,
     accentClass: 'text-accent',
     borderClass: 'border-l-accent',
@@ -90,7 +84,6 @@ const CONTRACT_TYPES: ContractType[] = [
   {
     key: 'shared-schema',
     label: 'Shared Schema',
-    description: 'Reusable data schemas (JSON Schema, Avro, XSD) referenced across contracts to ensure consistency.',
     icon: <GitMerge size={18} />,
     accentClass: 'text-muted',
     borderClass: 'border-l-edge',
