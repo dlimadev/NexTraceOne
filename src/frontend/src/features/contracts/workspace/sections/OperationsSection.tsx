@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, ChevronDown, ChevronRight, Trash2, Search } from 'lucide-react';
+import { Plus, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
+import { Button, SearchInput } from '../../../../shared/ui';
 import { METHOD_COLORS as NTO_METHOD_COLORS } from '../../shared/constants';
 
 // ── Local types ───────────────────────────────────────────────────────────────
@@ -96,25 +97,18 @@ export function OperationsSection({ specContent, protocol, isReadOnly = false, o
 
         <div className="flex items-center gap-2">
           {/* Search */}
-          <div className="relative">
-            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('contracts.operations.searchPlaceholder', 'Search operations...')}
-              className="text-xs bg-elevated border border-edge rounded pl-7 pr-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent w-52"
-            />
-          </div>
+          <SearchInput
+            size="sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('contracts.operations.searchPlaceholder', 'Search operations...')}
+            className="w-52"
+          />
 
           {!isReadOnly && (
-            <button
-              onClick={onAddOperation}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium rounded bg-accent text-white hover:bg-accent/90 transition-colors"
-            >
-              <Plus size={11} />
+            <Button variant="primary" size="xs" icon={<Plus size={11} />} onClick={onAddOperation}>
               {t('contracts.operations.add', 'Add Operation')}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -160,7 +154,7 @@ function OperationRow({
 
   return (
     <div>
-      <button onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-elevated/50 transition-colors">
+      <button type="button" onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-elevated/50 transition-colors">
         {isExpanded ? <ChevronDown size={12} className="text-muted flex-shrink-0" /> : <ChevronRight size={12} className="text-muted flex-shrink-0" />}
 
         <span className={`inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-bold uppercase rounded border ${colors} min-w-[52px] text-center`}>
@@ -206,7 +200,7 @@ function OperationRow({
 
           {!isReadOnly && (
             <div className="flex items-center gap-2 pt-1 border-t border-edge mt-1">
-              <button className="text-[10px] text-critical hover:text-critical inline-flex items-center gap-1">
+              <button type="button" className="text-[10px] text-critical hover:text-critical inline-flex items-center gap-1">
                 <Trash2 size={10} /> {t('common.remove', 'Remove')}
               </button>
             </div>

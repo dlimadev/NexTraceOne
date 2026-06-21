@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, FileText, Building2, Shield, Link as LinkIcon, Calendar } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
+import { Button } from '../../../../shared/ui';
 import { CONTRACT_TYPES, LIFECYCLE_STATES } from '../../shared/constants';
 import type { StudioContract } from '../studioTypes';
 
@@ -215,12 +216,9 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
 
       {!isReadOnly && onSave && (
         <div className="flex justify-end">
-          <button
-            onClick={() => onSave(fields)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 transition-colors"
-          >
-            <Save size={12} /> {t('common.save', 'Save')}
-          </button>
+          <Button variant="primary" size="sm" icon={<Save size={12} />} onClick={() => onSave(fields)}>
+            {t('common.save', 'Save')}
+          </Button>
         </div>
       )}
     </div>

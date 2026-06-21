@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Database, ChevronDown, ChevronRight, Share2, Tag } from 'lucide-react';
+import { Database, ChevronDown, ChevronRight, Share2, Tag } from 'lucide-react';
 import { Card, CardBody } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
+import { SearchInput } from '../../../../shared/ui';
 
 // ── Local types ───────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ export function SchemasSection({ specContent, protocol, className = '' }: Schema
             {(['all', 'shared'] as const).map((f) => (
               <button
                 key={f}
+                type="button"
                 onClick={() => setFilter(f)}
                 className={`px-2.5 py-1 text-[10px] font-medium transition-colors ${
                   filter === f ? 'bg-accent text-white' : 'text-muted hover:text-heading'
@@ -103,16 +105,13 @@ export function SchemasSection({ specContent, protocol, className = '' }: Schema
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('contracts.schemas.searchPlaceholder', 'Search schemas...')}
-              className="text-xs bg-elevated border border-edge rounded pl-7 pr-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent w-48"
-            />
-          </div>
+          <SearchInput
+            size="sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('contracts.schemas.searchPlaceholder', 'Search schemas...')}
+            className="w-48"
+          />
         </div>
       </div>
 
@@ -152,7 +151,7 @@ function SchemaCard({
 
   return (
     <Card>
-      <button onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
+      <button type="button" onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
         {isExpanded ? <ChevronDown size={12} className="text-muted flex-shrink-0" /> : <ChevronRight size={12} className="text-muted flex-shrink-0" />}
 
         <Database size={14} className="text-accent flex-shrink-0" />

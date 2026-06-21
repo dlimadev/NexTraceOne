@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { GitCompare, Clock, ArrowRight, AlertTriangle, Plus, Minus, RefreshCw, Info } from 'lucide-react';
+import { GitCompare, Clock, ArrowRight, AlertTriangle, Plus, Minus, Info } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
+import { Button, Select } from '../../../../shared/ui';
 import { LifecycleBadge } from '../../shared/components';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
 import { contractsApi } from '../../api/contracts';
@@ -118,38 +119,40 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-3 mb-4">
-            <select
+            <Select
+              size="sm"
+              className="flex-1"
               value={baseVersionId}
               onChange={(e) => setBaseVersionId(e.target.value)}
-              className="flex-1 text-xs bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              <option value="">{t('contracts.diff.selectBaseVersion', 'Select Base Version')}</option>
-              {versions.map((v: ContractVersion) => (
-                <option key={v.id} value={v.id}>v{v.version} — {v.lifecycleState}</option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: t('contracts.diff.selectBaseVersion', 'Select Base Version') },
+                ...versions.map((v: ContractVersion) => ({ value: v.id, label: `v${v.version} — ${v.lifecycleState}` })),
+              ]}
+            />
 
             <ArrowRight size={14} className="text-muted flex-shrink-0" />
 
-            <select
+            <Select
+              size="sm"
+              className="flex-1"
               value={targetVersionId}
               onChange={(e) => setTargetVersionId(e.target.value)}
-              className="flex-1 text-xs bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              <option value="">{t('contracts.diff.selectTargetVersion', 'Select Target Version')}</option>
-              {versions.map((v: ContractVersion) => (
-                <option key={v.id} value={v.id}>v{v.version} — {v.lifecycleState}</option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: t('contracts.diff.selectTargetVersion', 'Select Target Version') },
+                ...versions.map((v: ContractVersion) => ({ value: v.id, label: `v${v.version} — ${v.lifecycleState}` })),
+              ]}
+            />
 
-            <button
-              onClick={() => diffMutation.mutate()}
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<GitCompare size={12} />}
+              loading={diffMutation.isPending}
               disabled={!baseVersionId || !targetVersionId || diffMutation.isPending}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              onClick={() => diffMutation.mutate()}
             >
-              {diffMutation.isPending ? <RefreshCw size={12} className="animate-spin" /> : <GitCompare size={12} />}
               {t('contracts.diff.computeDiff', 'Compute Diff')}
-            </button>
+            </Button>
           </div>
 
           {/* Diff results */}
