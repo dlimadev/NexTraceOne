@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../../../lib/cn';
+import { Tabs } from '../../../../components/Tabs';
 import { WORKSPACE_SECTIONS, WORKSPACE_SECTION_GROUPS } from '../../shared/constants';
 import type { WorkspaceSectionId } from '../../types';
 
@@ -17,28 +18,16 @@ export function WorkspaceTabs({ activeSection, onSelect }: WorkspaceTabsProps) {
 
   return (
     <div className="mb-5">
-      <div role="tablist" className="flex gap-1 border-b border-edge overflow-x-auto">
-        {WORKSPACE_SECTION_GROUPS.map((group) => {
-          const isActive = group.key === activeGroup;
-          const first = WORKSPACE_SECTIONS.find((s) => s.group === group.key);
-          return (
-            <button
-              key={group.key}
-              role="tab"
-              type="button"
-              aria-selected={isActive}
-              onClick={() => first && onSelect(first.id)}
-              className={cn(
-                'px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors',
-                isActive ? 'text-accent border-accent' : 'text-muted border-transparent hover:text-heading',
-              )}
-            >
-              {t(group.labelKey, group.key)}
-            </button>
-          );
-        })}
-      </div>
-      <div className="flex flex-wrap gap-1.5 mt-3">
+      <Tabs
+        items={WORKSPACE_SECTION_GROUPS.map((g) => ({ id: g.key, label: t(g.labelKey, g.key) }))}
+        activeId={activeGroup}
+        onChange={(groupKey) => {
+          const first = WORKSPACE_SECTIONS.find((s) => s.group === groupKey);
+          if (first) onSelect(first.id);
+        }}
+        className="overflow-x-auto"
+      />
+      <div aria-label={t('contracts.workspace.sectionNav', 'Sections')} className="flex flex-wrap gap-1.5 mt-3">
         {sectionsInGroup.map((section) => {
           const isActive = section.id === activeSection;
           return (

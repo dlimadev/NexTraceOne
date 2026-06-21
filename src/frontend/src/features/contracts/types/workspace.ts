@@ -27,7 +27,8 @@ export type WorkspaceSectionGroup =
   | 'overview'
   | 'contract'
   | 'governance'
-  | 'relationships';
+  | 'relationships'
+  | 'ai';
 
 /** Definição de uma secção do workspace. */
 export interface WorkspaceSectionDef {
