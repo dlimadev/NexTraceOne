@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ContractWorkspacePage } from '../../features/contracts/workspace/ContractWorkspacePage';
 
+vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k: string, d?: string) => d ?? k }) }));
+
 vi.mock('monaco-editor', () => ({ default: {} }));
 vi.mock('@monaco-editor/react', () => ({
   default: vi.fn(() => null),
@@ -55,6 +57,30 @@ function renderPage() {
   );
 }
 
+function renderLoaded() {
+  vi.mocked(useContractDetail).mockReturnValue({
+    data: {
+      id: 'c1', apiAssetId: 'a1', apiName: 'payments-api', serviceName: 'payments-api',
+      serviceDisplayName: 'Payments API', semVer: '2.1.0', format: 'yaml', protocol: 'OpenApi',
+      specContent: '', lifecycleState: 'Approved', isLocked: false, serviceType: 'RestApi',
+      domain: 'payments', technicalOwner: 'ana', teamName: 'Payments',
+      createdAt: '2026-01-01T00:00:00Z', consumers: [], ruleViolations: [],
+    },
+    isLoading: false, isError: false, refetch: vi.fn(),
+  } as never);
+  vi.mocked(useContractViolations).mockReturnValue({ data: [], isLoading: false } as never);
+  vi.mocked(useContractTransition).mockReturnValue({ mutate: vi.fn() } as never);
+  vi.mocked(useContractExport).mockReturnValue({ exportVersion: vi.fn() } as never);
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/contracts/workspace/cversion-1']}>
+        <Routes><Route path="/contracts/workspace/:contractVersionId" element={<ContractWorkspacePage />} /></Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
 describe('ContractWorkspacePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -68,5 +94,12 @@ describe('ContractWorkspacePage', () => {
   it('shows loading state', () => {
     renderPage();
     expect(document.body).toBeDefined();
+  });
+
+  it('renders the identity card and group tabs when loaded', () => {
+    renderLoaded();
+    // technicalName aparece no PageHeader e no identity card
+    expect(screen.getAllByText('payments-api').length).toBeGreaterThan(0);
+    expect(screen.getByRole('tab', { name: /overview/i })).toBeInTheDocument();
   });
 });

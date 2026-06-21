@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { PageHeader } from '../../../components/PageHeader';
 import { WorkspaceLayout } from './WorkspaceLayout';
-import { ContractHeader, ContractQuickActions } from '../shared/components';
+import { WorkspaceTabs } from './components/WorkspaceTabs';
+import { ContractWorkspaceIdentityCard } from './components/ContractWorkspaceIdentityCard';
+import { ContractLifecycleActions } from './components/ContractLifecycleActions';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import {
   SummarySection,
@@ -45,6 +48,8 @@ export function ContractWorkspacePage() {
   const violationsQuery = useContractViolations(contractVersionId);
   const transition = useContractTransition(contractVersionId);
   const { exportVersion } = useContractExport();
+
+  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('summary');
 
   const studioContract = useMemo(() => {
     if (!detailQuery.data) return null;
@@ -191,36 +196,24 @@ export function ContractWorkspacePage() {
   return (
     <WorkspaceLayout
       header={
-        <ContractHeader
+        <PageHeader
           title={studioContract.technicalName}
-          friendlyName={studioContract.friendlyName}
-          version={detail.semVer}
-          protocol={detail.protocol}
-          lifecycleState={detail.lifecycleState}
-          serviceType={studioContract.serviceType}
-          domain={studioContract.domain || undefined}
-          owner={studioContract.owner || undefined}
-          isLocked={detail.isLocked}
-          isSigned={!!detail.signedBy}
+          subtitle={`${detail.protocol} · v${detail.semVer}${studioContract.domain ? ` · ${studioContract.domain}` : ''}`}
           actions={
-            <ContractQuickActions
+            <ContractLifecycleActions
               lifecycleState={detail.lifecycleState as ContractLifecycleState}
               isLocked={detail.isLocked}
-              isSigned={!!detail.signedBy}
               onTransition={handleTransition}
               onExport={handleExport}
             />
           }
         />
       }
-      rail={
-        <StudioRail
-          contract={studioContract}
-          onTransition={handleTransition}
-        />
-      }
+      identityCard={<ContractWorkspaceIdentityCard contract={studioContract} />}
+      rail={<StudioRail contract={studioContract} />}
     >
-      {(section, navigate) => renderSection(section, navigate)}
+      <WorkspaceTabs activeSection={activeSection} onSelect={setActiveSection} />
+      {renderSection(activeSection, setActiveSection)}
     </WorkspaceLayout>
   );
 }
