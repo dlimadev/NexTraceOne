@@ -33,8 +33,7 @@ import {
   useContractExport,
 } from '../hooks';
 import { toStudioContract } from './toStudioContract';
-import type { WorkspaceSectionId } from '../types';
-import type { ContractLifecycleState } from '../types';
+import type { WorkspaceSectionId, ContractLifecycleState } from '../types';
 
 /**
  * Página principal do studio de contrato.
