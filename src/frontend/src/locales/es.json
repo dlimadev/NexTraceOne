@@ -5307,7 +5307,11 @@
       "contract": "Contrato",
       "definition": "Definition",
       "groups": {
-        "ai": "IA"
+        "ai": "IA",
+        "contract": "Contrato",
+        "governance": "Gobernanza",
+        "overview": "Vista general",
+        "relationships": "Relaciones"
       },
       "lineCount": "{{count}} líneas",
       "lines": "líneas",
@@ -5353,7 +5357,12 @@
       "versioning": "Versionado",
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Diseñe su contrato visualmente sin escribir código de especificación. Configure endpoints, schemas, seguridad y más a través de una interfaz intuitiva basada en formularios.",
-      "visualBuilderTitle": "Constructor Visual"
+      "visualBuilderTitle": "Constructor Visual",
+      "approvals": "Aprobaciones",
+      "scorecard": "Scorecard",
+      "consumers": "Consumidores",
+      "dependencies": "Dependencias",
+      "deployments": "Despliegues"
     },
     "playground": {
       "placeholder": {

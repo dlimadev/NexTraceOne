@@ -4009,7 +4009,11 @@
       "contract": "Contract",
       "definition": "Definition",
       "groups": {
-        "ai": "AI"
+        "ai": "AI",
+        "contract": "Contract",
+        "governance": "Governance",
+        "overview": "Overview",
+        "relationships": "Relationships"
       },
       "lineCount": "{{count}} lines",
       "lines": "lines",
@@ -4055,7 +4059,12 @@
       "versioning": "Versioning",
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Design your contract visually without writing specification code. Configure endpoints, schemas, security and more through an intuitive form-based interface.",
-      "visualBuilderTitle": "Visual Builder"
+      "visualBuilderTitle": "Visual Builder",
+      "approvals": "Approvals",
+      "scorecard": "Scorecard",
+      "consumers": "Consumers",
+      "dependencies": "Dependencies",
+      "deployments": "Deployments"
     },
     "playground": {
       "placeholder": {
