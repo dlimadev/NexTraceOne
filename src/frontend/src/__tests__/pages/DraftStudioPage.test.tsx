@@ -35,6 +35,8 @@ vi.mock('../../features/contracts/api/contractStudio', () => ({
     publishDraft: vi.fn(),
     deleteDraft: vi.fn(),
     updateDraft: vi.fn(),
+    updateContent: vi.fn(),
+    updateMetadata: vi.fn(),
   },
 }));
 
@@ -58,7 +60,7 @@ import { serviceCatalogApi } from '../../features/catalog/api/serviceCatalog';
 
 function renderPage() {
   vi.mocked(contractStudioApi.getDraft).mockResolvedValue(null as never);
-  vi.mocked(serviceCatalogApi.listServices).mockResolvedValue({ services: [], totalCount: 0 } as never);
+  vi.mocked(serviceCatalogApi.listServices).mockResolvedValue({ items: [], totalCount: 0 } as never);
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
