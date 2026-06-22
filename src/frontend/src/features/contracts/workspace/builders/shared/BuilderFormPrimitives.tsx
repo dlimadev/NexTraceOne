@@ -5,7 +5,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { X, Plus, Trash2 } from 'lucide-react';
 
 const INPUT_CLASS =
   'w-full text-xs bg-elevated border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent';
@@ -239,5 +239,61 @@ export function BuilderSubSection({
       </h4>
       {children}
     </div>
+  );
+}
+
+const ADD_BUTTON_CLASS =
+  'inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+
+/** Pílula "Add X" canónica partilhada pelos visual builders. */
+export function AddButton({
+  label,
+  onClick,
+  disabled,
+  iconSize = 10,
+  className,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  iconSize?: number;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`${ADD_BUTTON_CLASS} ${className ?? ''}`}
+    >
+      <Plus size={iconSize} /> {label}
+    </button>
+  );
+}
+
+/** Afordância de remover linha (Trash2). `className` passthrough preserva reveal/spacing por call site. */
+export function RemoveIconButton({
+  onClick,
+  title,
+  disabled,
+  iconSize = 12,
+  className,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  title?: string;
+  disabled?: boolean;
+  iconSize?: number;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`text-muted hover:text-danger ${className ?? ''}`}
+    >
+      <Trash2 size={iconSize} />
+    </button>
   );
 }
