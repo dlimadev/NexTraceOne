@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Database,
   Plus,
-  Search,
   Tag,
   ChevronDown,
   ChevronRight,
@@ -17,6 +16,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
+import { Button, IconButton, SearchInput, Select } from '../../../shared/ui';
 import { stateToVariant } from '../lib/contractVariants';
 import { useCanonicalEntities, useCanonicalEntityUsages } from '../hooks';
 import type { CanonicalEntity, CanonicalEntityState } from '../types';
@@ -60,48 +60,42 @@ export function CanonicalEntityCatalogPage() {
         title={t('contracts.canonical.catalog.title', 'Canonical Entities')}
         subtitle={t('contracts.canonical.catalog.subtitle', 'Standardized, reusable schemas and models for contract governance.')}
         actions={
-          <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
-            <Plus size={14} />
+          <Button variant="primary" size="sm" icon={<Plus size={14} />}>
             {t('contracts.canonical.catalog.create', 'Add Entity')}
-          </button>
+          </Button>
         }
       />
 
       {/* Search & filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[240px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('contracts.canonical.catalog.searchPlaceholder', 'Search canonical entities...')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-elevated/50 border border-edge/20 text-heading placeholder:text-muted focus:border-accent/40 focus:outline-none"
-          />
-        </div>
+        <SearchInput
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={t('contracts.canonical.catalog.searchPlaceholder', 'Search canonical entities...')}
+          className="flex-1 min-w-[240px]"
+          size="sm"
+        />
 
-        <select
+        <Select
           value={stateFilter}
           onChange={(e) => setStateFilter(e.target.value as CanonicalEntityState | '')}
-          className="px-3 py-2 text-xs rounded-lg bg-elevated/50 border border-edge/20 text-heading focus:border-accent/40 focus:outline-none"
-        >
-          <option value="">{t('contracts.canonical.catalog.allStates', 'All States')}</option>
-          {(['Draft', 'Published', 'Deprecated', 'Retired'] as const).map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+          options={[
+            { value: '', label: t('contracts.canonical.catalog.allStates', 'All States') },
+            ...(['Draft', 'Published', 'Deprecated', 'Retired'] as const).map((s) => ({ value: s, label: s })),
+          ]}
+          size="sm"
+        />
 
         {domains.length > 0 && (
-          <select
+          <Select
             value={domainFilter}
             onChange={(e) => setDomainFilter(e.target.value)}
-            className="px-3 py-2 text-xs rounded-lg bg-elevated/50 border border-edge/20 text-heading focus:border-accent/40 focus:outline-none"
-          >
-            <option value="">{t('contracts.canonical.catalog.allDomains', 'All Domains')}</option>
-            {domains.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+            options={[
+              { value: '', label: t('contracts.canonical.catalog.allDomains', 'All Domains') },
+              ...domains.map((d) => ({ value: d, label: d })),
+            ]}
+            size="sm"
+          />
         )}
 
         <span className="text-xs text-muted">
@@ -159,9 +153,13 @@ function CanonicalEntityCard({
     <Card>
       <CardBody>
         <div className="flex items-center gap-3">
-          <button onClick={onToggle} className="text-muted hover:text-heading transition-colors">
-            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          </button>
+          <IconButton
+            onClick={onToggle}
+            icon={isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            label={t('contracts.canonical.catalog.toggleDetail', 'Toggle detail')}
+            variant="ghost"
+            size="sm"
+          />
 
           <Database size={16} className="text-accent" />
 
