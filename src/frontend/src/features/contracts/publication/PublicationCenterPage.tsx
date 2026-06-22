@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   EyeOff, AlertTriangle, Clock,
@@ -27,6 +27,7 @@ import { cn } from '../../../lib/cn';
  */
 export function PublicationCenterPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [withdrawTarget, setWithdrawTarget] = useState<ContractPublicationEntry | null>(null);
   const [withdrawReason, setWithdrawReason] = useState('');
@@ -60,11 +61,9 @@ export function PublicationCenterPage() {
           'Manage which contract versions are visible in the Developer Portal. Only Approved or Locked contracts can be published.',
         )}
         actions={
-          <Link to="/contracts/studio/new">
-            <Button variant="primary" size="sm" icon={<Plus size={14} />}>
-              {t('contracts.publication.newContract', 'New Contract')}
-            </Button>
-          </Link>
+          <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => navigate('/contracts/studio/new')}>
+            {t('contracts.publication.newContract', 'New Contract')}
+          </Button>
         }
       />
 
