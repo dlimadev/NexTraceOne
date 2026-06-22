@@ -7,10 +7,10 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
-  Field, FieldArea, FieldSelect, FieldCheckbox,
+  AddButton, Field, FieldArea, FieldSelect, FieldCheckbox, RemoveIconButton,
 } from './shared/BuilderFormPrimitives';
 import { validateDataContractBuilder } from './shared/builderValidation';
 import { dataContractBuilderToJson } from './shared/builderSync';
@@ -205,13 +205,7 @@ export function VisualDataContractBuilder({
               {t('contracts.builder.dataContract.columns', 'Columns')} ({state.columns.length})
             </h3>
             {!isReadOnly && (
-              <button
-                type="button"
-                onClick={addColumn}
-                className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-              >
-                <Plus size={10} /> {t('contracts.builder.dataContract.addColumn', 'Add Column')}
-              </button>
+              <AddButton label={t('contracts.builder.dataContract.addColumn', 'Add Column')} onClick={addColumn} />
             )}
           </div>
         </CardHeader>
@@ -247,13 +241,7 @@ export function VisualDataContractBuilder({
                       PII:{col.pii}
                     </span>
                     {!isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); removeColumn(col.id); }}
-                        className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                      <RemoveIconButton onClick={(e) => { e.stopPropagation(); removeColumn(col.id); }} className="opacity-0 group-hover:opacity-100 transition-all" />
                     )}
                   </button>
                   {isExpanded && (

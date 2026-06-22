@@ -12,10 +12,10 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
-  Field, FieldArea, FieldSelect,
+  AddButton, Field, FieldArea, FieldSelect, RemoveIconButton,
 } from './shared/BuilderFormPrimitives';
 import { validateLegacyContractBuilder } from './shared/builderValidation';
 import { legacyContractBuilderToYaml } from './shared/builderSync';
@@ -300,9 +300,7 @@ export function VisualLegacyContractBuilder({
               {t('contracts.builder.rest.parameters', 'Fields')} ({state.fields.length})
             </h3>
             {!isReadOnly && (
-              <button type="button" onClick={addField} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                <Plus size={10} /> {t('contracts.builder.legacy.addField', 'Add Field')}
-              </button>
+              <AddButton label={t('contracts.builder.legacy.addField', 'Add Field')} onClick={addField} />
             )}
           </div>
         </CardHeader>
@@ -324,9 +322,7 @@ export function VisualLegacyContractBuilder({
                     <span className="text-[10px] text-muted">{f.type}</span>
                     {f.picture && <span className="text-[10px] text-muted font-mono truncate max-w-[100px]">{f.picture}</span>}
                     {!isReadOnly && (
-                      <button type="button" onClick={(e) => { e.stopPropagation(); removeField(f.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
-                        <Trash2 size={12} />
-                      </button>
+                      <RemoveIconButton onClick={(e) => { e.stopPropagation(); removeField(f.id); }} className="opacity-0 group-hover:opacity-100 transition-all" />
                     )}
                   </button>
                   {isExpanded && (

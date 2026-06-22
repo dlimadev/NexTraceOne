@@ -12,11 +12,11 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, AlertTriangle, Copy, Sparkles, Zap, ClipboardCopy, Check, Braces,
+  Plus, ChevronDown, ChevronRight, AlertCircle, AlertTriangle, Copy, Sparkles, Zap, ClipboardCopy, Check, Braces,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
-  Field, FieldArea, FieldSelect, FieldCheckbox, FieldTagInput,
+  Field, FieldArea, FieldSelect, FieldCheckbox, FieldTagInput, AddButton, RemoveIconButton,
 } from './shared/BuilderFormPrimitives';
 import { SchemaPropertyEditor } from './shared/SchemaPropertyEditor';
 import { validateRestBuilder } from './shared/builderValidation';
@@ -353,11 +353,7 @@ export function VisualRestBuilder({
                       {schema.properties.length} {t('contracts.builder.rest.propsCount', 'props')}
                     </span>
                     {!isReadOnly && (
-                      <button type="button"
-                        onClick={(e) => { e.stopPropagation(); update({ schemas: (state.schemas ?? []).filter((s) => s.id !== schema.id) }); }}
-                        className="text-muted hover:text-danger transition-colors opacity-0 group-hover:opacity-100">
-                        <Trash2 size={12} />
-                      </button>
+                      <RemoveIconButton onClick={(e) => { e.stopPropagation(); update({ schemas: (state.schemas ?? []).filter((s) => s.id !== schema.id) }); }} className="transition-colors opacity-0 group-hover:opacity-100" />
                     )}
                   </div>
                   {isSchemaExpanded && (
@@ -427,12 +423,7 @@ export function VisualRestBuilder({
               {t('contracts.builder.rest.endpoints', 'Endpoints')} ({state.endpoints.length})
             </h3>
             {!isReadOnly && (
-              <button type="button"
-                onClick={addEndpoint}
-                className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-              >
-                <Plus size={10} /> {t('contracts.builder.rest.addEndpoint', 'Add Endpoint')}
-              </button>
+              <AddButton label={t('contracts.builder.rest.addEndpoint', 'Add Endpoint')} onClick={addEndpoint} />
             )}
           </div>
         </CardHeader>
@@ -484,12 +475,7 @@ export function VisualRestBuilder({
                           >
                             <Copy size={12} />
                           </button>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); removeEndpoint(ep.id); }}
-                            className="text-muted hover:text-danger transition-colors"
-                          >
-                            <Trash2 size={12} />
-                          </button>
+                          <RemoveIconButton onClick={(e) => { e.stopPropagation(); removeEndpoint(ep.id); }} className="transition-colors" />
                         </>
                       )}
                     </div>
@@ -618,8 +604,7 @@ export function VisualRestBuilder({
                                   </button>
                                 )}
                                 {!isReadOnly && (
-                                  <button type="button" onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })}
-                                    className="text-muted hover:text-danger transition-colors"><Trash2 size={11} /></button>
+                                  <RemoveIconButton onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })} iconSize={11} className="transition-colors" />
                                 )}
                               </div>
                             </div>
