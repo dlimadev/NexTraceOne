@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeftRight, Code2, Copy, ChevronDown, ChevronUp, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
+import { Button, IconButton, Select } from '../../../shared/ui';
 import { contractsApi } from '../api/contracts';
 import { cn } from '../../../lib/cn';
 import type { MigrationPatchResult, MigrationSuggestion } from '../../../types';
@@ -60,16 +61,16 @@ export function ContractMigrationPage() {
   };
 
   const severityIcon = (s: MigrationSuggestion['severity']) => {
-    if (s === 'high') return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    if (s === 'medium') return <Info className="h-4 w-4 text-yellow-500" />;
-    return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+    if (s === 'high') return <AlertTriangle className="h-4 w-4 text-critical" />;
+    if (s === 'medium') return <Info className="h-4 w-4 text-warning" />;
+    return <CheckCircle2 className="h-4 w-4 text-success" />;
   };
 
   const severityBadge = (s: MigrationSuggestion['severity']) => {
     const base = 'inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium';
-    if (s === 'high') return cn(base, 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300');
-    if (s === 'medium') return cn(base, 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300');
-    return cn(base, 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300');
+    if (s === 'high') return cn(base, 'bg-critical-muted text-critical');
+    if (s === 'medium') return cn(base, 'bg-warning-muted text-warning');
+    return cn(base, 'bg-success-muted text-success');
   };
 
   function SuggestionCard({ suggestion, idx, side }: { suggestion: MigrationSuggestion; idx: number; side: string }) {
@@ -91,28 +92,31 @@ export function ContractMigrationPage() {
             <p className="text-sm text-body">{suggestion.description}</p>
             {suggestion.codeHint && (
               <div className="mt-2">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  className="text-accent hover:text-accent/80"
                   onClick={() => toggleHint(hintKey)}
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
                 >
                   <Code2 className="h-3.5 w-3.5" />
                   {t('contracts.migrationCodeHint')}
                   {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                </button>
+                </Button>
                 {isExpanded && (
                   <div className="mt-2 relative">
-                    <pre className="overflow-x-auto rounded bg-canvas p-3 text-xs text-green-300 whitespace-pre-wrap">
+                    <pre className="overflow-x-auto rounded bg-canvas p-3 text-xs text-success whitespace-pre-wrap">
                       {suggestion.codeHint}
                     </pre>
-                    <button
-                      type="button"
+                    <IconButton
+                      icon={<Copy className="h-3.5 w-3.5" />}
+                      label={t('contracts.migrationCopyHint')}
                       title={t('contracts.migrationCopyHint')}
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2"
                       onClick={() => copyHint(suggestion.codeHint!)}
-                      className="absolute top-2 right-2 rounded bg-elevated p-1 text-faded hover:bg-elevated hover:text-white"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
+                    />
                   </div>
                 )}
               </div>
@@ -139,38 +143,36 @@ export function ContractMigrationPage() {
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationBaseVersion')}
           </h3>
-          <select
+          <Select
             aria-label={t('contracts.migrationSelectBaseVersion')}
             value={baseVersionId}
             onChange={(e) => setBaseVersionId(e.target.value)}
-            className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:border-accent focus:outline-none"
-          >
-            <option value="">{t('contracts.migrationSelectBaseVersion')}</option>
-            {contracts.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.apiAssetId} — v{c.version} [{c.protocol}]
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: '', label: t('contracts.migrationSelectBaseVersion') },
+              ...contracts.map((c) => ({
+                value: c.id ?? '',
+                label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
+              })),
+            ]}
+          />
         </div>
 
         <div className="rounded-lg border border-edge bg-card p-5">
           <h3 className="mb-4 text-sm font-semibold text-body">
             {t('contracts.migrationTargetVersion')}
           </h3>
-          <select
+          <Select
             aria-label={t('contracts.migrationSelectTargetVersion')}
             value={targetVersionId}
             onChange={(e) => setTargetVersionId(e.target.value)}
-            className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:border-accent focus:outline-none"
-          >
-            <option value="">{t('contracts.migrationSelectTargetVersion')}</option>
-            {contracts.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.apiAssetId} — v{c.version} [{c.protocol}]
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: '', label: t('contracts.migrationSelectTargetVersion') },
+              ...contracts.map((c) => ({
+                value: c.id ?? '',
+                label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
+              })),
+            ]}
+          />
         </div>
 
         <div className="rounded-lg border border-edge bg-card p-5">
@@ -179,19 +181,15 @@ export function ContractMigrationPage() {
           </h3>
           <div className="flex flex-wrap gap-2">
             {(['all', 'provider', 'consumer'] as const).map((side) => (
-              <button
+              <Button
                 key={side}
                 type="button"
+                size="sm"
+                variant={targetSide === side ? 'primary' : 'secondary'}
                 onClick={() => setTargetSide(side)}
-                className={cn(
-                  'rounded-md px-4 py-2 text-sm font-medium transition-colors',
-                  targetSide === side
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-edge bg-card text-body hover:bg-hover',
-                )}
               >
                 {t(`contracts.migrationSide${side.charAt(0).toUpperCase() + side.slice(1) as 'All' | 'Provider' | 'Consumer'}`)}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -202,19 +200,15 @@ export function ContractMigrationPage() {
           </h3>
           <div className="flex flex-wrap gap-2">
             {['C#', 'TypeScript', 'JavaScript', 'Java', 'Python'].map((lang) => (
-              <button
+              <Button
                 key={lang}
                 type="button"
+                size="sm"
+                variant={language === lang ? 'primary' : 'secondary'}
                 onClick={() => setLanguage(lang)}
-                className={cn(
-                  'rounded-md px-4 py-2 text-sm font-medium transition-colors',
-                  language === lang
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-edge bg-card text-body hover:bg-hover',
-                )}
               >
                 {lang}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -222,25 +216,22 @@ export function ContractMigrationPage() {
 
       {/* Generate Button */}
       <div className="mt-6 flex justify-end">
-        <button
+        <Button
           type="button"
-          disabled={!canGenerate || migrationMutation.isPending}
+          variant="primary"
+          size="lg"
+          disabled={!canGenerate}
+          loading={migrationMutation.isPending}
+          icon={<ArrowLeftRight className="h-4 w-4" />}
           onClick={() => migrationMutation.mutate()}
-          className={cn(
-            'inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-colors',
-            canGenerate && !migrationMutation.isPending
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : 'cursor-not-allowed bg-elevated',
-          )}
         >
-          <ArrowLeftRight className="h-4 w-4" />
           {migrationMutation.isPending ? t('contracts.migrationLoading') : t('contracts.migrationGenerate')}
-        </button>
+        </Button>
       </div>
 
       {/* Error */}
       {migrationMutation.isError && (
-        <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300">
+        <div className="mt-4 rounded-lg bg-critical-muted border border-critical/25 p-4 text-sm text-critical">
           {(migrationMutation.error as Error)?.message ?? 'An error occurred.'}
         </div>
       )}
@@ -296,7 +287,7 @@ export function ContractMigrationPage() {
           {/* Empty state */}
           {patch.providerSuggestions.length === 0 && patch.consumerSuggestions.length === 0 && (
             <div className="rounded-lg border border-edge bg-card p-8 text-center">
-              <CheckCircle2 className="mx-auto mb-3 h-8 w-8 text-green-500" />
+              <CheckCircle2 className="mx-auto mb-3 h-8 w-8 text-success" />
               <p className="text-sm text-muted">{t('contracts.migrationEmpty')}</p>
             </div>
           )}

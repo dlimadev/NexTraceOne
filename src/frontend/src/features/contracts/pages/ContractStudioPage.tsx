@@ -19,6 +19,7 @@ import {
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../shared/ui';
 import { useContractsSummary, useContractList } from '../hooks';
 import type { ContractListItem } from '../../../types';
 import { HUB_KEY_TO_CONTRACT_TYPE, BEST_FOR_KEY } from '../create/contractCreateConstants';
@@ -128,16 +129,17 @@ function StatCard({ testId, label, value, loading }: StatCardProps) {
 
 function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () => void }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="xs"
       onClick={onResume}
-      className="group flex-shrink-0 w-56 text-left rounded-md border border-edge bg-card hover:bg-elevated hover:border-edge-strong transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-accent p-3"
+      className="group flex-shrink-0 w-56 flex-col items-start justify-start border border-edge bg-card hover:bg-elevated hover:border-edge-strong p-3 h-auto gap-0"
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 w-full">
         <Badge variant="warning" size="sm">{item.lifecycleState}</Badge>
         <Clock size={11} className="text-faded" />
       </div>
-      <p className="text-xs font-semibold text-heading truncate mb-1">
+      <p className="text-xs font-semibold text-heading truncate mb-1 w-full">
         {item.apiName ?? item.name ?? 'Untitled'}
       </p>
       <p className="text-[11px] text-faded font-mono">{item.protocol}</p>
@@ -145,7 +147,7 @@ function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () =>
         <span>Resume</span>
         <ArrowRight size={10} />
       </div>
-    </button>
+    </Button>
   );
 }
 
@@ -221,20 +223,22 @@ function ContractTypeCard({ type, onSelect, onDesign, onImport }: ContractTypeCa
         className="px-4 pb-3 flex items-center gap-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="xs"
+          className="border border-edge hover:border-edge-strong"
           onClick={(e) => { e.stopPropagation(); onDesign(); }}
-          className="text-[11px] font-medium text-muted hover:text-heading px-2 py-1 rounded border border-edge hover:border-edge-strong transition-colors"
         >
           {t('contracts.create.modeVisual', 'Design')}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="ghost"
+          size="xs"
+          className="border border-edge hover:border-edge-strong"
           onClick={(e) => { e.stopPropagation(); onImport(); }}
-          className="text-[11px] font-medium text-muted hover:text-heading px-2 py-1 rounded border border-edge hover:border-edge-strong transition-colors"
         >
           {t('contracts.create.modeImport', 'Import')}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -261,14 +265,14 @@ export function ContractStudioPage() {
         subtitle={t('contractStudio.subtitle')}
         icon={<LayoutGrid size={20} />}
         actions={
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={13} />}
             onClick={() => navigate('/contracts/new')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 transition-colors"
           >
-            <Plus size={13} />
             {t('contractStudio.newContract')}
-          </button>
+          </Button>
         }
       />
 

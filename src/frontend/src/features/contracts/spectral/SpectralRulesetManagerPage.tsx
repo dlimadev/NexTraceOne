@@ -14,6 +14,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
+import { Button, IconButton } from '../../../shared/ui';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset, useCreateSpectralRuleset } from '../hooks';
 import { CreateRulesetModal } from './CreateRulesetModal';
@@ -53,14 +54,14 @@ export function SpectralRulesetManagerPage() {
         title={t('contracts.spectral.manager.title', 'Spectral Rulesets')}
         subtitle={t('contracts.spectral.manager.subtitle', 'Manage linting rulesets for contract validation and governance.')}
         actions={
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Plus size={14} />}
             onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors"
           >
-            <Plus size={14} />
             {t('contracts.spectral.manager.create', 'Add Ruleset')}
-          </button>
+          </Button>
         }
       />
 
@@ -87,12 +88,13 @@ export function SpectralRulesetManagerPage() {
               <CardBody>
                 <div className="flex items-center gap-3">
                   {/* Expand toggle */}
-                  <button type="button"
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    label={isExpanded ? t('common.collapse', 'Collapse') : t('common.expand', 'Expand')}
                     onClick={() => setExpandedId(isExpanded ? null : ruleset.id)}
-                    className="text-muted hover:text-heading transition-colors"
-                  >
-                    {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                  </button>
+                  />
 
                   {/* Icon */}
                   <FileCode size={16} className="text-accent" />
@@ -116,30 +118,27 @@ export function SpectralRulesetManagerPage() {
                   </div>
 
                   {/* Active toggle */}
-                  <button type="button"
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={ruleset.isActive ? <ToggleRight size={20} className="text-mint" /> : <ToggleLeft size={20} className="text-muted" />}
+                    label={ruleset.isActive ? t('contracts.spectral.manager.deactivate', 'Deactivate') : t('contracts.spectral.manager.activate', 'Activate')}
+                    title={ruleset.isActive ? t('contracts.spectral.manager.deactivate', 'Deactivate') : t('contracts.spectral.manager.activate', 'Activate')}
                     onClick={() => handleToggle(ruleset)}
                     disabled={toggleMutation.isPending}
-                    className="text-muted hover:text-heading transition-colors"
-                    title={ruleset.isActive
-                      ? t('contracts.spectral.manager.deactivate', 'Deactivate')
-                      : t('contracts.spectral.manager.activate', 'Activate')}
-                  >
-                    {ruleset.isActive ? (
-                      <ToggleRight size={20} className="text-mint" />
-                    ) : (
-                      <ToggleLeft size={20} className="text-muted" />
-                    )}
-                  </button>
+                  />
 
                   {/* Delete */}
-                  <button type="button"
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={<Trash2 size={14} />}
+                    label={t('common.delete', 'Delete')}
+                    title={t('common.delete', 'Delete')}
                     onClick={() => handleDelete(ruleset.id)}
                     disabled={deleteMutation.isPending}
-                    className="text-muted hover:text-danger transition-colors"
-                    title={t('common.delete', 'Delete')}
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                    className="hover:text-danger"
+                  />
                 </div>
 
                 {/* Expanded detail */}

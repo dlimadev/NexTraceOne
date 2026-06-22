@@ -8,7 +8,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
-import { cn } from '../../../lib/cn';
+import { Button, Tabs } from '../../../shared/ui';
 import { computeGovernanceInsights, computePolicyChecks } from './ContractGovernanceHelpers';
 import { OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView } from './ContractGovernanceViews';
 import type { GovernanceView } from './ContractGovernanceHelpers';
@@ -61,34 +61,26 @@ export function ContractGovernancePage() {
         title={t('contracts.governance.title', 'Contract Governance')}
         subtitle={t('contracts.governance.subtitle', 'Compliance overview, risk areas, and governance actions for all contracts.')}
         actions={
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<RefreshCw size={14} />}
             onClick={() => { summaryQuery.refetch(); listQuery.refetch(); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted hover:text-accent transition-colors"
           >
-            <RefreshCw size={14} />
             {t('common.refresh', 'Refresh')}
-          </button>
+          </Button>
         }
       />
 
       {/* View tabs */}
-      <div className="flex items-center gap-1 border-b border-edge overflow-x-auto mb-6">
-        {views.map((v) => (
-          <button
-            key={v.id}
-            onClick={() => setView(v.id)}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 flex-shrink-0',
-              view === v.id
-                ? 'text-accent border-accent'
-                : 'text-muted border-transparent hover:text-heading',
-            )}
-          >
-            {v.icon}
-            {t(v.labelKey, v.id)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        items={views.map((v) => ({ id: v.id, label: t(v.labelKey, v.id), icon: v.icon }))}
+        activeId={view}
+        onChange={(id) => setView(id as GovernanceView)}
+        variant="underline"
+        size="sm"
+        className="gap-1 overflow-x-auto mb-6"
+      />
 
       {/* ── Overview View ── */}
       {view === 'overview' && (
@@ -117,4 +109,3 @@ export function ContractGovernancePage() {
     </PageContainer>
   );
 }
-

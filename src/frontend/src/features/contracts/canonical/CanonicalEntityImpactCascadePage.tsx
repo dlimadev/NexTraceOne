@@ -10,6 +10,7 @@ import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown, Load
 import { contractsApi } from '../api/contracts';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, Select } from '../../../shared/ui';
 
 type CascadeNode = {
   entityName: string;
@@ -51,10 +52,12 @@ function CascadeNodeTree({ node, depth = 0 }: { node: CascadeNode; depth?: numbe
 
   return (
     <div className="ml-4 border-l border-edge pl-3">
-      <button
+      {/* Controlo 1: toggle de expansão → DS Button ghost */}
+      <Button
+        variant="ghost"
         onClick={() => setExpanded((v) => !v)}
-        className="flex items-center gap-2 py-1.5 w-full text-left hover:text-heading transition-colors text-body"
         aria-label={t('phase4.impactCascade.entityName')}
+        className="w-full justify-start gap-2 py-1.5 px-0 h-auto font-normal text-body hover:text-heading"
       >
         {hasChildren ? (
           expanded ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />
@@ -69,7 +72,7 @@ function CascadeNodeTree({ node, depth = 0 }: { node: CascadeNode; depth?: numbe
         <span className="ml-auto text-xs bg-elevated rounded px-1.5 py-0.5">
           {node.affectedContractIds.length} {t('phase4.impactCascade.affectedContracts')}
         </span>
-      </button>
+      </Button>
       {expanded && hasChildren && (
         <div>
           {node.children.map((child, i) => (
@@ -118,42 +121,41 @@ export function CanonicalEntityImpactCascadePage() {
       {/* Controls */}
       <div className="bg-elevated rounded-lg border border-edge p-4 space-y-4">
         <div className="flex gap-3 flex-wrap">
+          {/* Controlo 2: entity ID → DS TextField */}
           <div className="flex-1 min-w-[260px]">
-            <label className="block text-xs text-muted mb-1 uppercase tracking-wide">
-              {t('phase4.impactCascade.entityName', 'Canonical Entity ID')}
-            </label>
-            <input
+            <TextField
+              label={t('phase4.impactCascade.entityName', 'Canonical Entity ID')}
               type="text"
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
               placeholder={t('phase4.impactCascade.entityIdPlaceholder', 'Search or enter canonical entity name')}
-              className="w-full px-3 py-2 rounded-lg bg-elevated border border-edge text-heading text-sm placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
-              aria-label={t('phase4.impactCascade.entityName')}
+              size="sm"
             />
           </div>
+          {/* Controlo 3: max depth → DS Select */}
           <div className="w-36">
-            <label className="block text-xs text-muted mb-1 uppercase tracking-wide">
-              {t('phase4.impactCascade.maxDepth', 'Max Depth')}
-            </label>
-            <select
-              value={maxDepth}
+            <Select
+              label={t('phase4.impactCascade.maxDepth', 'Max Depth')}
+              value={String(maxDepth)}
               onChange={(e) => setMaxDepth(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-lg bg-elevated border border-edge text-heading text-sm focus:outline-none focus:ring-2 focus:ring-accent"
-              aria-label={t('phase4.impactCascade.maxDepth')}
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-            </select>
+              options={[
+                { value: '1', label: '1' },
+                { value: '2', label: '2' },
+                { value: '3', label: '3' },
+              ]}
+              size="sm"
+            />
           </div>
+          {/* Controlo 4: analyze → DS Button primary */}
           <div className="flex items-end">
-            <button
+            <Button
+              variant="primary"
               onClick={handleAnalyze}
-              disabled={!entityId.trim() || isLoading}
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-heading hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={!entityId.trim()}
+              loading={isLoading}
             >
-              {isLoading ? '...' : t('phase4.impactCascade.analyze', 'Analyze Cascade')}
-            </button>
+              {t('phase4.impactCascade.analyze', 'Analyze Cascade')}
+            </Button>
           </div>
         </div>
       </div>
@@ -171,7 +173,15 @@ export function CanonicalEntityImpactCascadePage() {
         <div className="bg-critical/10 border border-critical/25 rounded-lg p-4 flex items-center gap-2 text-critical">
           <AlertTriangle size={16} />
           <span className="text-sm">{t('phase4.impactCascade.loadError', 'Failed to load cascade analysis. Please verify the entity ID.')}</span>
-          <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
+          {/* Controlo 5: retry → DS Button ghost */}
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={() => refetch()}
+            className="ml-auto text-xs underline"
+          >
+            {t('common.retry', 'Retry')}
+          </Button>
         </div>
       )}
 
