@@ -69,8 +69,9 @@ normalizar duas divergências reais, sem mexer no que já está consistente.
   - Props: `onClick: (e?) => void`, `title?: string`, `disabled?: boolean`, `iconSize?: number`
     (default `12`), `className?: string` (passthrough — **obrigatório** para preservar variações
     existentes como `opacity-0 group-hover:opacity-100`).
-  - Renderiza `<button type="button">` com `<Trash2 size={iconSize} />` e base
-    `text-muted hover:text-danger transition-colors`; a className passada é concatenada.
+  - Renderiza `<button type="button">` com `<Trash2 size={iconSize} />` e base **mínima**
+    `text-muted hover:text-danger` (sem `transition-*` — cada call site fornece a sua transição via
+    `className`, preservando `transition-colors`/`transition-all` por site); a className é concatenada.
   - O `onClick` recebe o evento para que os call sites que fazem `e.stopPropagation()` continuem a
     funcionar inalterados.
 
