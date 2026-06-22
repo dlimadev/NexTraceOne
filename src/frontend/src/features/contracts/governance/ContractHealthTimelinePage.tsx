@@ -12,6 +12,7 @@ import { stateToVariant } from '../lib/contractVariants';
 import { contractsApi } from '../api/contracts';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField } from '../../../shared/ui';
 
 type HealthTimelinePoint = {
   semVer: string;
@@ -84,29 +85,24 @@ export function ContractHealthTimelinePage() {
       <div className="bg-elevated rounded-lg border border-edge p-4">
         <div className="flex gap-3 flex-wrap">
           <div className="flex-1 min-w-[260px]">
-            <label className="block text-xs text-muted mb-1 uppercase tracking-wide">
-              {t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
-            </label>
-            <input
-              type="text"
+            <TextField
+              label={t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
+              size="sm"
               value={apiAssetId}
               onChange={(e) => { setApiAssetId(e.target.value); setValidationError(''); }}
               placeholder={t('phase4.healthTimeline.apiAssetIdPlaceholder', 'Search or enter API asset name')}
-              className="w-full px-3 py-2 rounded-lg bg-panel border border-edge text-heading text-sm placeholder:text-muted focus:outline-none focus:border-accent/40"
-              aria-label={t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
+              error={validationError || undefined}
             />
-            {validationError && (
-              <p className="text-critical text-xs mt-1">{validationError}</p>
-            )}
           </div>
           <div className="flex items-end">
-            <button
+            <Button
+              variant="primary"
               onClick={handleAnalyze}
-              disabled={!apiAssetId.trim() || isLoading}
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={!apiAssetId.trim()}
+              loading={isLoading}
             >
-              {isLoading ? '...' : t('phase4.healthTimeline.loadTimeline', 'Load Timeline')}
-            </button>
+              {t('phase4.healthTimeline.loadTimeline', 'Load Timeline')}
+            </Button>
           </div>
         </div>
       </div>
@@ -124,7 +120,7 @@ export function ContractHealthTimelinePage() {
         <div className="bg-critical/10 border border-critical/25 rounded-lg p-4 flex items-center gap-2 text-critical">
           <AlertTriangle size={16} />
           <span className="text-sm">{t('phase4.healthTimeline.loadError', 'Failed to load health timeline. Please verify the API Asset ID.')}</span>
-          <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
+          <Button variant="ghost" size="xs" onClick={() => refetch()} className="ml-auto">{t('common.retry', 'Retry')}</Button>
         </div>
       )}
 
