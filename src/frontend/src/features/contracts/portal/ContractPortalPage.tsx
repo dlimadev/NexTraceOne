@@ -190,7 +190,7 @@ export function ContractPortalPage() {
               'rounded-none border-b-2 flex-shrink-0 h-auto py-2.5',
               activeTab === tab.id
                 ? 'text-accent border-accent'
-                : 'border-transparent hover:text-heading',
+                : 'text-muted border-transparent hover:text-heading',
             )}
           >
             {tab.icon}
