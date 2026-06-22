@@ -20,6 +20,11 @@ import {
   FileJson,
   Clock,
 } from 'lucide-react';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, TextArea, Select } from '../../../shared/ui';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 
 type PlaygroundRequest = {
   method: string;
@@ -47,16 +52,16 @@ export function ContractPlaygroundPage() {
   const [response, setResponse] = useState<PlaygroundResponse | null>(null);
   const [showHeaders, setShowHeaders] = useState(false);
 
-  const { data: contractDetail, isLoading: loadingDetail } = useQuery({
+  const {
+    data: contractDetail,
+    isLoading: loadingDetail,
+    isError: errorDetail,
+    refetch: refetchDetail,
+  } = useQuery({
     queryKey: ['contract-playground-detail', contractVersionId],
     queryFn: () => contractsApi.getDetail(contractVersionId),
     enabled: !!contractVersionId,
   });
-
-  const endpoints: Array<{ method: string; path: string; summary: string }> =
-    contractDetail?.spec
-      ? extractEndpoints(contractDetail.spec)
-      : [];
 
   const executeMutation = useMutation({
     mutationFn: async () => {
@@ -80,49 +85,51 @@ export function ContractPlaygroundPage() {
   });
 
   const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+  const methodOptions = methods.map((m) => ({ value: m, label: m }));
 
   const methodColors: Record<string, string> = {
-    GET: 'text-green-400',
+    GET: 'text-success',
     POST: 'text-blue-400',
-    PUT: 'text-orange-400',
+    PUT: 'text-warning',
     PATCH: 'text-yellow-400',
-    DELETE: 'text-red-400',
+    DELETE: 'text-critical',
     HEAD: 'text-purple-400',
     OPTIONS: 'text-faded',
   };
 
+  if (errorDetail) {
+    return (
+      <PageContainer>
+        <PageErrorState onRetry={refetchDetail} />
+      </PageContainer>
+    );
+  }
+
+  const endpoints: Array<{ method: string; path: string; summary: string }> =
+    contractDetail?.spec
+      ? extractEndpoints(contractDetail.spec)
+      : [];
+
   return (
-    <div className="min-h-screen bg-elevated px-6 py-6 text-body">
-      {/* ─── Header ─── */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Code2 size={20} className="text-accent" />
-          <h1 className="text-lg font-semibold text-heading">
-            {t('contracts.playground.title', 'Contract Playground')}
-          </h1>
-        </div>
-        <p className="text-xs text-muted">
-          {t(
-            'contracts.playground.subtitle',
-            'Interactive tester — validate your API contracts against mock responses generated from the spec.'
-          )}
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('contracts.playground.title', 'Contract Playground')}
+        subtitle={t(
+          'contracts.playground.subtitle',
+          'Interactive tester — validate your API contracts against mock responses generated from the spec.'
+        )}
+        icon={<Code2 size={20} />}
+      />
 
       {/* ─── Contract Selector ─── */}
       <div className="bg-panel border border-edge rounded-lg p-4 mb-4">
-        <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1.5 block">
-          {t('contracts.playground.contractId', 'Contract Version ID')}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={contractVersionId}
-            onChange={(e) => setContractVersionId(e.target.value)}
-            placeholder={t('contracts.playground.contractIdPlaceholder', 'Paste or select a contract version ID...')}
-            className="flex-1 text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-          />
-        </div>
+        <TextField
+          label={t('contracts.playground.contractId', 'Contract Version ID')}
+          size="sm"
+          value={contractVersionId}
+          onChange={(e) => setContractVersionId(e.target.value)}
+          placeholder={t('contracts.playground.contractIdPlaceholder', 'Paste or select a contract version ID...')}
+        />
         {loadingDetail && (
           <p className="text-[10px] text-muted mt-1">{t('common.loading', 'Loading...')}</p>
         )}
@@ -130,6 +137,12 @@ export function ContractPlaygroundPage() {
           <p className="text-[10px] text-accent mt-1">
             {contractDetail.protocol} — v{contractDetail.semVer}
           </p>
+        )}
+        {contractVersionId && !loadingDetail && !contractDetail && (
+          <EmptyState
+            title={t('common.noResults', 'No results found')}
+            size="compact"
+          />
         )}
       </div>
 
@@ -141,20 +154,21 @@ export function ContractPlaygroundPage() {
           </h3>
           <div className="space-y-1">
             {endpoints.map((ep, idx) => (
-              <button
+              <Button
                 key={idx}
-                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
                 onClick={() =>
                   setRequest((prev) => ({ ...prev, method: ep.method, path: ep.path }))
                 }
-                className="w-full flex items-center gap-2 text-xs px-2 py-1 rounded hover:bg-elevated/50 transition-colors text-left"
               >
                 <span className={`font-mono font-bold text-[10px] w-14 ${methodColors[ep.method] ?? 'text-body'}`}>
                   {ep.method}
                 </span>
                 <span className="font-mono text-body">{ep.path}</span>
                 {ep.summary && <span className="text-muted ml-auto truncate max-w-[200px]">{ep.summary}</span>}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -171,46 +185,48 @@ export function ContractPlaygroundPage() {
             </h2>
           </div>
 
-          <div className="flex gap-2 mb-3">
-            <select
+          <div className="flex gap-2 mb-3 items-end">
+            <Select
+              options={methodOptions}
+              size="sm"
               value={request.method}
               onChange={(e) => setRequest((prev) => ({ ...prev, method: e.target.value }))}
-              className="text-xs bg-elevated border border-edge rounded px-2 py-1.5 text-body focus:outline-none focus:border-accent"
-            >
-              {methods.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              value={request.path}
-              onChange={(e) => setRequest((prev) => ({ ...prev, path: e.target.value }))}
-              placeholder={t('contracts.playground.placeholder.path', '/api/v1/resource')}
-              className="flex-1 text-xs font-mono bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
+              className="w-28 shrink-0"
             />
-            <button
-              type="button"
-              onClick={() => executeMutation.mutate()}
+            <div className="flex-1">
+              <TextField
+                size="sm"
+                value={request.path}
+                onChange={(e) => setRequest((prev) => ({ ...prev, path: e.target.value }))}
+                placeholder={t('contracts.playground.placeholder.path', '/api/v1/resource')}
+                className="font-mono"
+              />
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Play size={12} />}
+              loading={executeMutation.isPending}
               disabled={!contractVersionId || executeMutation.isPending}
-              className="flex items-center gap-1.5 text-xs font-medium bg-accent text-white rounded px-3 py-1.5 hover:bg-accent/90 transition-colors disabled:opacity-40"
+              onClick={() => executeMutation.mutate()}
             >
-              <Play size={12} />
               {t('contracts.playground.send', 'Send')}
-            </button>
+            </Button>
           </div>
 
           {/* Headers toggle */}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="xs"
+            icon={showHeaders ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             onClick={() => setShowHeaders(!showHeaders)}
-            className="flex items-center gap-1 text-[10px] text-muted hover:text-body transition-colors mb-2"
+            className="mb-2"
           >
-            {showHeaders ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             {t('contracts.playground.headers', 'Headers')}
-          </button>
+          </Button>
 
           {showHeaders && (
-            <textarea
+            <TextArea
               value={JSON.stringify(request.headers, null, 2)}
               onChange={(e) => {
                 try {
@@ -218,24 +234,21 @@ export function ContractPlaygroundPage() {
                 } catch { /* user is typing */ }
               }}
               rows={4}
-              className="w-full text-xs font-mono bg-elevated border border-edge rounded px-3 py-2 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent mb-3"
+              textareaClassName="font-mono text-xs"
             />
           )}
 
           {/* Body */}
           {['POST', 'PUT', 'PATCH'].includes(request.method) && (
-            <>
-              <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1.5 block">
-                {t('contracts.playground.body', 'Body')}
-              </label>
-              <textarea
-                value={request.body}
-                onChange={(e) => setRequest((prev) => ({ ...prev, body: e.target.value }))}
-                rows={8}
-                placeholder={t('contracts.playground.placeholder.body', '{}')}
-                className="w-full text-xs font-mono bg-elevated border border-edge rounded px-3 py-2 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-              />
-            </>
+            <TextArea
+              label={t('contracts.playground.body', 'Body')}
+              value={request.body}
+              onChange={(e) => setRequest((prev) => ({ ...prev, body: e.target.value }))}
+              rows={8}
+              placeholder={t('contracts.playground.placeholder.body', '{}')}
+              textareaClassName="font-mono text-xs"
+              className="mt-3"
+            />
           )}
         </div>
 
@@ -250,7 +263,11 @@ export function ContractPlaygroundPage() {
               <div className="ml-auto flex items-center gap-2">
                 <span
                   className={`text-xs font-bold ${
-                    response.statusCode < 300 ? 'text-green-400' : response.statusCode < 500 ? 'text-orange-400' : 'text-red-400'
+                    response.statusCode < 300
+                      ? 'text-success'
+                      : response.statusCode < 500
+                        ? 'text-warning'
+                        : 'text-critical'
                   }`}
                 >
                   {response.statusCode}
@@ -259,14 +276,15 @@ export function ContractPlaygroundPage() {
                   <Clock size={10} />
                   {response.durationMs}ms
                 </span>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  icon={<Copy size={12} />}
                   onClick={() => navigator.clipboard.writeText(response.body)}
-                  className="text-muted hover:text-body transition-colors"
                   title={t('common.copy', 'Copy')}
                 >
-                  <Copy size={12} />
-                </button>
+                  <span className="sr-only">{t('common.copy', 'Copy')}</span>
+                </Button>
               </div>
             )}
           </div>
@@ -284,9 +302,9 @@ export function ContractPlaygroundPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-1.5 text-[10px]">
                 {response.statusCode < 300 ? (
-                  <CheckCircle2 size={12} className="text-green-400" />
+                  <CheckCircle2 size={12} className="text-success" />
                 ) : (
-                  <XCircle size={12} className="text-red-400" />
+                  <XCircle size={12} className="text-critical" />
                 )}
                 <span className="text-muted">
                   {t('contracts.playground.mockGenerated', 'Mock response generated from contract spec')}
@@ -299,7 +317,7 @@ export function ContractPlaygroundPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -354,4 +372,3 @@ function formatJson(s: string): string {
     return s;
   }
 }
-
