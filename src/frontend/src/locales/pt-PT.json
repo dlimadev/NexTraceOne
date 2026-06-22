@@ -17636,6 +17636,7 @@
   },
   "contractBuilder": {
     "header": {
+      "backToStudio": "Studio",
       "format": "Formatar",
       "saveDraft": "Guardar Rascunho",
       "publish": "Publicar"

@@ -16324,6 +16324,7 @@
   },
   "contractBuilder": {
     "header": {
+      "backToStudio": "Studio",
       "format": "Format",
       "saveDraft": "Save Draft",
       "publish": "Publish"

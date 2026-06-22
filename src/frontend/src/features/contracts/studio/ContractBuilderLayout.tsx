@@ -104,7 +104,7 @@ export function ContractBuilderLayout({
             to="/contracts/studio"
             className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-heading transition-colors"
           >
-            <ChevronLeft size={14} /> {t('contracts.studio.backToStudio', 'Studio')}
+            <ChevronLeft size={14} /> {t('contractBuilder.header.backToStudio', 'Studio')}
           </Link>
         </div>
 
