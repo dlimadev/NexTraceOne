@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Globe, EyeOff, AlertTriangle, Clock,
-  CheckCircle2, XCircle, RefreshCw, Plus,
+  EyeOff, AlertTriangle, Clock,
+  CheckCircle2, XCircle, Plus,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { LoadingState } from '../shared/components/StateIndicators';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField } from '../../../shared/ui';
 import {
   usePublicationCenterEntries,
   useWithdrawContractFromPortal,
@@ -51,45 +53,32 @@ export function PublicationCenterPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Globe size={16} className="text-accent" />
-          <h1 className="text-sm font-semibold text-accent">
-            {t('contracts.publication.title', 'Publication Center')}
-          </h1>
-        </div>
-        <Link
-          to="/contracts/studio/new"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded bg-accent text-bg hover:bg-accent/90 transition-colors"
-        >
-          <Plus size={12} />
-          {t('contracts.publication.newContract', 'New Contract')}
-        </Link>
-      </div>
-
-      <p className="text-xs text-muted mb-4">
-        {t(
+      <PageHeader
+        title={t('contracts.publication.title', 'Publication Center')}
+        subtitle={t(
           'contracts.publication.subtitle',
           'Manage which contract versions are visible in the Developer Portal. Only Approved or Locked contracts can be published.',
         )}
-      </p>
+        actions={
+          <Link to="/contracts/studio/new">
+            <Button variant="primary" size="sm" icon={<Plus size={14} />}>
+              {t('contracts.publication.newContract', 'New Contract')}
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Status filter tabs */}
       <div className="flex gap-1 mb-4">
         {filterOptions.map((opt) => (
-          <button
+          <Button
             key={opt.value ?? 'all'}
-            type="button"
+            variant={statusFilter === opt.value ? 'primary' : 'outline'}
+            size="xs"
             onClick={() => setStatusFilter(opt.value)}
-            className={cn(
-              'px-3 py-1 rounded text-xs font-medium transition-colors',
-              statusFilter === opt.value
-                ? 'bg-accent text-bg'
-                : 'bg-card text-muted hover:text-accent border border-edge',
-            )}
           >
             {opt.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -150,14 +139,14 @@ export function PublicationCenterPage() {
                     <td className="px-4 py-3 text-muted">{entry.publishedBy}</td>
                     <td className="px-4 py-3 text-right">
                       {entry.status === 'Published' && (
-                        <button
-                          type="button"
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          icon={<EyeOff size={11} />}
                           onClick={() => setWithdrawTarget(entry)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-edge text-muted hover:text-accent hover:border-accent transition-colors"
                         >
-                          <EyeOff size={11} />
                           {t('contracts.publication.withdraw', 'Withdraw')}
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
@@ -186,33 +175,32 @@ export function PublicationCenterPage() {
                 },
               )}
             </p>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('contracts.publication.withdrawModal.reason', 'Reason (optional)')}
-            </label>
-            <input
-              type="text"
-              value={withdrawReason}
-              onChange={(e) => setWithdrawReason(e.target.value)}
-              placeholder={t('contracts.publication.withdrawModal.reasonPlaceholder', 'e.g. Replaced by v2.0.0')}
-              className="w-full px-3 py-2 text-xs rounded border border-edge bg-bg text-accent mb-4"
-            />
+            <div className="mb-4">
+              <TextField
+                label={t('contracts.publication.withdrawModal.reason', 'Reason (optional)')}
+                value={withdrawReason}
+                onChange={(e) => setWithdrawReason(e.target.value)}
+                placeholder={t('contracts.publication.withdrawModal.reasonPlaceholder', 'e.g. Replaced by v2.0.0')}
+                size="sm"
+              />
+            </div>
             <div className="flex justify-end gap-2">
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => { setWithdrawTarget(null); setWithdrawReason(''); }}
-                className="px-3 py-1.5 text-xs rounded border border-edge text-muted hover:text-accent transition-colors"
               >
                 {t('common.cancel', 'Cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleWithdraw(withdrawTarget)}
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                loading={withdrawMutation.isPending}
                 disabled={withdrawMutation.isPending}
-                className="px-3 py-1.5 text-xs rounded bg-accent text-bg hover:bg-accent/90 transition-colors disabled:opacity-50 flex items-center gap-1"
+                onClick={() => handleWithdraw(withdrawTarget)}
               >
-                {withdrawMutation.isPending && <RefreshCw size={11} className="animate-spin" />}
                 {t('contracts.publication.withdrawModal.confirm', 'Withdraw')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -225,7 +213,7 @@ function PublicationStatusBadge({ status }: { status: ContractPublicationStatus 
   const { t } = useTranslation();
 
   const config: Record<ContractPublicationStatus, { label: string; icon: React.ReactNode; cls: string }> = {
-    Published: { label: t('contracts.publication.status.published', 'Published'), icon: <CheckCircle2 size={11} />, cls: 'text-green' },
+    Published: { label: t('contracts.publication.status.published', 'Published'), icon: <CheckCircle2 size={11} />, cls: 'text-success' },
     PendingPublication: { label: t('contracts.publication.status.pending', 'Pending'), icon: <Clock size={11} />, cls: 'text-accent' },
     Withdrawn: { label: t('contracts.publication.status.withdrawn', 'Withdrawn'), icon: <EyeOff size={11} />, cls: 'text-muted' },
     Deprecated: { label: t('contracts.publication.status.deprecated', 'Deprecated'), icon: <AlertTriangle size={11} />, cls: 'text-warning' },
