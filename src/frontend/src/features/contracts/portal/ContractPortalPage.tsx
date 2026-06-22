@@ -11,6 +11,8 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button, IconButton } from '../../../shared/ui';
 import { ProtocolBadge, LifecycleBadge } from '../shared/components';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
@@ -88,13 +90,41 @@ export function ContractPortalPage() {
   return (
     <PageContainer>
       {/* Back link */}
-      <Link
-        to={`/contracts/${contractVersionId}`}
-        className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors"
-      >
-        <ArrowLeft size={12} />
-        {t('contracts.portal.backToWorkspace', 'Back to workspace')}
-      </Link>
+      <div className="mb-4">
+        <Link
+          to={`/contracts/${contractVersionId}`}
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors"
+        >
+          <ArrowLeft size={12} />
+          {t('contracts.portal.backToWorkspace', 'Back to workspace')}
+        </Link>
+      </div>
+
+      <PageHeader
+        title={studio.friendlyName || detail.apiName || detail.apiAssetId}
+        subtitle={studio.functionalDescription || detail.routePattern || t('contracts.portal.noDescription', 'No description available.')}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<ExternalLink size={14} />}
+            onClick={async () => {
+              try {
+                const result = await contractsApi.exportVersion(contractVersionId!);
+                const blob = new Blob([result.specContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${studio.technicalName || detail.apiAssetId}-${detail.semVer}.${result.format}`;
+                a.click();
+                URL.revokeObjectURL(url);
+              } catch { /* toast */ }
+            }}
+          >
+            {t('contracts.portal.download', 'Download')}
+          </Button>
+        }
+      />
 
       {/* ── Hero header ── */}
       <div className="p-6 rounded-lg bg-card border border-edge">
@@ -104,8 +134,6 @@ export function ContractPortalPage() {
               {serviceIcon}
             </div>
             <div className="space-y-1.5">
-              <h1 className="text-lg font-bold text-heading">{studio.friendlyName || detail.apiName || detail.apiAssetId}</h1>
-              <p className="text-xs text-muted">{studio.functionalDescription || detail.routePattern || t('contracts.portal.noDescription', 'No description available.')}</p>
               <div className="flex items-center gap-2 flex-wrap">
                 <ProtocolBadge protocol={detail.protocol} size="md" />
                 <LifecycleBadge state={detail.lifecycleState} size="md" />
@@ -120,24 +148,6 @@ export function ContractPortalPage() {
               <p className="text-[10px] text-muted uppercase tracking-wider">{t('contracts.portal.violations', 'Violations')}</p>
               <p className="text-sm font-semibold text-heading">{violations.length}</p>
             </div>
-            <button
-              onClick={async () => {
-                try {
-                  const result = await contractsApi.exportVersion(contractVersionId!);
-                  const blob = new Blob([result.specContent], { type: 'text/plain' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `${studio.technicalName || detail.apiAssetId}-${detail.semVer}.${result.format}`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                } catch { /* toast */ }
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors"
-            >
-              <ExternalLink size={12} />
-              {t('contracts.portal.download', 'Download')}
-            </button>
           </div>
         </div>
       </div>
@@ -171,19 +181,21 @@ export function ContractPortalPage() {
       {/* ── Tab navigation ── */}
       <div className="flex items-center gap-1 border-b border-edge overflow-x-auto">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 flex-shrink-0',
+              'rounded-none border-b-2 flex-shrink-0 h-auto py-2.5',
               activeTab === tab.id
                 ? 'text-accent border-accent'
-                : 'text-muted border-transparent hover:text-heading',
+                : 'border-transparent hover:text-heading',
             )}
           >
             {tab.icon}
             {t(tab.labelKey, tab.id)}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -267,12 +279,13 @@ function OverviewTab({
                   <code className="flex-1 text-xs font-mono text-body bg-panel px-2 py-1 rounded border border-edge">
                     {baseUrl}
                   </code>
-                  <button
+                  <IconButton
+                    icon={<Copy size={12} />}
+                    label={t('common.copy', 'Copy')}
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigator.clipboard?.writeText(baseUrl)}
-                    className="p-1.5 rounded hover:bg-elevated transition-colors text-muted hover:text-accent"
-                  >
-                    <Copy size={12} />
-                  </button>
+                  />
                 </div>
               ) : (
                 <p className="text-xs text-muted">{t('common.notAvailable', 'Not available')}</p>
