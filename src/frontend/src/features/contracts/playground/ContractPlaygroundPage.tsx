@@ -97,14 +97,6 @@ export function ContractPlaygroundPage() {
     OPTIONS: 'text-faded',
   };
 
-  if (errorDetail) {
-    return (
-      <PageContainer>
-        <PageErrorState onRetry={refetchDetail} />
-      </PageContainer>
-    );
-  }
-
   const endpoints: Array<{ method: string; path: string; summary: string }> =
     contractDetail?.spec
       ? extractEndpoints(contractDetail.spec)
@@ -130,20 +122,20 @@ export function ContractPlaygroundPage() {
           onChange={(e) => setContractVersionId(e.target.value)}
           placeholder={t('contracts.playground.contractIdPlaceholder', 'Paste or select a contract version ID...')}
         />
-        {loadingDetail && (
+        {errorDetail ? (
+          <PageErrorState message={t('common.error', 'Something went wrong')} onRetry={() => refetchDetail()} />
+        ) : loadingDetail ? (
           <p className="text-[10px] text-muted mt-1">{t('common.loading', 'Loading...')}</p>
-        )}
-        {contractDetail && (
+        ) : contractDetail ? (
           <p className="text-[10px] text-accent mt-1">
             {contractDetail.protocol} — v{contractDetail.semVer}
           </p>
-        )}
-        {contractVersionId && !loadingDetail && !contractDetail && (
+        ) : contractVersionId ? (
           <EmptyState
             title={t('common.noResults', 'No results found')}
             size="compact"
           />
-        )}
+        ) : null}
       </div>
 
       {/* ─── Quick Endpoint Select ─── */}
