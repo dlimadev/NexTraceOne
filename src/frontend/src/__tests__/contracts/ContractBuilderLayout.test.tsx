@@ -45,6 +45,20 @@ describe('ContractBuilderLayout', () => {
     expect(screen.getByTestId('preview')).toBeInTheDocument();
   });
 
+  it('renders v5 framing with a back-link to studio and the contract name as heading', () => {
+    const { container } = wrap(
+      <ContractBuilderLayout
+        contractName="Payments API"
+        protocol="OpenAPI 3.1"
+        language="yaml"
+        initialContent="openapi: 3.1.0"
+        renderPreview={() => null}
+      />,
+    );
+    expect(container.querySelector('a[href="/contracts/studio"]')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Payments API' })).toBeInTheDocument();
+  });
+
   it('shows parse-error banner when YAML is invalid, after debounce', () => {
     wrap(
       <ContractBuilderLayout

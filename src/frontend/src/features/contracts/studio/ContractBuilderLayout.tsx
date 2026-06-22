@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import * as yaml from 'js-yaml';
 import SimpleSplitPane from '../../../components/SimpleSplitPane';
 import { MonacoEditorWrapper } from '../workspace/editor/MonacoEditorWrapper';
-import { BuilderHeader } from './components/BuilderHeader';
-import type { BuilderValidationStatus } from './components/BuilderHeader';
+import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
 
 export type BuilderLanguage = 'yaml' | 'json' | 'graphql' | 'proto' | 'xml';
+export type BuilderValidationStatus = 'idle' | 'valid' | 'errors';
 
 export interface ContractBuilderLayoutProps {
   contractName: string;
@@ -44,16 +50,16 @@ export function ContractBuilderLayout({
   onSave,
   onPublish,
 }: ContractBuilderLayoutProps) {
+  const { t } = useTranslation();
   const [content, setContent] = useState(initialContent);
   const [debouncedContent, setDebouncedContent] = useState(initialContent);
   const [lastValidContent, setLastValidContent] = useState(initialContent);
   const [validationStatus, setValidationStatus] = useState<BuilderValidationStatus>('idle');
   const [errorLine, setErrorLine] = useState<number | undefined>(undefined);
-  const getContent = useCallback(() => content, [content]);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedContent(content), 400);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setDebouncedContent(content), 400);
+    return () => clearTimeout(timer);
   }, [content]);
 
   useEffect(() => {
@@ -82,48 +88,84 @@ export function ContractBuilderLayout({
 
   const monacoLanguage = language === 'proto' ? 'plaintext' : language;
 
-  return (
-    <div className="flex flex-col h-full" data-testid="contract-builder-layout">
-      <BuilderHeader
-        contractName={contractName}
-        protocol={protocol}
-        validationStatus={validationStatus}
-        errorLine={errorLine}
-        onFormat={handleFormat}
-        onSave={onSave}
-        onPublish={onPublish}
-        getContent={getContent}
-      />
+  const chipLabel =
+    validationStatus === 'valid'
+      ? t('contractBuilder.validation.valid')
+      : validationStatus === 'errors'
+        ? t('contractBuilder.validation.errors', { line: errorLine ?? '' })
+        : null;
+  const chipVariant: 'success' | 'danger' = validationStatus === 'valid' ? 'success' : 'danger';
 
-      <div className="flex-1 min-h-0">
-        <SimpleSplitPane
-          className="h-full"
-          initialLeftPercent={45}
-          minLeftPercent={25}
-          minRightPercent={25}
-          left={
-            <MonacoEditorWrapper
-              value={content}
-              language={monacoLanguage}
-              onChange={setContent}
-            />
+  return (
+    <PageContainer className="animate-fade-in">
+      <div data-testid="contract-builder-layout">
+        <div className="mb-4">
+          <Link
+            to="/contracts/studio"
+            className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-heading transition-colors"
+          >
+            <ChevronLeft size={14} /> {t('contracts.studio.backToStudio', 'Studio')}
+          </Link>
+        </div>
+
+        <PageHeader
+          title={contractName}
+          subtitle={protocol}
+          badge={
+            chipLabel ? (
+              <Badge variant={chipVariant} className="text-[10px]">{chipLabel}</Badge>
+            ) : undefined
           }
-          right={
-            <div className="h-full overflow-auto p-4 bg-elevated">
-              {validationStatus === 'errors' && (
-                <div
-                  className="mb-3 px-3 py-2 rounded text-xs text-destructive bg-destructive/10 border border-destructive/20"
-                  data-testid="parse-error-banner"
+          actions={
+            <>
+              <Button size="sm" variant="ghost" onClick={handleFormat} data-testid="btn-format">
+                {t('contractBuilder.header.format')}
+              </Button>
+              {onSave && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => onSave(content)}
+                  data-testid="btn-save"
                 >
-                  contractBuilder.preview.parseError
-                  {errorLine ? ` (line ${errorLine})` : ''}
-                </div>
+                  {t('contractBuilder.header.saveDraft')}
+                </Button>
               )}
-              {renderPreview(lastValidContent)}
-            </div>
+              {onPublish && (
+                <Button size="sm" onClick={() => onPublish(content)} data-testid="btn-publish">
+                  {t('contractBuilder.header.publish')}
+                </Button>
+              )}
+            </>
           }
         />
+
+        <div className="h-[60vh] min-h-[420px] border border-edge rounded-lg overflow-hidden">
+          <SimpleSplitPane
+            className="h-full"
+            initialLeftPercent={45}
+            minLeftPercent={25}
+            minRightPercent={25}
+            left={
+              <MonacoEditorWrapper value={content} language={monacoLanguage} onChange={setContent} />
+            }
+            right={
+              <div className="h-full overflow-auto p-4 bg-elevated">
+                {validationStatus === 'errors' && (
+                  <div
+                    className="mb-3 px-3 py-2 rounded text-xs text-critical bg-critical/10 border border-critical/25"
+                    data-testid="parse-error-banner"
+                  >
+                    {t('contractBuilder.preview.parseError')}
+                    {errorLine ? ` (line ${errorLine})` : ''}
+                  </div>
+                )}
+                {renderPreview(lastValidContent)}
+              </div>
+            }
+          />
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
