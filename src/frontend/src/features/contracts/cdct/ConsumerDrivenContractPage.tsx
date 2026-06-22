@@ -10,8 +10,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, TextArea } from '../../../shared/ui';
 import {
-  ShieldCheck,
   ShieldAlert,
   Plus,
   CheckCircle2,
@@ -90,59 +91,46 @@ export function ConsumerDrivenContractPage() {
   }
 
   return (
-    <div className="min-h-screen bg-canvas px-6 py-6 text-body">
+    <PageContainer>
       {/* ─── Header ─── */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <ShieldCheck size={20} className="text-accent" />
-          <h1 className="text-lg font-semibold text-heading">
-            {t('contracts.cdct.title', 'Consumer-Driven Contract Testing')}
-          </h1>
-        </div>
-        <p className="text-xs text-muted">
-          {t(
-            'contracts.cdct.subtitle',
-            'Register consumer expectations and verify provider contracts satisfy them — prevent breaking changes.'
-          )}
-        </p>
-      </div>
+      <PageHeader
+        title={t('contracts.cdct.title', 'Consumer-Driven Contract Testing')}
+        subtitle={t(
+          'contracts.cdct.subtitle',
+          'Register consumer expectations and verify provider contracts satisfy them — prevent breaking changes.'
+        )}
+      />
 
       {/* ─── Contract Selector ─── */}
       <div className="bg-panel border border-edge rounded-lg p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <TextField
+            size="sm"
+            label={t('contracts.cdct.apiAssetId', 'API Asset ID')}
+            value={apiAssetId}
+            onChange={(e) => setApiAssetId(e.target.value)}
+            placeholder={t('contracts.cdct.apiAssetIdPlaceholder', 'Provider API Asset ID...')}
+          />
           <div>
-            <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1.5 block">
-              {t('contracts.cdct.apiAssetId', 'API Asset ID')}
-            </label>
-            <input
-              type="text"
-              value={apiAssetId}
-              onChange={(e) => setApiAssetId(e.target.value)}
-              placeholder={t('contracts.cdct.apiAssetIdPlaceholder', 'Provider API Asset ID...')}
-              className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1.5 block">
-              {t('contracts.cdct.versionId', 'Contract Version ID')}
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={versionId}
-                onChange={(e) => setVersionId(e.target.value)}
-                placeholder={t('contracts.cdct.versionIdPlaceholder', 'Version to verify...')}
-                className="flex-1 text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-              />
-              <button
-                type="button"
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <TextField
+                  size="sm"
+                  label={t('contracts.cdct.versionId', 'Contract Version ID')}
+                  value={versionId}
+                  onChange={(e) => setVersionId(e.target.value)}
+                  placeholder={t('contracts.cdct.versionIdPlaceholder', 'Version to verify...')}
+                />
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={<RefreshCw size={12} className={loadingCdct ? 'animate-spin' : ''} />}
                 onClick={() => runCdct()}
                 disabled={!apiAssetId || !versionId || loadingCdct}
-                className="flex items-center gap-1.5 text-xs font-medium bg-accent text-white rounded px-3 py-1.5 hover:bg-accent/90 transition-colors disabled:opacity-40"
               >
-                <RefreshCw size={12} className={loadingCdct ? 'animate-spin' : ''} />
                 {t('contracts.cdct.verify', 'Verify')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -162,11 +150,11 @@ export function ConsumerDrivenContractPage() {
               <p className="text-[10px] text-muted">{t('contracts.cdct.total', 'Total Expectations')}</p>
             </div>
             <div className="bg-elevated rounded-lg p-3 text-center">
-              <p className="text-lg font-bold text-green-400">{typed.compatible}</p>
+              <p className="text-lg font-bold text-success">{typed.compatible}</p>
               <p className="text-[10px] text-muted">{t('contracts.cdct.compatible', 'Compatible')}</p>
             </div>
             <div className="bg-elevated rounded-lg p-3 text-center">
-              <p className="text-lg font-bold text-red-400">{typed.incompatible}</p>
+              <p className="text-lg font-bold text-critical">{typed.incompatible}</p>
               <p className="text-[10px] text-muted">{t('contracts.cdct.incompatible', 'Incompatible')}</p>
             </div>
           </div>
@@ -175,9 +163,9 @@ export function ConsumerDrivenContractPage() {
             {typed.results?.map((r, idx) => (
               <div key={idx} className="flex items-start gap-2 bg-elevated/50 rounded p-2">
                 {r.isCompatible ? (
-                  <CheckCircle2 size={14} className="text-green-400 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 size={14} className="text-success mt-0.5 flex-shrink-0" />
                 ) : (
-                  <XCircle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
+                  <XCircle size={14} className="text-critical mt-0.5 flex-shrink-0" />
                 )}
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-heading">{r.consumerServiceName}</p>
@@ -185,13 +173,13 @@ export function ConsumerDrivenContractPage() {
                     <div className="text-[10px] text-muted mt-0.5">
                       {r.missingPaths?.length > 0 && (
                         <p>
-                          <span className="text-red-400">{t('contracts.cdct.missingPaths', 'Missing paths')}: </span>
+                          <span className="text-critical">{t('contracts.cdct.missingPaths', 'Missing paths')}: </span>
                           {r.missingPaths.join(', ')}
                         </p>
                       )}
                       {r.missingFields?.length > 0 && (
                         <p>
-                          <span className="text-orange-400">{t('contracts.cdct.missingFields', 'Missing fields')}: </span>
+                          <span className="text-warning">{t('contracts.cdct.missingFields', 'Missing fields')}: </span>
                           {r.missingFields.join(', ')}
                         </p>
                       )}
@@ -214,15 +202,15 @@ export function ConsumerDrivenContractPage() {
               <span className="text-[10px] text-muted">({expectationList.length})</span>
             )}
           </h2>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<Plus size={12} />}
             onClick={() => setShowNewForm(true)}
             disabled={!apiAssetId}
-            className="flex items-center gap-1 text-[10px] font-medium text-accent hover:text-accent/80 transition-colors disabled:opacity-40"
           >
-            <Plus size={12} />
             {t('contracts.cdct.addExpectation', 'Register Expectation')}
-          </button>
+          </Button>
         </div>
 
         {loadingExpectations ? (
@@ -258,76 +246,61 @@ export function ConsumerDrivenContractPage() {
               {t('contracts.cdct.newExpectation', 'Register New Expectation')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1 block">
-                  {t('contracts.cdct.consumerService', 'Consumer Service')}
-                </label>
-                <input
-                  type="text"
-                  value={newExpectation.consumerServiceName}
-                  onChange={(e) => setNewExpectation((p) => ({ ...p, consumerServiceName: e.target.value }))}
-                  placeholder={t('contracts.cdct.placeholder.serviceName', 'e.g., checkout-service')}
-                  className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1 block">
-                  {t('contracts.cdct.consumerDomain', 'Consumer Domain')}
-                </label>
-                <input
-                  type="text"
-                  value={newExpectation.consumerDomain}
-                  onChange={(e) => setNewExpectation((p) => ({ ...p, consumerDomain: e.target.value }))}
-                  placeholder={t('contracts.cdct.placeholder.domain', 'e.g., Commerce')}
-                  className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('contracts.cdct.consumerService', 'Consumer Service')}
+                value={newExpectation.consumerServiceName}
+                onChange={(e) => setNewExpectation((p) => ({ ...p, consumerServiceName: e.target.value }))}
+                placeholder={t('contracts.cdct.placeholder.serviceName', 'e.g., checkout-service')}
+              />
+              <TextField
+                size="sm"
+                label={t('contracts.cdct.consumerDomain', 'Consumer Domain')}
+                value={newExpectation.consumerDomain}
+                onChange={(e) => setNewExpectation((p) => ({ ...p, consumerDomain: e.target.value }))}
+                placeholder={t('contracts.cdct.placeholder.domain', 'e.g., Commerce')}
+              />
             </div>
             <div className="mb-3">
-              <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1 block">
-                {t('contracts.cdct.expectedSubset', 'Expected Subset (JSON)')}
-              </label>
-              <textarea
+              <TextArea
+                label={t('contracts.cdct.expectedSubset', 'Expected Subset (JSON)')}
                 value={newExpectation.expectedSubsetJson}
                 onChange={(e) => setNewExpectation((p) => ({ ...p, expectedSubsetJson: e.target.value }))}
                 rows={6}
-                className="w-full text-xs font-mono bg-elevated border border-edge rounded px-3 py-2 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
+                textareaClassName="font-mono"
               />
             </div>
             <div className="mb-3">
-              <label className="text-[10px] uppercase tracking-wider text-muted font-medium mb-1 block">
-                {t('contracts.cdct.notes', 'Notes')}
-              </label>
-              <input
-                type="text"
+              <TextField
+                size="sm"
+                label={t('contracts.cdct.notes', 'Notes')}
                 value={newExpectation.notes}
                 onChange={(e) => setNewExpectation((p) => ({ ...p, notes: e.target.value }))}
                 placeholder={t('contracts.cdct.notesPlaceholder', 'Optional notes about this expectation...')}
-                className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
               />
             </div>
             <div className="flex gap-2">
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
+                icon={<ShieldAlert size={12} />}
                 onClick={() => registerMutation.mutate()}
                 disabled={!newExpectation.consumerServiceName || registerMutation.isPending}
-                className="flex items-center gap-1.5 text-xs font-medium bg-accent text-white rounded px-3 py-1.5 hover:bg-accent/90 transition-colors disabled:opacity-40"
               >
-                <ShieldAlert size={12} />
                 {t('contracts.cdct.register', 'Register')}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowNewForm(false)}
-                className="text-xs text-muted hover:text-body transition-colors px-3 py-1.5"
               >
                 {t('common.cancel', 'Cancel')}
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
