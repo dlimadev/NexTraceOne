@@ -15,10 +15,13 @@ Workspace já redesenhado (ciclo A) e do Draft Studio (ciclo B).
 
 ### Achado de auditoria (reformula o que D precisa de ser)
 
-Ao contrário dos módulos antigos, os visual builders **já estão v5-token-clean**:
-- Zero cores cruas / zero tokens legados em todo o diretório `builders/` (construídos em 2026-05).
+Ao contrário dos módulos antigos, os visual builders estão **largamente v5-token-clean**:
 - Já usam DS `Card`/`CardHeader` e tokens semânticos (`bg-elevated`, `border-edge`, `ring-accent`,
   `text-muted`, `text-danger`, `text-heading`).
+- Exceção intencional: existe uma **taxonomia de cores cruas para tipos de schema** (`object`=purple,
+  `$ref`=pink, `oneOf/anyOf/allOf`=orange — mapa `TYPE_COLORS` em `SchemaPropertyEditor`), usada para
+  color-coding de tipos JSON-schema. É deliberada e **fica fora de escopo** (converter a tokens seria
+  outra discussão, não polish).
 - São embebidos → **não há shell/moldura para adicionar** (isso é trabalho dos ciclos A/B).
 - Os "controlos crus" (`<button>`/`<input>`) são, na maioria, afordâncias inline intencionais e
   densas (ícones de remover em hover, pílulas "Add", inputs minúsculos). Uma migração cega para
@@ -33,13 +36,19 @@ normalizar duas divergências reais, sem mexer no que já está consistente.
 
 1. **Pílula "Add X" duplicada verbatim ×14** nos 8 builders — className idêntica:
    `inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors`.
-2. **Ícone de remover (`Trash2`) duplicado** nos 8 builders — `text-muted hover:text-danger transition-colors`
-   (algumas instâncias com `e.stopPropagation()` no onClick e/ou `opacity-0 group-hover:opacity-100`).
-3. **Add-buttons divergentes nos 2 editores partilhados:** `SchemaPropertyEditor` usa um botão
-   *outline* (`text-[9px] text-accent border border-accent/30`, sem fundo); `SchemaCompositionEditor`
-   usa `Plus size={9}`. Visualmente diferentes da pílula cheia dos builders.
+2. **Ícone de remover (`Trash2`) duplicado** nos 8 builders — base `text-muted hover:text-danger`
+   (variantes por call site: `transition-colors`/`transition-all`, `opacity-0 group-hover:opacity-100`,
+   `pb-1`, size 11/12, com/sem `e.stopPropagation()` no onClick).
 
 ### O que NÃO é inconsistência (e por isso fica intocado)
+- **Add-buttons dos editores partilhados são seletores color-coded, NÃO uma pílula única.** Inspeção
+  detalhada (decisão do utilizador, scope corrigido) mostrou que `SchemaPropertyEditor` tem vários
+  botões add-property color-coded por tipo (add string=`text-accent`, add object=`text-purple-400`,
+  add $ref=`text-pink-400`) e `SchemaCompositionEditor` tem "Add Variant" (botão de texto). Normalizá-los
+  para a pílula accent única **destruiria** o color-coding → **fora de escopo, intocados**.
+- **Pílula "Add Schema" purple** em `VisualRestBuilder:324` (`bg-purple-500/10 text-purple-400`) — é
+  deliberadamente colorida para a taxonomia de schemas; **não** é uma pílula accent → não é substituída
+  pelo `AddButton` (que é accent).
 - Os ~30 títulos de secção `<h3 className="text-xs font-semibold text-heading">` já estão **uniformes**
   em todos os builders. Harmonizá-los seria uma mudança visual sem ganho de consistência → fora de escopo.
 - O primitive `BuilderSubSection` (em `BuilderFormPrimitives.tsx`) **não é usado por nenhum builder**
@@ -69,16 +78,16 @@ normalizar duas divergências reais, sem mexer no que já está consistente.
 
 - **8 builders** (`VisualRestBuilder`, `VisualSoapBuilder`, `VisualEventBuilder`,
   `VisualWorkserviceBuilder`, `VisualSharedSchemaBuilder`, `VisualWebhookBuilder`,
-  `VisualLegacyContractBuilder`, `VisualDataContractBuilder`): a pílula "Add" → `AddButton`; os
-  botões Trash2 de remover linha → `RemoveIconButton` (com `className` passthrough onde havia
-  `group-hover`/`opacity` e `e.stopPropagation()` preservado).
-- **2 editores partilhados** (`SchemaPropertyEditor`, `SchemaCompositionEditor`): os add-buttons
-  divergentes → `AddButton`. **Normalização visual deliberada**: o botão outline e o `size=9`
-  passam a usar a pílula cheia canónica.
+  `VisualLegacyContractBuilder`, `VisualDataContractBuilder`): **apenas** as pílulas "Add" **accent
+  idênticas** (`bg-accent/10 text-accent hover:bg-accent/20`) → `AddButton`; os botões Trash2 de
+  remover linha → `RemoveIconButton` (com `className` passthrough onde havia `group-hover`/`opacity`/
+  `pb-1`/`transition-*` e `e.stopPropagation()` preservado via `onClick(e)`).
+- A pílula "Add Schema" **purple** (`VisualRestBuilder:324`) **não** é substituída (não é accent).
 
 ### 3. Fora de escopo (explícito)
-- `Field*` (input/area/select/checkbox/tag) primitives — ficam como estão (densos, propositados,
-  já token-clean).
+- **Editores partilhados** (`SchemaPropertyEditor`, `SchemaCompositionEditor`): add-buttons
+  color-coded e a taxonomia de cores de tipos (purple/pink/orange) — intencionais, intocados.
+- `Field*` (input/area/select/checkbox/tag) primitives — ficam como estão (densos, propositados).
 - Títulos `<h3>` de secção (já consistentes); `BuilderSubSection` órfão (só observação).
 - Botões de mover linha (setas ↑↓) em `SchemaPropertyEditor`, toggles/chevrons de expansão, o `X`
   de remover tag dentro de `FieldTagInput` — afordâncias distintas, não duplicadas no mesmo padrão.
@@ -86,21 +95,23 @@ normalizar duas divergências reais, sem mexer no que já está consistente.
 
 ## Critérios de sucesso
 
-1. Zero ocorrências da className-pílula "Add" duplicada fora de `AddButton`; um único sítio para o
-   estilo add/remove.
+1. Zero ocorrências da className-pílula "Add" **accent** duplicada fora de `AddButton`; um único sítio
+   para o estilo add/remove dos 8 builders.
 2. Comportamento idêntico: cada `<button>` renderizado mantém texto+ícone e os handlers (incl.
-   `stopPropagation` e reveal por `group-hover`) → testes existentes por role/texto continuam verdes.
-3. As 2 divergências dos editores partilhados ficam visualmente alinhadas à pílula canónica.
+   `stopPropagation` e reveal por `group-hover`) → testes existentes continuam verdes.
+3. A pílula purple "Add Schema" e os seletores color-coded dos editores partilhados ficam **inalterados**.
 4. `npm run lint` + `npm run build` 0 erros; suíte total verde.
 5. `git diff --name-only` contém apenas ficheiros sob `workspace/builders/` (+ o spec/plano de docs).
    Nada não relacionado (lição do ciclo 9: `git add` só de paths explícitos).
 
 ## Riscos
 
-- **`RemoveIconButton` e variações por call site:** alguns removes têm `group-hover`/`opacity` e
-  `stopPropagation`. Mitigação: `className` passthrough + `onClick(e)` com evento. Verificar cada
-  call site convertido individualmente.
-- **Normalização visual dos editores partilhados (item 3):** muda ligeiramente a aparência de 2
-  botões (outline→pílula cheia). É intencional e aprovado, mas confirmar no smoke visual.
-- **Volume:** ~10 ficheiros tocados; mudanças mecânicas mas numerosas → executar por ficheiro/lote
-  com verificação, não num só commit gigante.
+- **`RemoveIconButton` e variações por call site:** os removes têm 4 variantes de className
+  (`group-hover`/`opacity`, `pb-1`, `transition-colors`/`transition-all`, size 11/12) e alguns
+  `stopPropagation`. Mitigação: base mínima (`text-muted hover:text-danger`) + `className` passthrough
+  verbatim por site + `onClick(e)` com evento. Verificar cada call site convertido individualmente.
+- **Não normalizar por engano os color-coded:** o `AddButton` (accent) só substitui pílulas accent
+  idênticas. Confirmar que a pílula purple "Add Schema" e os seletores dos editores partilhados ficam
+  intocados.
+- **Volume:** ~8 ficheiros de builder tocados; mudanças mecânicas mas numerosas → executar por
+  ficheiro/lote com verificação, não num só commit gigante.
