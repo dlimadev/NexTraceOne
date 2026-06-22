@@ -176,6 +176,7 @@ export function CanonicalEntityImpactCascadePage() {
           {/* Controlo 5: retry → DS Button ghost */}
           <Button
             variant="ghost"
+            size="xs"
             onClick={() => refetch()}
             className="ml-auto text-xs underline"
           >

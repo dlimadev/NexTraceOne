@@ -111,6 +111,7 @@ export function ContractMigrationPage() {
                     <IconButton
                       icon={<Copy className="h-3.5 w-3.5" />}
                       label={t('contracts.migrationCopyHint')}
+                      title={t('contracts.migrationCopyHint')}
                       variant="ghost"
                       size="sm"
                       className="absolute top-2 right-2"
@@ -146,11 +147,13 @@ export function ContractMigrationPage() {
             aria-label={t('contracts.migrationSelectBaseVersion')}
             value={baseVersionId}
             onChange={(e) => setBaseVersionId(e.target.value)}
-            placeholder={t('contracts.migrationSelectBaseVersion')}
-            options={contracts.map((c) => ({
-              value: c.id ?? '',
-              label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
-            }))}
+            options={[
+              { value: '', label: t('contracts.migrationSelectBaseVersion') },
+              ...contracts.map((c) => ({
+                value: c.id ?? '',
+                label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
+              })),
+            ]}
           />
         </div>
 
@@ -162,11 +165,13 @@ export function ContractMigrationPage() {
             aria-label={t('contracts.migrationSelectTargetVersion')}
             value={targetVersionId}
             onChange={(e) => setTargetVersionId(e.target.value)}
-            placeholder={t('contracts.migrationSelectTargetVersion')}
-            options={contracts.map((c) => ({
-              value: c.id ?? '',
-              label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
-            }))}
+            options={[
+              { value: '', label: t('contracts.migrationSelectTargetVersion') },
+              ...contracts.map((c) => ({
+                value: c.id ?? '',
+                label: `${c.apiAssetId} — v${c.version} [${c.protocol}]`,
+              })),
+            ]}
           />
         </div>
 

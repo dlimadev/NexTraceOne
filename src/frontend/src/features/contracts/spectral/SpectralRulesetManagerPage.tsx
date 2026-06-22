@@ -123,6 +123,7 @@ export function SpectralRulesetManagerPage() {
                     size="sm"
                     icon={ruleset.isActive ? <ToggleRight size={20} className="text-mint" /> : <ToggleLeft size={20} className="text-muted" />}
                     label={ruleset.isActive ? t('contracts.spectral.manager.deactivate', 'Deactivate') : t('contracts.spectral.manager.activate', 'Activate')}
+                    title={ruleset.isActive ? t('contracts.spectral.manager.deactivate', 'Deactivate') : t('contracts.spectral.manager.activate', 'Activate')}
                     onClick={() => handleToggle(ruleset)}
                     disabled={toggleMutation.isPending}
                   />
@@ -133,6 +134,7 @@ export function SpectralRulesetManagerPage() {
                     size="sm"
                     icon={<Trash2 size={14} />}
                     label={t('common.delete', 'Delete')}
+                    title={t('common.delete', 'Delete')}
                     onClick={() => handleDelete(ruleset.id)}
                     disabled={deleteMutation.isPending}
                     className="hover:text-danger"
