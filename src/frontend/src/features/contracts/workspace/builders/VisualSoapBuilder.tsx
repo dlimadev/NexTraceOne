@@ -8,10 +8,10 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
-  Field, FieldArea, FieldSelect, FieldTagInput,
+  AddButton, Field, FieldArea, FieldSelect, FieldTagInput, RemoveIconButton,
 } from './shared/BuilderFormPrimitives';
 import { validateSoapBuilder } from './shared/builderValidation';
 import { soapBuilderToXml } from './shared/builderSync';
@@ -192,9 +192,7 @@ export function VisualSoapBuilder({
               {t('contracts.builder.soap.operations', 'Operations')} ({state.operations.length})
             </h3>
             {!isReadOnly && (
-              <button type="button" onClick={addOperation} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                <Plus size={10} /> {t('contracts.builder.soap.addOperation', 'Add Operation')}
-              </button>
+              <AddButton label={t('contracts.builder.soap.addOperation', 'Add Operation')} onClick={addOperation} />
             )}
           </div>
         </CardHeader>
@@ -215,9 +213,7 @@ export function VisualSoapBuilder({
                     <span className="text-xs font-mono text-heading flex-1 truncate">{op.name || t('contracts.builder.soap.unnamed', 'Unnamed Operation')}</span>
                     {op.soapAction && <span className="text-[10px] text-muted truncate max-w-[160px]">{op.soapAction}</span>}
                     {!isReadOnly && (
-                      <button type="button" onClick={(e) => { e.stopPropagation(); removeOp(op.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
-                        <Trash2 size={12} />
-                      </button>
+                      <RemoveIconButton onClick={(e) => { e.stopPropagation(); removeOp(op.id); }} className="opacity-0 group-hover:opacity-100 transition-all" />
                     )}
                   </button>
                   {isExpanded && (
