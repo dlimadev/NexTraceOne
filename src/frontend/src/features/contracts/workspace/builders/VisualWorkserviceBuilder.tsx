@@ -9,10 +9,10 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
-  Field, FieldArea, FieldSelect, FieldCheckbox,
+  Field, FieldArea, FieldSelect, FieldCheckbox, AddButton, RemoveIconButton,
 } from './shared/BuilderFormPrimitives';
 import { validateWorkserviceBuilder } from './shared/builderValidation';
 import { workserviceBuilderToYaml } from './shared/builderSync';
@@ -273,9 +273,7 @@ export function VisualWorkserviceBuilder({
               {t('contracts.builder.workservice.dependencies', 'Dependencies')} ({state.dependencies.length})
             </h3>
             {!isReadOnly && (
-              <button type="button" onClick={addDependency} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                <Plus size={10} /> {t('contracts.builder.workservice.addDep', 'Add Dependency')}
-              </button>
+              <AddButton label={t('contracts.builder.workservice.addDep', 'Add Dependency')} onClick={addDependency} />
             )}
           </div>
         </CardHeader>
@@ -295,9 +293,7 @@ export function VisualWorkserviceBuilder({
               <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={dep.required}
                 onChange={(v) => updateDep(dep.id, { required: v })} disabled={isReadOnly} />
               {!isReadOnly && (
-                <button type="button" onClick={() => removeDep(dep.id)} className="text-muted hover:text-danger transition-colors pb-1">
-                  <Trash2 size={11} />
-                </button>
+                <RemoveIconButton onClick={() => removeDep(dep.id)} iconSize={11} className="transition-colors pb-1" />
               )}
             </div>
           ))}
@@ -331,9 +327,7 @@ export function VisualWorkserviceBuilder({
                   {t('contracts.builder.workservice.consumedTopics', 'Consumed Topics')} ({state.consumedTopics.length})
                 </span>
                 {!isReadOnly && (
-                  <button type="button" onClick={addConsumedTopic} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                    <Plus size={10} /> {t('contracts.builder.workservice.addTopic', 'Add Topic')}
-                  </button>
+                  <AddButton label={t('contracts.builder.workservice.addTopic', 'Add Topic')} onClick={addConsumedTopic} />
                 )}
               </div>
               {state.consumedTopics.length === 0 && (
@@ -351,9 +345,7 @@ export function VisualWorkserviceBuilder({
                     onChange={(v) => updateConsumedTopic(topic.id, { format: v as MessagingTopic['format'] })}
                     options={MSG_FORMATS} disabled={isReadOnly} />
                   {!isReadOnly && (
-                    <button type="button" onClick={() => removeConsumedTopic(topic.id)} className="text-muted hover:text-danger transition-colors pb-1">
-                      <Trash2 size={11} />
-                    </button>
+                    <RemoveIconButton onClick={() => removeConsumedTopic(topic.id)} iconSize={11} className="transition-colors pb-1" />
                   )}
                 </div>
               ))}
@@ -368,9 +360,7 @@ export function VisualWorkserviceBuilder({
                   {t('contracts.builder.workservice.producedTopics', 'Produced Topics')} ({state.producedTopics.length})
                 </span>
                 {!isReadOnly && (
-                  <button type="button" onClick={addProducedTopic} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                    <Plus size={10} /> {t('contracts.builder.workservice.addTopic', 'Add Topic')}
-                  </button>
+                  <AddButton label={t('contracts.builder.workservice.addTopic', 'Add Topic')} onClick={addProducedTopic} />
                 )}
               </div>
               {state.producedTopics.length === 0 && (
@@ -388,9 +378,7 @@ export function VisualWorkserviceBuilder({
                     onChange={(v) => updateProducedTopic(topic.id, { format: v as MessagingTopic['format'] })}
                     options={MSG_FORMATS} disabled={isReadOnly} />
                   {!isReadOnly && (
-                    <button type="button" onClick={() => removeProducedTopic(topic.id)} className="text-muted hover:text-danger transition-colors pb-1">
-                      <Trash2 size={11} />
-                    </button>
+                    <RemoveIconButton onClick={() => removeProducedTopic(topic.id)} iconSize={11} className="transition-colors pb-1" />
                   )}
                 </div>
               ))}
@@ -405,9 +393,7 @@ export function VisualWorkserviceBuilder({
                   {t('contracts.builder.workservice.consumedServices', 'Consumed Services')} ({state.consumedServices.length})
                 </span>
                 {!isReadOnly && (
-                  <button type="button" onClick={addConsumedService} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                    <Plus size={10} /> {t('contracts.builder.workservice.addService', 'Add Service')}
-                  </button>
+                  <AddButton label={t('contracts.builder.workservice.addService', 'Add Service')} onClick={addConsumedService} />
                 )}
               </div>
               {state.consumedServices.length === 0 && (
@@ -423,9 +409,7 @@ export function VisualWorkserviceBuilder({
                     onChange={(v) => updateConsumedSvc(svc.id, { protocol: v as ConsumedService['protocol'] })}
                     options={SVC_PROTOCOLS} disabled={isReadOnly} />
                   {!isReadOnly && (
-                    <button type="button" onClick={() => removeConsumedSvc(svc.id)} className="text-muted hover:text-danger transition-colors pb-1">
-                      <Trash2 size={11} />
-                    </button>
+                    <RemoveIconButton onClick={() => removeConsumedSvc(svc.id)} iconSize={11} className="transition-colors pb-1" />
                   )}
                 </div>
               ))}
@@ -440,9 +424,7 @@ export function VisualWorkserviceBuilder({
                   {t('contracts.builder.workservice.producedEvents', 'Produced Events')} ({state.producedEvents.length})
                 </span>
                 {!isReadOnly && (
-                  <button type="button" onClick={addProducedEvent} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
-                    <Plus size={10} /> {t('contracts.builder.workservice.addEvent', 'Add Event')}
-                  </button>
+                  <AddButton label={t('contracts.builder.workservice.addEvent', 'Add Event')} onClick={addProducedEvent} />
                 )}
               </div>
               {state.producedEvents.length === 0 && (
@@ -457,9 +439,7 @@ export function VisualWorkserviceBuilder({
                   <Field label={t('contracts.builder.workservice.targetTopic', 'Target Topic')} value={evt.targetTopic}
                     onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder={t('contracts.builder.workservice.targetTopicPlaceholder', 'orders.processed')} mono disabled={isReadOnly} />
                   {!isReadOnly && (
-                    <button type="button" onClick={() => removeProducedEvt(evt.id)} className="text-muted hover:text-danger transition-colors pb-1">
-                      <Trash2 size={11} />
-                    </button>
+                    <RemoveIconButton onClick={() => removeProducedEvt(evt.id)} iconSize={11} className="transition-colors pb-1" />
                   )}
                 </div>
               ))}
