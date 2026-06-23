@@ -183,18 +183,13 @@ public static class HealthCommand
         };
     }
 
-    private static HttpClient CreateHttpClient(string baseUrl, string? token)
-    {
-        var client = new HttpClient
+    private static HttpClient CreateHttpClient(string baseUrl, string? token) =>
+        NexTrace.Sdk.NexTraceHttpClientFactory.Create(new NexTrace.Sdk.NexTraceSdkOptions
         {
-            BaseAddress = new Uri(baseUrl.TrimEnd('/')),
-            Timeout = TimeSpan.FromSeconds(10)
-        };
-        if (!string.IsNullOrWhiteSpace(token))
-            client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        return client;
-    }
+            BaseUrl = baseUrl,
+            ApiToken = token ?? string.Empty,
+            TimeoutSeconds = 10
+        });
 
     // === DTOs ===
 
