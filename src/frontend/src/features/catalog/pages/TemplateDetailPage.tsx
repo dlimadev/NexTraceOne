@@ -18,6 +18,7 @@ import {
   Clock,
   BarChart2,
 } from 'lucide-react';
+import { Button } from '../../../shared/ui';
 import { templatesApi } from '../api/templates';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
@@ -104,9 +105,9 @@ export function TemplateDetailPage() {
       <div className="flex flex-col items-center gap-3 p-16 text-muted">
         <XCircle className="h-10 w-10 text-muted" />
         <p>{t('templates.detail.notFound')}</p>
-        <button onClick={() => navigate('/catalog/templates')} className="text-accent hover:underline text-sm">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/catalog/templates')}>
           {t('templates.detail.backToLibrary')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -121,49 +122,54 @@ export function TemplateDetailPage() {
       />
       {/* Breadcrumb + actions */}
       <div className="flex items-center justify-between gap-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft className="h-4 w-4" />}
           onClick={() => navigate('/catalog/templates')}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
-          <ArrowLeft className="h-4 w-4" />
           {t('templates.detail.backToLibrary')}
-        </button>
+        </Button>
 
         <div className="flex items-center gap-2">
           {template.isActive ? (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<PowerOff className="h-3.5 w-3.5" />}
               disabled={isToggling}
               onClick={() => deactivateMutation.mutate()}
-              className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:border-critical/50 hover:text-critical disabled:opacity-50"
             >
-              <PowerOff className="h-3.5 w-3.5" />
               {t('templates.detail.deactivate')}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<Power className="h-3.5 w-3.5" />}
               disabled={isToggling}
               onClick={() => activateMutation.mutate()}
-              className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:border-success/50 hover:text-success disabled:opacity-50"
             >
-              <Power className="h-3.5 w-3.5" />
               {t('templates.detail.activate')}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<Edit className="h-3.5 w-3.5" />}
             onClick={() => navigate(`/catalog/templates/${id}/edit`)}
-            className="flex items-center gap-1.5 rounded border border-edge bg-elevated px-3 py-1.5 text-xs font-medium text-body hover:bg-card"
           >
-            <Edit className="h-3.5 w-3.5" />
             {t('templates.detail.edit')}
-          </button>
+          </Button>
           {template.isActive && (
-            <button
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Zap className="h-3.5 w-3.5" />}
               onClick={() => navigate(`/catalog/templates/${id}/scaffold`)}
-              className="flex items-center gap-1.5 rounded bg-accent px-4 py-1.5 text-xs font-medium text-on-accent hover:bg-accent/90"
             >
-              <Zap className="h-3.5 w-3.5" />
               {t('templates.detail.scaffoldWithAi')}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -192,7 +198,7 @@ export function TemplateDetailPage() {
         <p className="text-sm text-muted">{template.description}</p>
 
         <div className="mt-2 flex flex-wrap gap-1.5">
-          <span className="rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-xs text-purple-400">
+          <span className="rounded border border-info/20 bg-info-muted px-1.5 py-0.5 text-xs text-info">
             {template.language}
           </span>
           <span className="rounded border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-xs text-accent">
