@@ -1,8 +1,22 @@
 # Plano — Evolução da Camada `tools/` + Segurança (inspiração n8n CyberSec)
 
-> **Status: PLANO (não executado).** Objetivo: consolidar o que evoluir na camada de ferramentas e definir o que, dos workflows de cibersegurança do n8n, faz sentido agregar ao NexTraceOne — sempre via a camada `tools/`.
+> **Status: EM EXECUÇÃO.** Objetivo: consolidar o que evoluir na camada de ferramentas e definir o que, dos workflows de cibersegurança do n8n, faz sentido agregar ao NexTraceOne — sempre via a camada `tools/`.
 > Fonte de inspiração: https://github.com/JoasASantos/n8n-CyberSecurity-Workflows (100 blueprints).
 > Escopo desta fase: **não** expandir para JetBrains. Focar no que está pronto, pela metade, com erro, e na evolução.
+
+## Progresso de execução
+
+> ⚠️ Verificação .NET feita em CI (ambiente de dev sem SDK). Actions (bash) e docs validadas localmente.
+
+- ✅ **0.1** — CLI default `:8080 → :5000` (const `CliConfig.DefaultUrl` + testes).
+- ✅ **0.4** — README da extensão VS Code atualizado (features reais + `^1.90.0`).
+- ✅ **0.5** — `VisualStudio.Tests` (net48) excluído do job unit no Linux; coberto pelo `build-vsix` (Windows).
+- ✅ **1.1/1.2** — SDK `SecurityClient` + CLI `nex security` (deps/vulnerable) com gate por severidade.
+- ✅ **1.4** — Action `nexone-contract-drift-gate`.
+- ✅ **1.5** — Action `nexone-sca-gate` + README das GitHub Actions.
+- ⏳ **0.2** — factory HTTP resiliente nos demais comandos do CLI (pendente).
+- ⏳ **0.3** — testes para os comandos sem cobertura (mcp, confidence, compliance, config, health, scaffold) (pendente).
+- ⏳ **Fase 2/3** — requerem trabalho no backend (risk signals, EPSS/KEV) — não iniciadas.
 
 ---
 
