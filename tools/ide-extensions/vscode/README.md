@@ -4,8 +4,15 @@ AI-assisted operations and contract governance directly in your IDE, powered by 
 
 ## Features
 
-- **Ask AI** (`NexTraceOne: Ask AI`): Select code or text and ask the NexTraceOne AI Assistant for context-aware answers about services, contracts, changes and incidents.
-- **Configure** (`NexTraceOne: Configure`): Open extension settings to configure the server URL and API key.
+- **AI Chat Panel** (sidebar): Copilot-like conversation with history, code-block rendering and "Insert at Cursor"/Copy actions.
+- **Chat Participant `@nextraceone`** (VS Code ≥ 1.90): slash commands `/service`, `/change`, `/contract`, `/incident`, `/report`, `/blast-radius`, `/scaffold`, `/generate`, `/migrate`.
+- **Language Model Tools** (VS Code ≥ 1.113): `get_service`, `get_contract`, `blast_radius`, `get_incident` — usable by Copilot agents.
+- **Service Catalog Tree View**: browse services, drill into ownership/domain/type, open in dashboard or ask the AI about a service.
+- **Scaffold New Service**: multi-step wizard from a governed template → writes files → optional catalog registration.
+- **Ask AI / Ask about selection**: context-aware answers about services, contracts, changes and incidents.
+- **Contract Migration Patch**: generate provider/consumer code hints for a contract change.
+- **Configure MCP Server**: write `mcp.json` (global or workspace) pointing at the NexTraceOne MCP endpoint.
+- **Open Dashboard** and a **status bar** indicator for the current service/environment.
 
 ## Installation
 
@@ -38,7 +45,7 @@ AI-assisted operations and contract governance directly in your IDE, powered by 
 
 ## Requirements
 
-- VS Code `^1.85.0`
+- VS Code `^1.90.0` (chat participant); Language Model Tools require `≥ 1.113`
 - A running NexTraceOne server with an IDE API key
 
 ## Notes

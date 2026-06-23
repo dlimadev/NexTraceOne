@@ -35,6 +35,9 @@ public sealed class NexTraceSdkClient : IDisposable
     /// <summary>Sub-cliente para aceleração de integrações.</summary>
     public IntegrationClient Integrations { get; }
 
+    /// <summary>Sub-cliente para governança de segurança de dependências (supply chain).</summary>
+    public SecurityClient Security { get; }
+
     /// <summary>
     /// Inicializa o cliente SDK com as opções fornecidas.
     /// </summary>
@@ -49,6 +52,7 @@ public sealed class NexTraceSdkClient : IDisposable
         Changes = new ChangeClient(_httpClient);
         Compliance = new ComplianceClient(_httpClient);
         Integrations = new IntegrationClient(_httpClient);
+        Security = new SecurityClient(_httpClient);
     }
 
     /// <summary>
@@ -63,6 +67,7 @@ public sealed class NexTraceSdkClient : IDisposable
         Changes = new ChangeClient(_httpClient);
         Compliance = new ComplianceClient(_httpClient);
         Integrations = new IntegrationClient(_httpClient);
+        Security = new SecurityClient(_httpClient);
     }
 
     private static HttpClient CreateHttpClient(NexTraceSdkOptions options)
