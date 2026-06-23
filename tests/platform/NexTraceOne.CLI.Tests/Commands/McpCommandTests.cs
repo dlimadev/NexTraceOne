@@ -30,7 +30,7 @@ public sealed class McpCommandTests
             .GetMethod("ConfigureMcpAsync", BindingFlags.NonPublic | BindingFlags.Static);
         method.Should().NotBeNull();
 
-        var outputPath = Path.Combine(Path.GetTempPath(), $"nex-mcp-{Guid.NewGuid()}.json");
+        var outputPath = Path.Join(Path.GetTempPath(), $"nex-mcp-{Guid.NewGuid()}.json");
 
         try
         {
@@ -47,7 +47,7 @@ public sealed class McpCommandTests
         }
         finally
         {
-            try { File.Delete(outputPath); } catch { /* best effort */ }
+            try { File.Delete(outputPath); } catch (IOException) { /* best effort */ }
         }
     }
 }
