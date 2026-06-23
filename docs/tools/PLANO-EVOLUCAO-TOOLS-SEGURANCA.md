@@ -14,9 +14,11 @@
 - ✅ **1.1/1.2** — SDK `SecurityClient` + CLI `nex security` (deps/vulnerable) com gate por severidade.
 - ✅ **1.4** — Action `nexone-contract-drift-gate`.
 - ✅ **1.5** — Action `nexone-sca-gate` + README das GitHub Actions.
-- ⏳ **0.2** — factory HTTP resiliente nos demais comandos do CLI (pendente).
-- ⏳ **0.3** — testes para os comandos sem cobertura (mcp, confidence, compliance, config, health, scaffold) (pendente).
-- ⏳ **Fase 2/3** — requerem trabalho no backend (risk signals, EPSS/KEV) — não iniciadas.
+- ✅ **0.2** — factory HTTP resiliente única (`NexTraceHttpClientFactory`) reusada por SDK + CLI (Catalog/Mcp/Confidence/Health).
+- ✅ **0.3** — testes para os 6 comandos sem cobertura (confidence, health, compliance, mcp, config, scaffold) → 14/14 comandos com teste.
+- ⏳ **Fase 2/3** — requerem trabalho no backend (modelo unificado de risk signal, completar `IVulnerabilityAdvisoryReader`, EPSS/KEV) — não iniciadas.
+
+> **Fase 0 e Fase 1 concluídas.** Próximo bloco (Fase 2/3) envolve mudanças no backend — recomenda-se verificar o lote atual via CI antes, pelo maior risco de codar backend sem compilar localmente.
 
 ---
 
