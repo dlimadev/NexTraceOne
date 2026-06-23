@@ -112,4 +112,3 @@ public sealed class VulnerableService
     [JsonPropertyName("lastScanAt")]
     public DateTimeOffset LastScanAt { get; init; }
 }
-</content>

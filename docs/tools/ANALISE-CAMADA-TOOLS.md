@@ -204,5 +204,4 @@ A camada `tools/` posiciona o NexTraceOne na categoria **Internal Developer Plat
 - [Platform Engineering Tools Compared (Encore)](https://encore.dev/articles/platform-engineering-tools)
 - [Top Backstage Alternatives 2025 (Port)](https://www.port.io/blog/top-backstage-alternatives)
 - [OpsLevel vs Cortex](https://www.opslevel.com/opslevel-vs-cortex-io)
-</content>
 </invoke>

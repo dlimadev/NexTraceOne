@@ -287,4 +287,3 @@ public static class SecurityCommand
         DefaultValueFactory = _ => "text"
     };
 }
-</content>

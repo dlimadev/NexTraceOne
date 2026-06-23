@@ -175,4 +175,3 @@ Legenda: **[E]** capacidade já existe no backend (só expor) · **[½]** existe
 - O maior ganho **não é** construir scanners: é **expor pelos `tools/` o núcleo de segurança que o NexTraceOne já tem** (SBOM, Cosign, SLSA, dependency scan, risk profiles, compliance) e **conectá-lo ao change confidence** como _risk signals_/gates.
 - Sequência: **Fase 0** (consertar tools) → **Fase 1** (expor o que existe) → **Fase 2** (novos achados→signals) → **Fase 3** (priorização EPSS/KEV no confidence).
 - **Nada será executado** até aprovação. Recomendo começar pela **Fase 0 + itens 1.4 (contract-drift-gate) e 1.1/1.2 (SecurityClient/CLI)** — maior valor com menor risco.
-</content>

@@ -73,4 +73,3 @@ nex security vulnerable --min-severity high --fail-on-found
 - As actions falham (exit 1) quando o gate é violado, bloqueando o job — coloque-as antes do passo de deploy/merge.
 - Em ambientes air-gapped, garanta conectividade do runner à API NexTraceOne (as actions não acessam serviços externos além da própria plataforma).
 - Para anotações nativas na aba **Security** do GitHub, combine com a publicação de SARIF dos scanners (Trivy/CodeQL) já presentes no workflow `security.yml`.
-</content>
