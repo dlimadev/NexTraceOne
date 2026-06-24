@@ -18,6 +18,7 @@ import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { SearchInput, Button } from '../../../shared/ui';
 
 /** Delay de debounce para a pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -97,32 +98,30 @@ export function SourceOfTruthExplorerPage() {
       <Card className="mb-8">
         <CardBody>
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input
-                type="text"
-                value={rawQuery}
-                onChange={(e) => setRawQuery(e.target.value)}
-                placeholder={t('sourceOfTruth.search.placeholder')}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-elevated border border-edge text-heading text-sm placeholder:text-muted outline-none focus:border-accent transition-colors"
-                aria-label={t('sourceOfTruth.search.placeholder')}
-              />
-            </div>
+            <SearchInput
+              className="flex-1"
+              value={rawQuery}
+              onChange={(e) => setRawQuery(e.target.value)}
+              placeholder={t('sourceOfTruth.search.placeholder')}
+              aria-label={t('sourceOfTruth.search.placeholder')}
+            />
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted whitespace-nowrap">{t('sourceOfTruth.search.scope')}:</span>
               <div className="flex gap-1">
                 {SCOPE_OPTIONS.map((opt) => (
-                  <button
+                  <Button
                     key={opt.value}
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setScope(opt.value)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    className={
                       scope === opt.value
                         ? 'bg-accent/15 text-accent border border-accent/30'
-                        : 'bg-elevated text-muted border border-edge hover:text-body hover:bg-hover'
-                    }`}
+                        : 'bg-elevated text-muted border border-edge'
+                    }
                   >
                     {t(opt.labelKey)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

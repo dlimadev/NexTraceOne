@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -13,37 +13,7 @@ import {
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-
-// ── Form field ────────────────────────────────────────────────────────────────
-
-function FormField({
-  label,
-  required,
-  hint,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-body">
-        {label}
-        {required && <span className="ml-0.5 text-critical">*</span>}
-      </label>
-      {children}
-      {hint && <p className="text-xs text-muted">{hint}</p>}
-    </div>
-  );
-}
-
-const INPUT_CLASS =
-  'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted outline-none focus:border-accent';
-
-const SELECT_CLASS =
-  'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body outline-none focus:border-accent';
+import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 
 // ── Form state ────────────────────────────────────────────────────────────────
 
@@ -88,14 +58,14 @@ export function TemplateEditorPage() {
   const queryClient = useQueryClient();
   const isEditing = !!id;
 
-  // Load existing template when editing
+  // Carrega template existente ao editar
   const { data: existing, isError: isLoadError } = useQuery({
     queryKey: ['service-template', id],
     queryFn: () => templatesApi.getById(id!),
     enabled: isEditing,
   });
 
-  // Derive initial form state from existing data (avoids setState-in-useEffect)
+  // Deriva estado inicial a partir dos dados existentes (evita setState-in-useEffect)
   const initialState = useMemo<TemplateFormState>(() => {
     if (!existing) return DEFAULT_FORM_STATE;
     return {
@@ -115,12 +85,12 @@ export function TemplateEditorPage() {
     };
   }, [existing]);
 
-  // Form state — single object, re-initialized when existing data loads
+  // Estado do formulário — objeto único, reinicializado quando os dados chegam
   const [form, setForm] = useState<TemplateFormState>(DEFAULT_FORM_STATE);
   const [formKey, setFormKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  // Sync form state when initial data arrives (key-based reset avoids setState-in-effect)
+  // Sincroniza estado quando os dados iniciais chegam (reset por key evita setState-in-effect)
   const currentKey = existing ? existing.slug : '__new__';
   if (currentKey !== '__new__' && formKey === 0) {
     setForm(initialState);
@@ -131,7 +101,7 @@ export function TemplateEditorPage() {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  // Destructure for easier access in JSX
+  // Desestrutura para acesso mais fácil no JSX
   const {
     slug, displayName, description, version, serviceType, language,
     defaultDomain, defaultTeam, tagsInput, baseContractSpec,
@@ -171,7 +141,7 @@ export function TemplateEditorPage() {
       .map(s => s.trim())
       .filter(Boolean);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -207,6 +177,25 @@ export function TemplateEditorPage() {
     }
   };
 
+  // Arrays de opções (construídos no render para t() estar disponível)
+  const serviceTypeOptions = [
+    { value: 'RestApi', label: t('templates.editor.serviceTypes.restApi', 'REST API') },
+    { value: 'EventDriven', label: t('templates.editor.serviceTypes.eventDriven', 'Event Driven') },
+    { value: 'BackgroundWorker', label: t('templates.editor.serviceTypes.backgroundWorker', 'Background Worker') },
+    { value: 'Grpc', label: t('templates.editor.serviceTypes.grpc', 'gRPC') },
+    { value: 'Soap', label: t('templates.editor.serviceTypes.soap', 'SOAP') },
+    { value: 'Generic', label: t('templates.editor.serviceTypes.generic', 'Generic') },
+  ];
+
+  const languageOptions = [
+    { value: 'DotNet', label: t('templates.editor.languages.dotnet', '.NET') },
+    { value: 'NodeJs', label: t('templates.editor.languages.nodejs', 'Node.js') },
+    { value: 'Java', label: t('templates.editor.languages.java', 'Java') },
+    { value: 'Go', label: t('templates.editor.languages.go', 'Go') },
+    { value: 'Python', label: t('templates.editor.languages.python', 'Python') },
+    { value: 'Agnostic', label: t('templates.editor.languages.agnostic', 'Agnostic') },
+  ];
+
   if (isLoadError) {
     return (
       <div className="flex flex-col gap-5 p-6">
@@ -221,15 +210,16 @@ export function TemplateEditorPage() {
         title={isEditing ? t('templates.editor.editTitle') : t('templates.editor.createTitle')}
         subtitle={t('catalog.templateEditor.subtitle', 'Define template metadata, classification, and scaffolding manifest')}
       />
-      {/* Back navigation */}
+      {/* Navegação de volta */}
       <div className="flex items-center gap-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft className="h-4 w-4" />}
           onClick={() => navigate(isEditing ? `/catalog/templates/${id}` : '/catalog/templates')}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
-          <ArrowLeft className="h-4 w-4" />
           {t('common.back')}
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -240,95 +230,74 @@ export function TemplateEditorPage() {
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {/* Identity section */}
+        {/* Secção de identidade */}
         <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
           <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.identity')}</h2>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {!isEditing && (
-              <FormField
+              <TextField
                 label={t('templates.editor.fields.slug')}
+                placeholder={t('catalog.template.placeholder.slug', 'payment-api')}
+                value={slug}
+                onChange={e => updateField('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 required
-                hint={t('templates.editor.hints.slug')}
-              >
-                <input
-                  className={INPUT_CLASS}
-                  placeholder={t('catalog.template.placeholder.slug', 'payment-api')}
-                  value={slug}
-                  onChange={e => updateField('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                  required
-                />
-              </FormField>
+                helperText={t('templates.editor.hints.slug')}
+                size="sm"
+              />
             )}
 
-            <FormField label={t('templates.editor.fields.displayName')} required>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('templates.editor.placeholders.displayName')}
-                value={displayName}
-                onChange={e => updateField('displayName', e.target.value)}
-                required
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.displayName')}
+              placeholder={t('templates.editor.placeholders.displayName')}
+              value={displayName}
+              onChange={e => updateField('displayName', e.target.value)}
+              required
+              size="sm"
+            />
 
-            <FormField label={t('templates.editor.fields.version')} required>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('catalog.template.placeholder.version', '1.0.0')}
-                value={version}
-                onChange={e => updateField('version', e.target.value)}
-                required
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.version')}
+              placeholder={t('catalog.template.placeholder.version', '1.0.0')}
+              value={version}
+              onChange={e => updateField('version', e.target.value)}
+              required
+              size="sm"
+            />
           </div>
 
-          <FormField label={t('templates.editor.fields.description')} required>
-            <textarea
-              className={`${INPUT_CLASS} resize-none`}
-              rows={3}
-              placeholder={t('templates.editor.placeholders.description')}
-              value={description}
-              onChange={e => updateField('description', e.target.value)}
-              required
-            />
-          </FormField>
+          <TextArea
+            label={t('templates.editor.fields.description')}
+            placeholder={t('templates.editor.placeholders.description')}
+            value={description}
+            onChange={e => updateField('description', e.target.value)}
+            required
+            rows={3}
+            textareaClassName="resize-none"
+          />
         </div>
 
-        {/* Classification section */}
+        {/* Secção de classificação */}
         <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
           <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.classification')}</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField label={t('templates.editor.fields.serviceType')} required>
-              <select
-                className={SELECT_CLASS}
-                value={serviceType}
-                onChange={e => updateField('serviceType', e.target.value as TemplateServiceType)}
-                disabled={isEditing}
-              >
-                <option value="RestApi">{t('templates.editor.serviceTypes.restApi', 'REST API')}</option>
-                <option value="EventDriven">{t('templates.editor.serviceTypes.eventDriven', 'Event Driven')}</option>
-                <option value="BackgroundWorker">{t('templates.editor.serviceTypes.backgroundWorker', 'Background Worker')}</option>
-                <option value="Grpc">{t('templates.editor.serviceTypes.grpc', 'gRPC')}</option>
-                <option value="Soap">{t('templates.editor.serviceTypes.soap', 'SOAP')}</option>
-                <option value="Generic">{t('templates.editor.serviceTypes.generic', 'Generic')}</option>
-              </select>
-            </FormField>
+            <Select
+              label={t('templates.editor.fields.serviceType')}
+              options={serviceTypeOptions}
+              value={serviceType}
+              onChange={e => updateField('serviceType', e.target.value as TemplateServiceType)}
+              disabled={isEditing}
+              size="sm"
+            />
 
-            <FormField label={t('templates.editor.fields.language')} required>
-              <select
-                className={SELECT_CLASS}
-                value={language}
-                onChange={e => updateField('language', e.target.value as TemplateLanguage)}
-                disabled={isEditing}
-              >
-                <option value="DotNet">{t('templates.editor.languages.dotnet', '.NET')}</option>
-                <option value="NodeJs">{t('templates.editor.languages.nodejs', 'Node.js')}</option>
-                <option value="Java">{t('templates.editor.languages.java', 'Java')}</option>
-                <option value="Go">{t('templates.editor.languages.go', 'Go')}</option>
-                <option value="Python">{t('templates.editor.languages.python', 'Python')}</option>
-                <option value="Agnostic">{t('templates.editor.languages.agnostic', 'Agnostic')}</option>
-              </select>
-            </FormField>
+            <Select
+              label={t('templates.editor.fields.language')}
+              options={languageOptions}
+              value={language}
+              onChange={e => updateField('language', e.target.value as TemplateLanguage)}
+              disabled={isEditing}
+              size="sm"
+            />
           </div>
 
           {isEditing && (
@@ -336,109 +305,100 @@ export function TemplateEditorPage() {
           )}
         </div>
 
-        {/* Ownership section */}
+        {/* Secção de ownership */}
         <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
           <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.ownership')}</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField label={t('templates.editor.fields.defaultDomain')} required>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('templates.editor.placeholders.domain')}
-                value={defaultDomain}
-                onChange={e => updateField('defaultDomain', e.target.value)}
-                required
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.defaultDomain')}
+              placeholder={t('templates.editor.placeholders.domain')}
+              value={defaultDomain}
+              onChange={e => updateField('defaultDomain', e.target.value)}
+              required
+              size="sm"
+            />
 
-            <FormField label={t('templates.editor.fields.defaultTeam')} required>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('templates.editor.placeholders.team')}
-                value={defaultTeam}
-                onChange={e => updateField('defaultTeam', e.target.value)}
-                required
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.defaultTeam')}
+              placeholder={t('templates.editor.placeholders.team')}
+              value={defaultTeam}
+              onChange={e => updateField('defaultTeam', e.target.value)}
+              required
+              size="sm"
+            />
           </div>
 
-          <FormField label={t('templates.editor.fields.tags')} hint={t('templates.editor.hints.tags')}>
-            <input
-              className={INPUT_CLASS}
-              placeholder={t('catalog.template.placeholder.tags', 'ddd, clean-architecture, payments')}
-              value={tagsInput}
-              onChange={e => updateField('tagsInput', e.target.value)}
-            />
-          </FormField>
+          <TextField
+            label={t('templates.editor.fields.tags')}
+            placeholder={t('catalog.template.placeholder.tags', 'ddd, clean-architecture, payments')}
+            value={tagsInput}
+            onChange={e => updateField('tagsInput', e.target.value)}
+            helperText={t('templates.editor.hints.tags')}
+            size="sm"
+          />
         </div>
 
-        {/* Advanced section */}
+        {/* Secção avançada */}
         <div className="flex flex-col gap-4 rounded-lg border border-edge bg-elevated p-5">
           <h2 className="text-sm font-medium text-body">{t('templates.editor.sections.advanced')}</h2>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField label={t('templates.editor.fields.repoUrl')} hint={t('templates.editor.hints.repoUrl')}>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('catalog.template.placeholder.repoUrl', 'https://github.com/org/template-name')}
-                value={repositoryTemplateUrl}
-                onChange={e => updateField('repositoryTemplateUrl', e.target.value)}
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.repoUrl')}
+              placeholder={t('catalog.template.placeholder.repoUrl', 'https://github.com/org/template-name')}
+              value={repositoryTemplateUrl}
+              onChange={e => updateField('repositoryTemplateUrl', e.target.value)}
+              helperText={t('templates.editor.hints.repoUrl')}
+              size="sm"
+            />
 
-            <FormField label={t('templates.editor.fields.repoBranch')}>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('catalog.template.placeholder.repoBranch', 'main')}
-                value={repositoryTemplateBranch}
-                onChange={e => updateField('repositoryTemplateBranch', e.target.value)}
-              />
-            </FormField>
+            <TextField
+              label={t('templates.editor.fields.repoBranch')}
+              placeholder={t('catalog.template.placeholder.repoBranch', 'main')}
+              value={repositoryTemplateBranch}
+              onChange={e => updateField('repositoryTemplateBranch', e.target.value)}
+              size="sm"
+            />
           </div>
 
-          <FormField
+          <TextArea
             label={t('templates.editor.fields.baseContractSpec')}
-            hint={t('templates.editor.hints.baseContractSpec')}
-          >
-            <textarea
-              className={`${INPUT_CLASS} resize-none font-mono text-xs`}
-              rows={8}
-              placeholder={t('catalog.template.placeholder.baseContractSpec', 'openapi: 3.0.0&#10;info:&#10;  title: Payment API&#10;  version: 1.0.0&#10;paths: ...')}
-              value={baseContractSpec}
-              onChange={e => updateField('baseContractSpec', e.target.value)}
-            />
-          </FormField>
+            placeholder={t('catalog.template.placeholder.baseContractSpec', 'openapi: 3.0.0&#10;info:&#10;  title: Payment API&#10;  version: 1.0.0&#10;paths: ...')}
+            value={baseContractSpec}
+            onChange={e => updateField('baseContractSpec', e.target.value)}
+            rows={8}
+            textareaClassName="resize-none font-mono text-xs"
+            helperText={t('templates.editor.hints.baseContractSpec')}
+          />
 
-          <FormField
+          <TextArea
             label={t('templates.editor.fields.scaffoldingManifest')}
-            hint={t('templates.editor.hints.scaffoldingManifest')}
-          >
-            <textarea
-              className={`${INPUT_CLASS} resize-none font-mono text-xs`}
-              rows={8}
-              placeholder={'[\n  { "path": "src/Controllers/{{ServiceNamePascal}}Controller.cs", "content": "..." },\n  { "path": "README.md", "content": "# {{ServiceName}}" }\n]'}
-              value={scaffoldingManifestJson}
-              onChange={e => updateField('scaffoldingManifestJson', e.target.value)}
-            />
-          </FormField>
+            placeholder={'[\n  { "path": "src/Controllers/{{ServiceNamePascal}}Controller.cs", "content": "..." },\n  { "path": "README.md", "content": "# {{ServiceName}}" }\n]'}
+            value={scaffoldingManifestJson}
+            onChange={e => updateField('scaffoldingManifestJson', e.target.value)}
+            rows={8}
+            textareaClassName="resize-none font-mono text-xs"
+            helperText={t('templates.editor.hints.scaffoldingManifest')}
+          />
         </div>
 
-        {/* Submit */}
+        {/* Submissão */}
         <div className="flex justify-end gap-3">
-          <button
+          <Button
+            variant="outline"
             type="button"
             onClick={() => navigate(isEditing ? `/catalog/templates/${id}` : '/catalog/templates')}
-            className="rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-card"
           >
             {t('common.cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            disabled={isPending}
-            className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90 disabled:opacity-50"
+            variant="primary"
+            loading={isPending}
+            icon={<Save className="h-4 w-4" />}
           >
-            <Save className="h-4 w-4" />
             {isPending ? t('common.saving') : t('common.save')}
-          </button>
+          </Button>
         </div>
       </form>
     </PageContainer>

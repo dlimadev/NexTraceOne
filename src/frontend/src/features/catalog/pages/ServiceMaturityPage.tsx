@@ -21,6 +21,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button, TextField, Tabs } from '../../../shared/ui';
 import { serviceCatalogApi } from '../api/serviceCatalog';
 import type {
   MaturityDashboardResponse,
@@ -87,38 +88,33 @@ export function ServiceMaturityPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <input
-          type="text"
+        <TextField
+          size="sm"
           placeholder={t('serviceMaturity.filterTeam')}
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
-          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-input text-body placeholder:text-muted w-48"
+          aria-label={t('serviceMaturity.filterTeam')}
+          className="w-48"
         />
-        <input
-          type="text"
+        <TextField
+          size="sm"
           placeholder={t('serviceMaturity.filterDomain')}
           value={domainFilter}
           onChange={(e) => setDomainFilter(e.target.value)}
-          className="px-3 py-1.5 text-xs rounded-md border border-edge bg-input text-body placeholder:text-muted w-48"
+          aria-label={t('serviceMaturity.filterDomain')}
+          className="w-48"
         />
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 -mb-px ${
-              activeTab === tab.key
-                ? 'border-accent text-accent'
-                : 'border-transparent text-muted hover:text-body'
-            }`}
-          >
-            {t(tab.labelKey)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        items={tabs.map((tab) => ({ id: tab.key, label: t(tab.labelKey) }))}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as TabKey)}
+        variant="underline"
+        size="sm"
+        className="mb-6"
+      />
 
       {activeTab === 'maturity' && (
         <MaturityTab teamName={teamFilter || undefined} domain={domainFilter || undefined} />
@@ -205,11 +201,12 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
             <div className="divide-y divide-edge">
               {services.map((svc: ServiceMaturityItemDto) => (
                 <div key={svc.serviceId} className="py-3">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setExpandedId(expandedId === svc.serviceId ? null : svc.serviceId)}
-                    className="w-full flex items-center gap-3 text-left"
+                    className="w-full justify-start h-auto p-0 gap-3 font-normal"
                   >
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-left">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-heading truncate">{svc.displayName || svc.serviceName}</span>
                         <Badge variant={maturityBadgeVariant(svc.level)}>
@@ -231,7 +228,7 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
                       <span className="text-xs text-muted w-8 text-right">{Math.round(svc.overallScore * 100)}%</span>
                       {expandedId === svc.serviceId ? <ChevronUp size={14} className="text-muted" /> : <ChevronDown size={14} className="text-muted" />}
                     </div>
-                  </button>
+                  </Button>
                   {expandedId === svc.serviceId && (
                     <div className="mt-3 grid grid-cols-3 md:grid-cols-6 gap-3 pl-2">
                       <DimensionPill icon={<Users size={12} />} label={t('serviceMaturity.dim.ownership')} ok={svc.hasOwnership} />

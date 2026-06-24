@@ -4,19 +4,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Sliders,
   RefreshCw,
-  Search,
-  ToggleLeft,
-  ToggleRight,
   Server,
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  Filter,
 } from 'lucide-react';
 import client from '../../../api/client';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, SearchInput, Select, Toggle, Tabs } from '../../../shared/ui';
 
 /**
  * Página de Feature Flags por Serviço.
@@ -81,6 +78,17 @@ export function ServiceFeatureFlagsPage() {
 
   const services = Array.from(new Set(flags.map((f) => f.serviceName))).sort();
 
+  const serviceOptions = [
+    { value: '', label: t('featureFlags.allServices', 'Todos os Serviços') },
+    ...services.map((s) => ({ value: s, label: s })),
+  ];
+
+  const statusItems = [
+    { id: 'all', label: t('featureFlags.statusAll', 'Todas') },
+    { id: 'enabled', label: t('featureFlags.statusEnabled', 'Ativas') },
+    { id: 'disabled', label: t('featureFlags.statusDisabled', 'Inativas') },
+  ];
+
   const filtered = flags.filter((f) => {
     const matchesSearch =
       !search ||
@@ -103,13 +111,14 @@ export function ServiceFeatureFlagsPage() {
       />
       {/* ── Header actions ── */}
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          icon={<RefreshCw size={14} />}
           onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-accent text-on-accent rounded-lg hover:bg-accent/90 transition-colors"
         >
-          <RefreshCw size={14} />
           {t('common.refresh', 'Atualizar')}
-        </button>
+        </Button>
       </div>
 
       {/* ── Stats Cards ── */}
@@ -153,49 +162,28 @@ export function ServiceFeatureFlagsPage() {
 
       {/* ── Filters ── */}
       <div className="flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            className="w-full pl-9 pr-3 py-2 text-sm border border-edge rounded-lg bg-panel text-body placeholder:text-muted/50 focus:outline-none focus:ring-1 focus:ring-accent"
-            placeholder={t('featureFlags.searchPlaceholder', 'Buscar por flag ou serviço...')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          className="flex-1 min-w-[200px]"
+          size="sm"
+          placeholder={t('featureFlags.searchPlaceholder', 'Buscar por flag ou serviço...')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         {services.length > 0 && (
-          <div className="relative">
-            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <select
-              className="pl-9 pr-8 py-2 text-sm border border-edge rounded-lg bg-panel text-body focus:outline-none focus:ring-1 focus:ring-accent appearance-none"
-              value={serviceFilter}
-              onChange={(e) => setServiceFilter(e.target.value)}
-            >
-              <option value="">{t('featureFlags.allServices', 'Todos os Serviços')}</option>
-              {services.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            options={serviceOptions}
+            size="sm"
+            value={serviceFilter}
+            onChange={(e) => setServiceFilter(e.target.value)}
+          />
         )}
-        <div className="flex rounded-lg border border-edge overflow-hidden">
-          {(['all', 'enabled', 'disabled'] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-2 text-xs font-medium transition-colors ${
-                statusFilter === s
-                  ? 'bg-accent text-on-accent'
-                  : 'bg-panel text-body hover:bg-elevated'
-              }`}
-            >
-              {s === 'all'
-                ? t('featureFlags.statusAll', 'Todas')
-                : s === 'enabled'
-                ? t('featureFlags.statusEnabled', 'Ativas')
-                : t('featureFlags.statusDisabled', 'Inativas')}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          variant="pill"
+          size="sm"
+          activeId={statusFilter}
+          onChange={(id) => setStatusFilter(id as 'all' | 'enabled' | 'disabled')}
+          items={statusItems}
+        />
       </div>
 
       {/* ── Content ── */}
@@ -287,28 +275,14 @@ export function ServiceFeatureFlagsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => toggleMutation.mutate({ flagId: flag.id, enabled: !flag.enabled })}
+                    <Toggle
+                      checked={flag.enabled}
+                      onChange={(checked) =>
+                        toggleMutation.mutate({ flagId: flag.id, enabled: checked })
+                      }
                       disabled={toggleMutation.isPending}
-                      title={flag.enabled ? t('featureFlags.disable', 'Desabilitar') : t('featureFlags.enable', 'Habilitar')}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-50 ${
-                        flag.enabled
-                          ? 'bg-success/10 text-success border border-success/20'
-                          : 'bg-elevated text-muted border border-edge'
-                      }`}
-                    >
-                      {flag.enabled ? (
-                        <>
-                          <ToggleRight size={14} className="text-success" />
-                          {t('featureFlags.on', 'Ativo')}
-                        </>
-                      ) : (
-                        <>
-                          <ToggleLeft size={14} className="text-muted" />
-                          {t('featureFlags.off', 'Inativo')}
-                        </>
-                      )}
-                    </button>
+                      label={flag.enabled ? t('featureFlags.disable', 'Desabilitar') : t('featureFlags.enable', 'Habilitar')}
+                    />
                   </td>
                 </tr>
               ))}

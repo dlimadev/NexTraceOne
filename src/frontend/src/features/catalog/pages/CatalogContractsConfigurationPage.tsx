@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronUp,
   Pencil,
-  Search,
   Filter,
   Check,
   X,
@@ -25,6 +24,16 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import {
+  Button,
+  IconButton,
+  TextField,
+  TextArea,
+  Select,
+  SearchInput,
+  Tabs,
+  Toggle,
+} from '../../../shared/ui';
 import {
   useConfigurationDefinitions,
   useEffectiveSettings,
@@ -146,6 +155,23 @@ export function CatalogContractsConfigurationPage() {
 
   const setValueMutation = useSetConfigurationValue();
 
+  // Tabs items para as secções
+  const tabItems = useMemo(
+    () =>
+      SECTIONS.map((s) => ({
+        id: s.key,
+        label: t(`catalogContractsConfig.sections.${s.key}`, s.key),
+        icon: s.icon,
+      })),
+    [t],
+  );
+
+  // Opções do scope Select
+  const scopeOptions = useMemo(
+    () => SCOPES.map((s) => ({ value: s, label: t(`configuration.scope.${s.toLowerCase()}`, s) })),
+    [t],
+  );
+
   // Filter definitions to catalog/change-related ones
   const catalogDefinitions = useMemo(() => {
     if (!definitions) return [];
@@ -237,13 +263,13 @@ export function CatalogContractsConfigurationPage() {
             'Could not load catalog, contracts and change governance configuration.'
           )}
           action={
-            <button
+            <Button
+              variant="primary"
+              icon={<RefreshCw className="w-4 h-4" />}
               onClick={() => refetchDefinitions()}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15"
             >
-              <RefreshCw className="w-4 h-4" />
               {t('catalogContractsConfig.error.retry', 'Retry')}
-            </button>
+            </Button>
           }
         />
       </PageContainer>
@@ -261,68 +287,45 @@ export function CatalogContractsConfigurationPage() {
       />
 
       {/* ── Section Tabs ─────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {SECTIONS.map((section) => (
-          <button
-            key={section.key}
-            onClick={() => setActiveSection(section.key)}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
-              activeSection === section.key
-                ? 'bg-info/15 border-info/25 text-info'
-                : 'bg-card border-edge text-faded hover:bg-subtle'
-            }`}
-          >
-            {section.icon}
-            {t(`catalogContractsConfig.sections.${section.key}`, section.key)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        variant="pill"
+        items={tabItems}
+        activeId={activeSection}
+        onChange={(id) => setActiveSection(id as CatalogSection)}
+        className="mb-6 flex-wrap h-auto"
+      />
 
       {/* ── Scope & Search Controls ──────────────────────────────── */}
       <Card className="mb-6">
         <CardBody>
           <div className="flex flex-wrap gap-4 items-end">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-body mb-1">
-                {t('catalogContractsConfig.scope', 'Scope')}
-              </label>
-              <select
+              <Select
+                label={t('catalogContractsConfig.scope', 'Scope')}
+                options={scopeOptions}
                 value={scope}
                 onChange={(e) => setScope(e.target.value as ConfigurationScope)}
-                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
-              >
-                {SCOPES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(`configuration.scope.${s.toLowerCase()}`, s)}
-                  </option>
-                ))}
-              </select>
+                size="sm"
+              />
             </div>
             {scope !== 'System' && (
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('catalogContractsConfig.scopeReference', 'Scope Reference ID')}
-                </label>
-                <input
-                  type="text"
+                <TextField
+                  label={t('catalogContractsConfig.scopeReference', 'Scope Reference ID')}
                   value={scopeReferenceId}
                   onChange={(e) => setScopeReferenceId(e.target.value)}
                   placeholder={t('catalogContractsConfig.scopeReferencePlaceholder', 'Enter tenant/environment ID...')}
-                  className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
+                  size="sm"
                 />
               </div>
             )}
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-body mb-1">
-                <Search className="w-3 h-3 inline mr-1" />
-                {t('catalogContractsConfig.search', 'Search')}
-              </label>
-              <input
-                type="text"
+              <SearchInput
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('catalogContractsConfig.searchPlaceholder', 'Search by key or name...')}
-                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
+                aria-label={t('catalogContractsConfig.search', 'Search')}
+                size="sm"
               />
             </div>
           </div>
@@ -430,61 +433,62 @@ export function CatalogContractsConfigurationPage() {
                       {/* Editing Form */}
                       {isEditing && (
                         <div className="mt-3 p-3 rounded-lg bg-info/15 border border-info/25">
-                          <label className="block text-xs font-medium text-body mb-1">
-                            {t('catalogContractsConfig.edit.value', 'Value')}
-                          </label>
                           {def.valueType === 'Boolean' ? (
-                            <button
-                              onClick={() => setEditValue(editValue === 'true' ? 'false' : 'true')}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                editValue === 'true'
-                                  ? 'bg-success/15 text-success'
-                                  : 'bg-critical/15 text-critical'
-                              }`}
-                            >
-                              {editValue === 'true' ? 'Enabled' : 'Disabled'}
-                            </button>
+                            <>
+                              <p className="text-xs font-medium text-body mb-2">
+                                {t('catalogContractsConfig.edit.value', 'Value')}
+                              </p>
+                              <Toggle
+                                checked={editValue === 'true'}
+                                onChange={(v) => setEditValue(v ? 'true' : 'false')}
+                                label={editValue === 'true' ? 'Enabled' : 'Disabled'}
+                              />
+                            </>
                           ) : def.valueType === 'Json' ? (
-                            <textarea
+                            <TextArea
+                              label={t('catalogContractsConfig.edit.value', 'Value')}
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               rows={6}
-                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm font-mono"
+                              textareaClassName="font-mono"
                             />
                           ) : (
-                            <input
+                            <TextField
+                              label={t('catalogContractsConfig.edit.value', 'Value')}
                               type={def.valueType === 'Integer' || def.valueType === 'Decimal' ? 'number' : 'text'}
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
+                              size="sm"
                             />
                           )}
-                          <label className="block text-xs font-medium text-body mt-2 mb-1">
-                            {t('catalogContractsConfig.edit.reason', 'Change Reason')}
-                          </label>
-                          <input
-                            type="text"
-                            value={editReason}
-                            onChange={(e) => setEditReason(e.target.value)}
-                            placeholder={t('catalogContractsConfig.edit.reasonPlaceholder', 'Optional reason for this change...')}
-                            className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
-                          />
+                          <div className="mt-3">
+                            <TextField
+                              label={t('catalogContractsConfig.edit.reason', 'Change Reason')}
+                              value={editReason}
+                              onChange={(e) => setEditReason(e.target.value)}
+                              placeholder={t('catalogContractsConfig.edit.reasonPlaceholder', 'Optional reason for this change...')}
+                              size="sm"
+                            />
+                          </div>
                           <div className="flex gap-2 mt-3">
-                            <button
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              icon={<Check className="w-3 h-3" />}
                               onClick={handleSave}
                               disabled={setValueMutation.isPending}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15 disabled:opacity-50"
+                              loading={setValueMutation.isPending}
                             >
-                              <Check className="w-3 h-3" />
                               {t('catalogContractsConfig.edit.save', 'Save')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              icon={<X className="w-3 h-3" />}
                               onClick={handleCancelEdit}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-faded bg-subtle rounded-lg hover:bg-subtle"
                             >
-                              <X className="w-3 h-3" />
                               {t('catalogContractsConfig.edit.cancel', 'Cancel')}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       )}
@@ -493,27 +497,21 @@ export function CatalogContractsConfigurationPage() {
                     {/* Actions */}
                     <div className="flex items-center gap-1 shrink-0">
                       {def.isEditable && !isEditing && (
-                        <button
+                        <IconButton
+                          icon={<Pencil className="w-4 h-4" />}
+                          label={t('catalogContractsConfig.actions.edit', 'Edit')}
                           onClick={() => handleEdit(def)}
-                          className="p-2 rounded-lg text-muted hover:text-info hover:bg-info/15 transition-colors"
-                          title={t('catalogContractsConfig.actions.edit', 'Edit')}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
+                          variant="ghost"
+                          size="sm"
+                        />
                       )}
-                      <button
-                        onClick={() =>
-                          setExpandedAudit(isAuditExpanded ? null : def.key)
-                        }
-                        className="p-2 rounded-lg text-muted hover:text-warning hover:bg-warning/15 transition-colors"
-                        title={t('catalogContractsConfig.actions.audit', 'Audit History')}
-                      >
-                        {isAuditExpanded ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
+                      <IconButton
+                        icon={isAuditExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        label={t('catalogContractsConfig.actions.audit', 'Audit History')}
+                        onClick={() => setExpandedAudit(isAuditExpanded ? null : def.key)}
+                        variant="ghost"
+                        size="sm"
+                      />
                     </div>
                   </div>
 

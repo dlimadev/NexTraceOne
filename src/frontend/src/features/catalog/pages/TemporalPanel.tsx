@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Clock, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
-import { Button } from '../../../components/Button';
+import { Button, Select } from '../../../shared/ui';
 import type { GraphSnapshotSummary, TemporalDiffResult } from '../../../types';
 
 export interface TemporalPanelProps {
@@ -23,42 +23,36 @@ export function TemporalPanel({
 }: TemporalPanelProps) {
   const { t } = useTranslation();
 
+  const snapshotOptions = [
+    { value: '', label: t('serviceCatalog.temporal.selectSnapshot') },
+    ...snapshots.map((s) => ({
+      value: s.snapshotId,
+      label: `${s.label} — ${new Date(s.capturedAt).toLocaleDateString()} (${s.nodeCount} ${t('serviceCatalog.temporal.nodes')}, ${s.edgeCount} ${t('serviceCatalog.temporal.edges')})`,
+    })),
+  ];
+
   return (
     <div className="space-y-4">
       {/* ── Controles de snapshot ────────────────────────────── */}
       <Card>
         <CardBody>
           <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.temporal.fromSnapshot')}</label>
-              <select
-                value={selectedFrom}
-                onChange={(e) => onSelectFrom(e.target.value)}
-                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <option value="">{t('serviceCatalog.temporal.selectSnapshot')}</option>
-                {snapshots.map((s) => (
-                  <option key={s.snapshotId} value={s.snapshotId}>
-                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('serviceCatalog.temporal.nodes')}, {s.edgeCount} {t('serviceCatalog.temporal.edges')})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.temporal.toSnapshot')}</label>
-              <select
-                value={selectedTo}
-                onChange={(e) => onSelectTo(e.target.value)}
-                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <option value="">{t('serviceCatalog.temporal.selectSnapshot')}</option>
-                {snapshots.map((s) => (
-                  <option key={s.snapshotId} value={s.snapshotId}>
-                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('serviceCatalog.temporal.nodes')}, {s.edgeCount} {t('serviceCatalog.temporal.edges')})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              className="flex-1"
+              label={t('serviceCatalog.temporal.fromSnapshot')}
+              value={selectedFrom}
+              onChange={(e) => onSelectFrom(e.target.value)}
+              options={snapshotOptions}
+              size="sm"
+            />
+            <Select
+              className="flex-1"
+              label={t('serviceCatalog.temporal.toSnapshot')}
+              value={selectedTo}
+              onChange={(e) => onSelectTo(e.target.value)}
+              options={snapshotOptions}
+              size="sm"
+            />
             <Button
               variant="secondary"
               onClick={onCreateSnapshot}

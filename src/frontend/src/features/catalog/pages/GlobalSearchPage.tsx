@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { Button, SearchInput } from '../../../shared/ui';
 import { globalSearchApi } from '../api/globalSearch';
 import type { SearchResultItem } from '../api/globalSearch';
 import { PageContainer } from '../../../components/shell';
@@ -111,17 +112,12 @@ export function GlobalSearchPage() {
       {/* ── Pesquisa ── */}
       <Card className="mb-6">
         <CardBody>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
-            <input
-              type="text"
-              className="w-full pl-10 pr-4 py-2 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-              placeholder={t('commandPalette.globalSearch.searchPlaceholder')}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              autoFocus
-            />
-          </div>
+          <SearchInput
+            placeholder={t('commandPalette.globalSearch.searchPlaceholder')}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            autoFocus
+          />
         </CardBody>
       </Card>
 
@@ -131,14 +127,12 @@ export function GlobalSearchPage() {
           const isActive = scope === s;
           const count = s === 'all' ? totalResults : (facetCounts[s] ?? 0);
           return (
-            <button
+            <Button
               key={s}
+              variant="ghost"
+              size="xs"
               onClick={() => setScope(s)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                isActive
-                  ? 'bg-accent/15 text-accent'
-                  : 'bg-elevated text-muted hover:bg-hover'
-              }`}
+              className={`rounded-full ${isActive ? 'bg-accent/15 text-accent' : 'bg-elevated text-muted'}`}
             >
               {t(scopeLabelKeys[s])}
               {searchEnabled && (
@@ -146,7 +140,7 @@ export function GlobalSearchPage() {
                   {count}
                 </span>
               )}
-            </button>
+            </Button>
           );
         })}
       </div>

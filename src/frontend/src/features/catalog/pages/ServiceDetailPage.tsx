@@ -691,7 +691,7 @@ function ServiceIdentityCard({ mode, summaryData, t, criticalityBadgeVariant, li
             'flex items-center justify-center w-11 h-11 rounded-xl font-bold text-lg shrink-0',
             mode === 'create' && !summaryData.name
               ? 'bg-accent/20 text-accent'
-              : 'bg-accent text-white',
+              : 'bg-accent text-on-accent',
           )}>
             {initial}
           </div>
@@ -1069,14 +1069,15 @@ function ViewContent({
                   <h2 className="text-base font-semibold text-heading">{t('catalog.detail.contracts')}</h2>
                 </div>
                 {service.serviceType && supportsContracts(service.serviceType as ServiceType) ? (
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
+                    size="xs"
                     onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
-                    className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                    icon={<Plus size={13} />}
+                    className="text-accent border border-accent/30 hover:text-accent/80 hover:bg-transparent"
                   >
-                    <Plus size={13} />
                     {t('catalog.services.addContract', 'Add Contract')}
-                  </button>
+                  </Button>
                 ) : (
                   <div className="flex items-center gap-1 text-xs text-muted border border-edge rounded px-2.5 py-1">
                     <Info size={12} />
@@ -1212,25 +1213,26 @@ function EditTabsContent({
       {/* Tabs de preenchimento — navegação livre */}
       <div className="flex gap-0.5 border-b border-edge overflow-x-auto">
         {FORM_TABS.map((tab, idx) => (
-          <button
+          <Button
             key={tab}
-            type="button"
+            variant="ghost"
+            size="md"
             onClick={() => setActiveFormTab(tab)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors',
+              'whitespace-nowrap border-b-2 rounded-none hover:bg-transparent',
               activeFormTab === tab
-                ? 'text-accent border-accent'
+                ? 'text-accent border-accent hover:text-accent'
                 : 'text-muted border-transparent hover:text-heading',
             )}
           >
             <span className={cn(
               'w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold',
-              activeFormTab === tab ? 'bg-accent text-white' : 'bg-elevated text-muted',
+              activeFormTab === tab ? 'bg-accent text-on-accent' : 'bg-elevated text-muted',
             )}>
               {idx + 1}
             </span>
             {TAB_LABELS[tab]}
-          </button>
+          </Button>
         ))}
       </div>
 

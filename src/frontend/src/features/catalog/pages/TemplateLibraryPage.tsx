@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../../../components/EmptyState';
 import {
   Plus,
-  Search,
   Layers,
   Zap,
   Filter,
@@ -24,6 +23,7 @@ import {
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, SearchInput, Select, Checkbox } from '../../../shared/ui';
 
 // ── Helper maps ───────────────────────────────────────────────────────────────
 
@@ -45,11 +45,14 @@ const SERVICE_TYPE_LABELS: Record<TemplateServiceType, string> = {
   Generic: 'Generic',
 };
 
+// INTENTIONAL TAXONOMY: cores por linguagem (DotNet=purple, Java=orange) não têm
+// tokens semânticos equivalentes no design system — mantidos como Tailwind raw.
+// Go migrado para --color-cyan (token disponível em index.css).
 const LANGUAGE_COLORS: Record<TemplateLanguage, string> = {
   DotNet: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
   NodeJs: 'bg-success/10 text-success border-success/20',
   Java: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  Go: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  Go: 'bg-cyan/10 text-cyan border-cyan/20',
   Python: 'bg-warning/10 text-warning border-warning/20',
   Agnostic: 'bg-elevated text-muted border-edge/50',
 };
@@ -176,27 +179,31 @@ function TemplateCard({
 
       {/* Actions */}
       <div className="flex gap-2 border-t border-edge pt-3">
-        <button
-          className="flex flex-1 items-center justify-center gap-1.5 rounded bg-elevated px-3 py-1.5 text-xs font-medium text-body transition-colors hover:bg-card"
+        <Button
+          variant="ghost"
+          size="xs"
+          className="flex-1"
+          icon={<Code2 className="h-3.5 w-3.5" />}
           onClick={e => {
             e.stopPropagation();
             onView();
           }}
         >
-          <Code2 className="h-3.5 w-3.5" />
           {t('templates.library.viewDetails')}
-        </button>
+        </Button>
         {template.isActive && (
-          <button
-            className="flex flex-1 items-center justify-center gap-1.5 rounded bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent/90"
+          <Button
+            variant="primary"
+            size="xs"
+            className="flex-1"
+            icon={<Zap className="h-3.5 w-3.5" />}
             onClick={e => {
               e.stopPropagation();
               onScaffold();
             }}
           >
-            <Zap className="h-3.5 w-3.5" />
             {t('templates.library.scaffold')}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -235,13 +242,13 @@ export function TemplateLibraryPage() {
       />
       {/* Create action */}
       <div className="flex justify-end">
-        <button
-          className="flex items-center gap-2 rounded bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent/90"
+        <Button
+          variant="primary"
+          icon={<Plus className="h-4 w-4" />}
           onClick={() => navigate('/catalog/templates/new')}
         >
-          <Plus className="h-4 w-4" />
           {t('templates.library.createTemplate')}
-        </button>
+        </Button>
       </div>
 
       {/* Stats bar */}
@@ -270,50 +277,41 @@ export function TemplateLibraryPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            placeholder={t('templates.library.searchPlaceholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full rounded border border-edge bg-elevated py-2 pl-9 pr-3 text-sm text-body placeholder-muted outline-none focus:border-accent"
-          />
-        </div>
+        <SearchInput
+          className="flex-1 min-w-[200px]"
+          size="sm"
+          placeholder={t('templates.library.searchPlaceholder')}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
 
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted" />
-          <select
+          <Select
             value={serviceType}
             onChange={e => setServiceType(e.target.value as TemplateServiceType | '')}
-            className="rounded border border-edge bg-elevated py-2 pl-3 pr-8 text-sm text-body outline-none focus:border-accent"
-          >
-            <option value="">{t('templates.library.filters.allTypes')}</option>
-            {Object.entries(SERVICE_TYPE_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
-          </select>
+            size="sm"
+            options={[
+              { value: '', label: t('templates.library.filters.allTypes') },
+              ...Object.entries(SERVICE_TYPE_LABELS).map(([k, v]) => ({ value: k, label: v })),
+            ]}
+          />
 
-          <select
+          <Select
             value={language}
             onChange={e => setLanguage(e.target.value as TemplateLanguage | '')}
-            className="rounded border border-edge bg-elevated py-2 pl-3 pr-8 text-sm text-body outline-none focus:border-accent"
-          >
-            <option value="">{t('templates.library.filters.allLanguages')}</option>
-            {Object.entries(LANGUAGE_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
-          </select>
+            size="sm"
+            options={[
+              { value: '', label: t('templates.library.filters.allLanguages') },
+              ...Object.entries(LANGUAGE_LABELS).map(([k, v]) => ({ value: k, label: v })),
+            ]}
+          />
 
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted">
-            <input
-              type="checkbox"
-              checked={showInactive}
-              onChange={e => setShowInactive(e.target.checked)}
-              className="rounded border-edge bg-elevated"
-            />
-            {t('templates.library.filters.showInactive')}
-          </label>
+          <Checkbox
+            checked={showInactive}
+            onChange={e => setShowInactive(e.target.checked)}
+            label={t('templates.library.filters.showInactive')}
+          />
         </div>
       </div>
 
@@ -335,13 +333,13 @@ export function TemplateLibraryPage() {
           title={t('templates.library.empty', 'No templates found')}
           description={t('templates.library.emptyHint', 'Create your first template to get started.')}
           action={
-            <button
-              className="flex items-center gap-2 rounded bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent/90"
+            <Button
+              variant="primary"
+              icon={<Plus className="h-4 w-4" />}
               onClick={() => navigate('/catalog/templates/new')}
             >
-              <Plus className="h-4 w-4" />
               {t('templates.library.createFirst')}
-            </button>
+            </Button>
           }
         />
       ) : (

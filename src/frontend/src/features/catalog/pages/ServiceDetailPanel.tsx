@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import { Button } from '../../../components/Button';
+import { Button, IconButton } from '../../../shared/ui';
 import type { AssetGraph, NodeHealthResult } from '../../../types';
 
 /** Variantes de badge para status de saúde dos nós. */
@@ -47,9 +47,7 @@ export function ServiceDetailPanel({
       <Card className="shadow-lg border-edge">
         <CardHeader className="flex items-center justify-between">
           <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.detail.title')}</h3>
-          <button onClick={onClose} className="text-muted hover:text-body transition-colors" aria-label={t('serviceCatalog.detail.close')}>
-            <X size={16} />
-          </button>
+          <IconButton onClick={onClose} label={t('serviceCatalog.detail.close')} icon={<X size={16} />} size="sm" />
         </CardHeader>
         <CardBody className="space-y-4">
           {/* Nome e saúde */}

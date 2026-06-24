@@ -3,24 +3,18 @@
  * Pertence ao módulo Service Catalog — bounded context de Service Interfaces.
  */
 import { useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Layers, Check } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
-import { Button } from '../../../components/Button';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button, TextField, TextArea, Select, Checkbox } from '../../../shared/ui';
 import { serviceCatalogApi } from '../api';
 import type { InterfaceType, ExposureType } from '../../../types';
-
-const inputClass =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
-const selectClass = inputClass;
-const monoClass = `${inputClass} font-mono`;
-const textareaClass = `${inputClass} resize-none`;
 
 interface CreateInterfaceFormData {
   name: string;
@@ -142,17 +136,40 @@ export function CreateServiceInterfacePage() {
   const showGrpc = TYPES_WITH_GRPC.includes(form.interfaceType);
   const showCron = TYPES_WITH_CRON.includes(form.interfaceType);
 
+  const interfaceTypeOptions = [
+    { value: 'RestApi', label: t('serviceInterfaces.typeRestApi', 'REST API') },
+    { value: 'GraphqlApi', label: t('serviceInterfaces.typeGraphqlApi', 'GraphQL API') },
+    { value: 'GrpcService', label: t('serviceInterfaces.typeGrpcService', 'gRPC Service') },
+    { value: 'SoapService', label: t('serviceInterfaces.typeSoapService', 'SOAP Service') },
+    { value: 'ZosConnectApi', label: t('serviceInterfaces.typeZosConnectApi', 'z/OS Connect API') },
+    { value: 'KafkaProducer', label: t('serviceInterfaces.typeKafkaProducer', 'Kafka Producer') },
+    { value: 'KafkaConsumer', label: t('serviceInterfaces.typeKafkaConsumer', 'Kafka Consumer') },
+    { value: 'WebhookProducer', label: t('serviceInterfaces.typeWebhookProducer', 'Webhook Producer') },
+    { value: 'WebhookConsumer', label: t('serviceInterfaces.typeWebhookConsumer', 'Webhook Consumer') },
+    { value: 'MqQueue', label: t('serviceInterfaces.typeMqQueue', 'MQ Queue') },
+    { value: 'BackgroundWorker', label: t('serviceInterfaces.typeBackgroundWorker', 'Background Worker') },
+    { value: 'ScheduledJob', label: t('serviceInterfaces.typeScheduledJob', 'Scheduled Job') },
+    { value: 'IntegrationBridge', label: t('serviceInterfaces.typeIntegrationBridge', 'Integration Bridge') },
+  ];
+
+  const exposureScopeOptions = [
+    { value: 'Internal', label: t('catalog.badges.exposure.Internal', 'Internal') },
+    { value: 'Partner', label: t('catalog.badges.exposure.Partner', 'Partner') },
+    { value: 'External', label: t('catalog.badges.exposure.External', 'External') },
+  ];
+
   return (
     <PageContainer className="animate-fade-in">
       {/* ── Breadcrumb / Back ── */}
       <div className="mb-4">
-        <Link
-          to={`/services/${serviceId}`}
-          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-heading transition-colors"
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft size={14} />}
+          onClick={() => navigate(`/services/${serviceId}`)}
         >
-          <ArrowLeft size={14} />
           {service.displayName || service.name}
-        </Link>
+        </Button>
       </div>
 
       <PageHeader
@@ -173,185 +190,106 @@ export function CreateServiceInterfacePage() {
 
               {/* Name + Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldName', 'Interface Name')} <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => set('name', e.target.value)}
-                    placeholder={t('serviceInterfaces.fieldNamePlaceholder', 'Orders REST API v1')}
-                    className={inputClass}
-                    autoFocus
-                  />
-                  {errors.name && <p className="text-xs text-danger mt-1">{errors.name}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldType', 'Interface Type')}
-                  </label>
-                  <select
-                    value={form.interfaceType}
-                    onChange={(e) => set('interfaceType', e.target.value as InterfaceType)}
-                    className={selectClass}
-                  >
-                    <optgroup label={t('serviceInterfaces.groupPublicApi', 'Public API')}>
-                      <option value="RestApi">{t('serviceInterfaces.typeRestApi', 'REST API')}</option>
-                      <option value="GraphqlApi">{t('serviceInterfaces.typeGraphqlApi', 'GraphQL API')}</option>
-                      <option value="GrpcService">{t('serviceInterfaces.typeGrpcService', 'gRPC Service')}</option>
-                      <option value="SoapService">{t('serviceInterfaces.typeSoapService', 'SOAP Service')}</option>
-                      <option value="ZosConnectApi">{t('serviceInterfaces.typeZosConnectApi', 'z/OS Connect API')}</option>
-                    </optgroup>
-                    <optgroup label={t('serviceInterfaces.groupEventDriven', 'Event-Driven')}>
-                      <option value="KafkaProducer">{t('serviceInterfaces.typeKafkaProducer', 'Kafka Producer')}</option>
-                      <option value="KafkaConsumer">{t('serviceInterfaces.typeKafkaConsumer', 'Kafka Consumer')}</option>
-                      <option value="WebhookProducer">{t('serviceInterfaces.typeWebhookProducer', 'Webhook Producer')}</option>
-                      <option value="WebhookConsumer">{t('serviceInterfaces.typeWebhookConsumer', 'Webhook Consumer')}</option>
-                      <option value="MqQueue">{t('serviceInterfaces.typeMqQueue', 'MQ Queue')}</option>
-                    </optgroup>
-                    <optgroup label={t('serviceInterfaces.groupBackground', 'Background')}>
-                      <option value="BackgroundWorker">{t('serviceInterfaces.typeBackgroundWorker', 'Background Worker')}</option>
-                      <option value="ScheduledJob">{t('serviceInterfaces.typeScheduledJob', 'Scheduled Job')}</option>
-                    </optgroup>
-                    <optgroup label={t('serviceInterfaces.groupInfrastructure', 'Infrastructure')}>
-                      <option value="IntegrationBridge">{t('serviceInterfaces.typeIntegrationBridge', 'Integration Bridge')}</option>
-                    </optgroup>
-                  </select>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('serviceInterfaces.fieldDescription', 'Description')}
-                </label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => set('description', e.target.value)}
-                  rows={3}
-                  className={textareaClass}
+                <TextField
+                  label={t('serviceInterfaces.fieldName', 'Interface Name')}
+                  value={form.name}
+                  onChange={(e) => set('name', e.target.value)}
+                  placeholder={t('serviceInterfaces.fieldNamePlaceholder', 'Orders REST API v1')}
+                  required
+                  autoFocus
+                  error={errors.name}
+                />
+                <Select
+                  label={t('serviceInterfaces.fieldType', 'Interface Type')}
+                  value={form.interfaceType}
+                  onChange={(e) => set('interfaceType', e.target.value as InterfaceType)}
+                  options={interfaceTypeOptions}
                 />
               </div>
 
+              {/* Description */}
+              <TextArea
+                label={t('serviceInterfaces.fieldDescription', 'Description')}
+                value={form.description}
+                onChange={(e) => set('description', e.target.value)}
+                rows={3}
+              />
+
               {/* Exposure */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldExposure', 'Exposure Scope')}
-                  </label>
-                  <select
-                    value={form.exposureScope}
-                    onChange={(e) => set('exposureScope', e.target.value as ExposureType)}
-                    className={selectClass}
-                  >
-                    <option value="Internal">{t('catalog.badges.exposure.Internal', 'Internal')}</option>
-                    <option value="Partner">{t('catalog.badges.exposure.Partner', 'Partner')}</option>
-                    <option value="External">{t('catalog.badges.exposure.External', 'External')}</option>
-                  </select>
-                </div>
+                <Select
+                  label={t('serviceInterfaces.fieldExposure', 'Exposure Scope')}
+                  value={form.exposureScope}
+                  onChange={(e) => set('exposureScope', e.target.value as ExposureType)}
+                  options={exposureScopeOptions}
+                />
               </div>
 
               {/* Conditional fields */}
               {showBasePath && (
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldBasePath', 'Base Path')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.basePath}
-                    onChange={(e) => set('basePath', e.target.value)}
-                    placeholder={t('serviceInterfaces.fieldBasePathPlaceholder', '/api/orders')}
-                    className={monoClass}
-                  />
-                </div>
+                <TextField
+                  label={t('serviceInterfaces.fieldBasePath', 'Base Path')}
+                  value={form.basePath}
+                  onChange={(e) => set('basePath', e.target.value)}
+                  placeholder={t('serviceInterfaces.fieldBasePathPlaceholder', '/api/orders')}
+                  className="font-mono"
+                />
               )}
 
               {showWsdl && (
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldWsdlNamespace', 'WSDL Namespace')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.wsdlNamespace}
-                    onChange={(e) => set('wsdlNamespace', e.target.value)}
-                    className={monoClass}
-                  />
-                </div>
+                <TextField
+                  label={t('serviceInterfaces.fieldWsdlNamespace', 'WSDL Namespace')}
+                  value={form.wsdlNamespace}
+                  onChange={(e) => set('wsdlNamespace', e.target.value)}
+                  className="font-mono"
+                />
               )}
 
               {showTopic && (
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldTopicName', 'Topic Name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.topicName}
-                    onChange={(e) => set('topicName', e.target.value)}
-                    placeholder={t('serviceInterfaces.fieldTopicNamePlaceholder', 'orders.events.v1')}
-                    className={monoClass}
-                  />
-                </div>
+                <TextField
+                  label={t('serviceInterfaces.fieldTopicName', 'Topic Name')}
+                  value={form.topicName}
+                  onChange={(e) => set('topicName', e.target.value)}
+                  placeholder={t('serviceInterfaces.fieldTopicNamePlaceholder', 'orders.events.v1')}
+                  className="font-mono"
+                />
               )}
 
               {showGrpc && (
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldGrpcServiceName', 'Proto Service Name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.grpcServiceName}
-                    onChange={(e) => set('grpcServiceName', e.target.value)}
-                    className={monoClass}
-                  />
-                </div>
+                <TextField
+                  label={t('serviceInterfaces.fieldGrpcServiceName', 'Proto Service Name')}
+                  value={form.grpcServiceName}
+                  onChange={(e) => set('grpcServiceName', e.target.value)}
+                  className="font-mono"
+                />
               )}
 
               {showCron && (
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('serviceInterfaces.fieldScheduleCron', 'Cron Expression')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.scheduleCron}
-                    onChange={(e) => set('scheduleCron', e.target.value)}
-                    placeholder="0 */5 * * *"
-                    className={monoClass}
-                  />
-                </div>
+                <TextField
+                  label={t('serviceInterfaces.fieldScheduleCron', 'Cron Expression')}
+                  value={form.scheduleCron}
+                  onChange={(e) => set('scheduleCron', e.target.value)}
+                  placeholder="0 */5 * * *"
+                  className="font-mono"
+                />
               )}
 
               {/* Documentation URL */}
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('serviceInterfaces.fieldDocumentationUrl', 'Documentation URL')}
-                </label>
-                <input
-                  type="url"
-                  value={form.documentationUrl}
-                  onChange={(e) => set('documentationUrl', e.target.value)}
-                  className={monoClass}
-                />
-              </div>
+              <TextField
+                label={t('serviceInterfaces.fieldDocumentationUrl', 'Documentation URL')}
+                type="url"
+                value={form.documentationUrl}
+                onChange={(e) => set('documentationUrl', e.target.value)}
+                className="font-mono"
+              />
 
               {/* Requires Contract */}
-              <div className="flex items-center gap-3">
-                <input
-                  id="requires-contract"
-                  type="checkbox"
-                  checked={form.requiresContract}
-                  onChange={(e) => set('requiresContract', e.target.checked)}
-                  className="w-4 h-4 rounded border-edge text-accent focus:ring-accent"
-                />
-                <label htmlFor="requires-contract" className="text-sm text-body select-none cursor-pointer">
-                  {t('serviceInterfaces.fieldRequiresContract', 'Requires Contract')}
-                </label>
-              </div>
+              <Checkbox
+                id="requires-contract"
+                checked={form.requiresContract}
+                onChange={(e) => set('requiresContract', e.target.checked)}
+                label={t('serviceInterfaces.fieldRequiresContract', 'Requires Contract')}
+              />
 
               {/* Error from mutation */}
               {mutation.isError && (
@@ -370,6 +308,7 @@ export function CreateServiceInterfacePage() {
                   {t('serviceInterfaces.cancel', 'Cancel')}
                 </Button>
                 <Button
+                  variant="primary"
                   type="button"
                   onClick={handleSubmit}
                   loading={mutation.isPending}

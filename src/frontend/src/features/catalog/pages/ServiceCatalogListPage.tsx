@@ -479,35 +479,3 @@ function SummaryCard({
   );
 }
 
-/** Dropdown de filtro reutilizável. */
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-  allLabel,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-  allLabel: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs text-muted">{label}</label>
-      <select
-        className="w-full px-3 py-1.5 bg-elevated border border-edge rounded-md text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">{allLabel}</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}

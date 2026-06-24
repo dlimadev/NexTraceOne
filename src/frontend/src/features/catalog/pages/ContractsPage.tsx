@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
-import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -20,6 +19,7 @@ import type {
   ContractVersionDetail, SemanticDiff,
 } from '../../../types';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { Button, IconButton, TextField, TextArea, Select } from '../../../shared/ui';
 
 /**
  * Retorna a variante visual do Badge conforme o estado do lifecycle.
@@ -225,6 +225,19 @@ export function ContractsPage() {
     );
   }
 
+  // ─── Opções reutilizáveis para selects de API Asset ─────────────────────────
+  const apiOptions = availableApis.map((api) => ({
+    value: api.apiAssetId,
+    label: `${api.name} — ${api.routePattern}`,
+  }));
+
+  const protocolOptions = [
+    { value: 'OpenApi', label: t('contracts.protocols.OpenApi') },
+    { value: 'Swagger', label: t('contracts.protocols.Swagger') },
+    { value: 'Wsdl', label: t('contracts.protocols.Wsdl') },
+    { value: 'AsyncApi', label: t('contracts.protocols.AsyncApi') },
+  ];
+
   return (
     <PageContainer>
 
@@ -268,58 +281,38 @@ export function ContractsPage() {
               className="space-y-4"
             >
               <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
-                  <select
-                    value={importForm.apiAssetId}
-                    onChange={(e) => setImportForm((f) => ({ ...f, apiAssetId: e.target.value }))}
-                    required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  >
-                    <option value="">{t('contracts.selectApiAsset')}</option>
-                    {availableApis.map((api) => (
-                      <option key={api.apiAssetId} value={api.apiAssetId}>
-                        {api.name} — {api.routePattern}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
-                  <input
-                    type="text"
-                    value={importForm.version}
-                    onChange={(e) => setImportForm((f) => ({ ...f, version: e.target.value }))}
-                    required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder={t('contracts.versionExample')}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.protocol')}</label>
-                  <select
-                    value={importForm.protocol}
-                    onChange={(e) => setImportForm((f) => ({ ...f, protocol: e.target.value as ContractProtocol }))}
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  >
-                    <option value="OpenApi">{t('contracts.protocols.OpenApi')}</option>
-                    <option value="Swagger">{t('contracts.protocols.Swagger')}</option>
-                    <option value="Wsdl">{t('contracts.protocols.Wsdl')}</option>
-                    <option value="AsyncApi">{t('contracts.protocols.AsyncApi')}</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('contracts.specContent')}</label>
-                <textarea
-                  value={importForm.content}
-                  onChange={(e) => setImportForm((f) => ({ ...f, content: e.target.value }))}
+                <Select
+                  label={t('contracts.apiAssetId')}
+                  placeholder={t('contracts.selectApiAsset')}
+                  options={apiOptions}
+                  value={importForm.apiAssetId}
+                  onChange={(e) => setImportForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                   required
-                  rows={6}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading font-mono placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  placeholder={t('contracts.specContentPlaceholder')}
+                />
+                <TextField
+                  label={t('contracts.version')}
+                  type="text"
+                  value={importForm.version}
+                  onChange={(e) => setImportForm((f) => ({ ...f, version: e.target.value }))}
+                  required
+                  placeholder={t('contracts.versionExample')}
+                />
+                <Select
+                  label={t('contracts.protocol')}
+                  options={protocolOptions}
+                  value={importForm.protocol}
+                  onChange={(e) => setImportForm((f) => ({ ...f, protocol: e.target.value as ContractProtocol }))}
                 />
               </div>
+              <TextArea
+                label={t('contracts.specContent')}
+                value={importForm.content}
+                onChange={(e) => setImportForm((f) => ({ ...f, content: e.target.value }))}
+                required
+                rows={6}
+                placeholder={t('contracts.specContentPlaceholder')}
+                textareaClassName="font-mono"
+              />
               <div className="flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowImportForm(false)}>{t('common.cancel')}</Button>
                 <Button type="submit" loading={importMutation.isPending}>{t('contracts.import')}</Button>
@@ -340,45 +333,32 @@ export function ContractsPage() {
               className="space-y-4"
             >
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
-                  <select
-                    value={createVersionForm.apiAssetId}
-                    onChange={(e) => setCreateVersionForm((f) => ({ ...f, apiAssetId: e.target.value }))}
-                    required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  >
-                    <option value="">{t('contracts.selectApiAsset')}</option>
-                    {availableApis.map((api) => (
-                      <option key={api.apiAssetId} value={api.apiAssetId}>
-                        {api.name} — {api.routePattern}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
-                  <input
-                    type="text"
-                    value={createVersionForm.version}
-                    onChange={(e) => setCreateVersionForm((f) => ({ ...f, version: e.target.value }))}
-                    required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder={t('contracts.versionExample')}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('contracts.specContent')}</label>
-                <textarea
-                  value={createVersionForm.content}
-                  onChange={(e) => setCreateVersionForm((f) => ({ ...f, content: e.target.value }))}
+                <Select
+                  label={t('contracts.apiAssetId')}
+                  placeholder={t('contracts.selectApiAsset')}
+                  options={apiOptions}
+                  value={createVersionForm.apiAssetId}
+                  onChange={(e) => setCreateVersionForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                   required
-                  rows={6}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading font-mono placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  placeholder={t('contracts.specContentPlaceholder')}
+                />
+                <TextField
+                  label={t('contracts.version')}
+                  type="text"
+                  value={createVersionForm.version}
+                  onChange={(e) => setCreateVersionForm((f) => ({ ...f, version: e.target.value }))}
+                  required
+                  placeholder={t('contracts.versionExample')}
                 />
               </div>
+              <TextArea
+                label={t('contracts.specContent')}
+                value={createVersionForm.content}
+                onChange={(e) => setCreateVersionForm((f) => ({ ...f, content: e.target.value }))}
+                required
+                rows={6}
+                placeholder={t('contracts.specContentPlaceholder')}
+                textareaClassName="font-mono"
+              />
               <div className="flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowCreateVersionForm(false)}>{t('common.cancel')}</Button>
                 <Button type="submit" loading={createVersionMutation.isPending}>{t('contracts.createVersion')}</Button>
@@ -394,38 +374,32 @@ export function ContractsPage() {
           <CardHeader>
             <div className="flex items-center justify-between w-full">
               <h2 className="font-semibold text-heading">{t('contracts.diffCompare.title')}</h2>
-              <button onClick={() => { setShowDiffPanel(false); setDiffResult(null); }} className="text-muted hover:text-heading transition-colors">
-                <X size={16} />
-              </button>
+              <IconButton
+                label={t('common.close')}
+                icon={<X size={16} />}
+                onClick={() => { setShowDiffPanel(false); setDiffResult(null); }}
+              />
             </div>
           </CardHeader>
           <CardBody>
             <div className="flex gap-4 items-end mb-4">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-body mb-1">{t('contracts.diffCompare.baseVersion')}</label>
-                <select
+                <Select
+                  label={t('contracts.diffCompare.baseVersion')}
+                  placeholder={t('contracts.diffView.selectBaseVersion')}
+                  options={(history ?? []).map((cv: ContractVersion) => ({ value: cv.id, label: cv.version }))}
                   value={diffBaseId}
                   onChange={(e) => setDiffBaseId(e.target.value)}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                >
-                  <option value="">{t('contracts.diffView.selectBaseVersion')}</option>
-                  {history.map((cv: ContractVersion) => (
-                    <option key={cv.id} value={cv.id}>{cv.version}</option>
-                  ))}
-                </select>
+                />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-body mb-1">{t('contracts.diffCompare.targetVersion')}</label>
-                <select
+                <Select
+                  label={t('contracts.diffCompare.targetVersion')}
+                  placeholder={t('contracts.diffView.selectTargetVersion')}
+                  options={(history ?? []).map((cv: ContractVersion) => ({ value: cv.id, label: cv.version }))}
                   value={diffTargetId}
                   onChange={(e) => setDiffTargetId(e.target.value)}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                >
-                  <option value="">{t('contracts.diffView.selectTargetVersion')}</option>
-                  {history.map((cv: ContractVersion) => (
-                    <option key={cv.id} value={cv.id}>{cv.version}</option>
-                  ))}
-                </select>
+                />
               </div>
               <Button
                 onClick={() => diffMutation.mutate({ from: diffBaseId, to: diffTargetId })}
@@ -490,18 +464,15 @@ export function ContractsPage() {
         <CardBody>
           <div className="flex gap-3 items-center">
             <label className="text-sm font-medium text-body whitespace-nowrap">{t('contracts.selectApiAssetLabel')}</label>
-            <select
+            <Select
+              aria-label={t('contracts.selectApiAsset')}
+              placeholder={t('contracts.selectApiAsset')}
+              options={apiOptions}
               value={apiAssetId}
               onChange={(e) => setApiAssetId(e.target.value)}
-              className="flex-1 text-sm bg-canvas border border-edge rounded-md px-3 py-1.5 text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-            >
-              <option value="">{t('contracts.selectApiAsset')}</option>
-              {availableApis.map((api) => (
-                <option key={api.apiAssetId} value={api.apiAssetId}>
-                  {api.name} — {api.routePattern}
-                </option>
-              ))}
-            </select>
+              className="flex-1"
+              size="sm"
+            />
           </div>
         </CardBody>
       </Card>
@@ -571,37 +542,41 @@ export function ContractsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {!cv.isLocked && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="xs"
                             onClick={() => lockMutation.mutate({ id: cv.id, reason: t('contracts.lockedViaUi') })}
-                            className="inline-flex items-center gap-1 text-xs text-muted hover:text-critical transition-colors"
                             title={t('contracts.lock')}
                           >
                             <Lock size={12} /> {t('contracts.lock')}
-                          </button>
+                          </Button>
                         )}
                         {cv.isLocked && !cv.fingerprint && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="xs"
                             onClick={() => signMutation.mutate(cv.id)}
-                            className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
                             title={t('contracts.sign')}
                           >
                             <Shield size={12} /> {t('contracts.sign')}
-                          </button>
+                          </Button>
                         )}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="xs"
                           onClick={() => handleExport(cv.id)}
-                          className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
                           title={t('contracts.export')}
                         >
                           <Download size={12} /> {t('contracts.export')}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="xs"
                           onClick={() => handleSelectDetail(cv.id)}
-                          className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
                           title={t('contracts.detail')}
                         >
                           <Eye size={12} /> {t('contracts.detail')}
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -630,9 +605,11 @@ export function ContractsPage() {
           <CardHeader>
             <div className="flex items-center justify-between w-full">
               <h2 className="font-semibold text-heading">{t('contracts.export')} — {exportContent.format}</h2>
-              <button onClick={() => setExportContent(null)} className="text-muted hover:text-heading transition-colors">
-                <X size={16} />
-              </button>
+              <IconButton
+                label={t('common.close')}
+                icon={<X size={16} />}
+                onClick={() => setExportContent(null)}
+              />
             </div>
           </CardHeader>
           <CardBody>

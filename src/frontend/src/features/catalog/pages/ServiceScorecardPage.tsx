@@ -10,7 +10,6 @@ import {
   GitBranch,
   BookOpen,
   Shield,
-  Search,
   BarChart3,
   ChevronDown,
   ChevronUp,
@@ -22,6 +21,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button, SearchInput, Select } from '../../../shared/ui';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import type { ScorecardDimensionDto } from '../api/sourceOfTruth';
 import { queryKeys } from '../../../shared/api/queryKeys';
@@ -98,10 +98,11 @@ function DimensionCard({
 
   return (
     <Card>
-      <button
+      <Button
         type="button"
-        className="w-full text-left"
+        variant="ghost"
         onClick={() => setExpanded(!expanded)}
+        className="w-full flex h-auto p-0 text-left"
       >
         <CardBody className="py-3">
           <div className="flex items-center gap-3">
@@ -130,7 +131,7 @@ function DimensionCard({
             </div>
           )}
         </CardBody>
-      </button>
+      </Button>
     </Card>
   );
 }
@@ -193,39 +194,31 @@ export function ServiceScorecardPage() {
                 <label className="block text-xs font-medium text-muted mb-1">
                   {t('serviceScorecard.serviceName', 'Service Name')}
                 </label>
-                <div className="relative">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-                  <input
-                    type="text"
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    placeholder={t('serviceScorecard.searchPlaceholder', 'Enter service name...')}
-                    className="w-full rounded-md bg-canvas border border-edge pl-9 pr-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  />
-                </div>
+                <SearchInput
+                  size="sm"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder={t('serviceScorecard.searchPlaceholder', 'Enter service name...')}
+                  aria-label={t('serviceScorecard.serviceName', 'Service Name')}
+                />
               </div>
               <div className="w-40">
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('serviceScorecard.environment', 'Environment')}
-                </label>
-                <select
+                <Select
+                  label={t('serviceScorecard.environment', 'Environment')}
                   value={environment}
                   onChange={(e) => setEnvironment(e.target.value)}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                >
-                  <option value="Production">{t('environment.profile.production', 'Production')}</option>
-                  <option value="Staging">{t('environment.profile.staging', 'Staging')}</option>
-                  <option value="Development">{t('environment.profile.development', 'Development')}</option>
-                </select>
+                  options={[
+                    { value: 'Production', label: t('environment.profile.production', 'Production') },
+                    { value: 'Staging', label: t('environment.profile.staging', 'Staging') },
+                    { value: 'Development', label: t('environment.profile.development', 'Development') },
+                  ]}
+                  size="sm"
+                />
               </div>
-              <button
-                type="button"
-                onClick={handleSearch}
-                className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors"
-              >
+              <Button variant="primary" onClick={handleSearch}>
                 {t('serviceScorecard.compute', 'Compute')}
-              </button>
+              </Button>
             </div>
           </CardBody>
         </Card>
