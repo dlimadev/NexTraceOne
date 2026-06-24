@@ -21,7 +21,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { Button, SearchInput, Tabs } from '../../../shared/ui';
+import { Button, TextField, Tabs } from '../../../shared/ui';
 import { serviceCatalogApi } from '../api/serviceCatalog';
 import type {
   MaturityDashboardResponse,
@@ -88,7 +88,7 @@ export function ServiceMaturityPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <SearchInput
+        <TextField
           size="sm"
           placeholder={t('serviceMaturity.filterTeam')}
           value={teamFilter}
@@ -96,7 +96,7 @@ export function ServiceMaturityPage() {
           aria-label={t('serviceMaturity.filterTeam')}
           className="w-48"
         />
-        <SearchInput
+        <TextField
           size="sm"
           placeholder={t('serviceMaturity.filterDomain')}
           value={domainFilter}

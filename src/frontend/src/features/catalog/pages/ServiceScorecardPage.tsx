@@ -102,7 +102,7 @@ function DimensionCard({
         type="button"
         variant="ghost"
         onClick={() => setExpanded(!expanded)}
-        className="w-full block h-auto p-0 rounded-none text-left"
+        className="w-full flex h-auto p-0 text-left"
       >
         <CardBody className="py-3">
           <div className="flex items-center gap-3">

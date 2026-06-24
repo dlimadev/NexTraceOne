@@ -281,6 +281,7 @@ export function ServiceFeatureFlagsPage() {
                         toggleMutation.mutate({ flagId: flag.id, enabled: checked })
                       }
                       disabled={toggleMutation.isPending}
+                      label={flag.enabled ? t('featureFlags.disable', 'Desabilitar') : t('featureFlags.enable', 'Habilitar')}
                     />
                   </td>
                 </tr>
