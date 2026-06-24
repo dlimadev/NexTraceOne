@@ -89,14 +89,14 @@ describe('SourceOfTruthExplorerPage', () => {
 
   it('shows empty state before search', () => {
     renderPage();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
   });
 
   it('shows search results after typing', async () => {
     vi.mocked(sourceOfTruthApi.search).mockResolvedValue(mockSearchResults);
     const user = userEvent.setup();
     renderPage();
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('searchbox');
     await user.type(input, 'order');
     await waitFor(
       () => {
@@ -110,14 +110,14 @@ describe('SourceOfTruthExplorerPage', () => {
 
   it('shows scope filter buttons', () => {
     renderPage();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
   });
 
   it('shows error state on API failure', async () => {
     vi.mocked(sourceOfTruthApi.search).mockRejectedValue(new Error('Network error'));
     const user = userEvent.setup();
     renderPage();
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('searchbox');
     await user.type(input, 'failing-query');
     await waitFor(
       () => {
