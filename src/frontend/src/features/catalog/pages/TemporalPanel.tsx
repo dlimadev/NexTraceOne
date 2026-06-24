@@ -23,10 +23,13 @@ export function TemporalPanel({
 }: TemporalPanelProps) {
   const { t } = useTranslation();
 
-  const snapshotOptions = snapshots.map((s) => ({
-    value: s.snapshotId,
-    label: `${s.label} — ${new Date(s.capturedAt).toLocaleDateString()} (${s.nodeCount} ${t('serviceCatalog.temporal.nodes')}, ${s.edgeCount} ${t('serviceCatalog.temporal.edges')})`,
-  }));
+  const snapshotOptions = [
+    { value: '', label: t('serviceCatalog.temporal.selectSnapshot') },
+    ...snapshots.map((s) => ({
+      value: s.snapshotId,
+      label: `${s.label} — ${new Date(s.capturedAt).toLocaleDateString()} (${s.nodeCount} ${t('serviceCatalog.temporal.nodes')}, ${s.edgeCount} ${t('serviceCatalog.temporal.edges')})`,
+    })),
+  ];
 
   return (
     <div className="space-y-4">
@@ -40,7 +43,6 @@ export function TemporalPanel({
               value={selectedFrom}
               onChange={(e) => onSelectFrom(e.target.value)}
               options={snapshotOptions}
-              placeholder={t('serviceCatalog.temporal.selectSnapshot')}
               size="sm"
             />
             <Select
@@ -49,7 +51,6 @@ export function TemporalPanel({
               value={selectedTo}
               onChange={(e) => onSelectTo(e.target.value)}
               options={snapshotOptions}
-              placeholder={t('serviceCatalog.temporal.selectSnapshot')}
               size="sm"
             />
             <Button

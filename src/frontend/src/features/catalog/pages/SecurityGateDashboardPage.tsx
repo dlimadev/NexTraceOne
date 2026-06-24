@@ -106,8 +106,7 @@ const securityApi = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-// NOTE: `orange-X` classes below are intentional — "High" severity maps to orange
-// (CVE-severity exception: no --color-orange token exists in the design system).
+// Taxonomia intencional: 'High' nao tem token DS (entre critical e warning)
 const SEVERITY_CONFIG: Record<FindingSeverity, { color: string; bg: string; icon: React.ReactNode }> = {
   Critical: {
     color: 'text-critical',
@@ -115,9 +114,9 @@ const SEVERITY_CONFIG: Record<FindingSeverity, { color: string; bg: string; icon
     icon: <ShieldX className="h-3.5 w-3.5 text-critical" />,
   },
   High: {
-    color: 'text-orange-400',
+    color: 'text-orange-500',
     bg: 'bg-orange-500/10 border-orange-500/30',
-    icon: <ShieldAlert className="h-3.5 w-3.5 text-orange-400" />,
+    icon: <ShieldAlert className="h-3.5 w-3.5 text-orange-500" />,
   },
   Medium: {
     color: 'text-warning',
@@ -140,7 +139,7 @@ const RISK_CONFIG: Record<SecurityRiskLevel, { color: string; icon: React.ReactN
   Clean: { color: 'text-success', icon: <ShieldCheck className="h-4 w-4 text-success" /> },
   Low: { color: 'text-accent', icon: <Shield className="h-4 w-4 text-accent" /> },
   Medium: { color: 'text-warning', icon: <AlertTriangle className="h-4 w-4 text-warning" /> },
-  High: { color: 'text-orange-400', icon: <ShieldAlert className="h-4 w-4 text-orange-400" /> },
+  High: { color: 'text-orange-500', icon: <ShieldAlert className="h-4 w-4 text-orange-500" /> }, // Taxonomia intencional: 'High' nao tem token DS (entre critical e warning)
   Critical: { color: 'text-critical', icon: <ShieldX className="h-4 w-4 text-critical" /> },
 };
 
@@ -341,7 +340,7 @@ export function SecurityGateDashboardPage() {
                 {/* Severity summary */}
                 <div className="grid grid-cols-3 gap-2">
                   <SummaryCard label={t('critical')} value={scanMutation.data.summary.criticalCount} color="text-critical" />
-                  <SummaryCard label={t('high')} value={scanMutation.data.summary.highCount} color="text-orange-400" />
+                  <SummaryCard label={t('high')} value={scanMutation.data.summary.highCount} color="text-orange-500" />
                   <SummaryCard label={t('medium')} value={scanMutation.data.summary.mediumCount} color="text-warning" />
                 </div>
 

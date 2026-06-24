@@ -28,6 +28,7 @@ export function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading
   const { t } = useTranslation();
 
   const nodeOptions = [
+    { value: '', label: t('serviceCatalog.impact.selectNodePlaceholder') },
     ...(graph?.apis?.map((api) => ({
       value: api.apiAssetId,
       label: `API: ${api.name} (${api.routePattern})`,
@@ -51,7 +52,6 @@ export function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading
               value={selectedNodeId ?? ''}
               onChange={(e) => onSelectNode(e.target.value)}
               options={nodeOptions}
-              placeholder={t('serviceCatalog.impact.selectNodePlaceholder')}
               size="sm"
             />
             <Select
