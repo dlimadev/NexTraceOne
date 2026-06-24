@@ -21,6 +21,7 @@ import JSZip from 'jszip';
 import { templatesApi, type AiScaffoldResult, type ScaffoldedFile } from '../api/templates';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 
 // ── Step indicator ─────────────────────────────────────────────────────────────
 
@@ -70,18 +71,18 @@ function FileTree({
   return (
     <div className="flex flex-col gap-0.5 overflow-auto">
       {files.map((f, i) => (
-        <button
+        <Button
           key={i}
+          variant="ghost"
+          size="xs"
           onClick={() => onSelect(i)}
-          className={`flex items-center gap-2 truncate rounded px-2 py-1 text-left text-xs transition-colors ${
-            i === selected
-              ? 'bg-accent/20 text-accent'
-              : 'text-muted hover:bg-elevated hover:text-body'
+          icon={<FileCode className="h-3 w-3 shrink-0" />}
+          className={`w-full justify-start truncate text-left ${
+            i === selected ? 'bg-accent/20 text-accent' : ''
           }`}
         >
-          <FileCode className="h-3 w-3 shrink-0" />
           <span className="truncate">{f.path}</span>
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -171,9 +172,6 @@ export function AiScaffoldWizardPage() {
     );
   }
 
-  const INPUT_CLASS =
-    'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted outline-none focus:border-accent';
-
   return (
     <PageContainer>
       <PageHeader
@@ -182,13 +180,14 @@ export function AiScaffoldWizardPage() {
       />
       {/* Back + wizard title */}
       <div className="flex items-center gap-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft className="h-4 w-4" />}
           onClick={() => navigate(`/catalog/templates/${id}`)}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-body"
         >
-          <ArrowLeft className="h-4 w-4" />
           {t('templates.scaffold.backToTemplate')}
-        </button>
+        </Button>
         <div className="flex items-center gap-2">
           <Zap className="h-5 w-5 text-accent" />
           <h2 className="text-lg font-semibold text-body">{t('templates.scaffold.title')}</h2>
@@ -224,6 +223,7 @@ export function AiScaffoldWizardPage() {
                 <p className="text-xs text-muted">{template.slug} · v{template.version}</p>
               </div>
               <div className="flex gap-1.5">
+                {/* purple/orange taxonomy — no DS token yet */}
                 <span className="rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-xs text-purple-400">
                   {template.language}
                 </span>
@@ -274,13 +274,13 @@ export function AiScaffoldWizardPage() {
           </div>
 
           <div className="flex justify-end">
-            <button
-              className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90"
+            <Button
+              variant="primary"
+              icon={<ArrowRight className="h-4 w-4" />}
               onClick={() => setStep('intent')}
             >
               {t('templates.scaffold.next')}
-              <ArrowRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -289,121 +289,96 @@ export function AiScaffoldWizardPage() {
       {step === 'intent' && (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 rounded-lg border border-edge bg-elevated p-5 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.serviceName')}
-                <span className="ml-0.5 text-critical">*</span>
-              </label>
-              <input
-                className={INPUT_CLASS}
+            <div className="sm:col-span-2">
+              <TextField
+                label={t('templates.scaffold.fields.serviceName')}
                 placeholder={t('catalog.aiScaffold.serviceNamePlaceholder', 'payment-api')}
                 value={serviceName}
                 onChange={e =>
                   setServiceName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
                 }
-              />
-              <p className="text-xs text-muted">{t('templates.scaffold.hints.serviceName')}</p>
-            </div>
-
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.serviceDescription')}
-                <span className="ml-0.5 text-critical">*</span>
-              </label>
-              <textarea
-                className={`${INPUT_CLASS} resize-none`}
-                rows={4}
-                placeholder={t('templates.scaffold.placeholders.serviceDescription')}
-                value={serviceDescription}
-                onChange={e => setServiceDescription(e.target.value)}
-              />
-              <p className="text-xs text-muted">{t('templates.scaffold.hints.descriptionTip')}</p>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.mainEntities')}
-              </label>
-              <input
-                className={INPUT_CLASS}
-                placeholder={t('catalog.aiScaffold.entitiesPlaceholder', 'Payment, Refund, Statement')}
-                value={mainEntities}
-                onChange={e => setMainEntities(e.target.value)}
+                helperText={t('templates.scaffold.hints.serviceName')}
+                size="sm"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.languageOverride')}
-              </label>
-              <select
-                className={INPUT_CLASS}
-                value={languageOverride}
-                onChange={e => setLanguageOverride(e.target.value)}
-              >
-                <option value="">{t('templates.scaffold.options.useTemplateDefault')} ({template?.language})</option>
-                <option value="DotNet">.NET</option>
-                <option value="NodeJs">Node.js</option>
-                <option value="Java">Java</option>
-                <option value="Go">Go</option>
-                <option value="Python">Python</option>
-              </select>
-            </div>
+            <TextArea
+              className="sm:col-span-2"
+              label={t('templates.scaffold.fields.serviceDescription')}
+              placeholder={t('templates.scaffold.placeholders.serviceDescription')}
+              value={serviceDescription}
+              onChange={e => setServiceDescription(e.target.value)}
+              rows={4}
+              textareaClassName="resize-none"
+              helperText={t('templates.scaffold.hints.descriptionTip')}
+            />
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.teamName')}
-              </label>
-              <input
-                className={INPUT_CLASS}
-                placeholder={template?.defaultTeam}
-                value={teamName}
-                onChange={e => setTeamName(e.target.value)}
-              />
-            </div>
+            <TextField
+              label={t('templates.scaffold.fields.mainEntities')}
+              placeholder={t('catalog.aiScaffold.entitiesPlaceholder', 'Payment, Refund, Statement')}
+              value={mainEntities}
+              onChange={e => setMainEntities(e.target.value)}
+              size="sm"
+            />
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.domain')}
-              </label>
-              <input
-                className={INPUT_CLASS}
-                placeholder={template?.defaultDomain}
-                value={domain}
-                onChange={e => setDomain(e.target.value)}
-              />
-            </div>
+            <Select
+              label={t('templates.scaffold.fields.languageOverride')}
+              value={languageOverride}
+              onChange={e => setLanguageOverride(e.target.value)}
+              options={[
+                { value: '', label: `${t('templates.scaffold.options.useTemplateDefault')} (${template?.language})` },
+                { value: 'DotNet', label: '.NET' },
+                { value: 'NodeJs', label: 'Node.js' },
+                { value: 'Java', label: 'Java' },
+                { value: 'Go', label: 'Go' },
+                { value: 'Python', label: 'Python' },
+              ]}
+              size="sm"
+            />
 
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-body">
-                {t('templates.scaffold.fields.additionalRequirements')}
-              </label>
-              <textarea
-                className={`${INPUT_CLASS} resize-none`}
-                rows={3}
-                placeholder={t('templates.scaffold.placeholders.additionalRequirements')}
-                value={additionalRequirements}
-                onChange={e => setAdditionalRequirements(e.target.value)}
-              />
-            </div>
+            <TextField
+              label={t('templates.scaffold.fields.teamName')}
+              placeholder={template?.defaultTeam}
+              value={teamName}
+              onChange={e => setTeamName(e.target.value)}
+              size="sm"
+            />
+
+            <TextField
+              label={t('templates.scaffold.fields.domain')}
+              placeholder={template?.defaultDomain}
+              value={domain}
+              onChange={e => setDomain(e.target.value)}
+              size="sm"
+            />
+
+            <TextArea
+              className="sm:col-span-2"
+              label={t('templates.scaffold.fields.additionalRequirements')}
+              placeholder={t('templates.scaffold.placeholders.additionalRequirements')}
+              value={additionalRequirements}
+              onChange={e => setAdditionalRequirements(e.target.value)}
+              rows={3}
+              textareaClassName="resize-none"
+            />
           </div>
 
           <div className="flex justify-between">
-            <button
-              className="flex items-center gap-2 rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-elevated/80"
+            <Button
+              variant="outline"
+              icon={<ArrowLeft className="h-4 w-4" />}
               onClick={() => setStep('template')}
             >
-              <ArrowLeft className="h-4 w-4" />
               {t('common.back')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
               disabled={!serviceName || !serviceDescription}
-              className="flex items-center gap-2 rounded bg-accent px-5 py-2 text-sm font-medium text-on-accent hover:bg-accent/90 disabled:opacity-40"
+              icon={<Zap className="h-4 w-4" />}
               onClick={handleGenerate}
             >
-              <Zap className="h-4 w-4" />
               {t('templates.scaffold.generate')}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -450,12 +425,12 @@ export function AiScaffoldWizardPage() {
                   ? generateMutation.error.message
                   : t('templates.scaffold.generateErrorGeneric')}
               </p>
-              <button
-                className="rounded bg-accent px-4 py-2 text-sm text-on-accent hover:bg-accent/90"
+              <Button
+                variant="primary"
                 onClick={handleGenerate}
               >
                 {t('templates.scaffold.retry')}
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>
@@ -514,13 +489,14 @@ export function AiScaffoldWizardPage() {
                 <code className="text-xs text-muted">
                   {result.files[selectedFile]?.path}
                 </code>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<Copy className="h-3.5 w-3.5" />}
                   onClick={handleCopyFile}
-                  className="flex items-center gap-1.5 rounded px-2 py-1 text-xs text-muted hover:bg-elevated hover:text-body"
                 >
-                  <Copy className="h-3.5 w-3.5" />
                   {copied ? t('common.copied') : t('common.copy')}
-                </button>
+                </Button>
               </div>
               <pre className="flex-1 overflow-auto bg-elevated p-4 text-xs text-body max-h-[440px]">
                 {result.files[selectedFile]?.content ?? ''}
@@ -530,22 +506,23 @@ export function AiScaffoldWizardPage() {
 
           {/* Actions */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              className="flex items-center gap-2 rounded border border-edge bg-elevated px-4 py-2 text-sm font-medium text-body hover:bg-elevated/80"
+            <Button
+              variant="outline"
+              icon={<ArrowLeft className="h-4 w-4" />}
               onClick={() => setStep('intent')}
             >
-              <ArrowLeft className="h-4 w-4" />
               {t('templates.scaffold.review.regenerate')}
-            </button>
+            </Button>
 
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="primary"
+                className="bg-success hover:bg-success/90"
+                icon={<Download className="h-4 w-4" />}
                 onClick={handleDownloadZip}
-                className="flex items-center gap-2 rounded bg-success px-5 py-2 text-sm font-medium text-on-accent hover:bg-success/90"
               >
-                <Download className="h-4 w-4" />
                 {t('templates.scaffold.review.downloadZip')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
