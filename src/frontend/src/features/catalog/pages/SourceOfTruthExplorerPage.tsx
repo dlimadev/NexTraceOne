@@ -117,7 +117,7 @@ export function SourceOfTruthExplorerPage() {
                     className={
                       scope === opt.value
                         ? 'bg-accent/15 text-accent border border-accent/30'
-                        : 'border border-edge'
+                        : 'bg-elevated text-muted border border-edge'
                     }
                   >
                     {t(opt.labelKey)}

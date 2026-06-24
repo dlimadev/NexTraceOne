@@ -16,6 +16,7 @@ import {
   ChevronRight,
   BarChart3,
   Lock,
+  Loader2,
 } from 'lucide-react';
 import axios from 'axios';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -400,7 +401,7 @@ export function SecurityGateDashboardPage() {
         <div className="flex flex-col gap-6">
           {dashboardQuery.isLoading && (
             <div className="flex items-center justify-center py-16">
-              <Shield className="h-8 w-8 animate-pulse text-muted" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted" />
             </div>
           )}
 

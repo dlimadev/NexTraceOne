@@ -291,7 +291,7 @@ export function AiScaffoldWizardPage() {
           <div className="grid grid-cols-1 gap-4 rounded-lg border border-edge bg-elevated p-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <TextField
-                label={t('templates.scaffold.fields.serviceName')}
+                label={t('templates.scaffold.fields.serviceName') + ' *'}
                 placeholder={t('catalog.aiScaffold.serviceNamePlaceholder', 'payment-api')}
                 value={serviceName}
                 onChange={e =>
@@ -299,18 +299,20 @@ export function AiScaffoldWizardPage() {
                 }
                 helperText={t('templates.scaffold.hints.serviceName')}
                 size="sm"
+                required
               />
             </div>
 
             <TextArea
               className="sm:col-span-2"
-              label={t('templates.scaffold.fields.serviceDescription')}
+              label={t('templates.scaffold.fields.serviceDescription') + ' *'}
               placeholder={t('templates.scaffold.placeholders.serviceDescription')}
               value={serviceDescription}
               onChange={e => setServiceDescription(e.target.value)}
               rows={4}
               textareaClassName="resize-none"
               helperText={t('templates.scaffold.hints.descriptionTip')}
+              required
             />
 
             <TextField
