@@ -9,7 +9,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Button } from '../../../components/Button';
+import { Button, TextField, Select, SearchInput, TextArea } from '../../../shared/ui';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -164,10 +164,6 @@ export function DeveloperExperienceScorePage() {
     createMutation.mutate(form);
   };
 
-  const inputClass =
-    'w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
-  const labelClass = 'mb-1 block text-xs font-medium text-muted';
-
   return (
     <PageContainer>
       <PageHeader
@@ -181,92 +177,63 @@ export function DeveloperExperienceScorePage() {
           <CardBody>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.teamId')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={form.teamId}
-                    onChange={(e) => setForm((f) => ({ ...f, teamId: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.teamName')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={form.teamName}
-                    onChange={(e) => setForm((f) => ({ ...f, teamName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.period')}</label>
-                  <select
-                    className={inputClass}
-                    value={form.period}
-                    onChange={(e) => setForm((f) => ({ ...f, period: e.target.value }))}
-                  >
-                    {PERIODS.map((p) => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.cycleTimeHours')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.cycleTimeHours}
-                    min={0}
-                    step={0.5}
-                    onChange={(e) => setForm((f) => ({ ...f, cycleTimeHours: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.deploymentFrequency')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.deploymentFrequencyPerWeek}
-                    min={0}
-                    step={0.1}
-                    onChange={(e) => setForm((f) => ({ ...f, deploymentFrequencyPerWeek: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.cognitiveLoadScore')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.cognitiveLoadScore}
-                    min={0}
-                    max={10}
-                    step={0.1}
-                    onChange={(e) => setForm((f) => ({ ...f, cognitiveLoadScore: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.toilPercentage')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.toilPercentage}
-                    min={0}
-                    max={100}
-                    onChange={(e) => setForm((f) => ({ ...f, toilPercentage: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('developerExperienceScore.notes')}</label>
-                  <textarea
-                    className={inputClass}
-                    value={form.notes}
-                    rows={2}
-                    onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                  />
-                </div>
+                <TextField
+                  label={t('developerExperienceScore.teamId')}
+                  value={form.teamId}
+                  onChange={(e) => setForm((f) => ({ ...f, teamId: e.target.value }))}
+                  required
+                />
+                <TextField
+                  label={t('developerExperienceScore.teamName')}
+                  value={form.teamName}
+                  onChange={(e) => setForm((f) => ({ ...f, teamName: e.target.value }))}
+                  required
+                />
+                <Select
+                  label={t('developerExperienceScore.period')}
+                  options={PERIODS.map((p) => ({ value: p, label: p }))}
+                  value={form.period}
+                  onChange={(e) => setForm((f) => ({ ...f, period: e.target.value }))}
+                />
+                <TextField
+                  label={t('developerExperienceScore.cycleTimeHours')}
+                  type="number"
+                  value={form.cycleTimeHours}
+                  min={0}
+                  step={0.5}
+                  onChange={(e) => setForm((f) => ({ ...f, cycleTimeHours: Number(e.target.value) }))}
+                />
+                <TextField
+                  label={t('developerExperienceScore.deploymentFrequency')}
+                  type="number"
+                  value={form.deploymentFrequencyPerWeek}
+                  min={0}
+                  step={0.1}
+                  onChange={(e) => setForm((f) => ({ ...f, deploymentFrequencyPerWeek: Number(e.target.value) }))}
+                />
+                <TextField
+                  label={t('developerExperienceScore.cognitiveLoadScore')}
+                  type="number"
+                  value={form.cognitiveLoadScore}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  onChange={(e) => setForm((f) => ({ ...f, cognitiveLoadScore: Number(e.target.value) }))}
+                />
+                <TextField
+                  label={t('developerExperienceScore.toilPercentage')}
+                  type="number"
+                  value={form.toilPercentage}
+                  min={0}
+                  max={100}
+                  onChange={(e) => setForm((f) => ({ ...f, toilPercentage: Number(e.target.value) }))}
+                />
+                <TextArea
+                  label={t('developerExperienceScore.notes')}
+                  value={form.notes}
+                  rows={2}
+                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                />
               </div>
 
               {createMutation.isError && (
@@ -274,7 +241,7 @@ export function DeveloperExperienceScorePage() {
               )}
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={createMutation.isPending}>
+                <Button type="submit" loading={createMutation.isPending}>
                   {createMutation.isPending ? t('developerExperienceScore.loading') : t('developerExperienceScore.submit')}
                 </Button>
               </div>
@@ -291,12 +258,11 @@ export function DeveloperExperienceScorePage() {
 
       <PageSection title={t('developerExperienceScore.recentScores')}>
         <div className="mb-3 flex gap-2">
-          <input
-            type="text"
-            className="rounded border border-edge bg-elevated px-3 py-1.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
+          <SearchInput
             placeholder={t('developerExperienceScore.teamId')}
             value={filterTeamId}
             onChange={(e) => setFilterTeamId(e.target.value)}
+            aria-label={t('developerExperienceScore.teamId')}
           />
         </div>
 
