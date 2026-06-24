@@ -10,6 +10,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import client from '../../../api/client';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { Button, TextField } from '../../../shared/ui';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -160,42 +161,39 @@ export function LicenseCompliancePage() {
           <CardBody>
             <div className="flex flex-col sm:flex-row gap-3 items-end">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('licenseCompliance.serviceId')}
-                </label>
-                <input
-                  type="text"
+                <TextField
+                  label={t('licenseCompliance.serviceId')}
                   value={serviceId}
                   onChange={(e) => setServiceId(e.target.value)}
                   placeholder={t('licenseCompliance.serviceIdPlaceholder', 'Enter service name or ID')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  size="sm"
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
-                <button
-                  type="button"
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => handleAction('licenses')}
                   disabled={isLoading || !serviceId.trim()}
-                  className="px-3 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('licenseCompliance.checkLicenses')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleAction('upgrades')}
                   disabled={isLoading || !serviceId.trim()}
-                  className="px-3 py-2 rounded-md border border-edge text-sm font-medium text-heading hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('licenseCompliance.getUpgrades')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleAction('sbom')}
                   disabled={isLoading || !serviceId.trim()}
-                  className="px-3 py-2 rounded-md border border-edge text-sm font-medium text-heading hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('licenseCompliance.generateSbom')}
-                </button>
+                </Button>
               </div>
             </div>
           </CardBody>
