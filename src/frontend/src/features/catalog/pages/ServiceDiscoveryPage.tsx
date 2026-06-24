@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Search,
   Radar,
   CheckCircle2,
   XCircle,
@@ -18,6 +17,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, IconButton, TextField, TextArea, Select, SearchInput } from '../../../shared/ui';
 
 /**
  * Página de Service Discovery Automático.
@@ -117,6 +117,11 @@ export default function ServiceDiscoveryPage() {
     Ignored: XCircle,
   };
 
+  // Taxonomia de cor por ação de triagem:
+  // Match → accent (associar a serviço existente)
+  // Register → mint (criar novo serviço)
+  // Ignore → muted (neutro)
+
   return (
     <PageContainer>
       <PageHeader
@@ -125,14 +130,14 @@ export default function ServiceDiscoveryPage() {
       />
       {/* Run discovery action */}
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="primary"
+          icon={<RefreshCw size={14} />}
+          loading={runDiscoveryMutation.isPending}
           onClick={() => runDiscoveryMutation.mutate()}
-          disabled={runDiscoveryMutation.isPending}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-50"
         >
-          <RefreshCw size={14} className={runDiscoveryMutation.isPending ? 'animate-spin' : ''} />
           {t('catalog.discovery.runDiscovery', 'Run Discovery')}
-        </button>
+        </Button>
       </div>
 
       {/* Dashboard Error */}
@@ -154,36 +159,34 @@ export default function ServiceDiscoveryPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('catalog.discovery.searchPlaceholder', 'Search service name...')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-edge bg-panel text-body placeholder:text-muted/50 focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </div>
+        <SearchInput
+          size="sm"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={t('catalog.discovery.searchPlaceholder', 'Search service name...')}
+          className="flex-1 min-w-[200px] max-w-sm"
+        />
         <div className="flex items-center gap-1">
           <Filter size={14} className="text-muted" />
-          <select
+          <Select
+            size="sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm rounded-lg border border-edge bg-panel text-body px-3 py-2 focus:outline-none focus:ring-1 focus:ring-accent"
-          >
-            <option value="">{t('catalog.discovery.filters.allStatuses', 'All statuses')}</option>
-            <option value="Pending">{t('catalog.discovery.filters.pending', 'Pending')}</option>
-            <option value="Matched">{t('catalog.discovery.filters.matched', 'Matched')}</option>
-            <option value="Registered">{t('catalog.discovery.filters.registered', 'Registered')}</option>
-            <option value="Ignored">{t('catalog.discovery.filters.ignored', 'Ignored')}</option>
-          </select>
+            options={[
+              { value: '', label: t('catalog.discovery.filters.allStatuses', 'All statuses') },
+              { value: 'Pending', label: t('catalog.discovery.filters.pending', 'Pending') },
+              { value: 'Matched', label: t('catalog.discovery.filters.matched', 'Matched') },
+              { value: 'Registered', label: t('catalog.discovery.filters.registered', 'Registered') },
+              { value: 'Ignored', label: t('catalog.discovery.filters.ignored', 'Ignored') },
+            ]}
+          />
         </div>
-        <input
-          type="text"
+        <TextField
+          size="sm"
           value={envFilter}
           onChange={(e) => setEnvFilter(e.target.value)}
           placeholder={t('catalog.discovery.filters.environment', 'Environment')}
-          className="text-sm rounded-lg border border-edge bg-panel text-body px-3 py-2 w-40 focus:outline-none focus:ring-1 focus:ring-accent"
+          className="w-40"
         />
       </div>
 
@@ -273,36 +276,41 @@ export default function ServiceDiscoveryPage() {
                   <td className="px-4 py-3 text-right">
                     {svc.status === 'Pending' && (
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => { setSelectedService(svc); setActionType('match'); }}
-                          className="text-[11px] px-2 py-1 rounded text-accent hover:bg-accent/10 transition-colors"
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          className="text-accent hover:bg-accent/10"
                           title={t('catalog.discovery.actions.match', 'Match')}
+                          onClick={() => { setSelectedService(svc); setActionType('match'); }}
                         >
                           {t('catalog.discovery.actions.match', 'Match')}
-                        </button>
-                        <button
-                          onClick={() => { setSelectedService(svc); setActionType('register'); }}
-                          className="text-[11px] px-2 py-1 rounded text-mint hover:bg-mint/10 transition-colors"
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          className="text-mint hover:bg-mint/10"
                           title={t('catalog.discovery.actions.register', 'Register')}
+                          onClick={() => { setSelectedService(svc); setActionType('register'); }}
                         >
                           {t('catalog.discovery.actions.register', 'Register')}
-                        </button>
-                        <button
-                          onClick={() => { setSelectedService(svc); setActionType('ignore'); }}
-                          className="text-[11px] px-2 py-1 rounded text-muted hover:bg-muted/10 transition-colors"
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="xs"
                           title={t('catalog.discovery.actions.ignore', 'Ignore')}
+                          onClick={() => { setSelectedService(svc); setActionType('ignore'); }}
                         >
                           {t('catalog.discovery.actions.ignore', 'Ignore')}
-                        </button>
+                        </Button>
                       </div>
                     )}
                     {svc.status !== 'Pending' && (
-                      <button
+                      <IconButton
+                        icon={<Eye size={12} />}
+                        label={t('catalog.discovery.actions.view', 'View')}
+                        size="sm"
                         onClick={() => { setSelectedService(svc); setActionType(null); }}
-                        className="text-[11px] px-2 py-1 rounded text-muted hover:bg-elevated/50 transition-colors"
-                      >
-                        <Eye size={12} />
-                      </button>
+                      />
                     )}
                   </td>
                 </tr>
@@ -411,80 +419,62 @@ function ActionModal({
 
         {actionType === 'match' && (
           <div className="space-y-3">
-            <label className="block text-xs font-medium text-heading">
-              {t('catalog.discovery.modal.serviceAssetId', 'Service Asset ID')}
-            </label>
-            <input
-              type="text"
+            <TextField
+              size="sm"
+              label={t('catalog.discovery.modal.serviceAssetId', 'Service Asset ID')}
               value={serviceAssetId}
               onChange={(e) => setServiceAssetId(e.target.value)}
               placeholder={t('catalog.discovery.modal.serviceAssetIdPlaceholder', 'Select or enter service ID...')}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-edge bg-elevated text-body focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
         )}
 
         {actionType === 'register' && (
           <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-heading mb-1">
-                {t('catalog.discovery.modal.domain', 'Domain')}
-              </label>
-              <input
-                type="text"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder={t('catalog.discovery.modal.domainPlaceholder', 'e.g. Payments')}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-edge bg-elevated text-body focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-heading mb-1">
-                {t('catalog.discovery.modal.teamName', 'Team')}
-              </label>
-              <input
-                type="text"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                placeholder={t('catalog.discovery.modal.teamNamePlaceholder', 'e.g. Platform Engineering')}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-edge bg-elevated text-body focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-            </div>
+            <TextField
+              size="sm"
+              label={t('catalog.discovery.modal.domain', 'Domain')}
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+              placeholder={t('catalog.discovery.modal.domainPlaceholder', 'e.g. Payments')}
+            />
+            <TextField
+              size="sm"
+              label={t('catalog.discovery.modal.teamName', 'Team')}
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              placeholder={t('catalog.discovery.modal.teamNamePlaceholder', 'e.g. Platform Engineering')}
+            />
           </div>
         )}
 
         {actionType === 'ignore' && (
           <div className="space-y-3">
-            <label className="block text-xs font-medium text-heading">
-              {t('catalog.discovery.modal.reason', 'Reason')}
-            </label>
-            <textarea
+            <TextArea
+              label={t('catalog.discovery.modal.reason', 'Reason')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder={t('catalog.discovery.modal.reasonPlaceholder', 'e.g. Internal tooling, not a business service')}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-edge bg-elevated text-body focus:outline-none focus:ring-1 focus:ring-accent resize-none h-20"
+              textareaClassName="resize-none h-20 min-h-0"
             />
           </div>
         )}
 
         <div className="flex justify-end gap-2 mt-5">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm rounded-lg border border-edge text-muted hover:text-heading transition-colors"
-          >
+          <Button variant="outline" onClick={onClose}>
             {t('common.cancel', 'Cancel')}
-          </button>
-          <button
-            disabled={isLoading}
+          </Button>
+          <Button
+            variant="primary"
+            loading={isLoading}
             onClick={() => {
               if (actionType === 'match') onMatch(serviceAssetId);
               if (actionType === 'register') onRegister(domain, teamName);
               if (actionType === 'ignore') onIgnore(reason);
             }}
-            className="px-4 py-2 text-sm rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-50"
           >
             {isLoading ? t('common.loading', 'Loading...') : t('common.confirm', 'Confirm')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
