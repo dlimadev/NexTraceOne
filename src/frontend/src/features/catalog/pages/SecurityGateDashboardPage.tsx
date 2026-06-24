@@ -6,13 +6,11 @@ import {
   ShieldAlert,
   ShieldCheck,
   ShieldX,
-  Search,
   Filter,
   AlertTriangle,
   CheckCircle2,
   XCircle,
   Eye,
-  Loader2,
   FileCode,
   ChevronDown,
   ChevronRight,
@@ -23,6 +21,7 @@ import axios from 'axios';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, TextArea, Select, SearchInput, Tabs } from '../../../shared/ui';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -106,6 +105,8 @@ const securityApi = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+// NOTE: `orange-X` classes below are intentional — "High" severity maps to orange
+// (CVE-severity exception: no --color-orange token exists in the design system).
 const SEVERITY_CONFIG: Record<FindingSeverity, { color: string; bg: string; icon: React.ReactNode }> = {
   Critical: {
     color: 'text-critical',
@@ -151,9 +152,10 @@ function FindingRow({ finding }: { finding: SecurityFinding }) {
 
   return (
     <div className={`rounded-md border ${cfg.bg} overflow-hidden`}>
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+        className="w-full h-auto flex items-start justify-start gap-3 px-4 py-3 text-left rounded-none hover:bg-white/5"
       >
         <span className="mt-0.5 shrink-0">{cfg.icon}</span>
         <div className="flex-1 min-w-0">
@@ -180,7 +182,7 @@ function FindingRow({ finding }: { finding: SecurityFinding }) {
           <p className="mt-0.5 text-xs text-muted font-mono truncate">{finding.filePath}{finding.lineNumber ? `:${finding.lineNumber}` : ''}</p>
         </div>
         {expanded ? <ChevronDown className="h-4 w-4 text-muted shrink-0 mt-0.5" /> : <ChevronRight className="h-4 w-4 text-muted shrink-0 mt-0.5" />}
-      </button>
+      </Button>
 
       {expanded && (
         <div className="px-4 pb-4 pt-2 border-t border-edge/50">
@@ -265,57 +267,45 @@ export function SecurityGateDashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border border-edge bg-elevated/40 p-1 w-fit">
-        {(['scan', 'dashboard'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`rounded-md px-4 py-1.5 text-sm transition-colors ${
-              activeTab === tab
-                ? 'bg-elevated text-body'
-                : 'text-muted hover:text-body'
-            }`}
-          >
-            {t(`tabs.${tab}`)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        variant="pill"
+        items={[
+          { id: 'scan', label: t('tabs.scan') },
+          { id: 'dashboard', label: t('tabs.dashboard') },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as 'scan' | 'dashboard')}
+      />
 
       {/* ── Scan Tab ── */}
       {activeTab === 'scan' && (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Code input */}
           <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-muted">{t('filePath')}</label>
-              <input
-                type="text"
-                value={filePathInput}
-                onChange={e => setFilePathInput(e.target.value)}
-                placeholder={t('catalog.security.placeholder.filePath', 'src/MyController.cs')}
-                className="rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted focus:border-accent focus:outline-none font-mono"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5 flex-1">
-              <label className="text-xs font-medium text-muted">{t('sourceCode')}</label>
-              <textarea
-                value={codeInput}
-                onChange={e => setCodeInput(e.target.value)}
-                placeholder={t('sourceCodePlaceholder')}
-                className="min-h-80 rounded-md border border-edge bg-elevated px-3 py-2 text-xs font-mono text-body placeholder-muted focus:border-accent focus:outline-none resize-none"
-              />
-            </div>
-            <button
+            <TextField
+              size="sm"
+              label={t('filePath')}
+              value={filePathInput}
+              onChange={e => setFilePathInput(e.target.value)}
+              placeholder={t('catalog.security.placeholder.filePath', 'src/MyController.cs')}
+              className="font-mono"
+            />
+            <TextArea
+              label={t('sourceCode')}
+              value={codeInput}
+              onChange={e => setCodeInput(e.target.value)}
+              placeholder={t('sourceCodePlaceholder')}
+              textareaClassName="min-h-80 text-xs font-mono resize-none"
+            />
+            <Button
+              variant="danger"
               onClick={() => scanMutation.mutate()}
-              disabled={!canScan || scanMutation.isPending}
-              className="flex items-center justify-center gap-2 rounded-md bg-critical hover:bg-critical/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-medium text-white transition-colors"
+              disabled={!canScan}
+              loading={scanMutation.isPending}
+              icon={<Shield className="h-4 w-4" />}
             >
-              {scanMutation.isPending ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> {t('scanning')}</>
-              ) : (
-                <><Shield className="h-4 w-4" /> {t('runScan')}</>
-              )}
-            </button>
+              {scanMutation.isPending ? t('scanning') : t('runScan')}
+            </Button>
           </div>
 
           {/* Results */}
@@ -357,26 +347,22 @@ export function SecurityGateDashboardPage() {
                 {/* Filters */}
                 {findings.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
-                    <div className="relative flex-1 min-w-48">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        placeholder={t('searchFindings')}
-                        className="w-full rounded-md border border-edge bg-elevated pl-9 pr-3 py-2 text-xs text-body placeholder-muted focus:border-accent focus:outline-none"
-                      />
-                    </div>
-                    <select
+                    <SearchInput
+                      size="sm"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      placeholder={t('searchFindings')}
+                      className="flex-1 min-w-48"
+                    />
+                    <Select
+                      size="sm"
                       value={severityFilter}
                       onChange={e => setSeverityFilter(e.target.value as FindingSeverity | 'All')}
-                      className="rounded-md border border-edge bg-elevated px-3 py-2 text-xs text-body focus:border-accent focus:outline-none"
-                    >
-                      <option value="All">{t('allSeverities')}</option>
-                      {(['Critical', 'High', 'Medium', 'Low', 'Info'] as FindingSeverity[]).map(s => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: 'All', label: t('allSeverities') },
+                        ...(['Critical', 'High', 'Medium', 'Low', 'Info'] as FindingSeverity[]).map(s => ({ value: s, label: s })),
+                      ]}
+                    />
                   </div>
                 )}
 
@@ -414,7 +400,7 @@ export function SecurityGateDashboardPage() {
         <div className="flex flex-col gap-6">
           {dashboardQuery.isLoading && (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-muted" />
+              <Shield className="h-8 w-8 animate-pulse text-muted" />
             </div>
           )}
 
@@ -459,7 +445,7 @@ export function SecurityGateDashboardPage() {
                     <FileCode className="h-4 w-4 text-muted" />
                     <h3 className="text-sm font-medium text-body">{t('recentScans')}</h3>
                   </div>
-                  <div className="divide-y divide-neutral-800">
+                  <div className="divide-y divide-edge">
                     {dashboardQuery.data.recentScans.map(s => (
                       <div key={s.scanId} className="flex items-center gap-4 px-4 py-3">
                         {RISK_CONFIG[s.overallRisk].icon}
