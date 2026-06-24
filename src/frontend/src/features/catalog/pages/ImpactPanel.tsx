@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Zap, RefreshCw, AlertTriangle, Shield } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Select } from '../../../shared/ui';
 import type { AssetGraph, ImpactPropagationResult } from '../../../types';
 
 /** Mapeamento de confiança para variantes visuais de badge. */
@@ -26,44 +27,41 @@ export interface ImpactPanelProps {
 export function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impactDepth, onSelectNode, onChangeDepth }: ImpactPanelProps) {
   const { t } = useTranslation();
 
+  const nodeOptions = [
+    ...(graph?.apis?.map((api) => ({
+      value: api.apiAssetId,
+      label: `API: ${api.name} (${api.routePattern})`,
+    })) ?? []),
+    ...(graph?.services?.map((svc) => ({
+      value: svc.serviceAssetId,
+      label: `Service: ${svc.name} (${svc.domain})`,
+    })) ?? []),
+  ];
+  const depthOptions = [1, 2, 3, 4, 5].map((d) => ({ value: String(d), label: String(d) }));
+
   return (
     <div className="space-y-4">
       {/* ── Seletor de nó e profundidade ────────────────────── */}
       <Card>
         <CardBody>
           <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.impact.selectNode')}</label>
-              <select
-                value={selectedNodeId ?? ''}
-                onChange={(e) => onSelectNode(e.target.value)}
-                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <option value="">{t('serviceCatalog.impact.selectNodePlaceholder')}</option>
-                {graph?.apis?.map((api) => (
-                  <option key={api.apiAssetId} value={api.apiAssetId}>
-                    API: {api.name} ({api.routePattern})
-                  </option>
-                ))}
-                {graph?.services?.map((svc) => (
-                  <option key={svc.serviceAssetId} value={svc.serviceAssetId}>
-                    Service: {svc.name} ({svc.domain})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-32">
-              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.impact.maxDepth')}</label>
-              <select
-                value={impactDepth}
-                onChange={(e) => onChangeDepth(Number(e.target.value))}
-                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                {[1, 2, 3, 4, 5].map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              className="flex-1"
+              label={t('serviceCatalog.impact.selectNode')}
+              value={selectedNodeId ?? ''}
+              onChange={(e) => onSelectNode(e.target.value)}
+              options={nodeOptions}
+              placeholder={t('serviceCatalog.impact.selectNodePlaceholder')}
+              size="sm"
+            />
+            <Select
+              className="w-32"
+              label={t('serviceCatalog.impact.maxDepth')}
+              value={impactDepth}
+              onChange={(e) => onChangeDepth(Number(e.target.value))}
+              options={depthOptions}
+              size="sm"
+            />
           </div>
         </CardBody>
       </Card>
