@@ -11,7 +11,6 @@ import {
   Copy,
   CheckCircle2,
   XCircle,
-  Loader2,
   ArrowRight,
   Play,
   Code2,
@@ -21,6 +20,7 @@ import {
 import axios from 'axios';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { Button, TextField, Select, TextArea } from '../../../shared/ui';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -110,12 +110,13 @@ function ArtifactCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Intentional taxonomy: purple and orange have no semantic DS token
   const icons: Record<string, React.ReactNode> = {
     ServerStubs: <Server className="h-4 w-4 text-accent" />,
     MockServer: <Box className="h-4 w-4 text-purple-400" />,
     PostmanCollection: <FileJson className="h-4 w-4 text-orange-400" />,
     ContractTests: <TestTube2 className="h-4 w-4 text-success" />,
-    ClientSdk: <Code2 className="h-4 w-4 text-cyan-400" />,
+    ClientSdk: <Code2 className="h-4 w-4 text-cyan" />,
   };
 
   return (
@@ -128,37 +129,42 @@ function ArtifactCard({
           <span className="rounded-full bg-elevated px-2 py-0.5 text-xs text-muted">{files.length} {t('files')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs text-muted hover:bg-elevated hover:text-body transition-colors"
+            icon={copied ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
           >
-            {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? t('copied') : t('copy')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={onDownload}
-            className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30 transition-colors"
+            icon={<Download className="h-3.5 w-3.5" />}
+            className="bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30 hover:text-accent"
           >
-            <Download className="h-3.5 w-3.5" />
             {t('download')}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* File tabs */}
       <div className="flex gap-1 overflow-x-auto border-b border-edge bg-elevated/40 px-4 py-2">
         {files.map((f, i) => (
-          <button
+          <Button
             key={i}
+            variant="ghost"
+            size="xs"
             onClick={() => setSelected(i)}
-            className={`shrink-0 rounded px-2.5 py-1 text-xs transition-colors ${
+            className={`shrink-0 ${
               i === selected
-                ? 'bg-accent/20 text-accent'
+                ? 'bg-accent/20 text-accent hover:text-accent'
                 : 'text-muted hover:text-body hover:bg-elevated'
             }`}
           >
             {getLanguageIcon(f.language)} {f.fileName}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -206,6 +212,11 @@ export function ContractPipelinePage() {
 
   const canRun = contractJson.trim().length > 0 && serviceName.trim().length > 0;
 
+  const languageOptions = LANGUAGES.map(l => ({
+    value: l,
+    label: l.charAt(0).toUpperCase() + l.slice(1),
+  }));
+
   return (
     <PageContainer>
       <PageHeader
@@ -227,7 +238,7 @@ export function ContractPipelinePage() {
             { label: t('steps.server'), icon: <Server className="h-4 w-4 text-success" /> },
             { label: t('steps.mock'), icon: <Box className="h-4 w-4 text-orange-400" /> },
             { label: t('steps.tests'), icon: <TestTube2 className="h-4 w-4 text-warning" /> },
-            { label: t('steps.sdk'), icon: <Code2 className="h-4 w-4 text-cyan-400" /> },
+            { label: t('steps.sdk'), icon: <Code2 className="h-4 w-4 text-cyan" /> },
           ].flatMap((step, i, arr) => [
             <div key={`step-${i}`} className="flex items-center gap-1.5">
               {step.icon}
@@ -246,30 +257,22 @@ export function ContractPipelinePage() {
           <h2 className="text-sm font-semibold text-body uppercase tracking-wider">{t('configuration')}</h2>
 
           {/* Service name */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">{t('serviceName')}</label>
-            <input
-              type="text"
-              value={serviceName}
-              onChange={e => setServiceName(e.target.value)}
-              placeholder={t('serviceNamePlaceholder')}
-              className="rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted focus:border-accent focus:outline-none"
-            />
-          </div>
+          <TextField
+            label={t('serviceName')}
+            value={serviceName}
+            onChange={e => setServiceName(e.target.value)}
+            placeholder={t('serviceNamePlaceholder')}
+            size="sm"
+          />
 
           {/* Language */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">{t('targetLanguage')}</label>
-            <select
-              value={targetLanguage}
-              onChange={e => setTargetLanguage(e.target.value as TargetLanguage)}
-              className="rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:border-accent focus:outline-none"
-            >
-              {LANGUAGES.map(l => (
-                <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label={t('targetLanguage')}
+            value={targetLanguage}
+            onChange={e => setTargetLanguage(e.target.value as TargetLanguage)}
+            options={languageOptions}
+            size="sm"
+          />
 
           {/* Artifact toggles */}
           <div className="flex flex-col gap-2">
@@ -282,37 +285,40 @@ export function ContractPipelinePage() {
                 { key: 'tests', label: t('artifactTypes.ContractTests'), value: generateTests, setter: setGenerateTests, icon: <TestTube2 className="h-3.5 w-3.5" /> },
                 { key: 'sdk', label: t('artifactTypes.ClientSdk'), value: generateSdk, setter: setGenerateSdk, icon: <Code2 className="h-3.5 w-3.5" /> },
               ].map(item => (
-                <button
+                <Button
                   key={item.key}
+                  variant="ghost"
+                  size="sm"
                   onClick={() => item.setter(!item.value)}
-                  className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs transition-colors ${
+                  icon={
                     item.value
-                      ? 'border-accent/50 bg-accent/10 text-accent'
-                      : 'border-edge bg-elevated text-muted hover:text-body'
+                      ? <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
+                      : <XCircle className="h-3.5 w-3.5 text-muted shrink-0" />
+                  }
+                  className={`w-full justify-start ${
+                    item.value
+                      ? 'border border-accent/50 bg-accent/10 text-accent hover:bg-accent/15 hover:text-accent'
+                      : 'border border-edge bg-elevated text-muted hover:text-body'
                   }`}
                 >
-                  {item.value
-                    ? <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
-                    : <XCircle className="h-3.5 w-3.5 text-muted shrink-0" />}
-                  {item.icon}
+                  <span className="shrink-0">{item.icon}</span>
                   {item.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
           {/* Run button */}
-          <button
+          <Button
+            variant="primary"
             onClick={() => mutation.mutate()}
-            disabled={!canRun || mutation.isPending}
-            className="flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-on-accent hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50 transition-colors mt-2"
+            disabled={!canRun}
+            loading={mutation.isPending}
+            icon={<Play className="h-4 w-4" />}
+            className="w-full mt-2"
           >
-            {mutation.isPending ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> {t('running')}</>
-            ) : (
-              <><Play className="h-4 w-4" /> {t('runPipeline')}</>
-            )}
-          </button>
+            {mutation.isPending ? t('running') : t('runPipeline')}
+          </Button>
 
           {mutation.isError && (
             <div className="flex items-center gap-2 rounded-md border border-critical/30 bg-critical/10 px-3 py-2 text-sm text-critical">
@@ -323,15 +329,14 @@ export function ContractPipelinePage() {
         </div>
 
         {/* Contract JSON input */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-muted">{t('contractJson')}</label>
-          <textarea
-            value={contractJson}
-            onChange={e => setContractJson(e.target.value)}
-            placeholder={t('contractJsonPlaceholder')}
-            className="flex-1 min-h-72 rounded-md border border-edge bg-elevated px-3 py-2 text-xs font-mono text-body placeholder-muted focus:border-accent focus:outline-none resize-none"
-          />
-        </div>
+        <TextArea
+          label={t('contractJson')}
+          value={contractJson}
+          onChange={e => setContractJson(e.target.value)}
+          placeholder={t('contractJsonPlaceholder')}
+          className="flex-1"
+          textareaClassName="min-h-72 font-mono text-xs resize-none"
+        />
       </div>
 
       {/* Results */}
@@ -348,16 +353,18 @@ export function ContractPipelinePage() {
                 {t('duration', { ms: mutation.data.durationMs })}
               </p>
             </div>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={() => {
                 const allFiles = mutation.data.artifacts.flatMap(a => a.files);
                 downloadZip(allFiles, `${mutation.data.serviceName}-pipeline.zip`);
               }}
-              className="flex items-center gap-1.5 rounded-md bg-success/20 border border-success/30 px-3 py-1.5 text-xs text-success hover:bg-success/30 transition-colors"
+              icon={<Download className="h-3.5 w-3.5" />}
+              className="bg-success/20 border border-success/30 text-success hover:bg-success/30 hover:text-success"
             >
-              <Download className="h-3.5 w-3.5" />
               {t('downloadAll')}
-            </button>
+            </Button>
           </div>
 
           {/* Artifact cards */}
