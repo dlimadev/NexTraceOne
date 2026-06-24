@@ -56,7 +56,7 @@ function formatValue(value: number): string {
 interface EChartsTreemapProps {
   nodes: TreemapNode[];
   unit: string;
-  colorPalette: string[];
+  colorPalette: readonly string[];
   activeServiceId?: string | null;
   onNodeClick?: (name: string) => void;
 }
@@ -102,7 +102,7 @@ function EChartsTreemap({ nodes, unit, colorPalette, activeServiceId, onNodeClic
     }));
 
     const option: echarts.EChartsOption = {
-      color: colorPalette,
+      color: [...colorPalette],
       tooltip: {
         formatter: (params) => {
           const p = params as echarts.DefaultLabelFormatterCallbackParams;
