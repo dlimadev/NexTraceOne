@@ -8,6 +8,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import client from '../../../api/client';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -62,9 +63,9 @@ const healthScoreVariant = (score: number): 'success' | 'warning' | 'danger' => 
 };
 
 const healthScoreColor = (score: number): string => {
-  if (score >= 80) return 'text-green-600 dark:text-green-400';
-  if (score >= 60) return 'text-yellow-600 dark:text-yellow-400';
-  return 'text-red-600 dark:text-red-400';
+  if (score >= 80) return 'text-success';
+  if (score >= 60) return 'text-warning';
+  return 'text-critical';
 };
 
 // ── Page ───────────────────────────────────────────────────────────────────
@@ -172,54 +173,42 @@ export function DependencyDashboardPage() {
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('dependencyDashboard.serviceId')}
-                </label>
-                <input
-                  type="text"
-                  value={scanServiceId}
-                  onChange={(e) => setScanServiceId(e.target.value)}
-                  placeholder={t('dependencyDashboard.serviceIdPlaceholder', 'Enter service name or ID')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('dependencyDashboard.projectFileContent')}
-                </label>
-                <textarea
-                  value={projectFileContent}
-                  onChange={(e) => setProjectFileContent(e.target.value)}
-                  rows={6}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono resize-y"
-                />
-              </div>
+              <TextField
+                label={t('dependencyDashboard.serviceId')}
+                value={scanServiceId}
+                onChange={(e) => setScanServiceId(e.target.value)}
+                placeholder={t('dependencyDashboard.serviceIdPlaceholder', 'Enter service name or ID')}
+              />
+              <TextArea
+                label={t('dependencyDashboard.projectFileContent')}
+                value={projectFileContent}
+                onChange={(e) => setProjectFileContent(e.target.value)}
+                rows={6}
+                textareaClassName="font-mono resize-y"
+              />
               <div className="flex items-end gap-4">
                 <div className="w-48">
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('dependencyDashboard.projectFileType')}
-                  </label>
-                  <select
+                  <Select
+                    label={t('dependencyDashboard.projectFileType')}
                     value={projectFileType}
                     onChange={(e) => setProjectFileType(e.target.value)}
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  >
-                    <option value="csproj">csproj</option>
-                    <option value="package.json">package.json</option>
-                    <option value="pom.xml">pom.xml</option>
-                  </select>
+                    options={[
+                      { value: 'csproj', label: 'csproj' },
+                      { value: 'package.json', label: 'package.json' },
+                      { value: 'pom.xml', label: 'pom.xml' },
+                    ]}
+                  />
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="primary"
                   onClick={handleScan}
                   disabled={scanMutation.isPending || !scanServiceId.trim() || !projectFileContent.trim()}
-                  className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  loading={scanMutation.isPending}
                 >
                   {scanMutation.isPending
                     ? t('dependencyDashboard.loading')
                     : t('dependencyDashboard.scanButton')}
-                </button>
+                </Button>
               </div>
 
               {scanMutation.isError && (
@@ -287,26 +276,21 @@ export function DependencyDashboardPage() {
           <CardBody>
             <div className="flex gap-3 items-end mb-4">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('dependencyDashboard.serviceId')}
-                </label>
-                <input
-                  type="text"
+                <TextField
+                  label={t('dependencyDashboard.serviceId')}
                   value={healthServiceId}
                   onChange={(e) => setHealthServiceId(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleFetchHealth()}
                   placeholder={t('dependencyDashboard.serviceIdPlaceholder', 'Enter service name or ID')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
-              <button
-                type="button"
+              <Button
+                variant="primary"
                 onClick={handleFetchHealth}
                 disabled={!healthServiceId.trim()}
-                className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {t('dependencyDashboard.serviceHealth')}
-              </button>
+              </Button>
             </div>
 
             {isHealthLoading && <PageLoadingState />}
@@ -343,6 +327,9 @@ export function DependencyDashboardPage() {
                     </p>
                     <p className="text-xs text-muted mt-1">{t('dependencyDashboard.criticalVulns')}</p>
                   </div>
+                  {/* text-orange-500 / bg-orange-500/5: taxonomia intencional — nível "high" de
+                      severidade de vulnerabilidade fica entre critical e warning; não existe token
+                      --color-orange ainda. Manter até adição do token ao design system. */}
                   <div className="rounded-lg border border-edge bg-orange-500/5 p-3 text-center">
                     <p className="text-2xl font-bold text-orange-500">
                       {serviceHealth.highVulnCount}
@@ -403,18 +390,19 @@ export function DependencyDashboardPage() {
               <h3 className="text-sm font-semibold text-heading">
                 {t('dependencyDashboard.vulnerableServices')}
               </h3>
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => {
                   setLoadVulnerable(true);
                   if (loadVulnerable) refetchVulnerable();
                 }}
-                className="px-3 py-1.5 rounded-md bg-accent text-white text-xs font-medium hover:bg-accent-hover transition-colors"
+                loading={isVulnerableLoading}
               >
                 {isVulnerableLoading
                   ? t('dependencyDashboard.loading')
                   : t('dependencyDashboard.loadVulnerable')}
-              </button>
+              </Button>
             </div>
           </CardHeader>
           <CardBody>
@@ -473,6 +461,7 @@ export function DependencyDashboardPage() {
                             <td className="py-2 px-3 text-critical font-semibold">
                               {svc.criticalCount}
                             </td>
+                            {/* text-orange-500: taxonomia intencional — nível "high" de severidade */}
                             <td className="py-2 px-3 text-orange-500 font-semibold">
                               {svc.highCount}
                             </td>
