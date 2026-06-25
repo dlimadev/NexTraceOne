@@ -285,20 +285,20 @@ export function ReliabilitySloManagementPage() {
                   />
                 ) : (
                   slos.map((slo: ServiceSloItem) => (
-                    <button
+                    <Button
                       key={slo.id}
-                      type="button"
+                      variant="ghost"
                       onClick={() => setSelectedSloId(slo.id)}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${resolvedSelectedSloId === slo.id ? 'border-accent bg-accent/10' : 'border-edge bg-elevated hover:border-edge-strong hover:bg-hover'}`}
+                      className={`w-full h-auto flex-col items-start justify-start gap-0 rounded-md border px-3 py-2 ${resolvedSelectedSloId === slo.id ? 'border-accent bg-accent/10' : 'border-edge bg-elevated hover:border-edge-strong hover:bg-hover'}`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex w-full items-center justify-between">
                         <span className="text-sm text-heading font-medium">{slo.name}</span>
                         <Badge variant={slo.isActive ? 'success' : 'default'}>
                           {slo.isActive ? t('reliability.slo.active') : t('reliability.slo.inactive')}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted mt-1">{slo.type} • {slo.targetPercent}% • {slo.environment}</p>
-                    </button>
+                    </Button>
                   ))
                 )}
               </div>
