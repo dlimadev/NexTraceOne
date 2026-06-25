@@ -16,7 +16,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import { Button } from '../../../components/Button';
+import { Button, Tabs } from '../../../shared/ui';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getLoadTestRuns, type LoadTestRun, type LoadTestStatus } from '../api/telemetry';
@@ -107,20 +107,14 @@ export function LoadTestingPage() {
           icon={<Gauge className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+          <Tabs
+            variant="pill"
+            size="sm"
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+          />
+          <Button variant="outline" size="sm" icon={<RefreshCw className="w-3.5 h-3.5" />} onClick={handleRefresh}>
             {t('common.refresh')}
           </Button>
         </div>
@@ -183,10 +177,10 @@ export function LoadTestingPage() {
                             <td className="px-4 py-2.5 tabular-nums">{r.vus.toLocaleString()}</td>
                             <td className="px-4 py-2.5 tabular-nums">{fmtDuration(r.durationMs)}</td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={r.p95LatencyMs > 500 ? 'text-red-500 font-semibold' : ''}>{fmtMs(r.p95LatencyMs)}</span>
+                              <span className={r.p95LatencyMs > 500 ? 'text-critical font-semibold' : ''}>{fmtMs(r.p95LatencyMs)}</span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={r.errorRate > 1 ? 'text-red-500 font-semibold' : ''}>{r.errorRate.toFixed(2)}%</span>
+                              <span className={r.errorRate > 1 ? 'text-critical font-semibold' : ''}>{r.errorRate.toFixed(2)}%</span>
                             </td>
                             <td className="px-4 py-2.5 text-xs text-muted">
                               {r.maxCapacityVus ? `${r.maxCapacityVus} VUs / ${r.maxRps} RPS` : '—'}
