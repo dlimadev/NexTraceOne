@@ -136,7 +136,7 @@ describe('PlatformOperationsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('API')).toBeInTheDocument();
     });
-    const jobsTab = screen.getByRole('button', { name: /jobs/i });
+    const jobsTab = screen.getByRole('tab', { name: /jobs/i });
     await userEvent.click(jobsTab);
     await waitFor(() => {
       expect(screen.getByText('Outbox Processor')).toBeInTheDocument();
@@ -148,7 +148,7 @@ describe('PlatformOperationsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('API')).toBeInTheDocument();
     });
-    const queuesTab = screen.getByRole('button', { name: /queues/i });
+    const queuesTab = screen.getByRole('tab', { name: /queues/i });
     await userEvent.click(queuesTab);
     await waitFor(() => {
       expect(screen.getByText('outbox')).toBeInTheDocument();
@@ -160,7 +160,7 @@ describe('PlatformOperationsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('API')).toBeInTheDocument();
     });
-    const eventsTab = screen.getByRole('button', { name: /events/i });
+    const eventsTab = screen.getByRole('tab', { name: /events/i });
     await userEvent.click(eventsTab);
     await waitFor(() => {
       expect(screen.getByText('Rate limiter adjusted')).toBeInTheDocument();

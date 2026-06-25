@@ -12,6 +12,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button, Tabs, Select } from '../../../shared/ui';
 import { platformOpsApi } from '../api/platformOps';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import type {
@@ -110,11 +111,11 @@ export function PlatformOperationsPage() {
   const totalPending = queues.reduce((sum, q) => sum + q.pendingCount, 0);
   const unresolvedCount = events.filter(e => !e.resolved).length;
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'health', label: t('platformOps.tabHealth') },
-    { key: 'jobs', label: t('platformOps.tabJobs') },
-    { key: 'queues', label: t('platformOps.tabQueues') },
-    { key: 'events', label: t('platformOps.tabEvents') },
+  const tabItems = [
+    { id: 'health', label: t('platformOps.tabHealth') },
+    { id: 'jobs', label: t('platformOps.tabJobs') },
+    { id: 'queues', label: t('platformOps.tabQueues') },
+    { id: 'events', label: t('platformOps.tabEvents') },
   ];
 
   return (
@@ -156,21 +157,13 @@ export function PlatformOperationsPage() {
       </PageSection>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
-        {tabs.map(tab => (
-          <button
-            type="button"
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? 'text-accent border-b-2 border-accent -mb-px'
-                : 'text-muted hover:text-body'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="mb-6">
+        <Tabs
+          variant="underline"
+          items={tabItems}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as Tab)}
+        />
       </div>
 
       {/* ── Health Tab ── */}
@@ -180,9 +173,9 @@ export function PlatformOperationsPage() {
           {healthQuery.isError && (
             <PageErrorState
               action={
-                <button type="button" onClick={() => healthQuery.refetch()} className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50">
+                <Button variant="outline" size="sm" onClick={() => healthQuery.refetch()}>
                   {t('common.retry')}
-                </button>
+                </Button>
               }
             />
           )}
@@ -241,24 +234,25 @@ export function PlatformOperationsPage() {
       {activeTab === 'jobs' && (
         <PageSection>
           <div className="flex items-center gap-3 mb-4">
-            <select
+            <Select
+              size="sm"
               value={jobFilter}
               onChange={e => setJobFilter(e.target.value as 'all' | BackgroundJobStatus)}
-              className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              <option value="all">{t('platformOps.filterAll')}</option>
-              <option value="Running">{t('platformOps.filterRunning')}</option>
-              <option value="Completed">{t('platformOps.filterCompleted')}</option>
-              <option value="Failed">{t('platformOps.filterFailed')}</option>
-            </select>
+              options={[
+                { value: 'all', label: t('platformOps.filterAll') },
+                { value: 'Running', label: t('platformOps.filterRunning') },
+                { value: 'Completed', label: t('platformOps.filterCompleted') },
+                { value: 'Failed', label: t('platformOps.filterFailed') },
+              ]}
+            />
           </div>
           {jobsQuery.isLoading && <PageLoadingState message={t('common.loading')} />}
           {jobsQuery.isError && (
             <PageErrorState
               action={
-                <button type="button" onClick={() => jobsQuery.refetch()} className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50">
+                <Button variant="outline" size="sm" onClick={() => jobsQuery.refetch()}>
                   {t('common.retry')}
-                </button>
+                </Button>
               }
             />
           )}
@@ -311,9 +305,9 @@ export function PlatformOperationsPage() {
           {queuesQuery.isError && (
             <PageErrorState
               action={
-                <button type="button" onClick={() => queuesQuery.refetch()} className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50">
+                <Button variant="outline" size="sm" onClick={() => queuesQuery.refetch()}>
                   {t('common.retry')}
-                </button>
+                </Button>
               }
             />
           )}
@@ -360,25 +354,26 @@ export function PlatformOperationsPage() {
       {activeTab === 'events' && (
         <PageSection>
           <div className="flex items-center gap-3 mb-4">
-            <select
+            <Select
+              size="sm"
               value={severityFilter}
               onChange={e => setSeverityFilter(e.target.value as 'all' | PlatformEventSeverity)}
-              className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              <option value="all">{t('platformOps.filterAll')}</option>
-              <option value="Info">{t('platformOps.filterInfo')}</option>
-              <option value="Warning">{t('platformOps.filterWarning')}</option>
-              <option value="Error">{t('platformOps.filterError')}</option>
-              <option value="Critical">{t('platformOps.filterCritical')}</option>
-            </select>
+              options={[
+                { value: 'all', label: t('platformOps.filterAll') },
+                { value: 'Info', label: t('platformOps.filterInfo') },
+                { value: 'Warning', label: t('platformOps.filterWarning') },
+                { value: 'Error', label: t('platformOps.filterError') },
+                { value: 'Critical', label: t('platformOps.filterCritical') },
+              ]}
+            />
           </div>
           {eventsQuery.isLoading && <PageLoadingState message={t('common.loading')} />}
           {eventsQuery.isError && (
             <PageErrorState
               action={
-                <button type="button" onClick={() => eventsQuery.refetch()} className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50">
+                <Button variant="outline" size="sm" onClick={() => eventsQuery.refetch()}>
                   {t('common.retry')}
-                </button>
+                </Button>
               }
             />
           )}
