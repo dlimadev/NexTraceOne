@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Zap, ShieldAlert, Search, Clock, AlertTriangle,
+  Zap, ShieldAlert, Clock, AlertTriangle,
   CheckCircle2, XCircle, Loader2,
 } from 'lucide-react';
+import { SearchInput, Select } from '../../../shared/ui';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
@@ -98,31 +99,29 @@ export function AutomationWorkflowsPage() {
       </StatsGrid>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            placeholder={t('automation.searchPlaceholder', 'Search workflows...')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-          />
-        </div>
-        <select
+        <SearchInput
+          className="flex-1"
+          size="sm"
+          placeholder={t('automation.searchPlaceholder', 'Search workflows...')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Select
+          size="sm"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="rounded-md border border-edge bg-input px-3 py-2 text-sm text-body focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-        >
-          <option value="all">{t('common.allStatuses', 'All statuses')}</option>
-          <option value="Created">{t('automation.status.created', 'Created')}</option>
-          <option value="PendingApproval">{t('automation.status.pendingApproval', 'Pending Approval')}</option>
-          <option value="Approved">{t('automation.status.approved', 'Approved')}</option>
-          <option value="Executing">{t('automation.status.executing', 'Executing')}</option>
-          <option value="Completed">{t('automation.status.completed', 'Completed')}</option>
-          <option value="Failed">{t('automation.status.failed', 'Failed')}</option>
-          <option value="Cancelled">{t('automation.status.cancelled', 'Cancelled')}</option>
-          <option value="Rejected">{t('automation.status.rejected', 'Rejected')}</option>
-        </select>
+          options={[
+            { value: 'all', label: t('common.allStatuses', 'All statuses') },
+            { value: 'Created', label: t('automation.status.created', 'Created') },
+            { value: 'PendingApproval', label: t('automation.status.pendingApproval', 'Pending Approval') },
+            { value: 'Approved', label: t('automation.status.approved', 'Approved') },
+            { value: 'Executing', label: t('automation.status.executing', 'Executing') },
+            { value: 'Completed', label: t('automation.status.completed', 'Completed') },
+            { value: 'Failed', label: t('automation.status.failed', 'Failed') },
+            { value: 'Cancelled', label: t('automation.status.cancelled', 'Cancelled') },
+            { value: 'Rejected', label: t('automation.status.rejected', 'Rejected') },
+          ]}
+        />
       </div>
 
       {filtered.length === 0 ? (
