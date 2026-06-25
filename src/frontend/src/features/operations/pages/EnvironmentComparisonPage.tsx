@@ -21,6 +21,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { TextField, Select } from '../../../shared/ui';
 import { runtimeIntelligenceApi } from '../api/runtimeIntelligence';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -50,7 +51,7 @@ function gradeColor(grade: string): string {
     case 'A':
       return 'text-success';
     case 'B':
-      return 'text-lime-400';
+      return 'text-lime-400'; /* intencional: sem token semântico para lime no DS */
     case 'C':
       return 'text-warning';
     case 'D':
@@ -202,84 +203,58 @@ export const EnvironmentComparisonPage: React.FC = () => {
               onSubmit={handleSubmit}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
             >
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-service" className="text-xs text-text-muted">
-                  {t('environmentComparison.serviceName')}
-                </label>
-                <input
-                  id="ec-service"
-                  type="text"
-                  value={form.serviceName}
-                  onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
-                  placeholder={t('environmentComparison.serviceNamePlaceholder')}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-env" className="text-xs text-text-muted">
-                  {t('environmentComparison.environment')}
-                </label>
-                <select
-                  id="ec-env"
-                  value={form.environment}
-                  onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                >
-                  {['dev', 'test', 'qa', 'uat', 'staging', 'production'].map((env) => (
-                    <option key={env} value={env}>
-                      {env}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-before-start" className="text-xs text-text-muted">
-                  {t('environmentComparison.beforePeriodStart')}
-                </label>
-                <input
-                  id="ec-before-start"
-                  type="datetime-local"
-                  value={form.beforeStart}
-                  onChange={(e) => setForm((f) => ({ ...f, beforeStart: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-before-end" className="text-xs text-text-muted">
-                  {t('environmentComparison.beforePeriodEnd')}
-                </label>
-                <input
-                  id="ec-before-end"
-                  type="datetime-local"
-                  value={form.beforeEnd}
-                  onChange={(e) => setForm((f) => ({ ...f, beforeEnd: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-after-start" className="text-xs text-text-muted">
-                  {t('environmentComparison.afterPeriodStart')}
-                </label>
-                <input
-                  id="ec-after-start"
-                  type="datetime-local"
-                  value={form.afterStart}
-                  onChange={(e) => setForm((f) => ({ ...f, afterStart: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="ec-after-end" className="text-xs text-text-muted">
-                  {t('environmentComparison.afterPeriodEnd')}
-                </label>
-                <input
-                  id="ec-after-end"
-                  type="datetime-local"
-                  value={form.afterEnd}
-                  onChange={(e) => setForm((f) => ({ ...f, afterEnd: e.target.value }))}
-                  className="rounded border border-edge bg-input px-3 py-2 text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
+              <TextField
+                id="ec-service"
+                label={t('environmentComparison.serviceName')}
+                size="sm"
+                type="text"
+                value={form.serviceName}
+                onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
+                placeholder={t('environmentComparison.serviceNamePlaceholder')}
+              />
+              <Select
+                id="ec-env"
+                label={t('environmentComparison.environment')}
+                size="sm"
+                options={['dev', 'test', 'qa', 'uat', 'staging', 'production'].map((env) => ({
+                  value: env,
+                  label: env,
+                }))}
+                value={form.environment}
+                onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
+              />
+              <TextField
+                id="ec-before-start"
+                label={t('environmentComparison.beforePeriodStart')}
+                size="sm"
+                type="datetime-local"
+                value={form.beforeStart}
+                onChange={(e) => setForm((f) => ({ ...f, beforeStart: e.target.value }))}
+              />
+              <TextField
+                id="ec-before-end"
+                label={t('environmentComparison.beforePeriodEnd')}
+                size="sm"
+                type="datetime-local"
+                value={form.beforeEnd}
+                onChange={(e) => setForm((f) => ({ ...f, beforeEnd: e.target.value }))}
+              />
+              <TextField
+                id="ec-after-start"
+                label={t('environmentComparison.afterPeriodStart')}
+                size="sm"
+                type="datetime-local"
+                value={form.afterStart}
+                onChange={(e) => setForm((f) => ({ ...f, afterStart: e.target.value }))}
+              />
+              <TextField
+                id="ec-after-end"
+                label={t('environmentComparison.afterPeriodEnd')}
+                size="sm"
+                type="datetime-local"
+                value={form.afterEnd}
+                onChange={(e) => setForm((f) => ({ ...f, afterEnd: e.target.value }))}
+              />
               <div className="flex items-end gap-2 lg:col-span-3">
                 <Button type="submit" variant="primary" size="sm">
                   <Search size={14} />
