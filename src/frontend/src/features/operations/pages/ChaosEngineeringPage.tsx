@@ -8,7 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Button } from '../../../components/Button';
+import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import client from '../../../api/client';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -113,14 +113,15 @@ function ExperimentResultCard({ result }: { result: CreateChaosExperimentRespons
       <CardBody className="space-y-3">
         {/* Steps */}
         <div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
+            icon={stepsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             onClick={() => setStepsOpen((v) => !v)}
-            className="flex items-center gap-1 text-sm font-medium text-body hover:text-blue-600 dark:hover:text-blue-400"
           >
-            {stepsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             {t('chaosEngineering.steps')} ({result.steps.length})
-          </button>
+          </Button>
           {stepsOpen && (
             <ol className="mt-2 space-y-1 pl-5 list-decimal">
               {result.steps.map((step, i) => (
@@ -133,14 +134,14 @@ function ExperimentResultCard({ result }: { result: CreateChaosExperimentRespons
         {/* Safety Checks */}
         <div>
           <p className="mb-1 flex items-center gap-1 text-sm font-medium text-body">
-            <ShieldCheck size={14} className="text-amber-500" />
+            <ShieldCheck size={14} className="text-warning" />
             {t('chaosEngineering.safetyChecks')}
           </p>
           <ul className="space-y-1">
             {result.safetyChecks.map((check, i) => (
-              <li key={i} className="flex items-center gap-2 rounded bg-amber-50 dark:bg-amber-900/20 px-2 py-1">
-                <AlertTriangle size={12} className="shrink-0 text-amber-500" />
-                <span className="text-xs text-amber-700 dark:text-amber-300">{check}</span>
+              <li key={i} className="flex items-center gap-2 rounded bg-warning-muted px-2 py-1">
+                <AlertTriangle size={12} className="shrink-0 text-warning" />
+                <span className="text-xs text-warning">{check}</span>
               </li>
             ))}
           </ul>
@@ -196,10 +197,6 @@ export function ChaosEngineeringPage() {
     createMutation.mutate(form);
   };
 
-  const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
-  const labelClass = 'mb-1 block text-xs font-medium text-body';
-
   return (
     <PageContainer>
       <PageHeader
@@ -213,84 +210,65 @@ export function ChaosEngineeringPage() {
           <CardBody>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.serviceName')}</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={form.serviceName}
-                    onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.environment')}</label>
-                  <select
-                    className={inputClass}
-                    value={form.environment}
-                    onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                  >
-                    {ENVIRONMENTS.map((env) => (
-                      <option key={env} value={env}>{env}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.experimentType')}</label>
-                  <select
-                    className={inputClass}
-                    value={form.experimentType}
-                    onChange={(e) => setForm((f) => ({ ...f, experimentType: e.target.value }))}
-                  >
-                    {EXPERIMENT_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {t(`chaosEngineering.${type.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())}` as never, {
-                          defaultValue: type,
-                        })}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.duration')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.durationSeconds}
-                    min={10}
-                    max={3600}
-                    onChange={(e) => setForm((f) => ({ ...f, durationSeconds: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.targetPercentage')}</label>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={form.targetPercentage}
-                    min={1}
-                    max={100}
-                    onChange={(e) => setForm((f) => ({ ...f, targetPercentage: Number(e.target.value) }))}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('chaosEngineering.description')}</label>
-                  <textarea
-                    className={inputClass}
-                    value={form.description}
-                    rows={2}
-                    onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  />
-                </div>
+                <TextField
+                  label={t('chaosEngineering.serviceName')}
+                  type="text"
+                  value={form.serviceName}
+                  onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
+                  required
+                />
+                <Select
+                  label={t('chaosEngineering.environment')}
+                  value={form.environment}
+                  onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
+                  options={ENVIRONMENTS.map((env) => ({ value: env, label: env }))}
+                />
+                <Select
+                  label={t('chaosEngineering.experimentType')}
+                  value={form.experimentType}
+                  onChange={(e) => setForm((f) => ({ ...f, experimentType: e.target.value }))}
+                  options={EXPERIMENT_TYPES.map((type) => ({
+                    value: type,
+                    label: t(`chaosEngineering.${type.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())}` as never, {
+                      defaultValue: type,
+                    }),
+                  }))}
+                />
+                <TextField
+                  label={t('chaosEngineering.duration')}
+                  type="number"
+                  value={form.durationSeconds}
+                  min={10}
+                  max={3600}
+                  onChange={(e) => setForm((f) => ({ ...f, durationSeconds: Number(e.target.value) }))}
+                />
+                <TextField
+                  label={t('chaosEngineering.targetPercentage')}
+                  type="number"
+                  value={form.targetPercentage}
+                  min={1}
+                  max={100}
+                  onChange={(e) => setForm((f) => ({ ...f, targetPercentage: Number(e.target.value) }))}
+                />
+                <TextArea
+                  label={t('chaosEngineering.description')}
+                  value={form.description}
+                  rows={2}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                />
               </div>
 
               {createMutation.isError && (
-                <p className="text-sm text-red-600 dark:text-red-400">{t('chaosEngineering.createError')}</p>
+                <p className="text-sm text-critical">{t('chaosEngineering.createError')}</p>
               )}
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? '...' : t('chaosEngineering.submit')}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={createMutation.isPending}
+                >
+                  {t('chaosEngineering.submit')}
                 </Button>
               </div>
             </form>
