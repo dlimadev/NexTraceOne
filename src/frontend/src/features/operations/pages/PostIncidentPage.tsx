@@ -87,16 +87,16 @@ export function PostIncidentPage() {
           icon={<FileText className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
+          <div className="flex gap-1">
             {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
+              <Button
                 key={opt.value}
-                type="button"
+                variant={timeRange === opt.value ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
               >
                 {t(opt.labelKey)}
-              </button>
+              </Button>
             ))}
           </div>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
