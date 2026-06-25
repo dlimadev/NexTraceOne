@@ -19,6 +19,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Tabs } from '../../../shared/ui';
 import { getSlowQueries, type SlowQuery, type DbSortMode } from '../api/telemetry';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -99,18 +100,13 @@ export function DbExplorerPage() {
           icon={<HardDrive className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            variant="pill"
+            size="sm"
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+          />
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             {t('common.refresh')}
@@ -143,9 +139,9 @@ export function DbExplorerPage() {
 
           {indexMisses > 0 && (
             <PageSection>
-              <Card className="border-amber-500/40 bg-amber-500/5">
+              <Card className="border-warning/40 bg-warning/5">
                 <CardBody className="p-3">
-                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm font-semibold mb-1">
+                  <div className="flex items-center gap-2 text-warning text-sm font-semibold mb-1">
                     <AlertTriangle className="w-4 h-4" />
                     {t('dbExplorer.indexWarnings.title')}
                   </div>
@@ -160,18 +156,13 @@ export function DbExplorerPage() {
           <PageSection>
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  {SORT_TABS.map((tab) => (
-                    <button
-                      key={tab.value}
-                      type="button"
-                      onClick={() => setSortBy(tab.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${sortBy === tab.value ? 'bg-accent text-on-accent' : 'text-muted hover:bg-muted'}`}
-                    >
-                      {t(tab.labelKey)}
-                    </button>
-                  ))}
-                </div>
+                <Tabs
+                  variant="pill"
+                  size="sm"
+                  items={SORT_TABS.map((tab) => ({ id: tab.value, label: t(tab.labelKey) }))}
+                  activeId={sortBy}
+                  onChange={(id) => setSortBy(id as DbSortMode)}
+                />
               </CardHeader>
               <CardBody className="p-0">
                 {queries.length === 0 ? (
@@ -196,7 +187,7 @@ export function DbExplorerPage() {
                             <td className="px-4 py-2.5 font-mono text-xs max-w-xs truncate" title={q.fingerprint}>{q.fingerprint}</td>
                             <td className="px-4 py-2.5 text-muted">{q.database}</td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={q.avgDurationMs > 2000 ? 'text-red-500 font-semibold' : ''}>{fmtMs(q.avgDurationMs)}</span>
+                              <span className={q.avgDurationMs > 2000 ? 'text-critical font-semibold' : ''}>{fmtMs(q.avgDurationMs)}</span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">{fmtMs(q.maxDurationMs)}</td>
                             <td className="px-4 py-2.5 tabular-nums">{q.executionCount.toLocaleString()}</td>
