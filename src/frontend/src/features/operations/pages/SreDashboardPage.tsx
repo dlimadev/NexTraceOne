@@ -466,16 +466,17 @@ export function SreDashboardPage() {
                 <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
               </Button>
               {showTimeMenu && (
-                <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px]">
+                <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-edge rounded-md shadow-md min-w-[120px] flex flex-col">
                   {TIME_RANGE_OPTIONS.map((opt) => (
-                    <button
+                    <Button
                       key={opt.value}
-                      type="button"
-                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted transition-colors ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
+                      variant="ghost"
+                      size="sm"
+                      className={`justify-start w-full rounded-none ${timeRange === opt.value ? 'font-semibold text-accent' : ''}`}
                       onClick={() => { setTimeRange(opt.value); setShowTimeMenu(false); }}
                     >
                       {t(opt.labelKey)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
