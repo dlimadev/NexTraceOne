@@ -138,8 +138,8 @@ describe('SloMarketplacePage', () => {
     await waitFor(() => {
       expect(screen.getByText('REST API Availability 99.9%')).toBeTruthy();
     });
-    // click Database category filter
-    const dbBtn = screen.getByRole('button', { name: /Database/i });
+    // click Database category filter (DS Tabs renders role="tab")
+    const dbBtn = screen.getByRole('tab', { name: /Database/i });
     dbBtn.click();
     await waitFor(() => {
       expect(screen.getByText('Database Query p95 < 100ms')).toBeTruthy();

@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getSloTemplates, type SloTemplate, type SloTemplateCategory } from '../api/telemetry';
@@ -82,18 +83,14 @@ export function SloMarketplacePage() {
           icon={<Store className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
+          {/* Seletor de janela temporal — DS Tabs pill */}
+          <Tabs
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+            variant="pill"
+            size="sm"
+          />
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             {t('common.refresh')}
@@ -126,18 +123,14 @@ export function SloMarketplacePage() {
           <PageSection>
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  {CATEGORY_OPTIONS.map((cat) => (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => setCategory(cat.value)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${category === cat.value ? 'bg-accent text-on-accent' : 'text-muted hover:bg-muted'}`}
-                    >
-                      {t(cat.labelKey)}
-                    </button>
-                  ))}
-                </div>
+                {/* Filtro por categoria — DS Tabs pill */}
+                <Tabs
+                  items={CATEGORY_OPTIONS.map((cat) => ({ id: cat.value, label: t(cat.labelKey) }))}
+                  activeId={category}
+                  onChange={(id) => setCategory(id as SloTemplateCategory | 'all')}
+                  variant="pill"
+                  size="sm"
+                />
               </CardHeader>
               <CardBody className="p-0">
                 {filtered.length === 0 ? (
