@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getDependencyRisks, type DependencyRiskEntry, type RiskLevel } from '../api/telemetry';
@@ -61,10 +62,10 @@ function riskVariant(level: RiskLevel): 'danger' | 'warning' | 'info' | 'success
 }
 
 function riskScoreColor(score: number): string {
-  if (score >= 8) return 'text-red-500 font-bold';
-  if (score >= 6) return 'text-amber-500 font-semibold';
-  if (score >= 4) return 'text-blue-500';
-  return 'text-emerald-500';
+  if (score >= 8) return 'text-critical font-bold';
+  if (score >= 6) return 'text-warning font-semibold';
+  if (score >= 4) return 'text-accent';
+  return 'text-success';
 }
 
 export function DependencyRiskPage() {
@@ -103,18 +104,14 @@ export function DependencyRiskPage() {
           icon={<GitFork className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
+          {/* Seletor de janela temporal — DS Tabs pill */}
+          <Tabs
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+            variant="pill"
+            size="sm"
+          />
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             {t('common.refresh')}
@@ -179,14 +176,14 @@ export function DependencyRiskPage() {
                             </td>
                             <td className="px-4 py-2.5 tabular-nums text-muted">{e.failureCount30d}x</td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={e.sloHealthPercent < 95 ? 'text-amber-500 font-semibold' : 'text-emerald-500'}>
+                              <span className={e.sloHealthPercent < 95 ? 'text-warning font-semibold' : 'text-success'}>
                                 {e.sloHealthPercent.toFixed(1)}%
                               </span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">{e.blastRadius} {e.blastRadius === 1 ? 'svc' : 'svcs'}</td>
                             <td className="px-4 py-2.5 tabular-nums">{e.dependentsCount}</td>
                             <td className="px-4 py-2.5">
-                              <span className={e.trendDirection === 'up' ? 'text-red-500' : e.trendDirection === 'down' ? 'text-emerald-500' : 'text-muted'}>
+                              <span className={e.trendDirection === 'up' ? 'text-critical' : e.trendDirection === 'down' ? 'text-success' : 'text-muted'}>
                                 {e.trendDirection === 'up' ? '↑' : e.trendDirection === 'down' ? '↓' : '→'}
                               </span>
                             </td>

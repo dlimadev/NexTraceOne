@@ -19,6 +19,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Tabs } from '../../../shared/ui';
 import { getProfilingSessions, type ProfilingSession } from '../api/telemetry';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -91,18 +92,13 @@ export function ProfilingExplorerPage() {
           icon={<Cpu className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            variant="pill"
+            size="sm"
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+          />
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             {t('common.refresh')}
@@ -160,7 +156,7 @@ export function ProfilingExplorerPage() {
                             <td className="px-4 py-2.5 text-muted font-mono text-xs">{s.version}</td>
                             <td className="px-4 py-2.5"><Badge variant="secondary">{s.environment}</Badge></td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={s.cpuPercent > 75 ? 'text-red-500 font-semibold' : ''}>{s.cpuPercent.toFixed(1)}%</span>
+                              <span className={s.cpuPercent > 75 ? 'text-critical font-semibold' : ''}>{s.cpuPercent.toFixed(1)}%</span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">{s.memoryMb} MB</td>
                             <td className="px-4 py-2.5 tabular-nums">{s.heapMb} MB</td>

@@ -9444,6 +9444,7 @@
     "riskHeatmap": "Heatmap de Risco",
     "runbooks": "Runbooks",
     "runtimeIntelligence": "Inteligência de Runtime",
+    "runtimeDashboard": "Painel de Runtime",
     "scoreMaturity": "Score & Maturidade",
     "sectionAdmin": "Administração",
     "sectionAiHub": "Hub de IA",
@@ -17667,5 +17668,97 @@
     "successTitle": "Verifique o seu email",
     "successMessage": "Enviámos um link de ativação para {{email}}. Abra-o para definir a sua palavra-passe e aceder ao workspace.",
     "backToLogin": "Voltar ao início de sessão"
+  },
+  "runtimeIntelligence": {
+    "title": "Inteligência de Runtime",
+    "subtitle": "Monitorização em tempo real da saúde e desempenho dos serviços",
+    "actions": {
+      "ingest": "Ingerir Snapshot",
+      "refresh": "Atualizar"
+    },
+    "toast": {
+      "ingestSuccess": "Snapshot ingerido com sucesso",
+      "ingestError": "Falha ao ingerir snapshot"
+    },
+    "filters": {
+      "service": "Serviço",
+      "allServices": "Todos os Serviços",
+      "environment": "Ambiente",
+      "period": "Período"
+    },
+    "env": {
+      "production": "Produção",
+      "staging": "Staging",
+      "development": "Desenvolvimento"
+    },
+    "period": {
+      "1h": "Última Hora",
+      "6h": "Últimas 6 Horas",
+      "24h": "Últimas 24 Horas",
+      "7d": "Últimos 7 Dias"
+    },
+    "kpi": {
+      "avgLatency": "Latência Média",
+      "avgLatencyHint": "Tempo médio de resposta",
+      "errorRate": "Taxa de Erro",
+      "errorRateHint": "Pedidos com falha",
+      "throughput": "Throughput",
+      "throughputHint": "Pedidos por segundo",
+      "healthyServices": "Serviços Saudáveis",
+      "healthyHint": "{{percent}}% saudáveis"
+    },
+    "tabs": {
+      "health": "Distribuição de Saúde",
+      "latency": "Tendência de Latência",
+      "drift": "Deteção de Drift",
+      "observability": "Score de Observabilidade"
+    },
+    "health": {
+      "healthy": "Saudável",
+      "degraded": "Degradado",
+      "unhealthy": "Não Saudável",
+      "title": "Distribuição de Saúde dos Serviços",
+      "description": "Visualização da saúde atual dos serviços monitorizados"
+    },
+    "latency": {
+      "title": "Tendência de Latência",
+      "description": "Evolução da latência média, p95 e p99 ao longo do tempo",
+      "avg": "Média",
+      "p95": "P95",
+      "p99": "P99"
+    },
+    "drift": {
+      "title": "Drift Findings Detetados",
+      "description": "Desvios identificados entre baseline esperada e comportamento real",
+      "service": "Serviço",
+      "environment": "Ambiente",
+      "severity": "Severidade",
+      "deviation": "Desvio",
+      "expected": "Esperado",
+      "actual": "Atual",
+      "detectedAt": "Detetado em",
+      "emptyTitle": "Nenhum drift detetado",
+      "emptyDescription": "Todos os serviços estão dentro da baseline esperada"
+    },
+    "observability": {
+      "title": "Score de Observabilidade",
+      "description": "Maturidade de observabilidade por serviço (0-100%)",
+      "score": "Score",
+      "critical": "Crítico",
+      "normal": "Normal",
+      "emptyTitle": "Nenhum score disponível",
+      "emptyDescription": "Configure perfis de observabilidade para os serviços"
+    },
+    "snapshots": {
+      "title": "Snapshots Recentes",
+      "description": "Últimos snapshots de saúde capturados",
+      "service": "Serviço",
+      "environment": "Ambiente",
+      "health": "Saúde",
+      "latency": "Latência (ms)",
+      "errorRate": "Error Rate",
+      "throughput": "Throughput",
+      "timestamp": "Timestamp"
+    }
   }
 }

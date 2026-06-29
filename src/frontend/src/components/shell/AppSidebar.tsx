@@ -116,6 +116,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.sreDashboard', to: '/operations/sre-dashboard', icon: <Monitor size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.syntheticMonitoring', to: '/operations/synthetic-monitoring', icon: <Gauge size={18} />, permission: 'operations:reliability:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.runtimeIntelligence', to: '/operations/runtime-comparison', icon: <Cpu size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
+  { labelKey: 'sidebar.runtimeDashboard', to: '/operations/runtime-intelligence', icon: <Activity size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.predictiveIntelligence', to: '/operations/predictive-intelligence', icon: <Lightbulb size={18} />, permission: 'operations:runtime:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.onCallIntelligence', to: '/operations/on-call-intelligence', icon: <Brain size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },
   { labelKey: 'sidebar.postIncident', to: '/operations/post-incident', icon: <FileSearch size={18} />, permission: 'operations:incidents:read', section: 'operations', subGroup: 'sidebar.subGroupSreIntelligence' },

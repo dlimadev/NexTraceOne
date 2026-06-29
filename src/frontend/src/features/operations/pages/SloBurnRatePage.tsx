@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getSloBurnRates, type SloBurnRate, type SloBurnStatus } from '../api/telemetry';
@@ -101,19 +102,14 @@ export function SloBurnRatePage() {
         subtitle={t('sloBurnRate.subtitle')}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Seletor de janela temporal — estilo segment com botões DS */}
-            <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-              {TIME_RANGE_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setTimeRange(opt.value)}
-                  className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-                >
-                  {t(opt.labelKey)}
-                </button>
-              ))}
-            </div>
+            {/* Seletor de janela temporal — DS Tabs pill */}
+            <Tabs
+              items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+              activeId={timeRange}
+              onChange={(id) => setTimeRange(id as TimeRange)}
+              variant="pill"
+              size="sm"
+            />
             <Button variant="outline" size="sm" onClick={handleRefresh}>
               <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
               {t('common.refresh')}

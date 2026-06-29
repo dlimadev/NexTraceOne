@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, AlertCircle, ShieldAlert, Eye,
@@ -104,6 +104,7 @@ const STATUS_FILTERS: StatusFilter[] = ['all', 'Open', 'Investigating', 'Mitigat
  */
 export function IncidentsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { activeEnvironmentId } = useEnvironment();
@@ -245,15 +246,14 @@ export function IncidentsPage() {
         actions={
           <>
             {/* Link para vista de timeline como ação secundária */}
-            <NavLink to="/operations/incidents/timeline">
-              <Button
-                variant="outline"
-                size="sm"
-                icon={<CalendarClock size={15} />}
-              >
-                {t('incidents.timelineView.open')}
-              </Button>
-            </NavLink>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<CalendarClock size={15} />}
+              onClick={() => navigate('/operations/incidents/timeline')}
+            >
+              {t('incidents.timelineView.open')}
+            </Button>
 
             {/* CTA principal — visível apenas para quem tem permissão de escrita */}
             {canCreateIncident && (
@@ -532,20 +532,20 @@ export function IncidentsPage() {
                             </Badge>
                           )}
                           {canCreateIncident && inc.status !== 'Resolved' && inc.status !== 'Closed' && (
-                            <button
-                              type="button"
+                            <Button
+                              variant="ghost"
+                              size="xs"
+                              disabled={resolveIncidentMutation.isPending}
+                              title={t('incidents.list.resolveAction', 'Resolve incident')}
+                              icon={<CheckCircle2 size={12} />}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 resolveIncidentMutation.mutate(inc.incidentId);
                               }}
-                              disabled={resolveIncidentMutation.isPending}
-                              className="flex items-center gap-1 px-2 py-1 text-[11px] rounded-md border border-edge text-muted hover:text-success hover:border-success transition-colors disabled:opacity-50"
-                              title={t('incidents.list.resolveAction', 'Resolve incident')}
                             >
-                              <CheckCircle2 size={12} />
                               {t('incidents.list.resolveAction', 'Resolve')}
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </NavLink>

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Clock, Filter } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { TextField, Select } from '../../../shared/ui';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -78,27 +79,28 @@ export function IncidentTimelinePage() {
           <div className="flex items-center gap-2 text-xs text-muted">
             <Filter size={14} /> {t('incidents.timelineView.filters')}
           </div>
-          <input
+          <TextField
             value={serviceName}
             onChange={(e) => setServiceName(e.target.value)}
             placeholder={t('incidents.timelineView.servicePlaceholder')}
-            className="px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
+            size="sm"
           />
-          <input
+          <TextField
             value={environment}
             onChange={(e) => setEnvironment(e.target.value)}
             placeholder={t('incidents.timelineView.environmentPlaceholder')}
-            className="px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
+            size="sm"
           />
-          <select
+          <Select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value as SourceFilter)}
-            className="px-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading"
-          >
-            <option value="all">{t('incidents.timelineView.source.all')}</option>
-            <option value="incident">{t('incidents.timelineView.source.incident')}</option>
-            <option value="observability">{t('incidents.timelineView.source.observability')}</option>
-          </select>
+            size="sm"
+            options={[
+              { value: 'all', label: t('incidents.timelineView.source.all') },
+              { value: 'incident', label: t('incidents.timelineView.source.incident') },
+              { value: 'observability', label: t('incidents.timelineView.source.observability') },
+            ]}
+          />
         </CardBody>
       </Card>
 

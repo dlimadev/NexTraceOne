@@ -17,6 +17,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { getApiRegressions, type ApiRegressionEntry, type RegressionStatus, type ChangeConfidence } from '../api/telemetry';
@@ -110,18 +111,14 @@ export function ApiRegressionPage() {
           icon={<TrendingDown className="w-5 h-5" />}
         />
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex rounded-md border border-edge overflow-hidden text-xs">
-            {TIME_RANGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setTimeRange(opt.value)}
-                className={`px-3 py-1.5 transition-colors ${timeRange === opt.value ? 'bg-accent text-on-accent font-semibold' : 'hover:bg-muted text-muted'}`}
-              >
-                {t(opt.labelKey)}
-              </button>
-            ))}
-          </div>
+          {/* Seletor de janela temporal — DS Tabs pill */}
+          <Tabs
+            items={TIME_RANGE_OPTIONS.map((opt) => ({ id: opt.value, label: t(opt.labelKey) }))}
+            activeId={timeRange}
+            onChange={(id) => setTimeRange(id as TimeRange)}
+            variant="pill"
+            size="sm"
+          />
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             {t('common.refresh')}
@@ -182,13 +179,13 @@ export function ApiRegressionPage() {
                             <td className="px-4 py-2.5 text-muted">{e.serviceName}</td>
                             <td className="px-4 py-2.5 tabular-nums text-muted">{fmtMs(e.p50BaselineMs)}</td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={e.p50CurrentMs > e.p50BaselineMs * 1.2 ? 'text-red-500 font-semibold' : ''}>{fmtMs(e.p50CurrentMs)}</span>
+                              <span className={e.p50CurrentMs > e.p50BaselineMs * 1.2 ? 'text-critical font-semibold' : ''}>{fmtMs(e.p50CurrentMs)}</span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={e.p95CurrentMs > e.p95BaselineMs * 1.2 ? 'text-red-500 font-semibold' : ''}>{fmtMs(e.p95CurrentMs)}</span>
+                              <span className={e.p95CurrentMs > e.p95BaselineMs * 1.2 ? 'text-critical font-semibold' : ''}>{fmtMs(e.p95CurrentMs)}</span>
                             </td>
                             <td className="px-4 py-2.5 tabular-nums">
-                              <span className={e.p99CurrentMs > e.p99BaselineMs * 1.2 ? 'text-red-500 font-semibold' : ''}>{fmtMs(e.p99CurrentMs)}</span>
+                              <span className={e.p99CurrentMs > e.p99BaselineMs * 1.2 ? 'text-critical font-semibold' : ''}>{fmtMs(e.p99CurrentMs)}</span>
                             </td>
                             <td className="px-4 py-2.5">
                               <Badge variant={statusVariant(e.status)}>

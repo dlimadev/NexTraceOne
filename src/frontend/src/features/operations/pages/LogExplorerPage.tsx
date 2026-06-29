@@ -30,6 +30,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { IconButton, TextField, Select } from '../../../shared/ui';
 import { queryLogs, type LogEntry } from '../api/telemetry';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -129,69 +130,56 @@ export function LogExplorerPage() {
         <Card>
           <CardBody className="p-4">
             <div className="flex flex-wrap items-end gap-3">
-              <div>
-                <label className="text-xs font-medium text-muted block mb-1">
-                  {t('telemetryExplorer.filters.environment')}
-                </label>
-                <select
-                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
-                  value={environment}
-                  onChange={(e) => setEnvironment(e.target.value)}
-                >
-                  <option value="production">Production</option>
-                  <option value="staging">Staging</option>
-                  <option value="development">Development</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted block mb-1">
-                  {t('telemetryExplorer.logs.service')}
-                </label>
-                <input
-                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-40"
-                  placeholder={t('telemetryExplorer.logs.service')}
-                  value={serviceName}
-                  onChange={(e) => setServiceName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted block mb-1">
-                  {t('telemetryExplorer.logs.level')}
-                </label>
-                <select
-                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm"
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                >
-                  <option value="">{t('telemetryExplorer.logs.allLevels')}</option>
-                  <option value="Error">Error</option>
-                  <option value="Warning">Warning</option>
-                  <option value="Information">Information</option>
-                  <option value="Debug">Debug</option>
-                </select>
-              </div>
+              <Select
+                label={t('telemetryExplorer.filters.environment')}
+                size="sm"
+                options={[
+                  { value: 'production', label: 'Production' },
+                  { value: 'staging', label: 'Staging' },
+                  { value: 'development', label: 'Development' },
+                ]}
+                value={environment}
+                onChange={(e) => setEnvironment(e.target.value)}
+              />
+              <TextField
+                label={t('telemetryExplorer.logs.service')}
+                size="sm"
+                placeholder={t('telemetryExplorer.logs.service')}
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
+                className="w-40"
+              />
+              <Select
+                label={t('telemetryExplorer.logs.level')}
+                size="sm"
+                options={[
+                  { value: '', label: t('telemetryExplorer.logs.allLevels') },
+                  { value: 'Error', label: 'Error' },
+                  { value: 'Warning', label: 'Warning' },
+                  { value: 'Information', label: 'Information' },
+                  { value: 'Debug', label: 'Debug' },
+                ]}
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+              />
               <div className="flex-1 min-w-[200px]">
-                <label className="text-xs font-medium text-muted block mb-1">
-                  {t('telemetryExplorer.logs.message')}
-                </label>
-                <input
-                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-full"
+                <TextField
+                  label={t('telemetryExplorer.logs.message')}
+                  size="sm"
                   placeholder={t('telemetryExplorer.logs.searchPlaceholder')}
                   value={messageContains}
                   onChange={(e) => setMessageContains(e.target.value)}
+                  className="w-full"
                 />
               </div>
-              <div>
-                <label className="text-xs font-medium text-muted block mb-1">
-                  {t('telemetryExplorer.logs.traceId')}
-                </label>
-                <input
-                  className="h-9 rounded-md border border-edge bg-elevated px-3 text-sm w-40 font-mono"
-                  placeholder={t('operations.logExplorer.traceIdPlaceholder', 'Trace ID')}
-                  value={traceIdFilter}
-                  onChange={(e) => setTraceIdFilter(e.target.value)}
-                />
-              </div>
+              <TextField
+                label={t('telemetryExplorer.logs.traceId')}
+                size="sm"
+                placeholder={t('operations.logExplorer.traceIdPlaceholder', 'Trace ID')}
+                value={traceIdFilter}
+                onChange={(e) => setTraceIdFilter(e.target.value)}
+                className="w-40 font-mono"
+              />
               <Button size="sm" onClick={() => logsQuery.refetch()}>
                 <Search className="w-4 h-4 mr-1" />
                 {t('telemetryExplorer.filters.apply')}
@@ -244,30 +232,26 @@ export function LogExplorerPage() {
                               <div className="flex items-center gap-2">
                                 <span className="truncate max-w-[400px]">{log.message}</span>
                                 {log.exception && (
-                                  <button
-                                    type="button"
-                                    className="text-muted hover:text-body flex-shrink-0"
+                                  <IconButton
+                                    size="sm"
+                                    label={expandedRow === index ? t('common.collapse', 'Collapse') : t('common.expand', 'Expand')}
+                                    icon={expandedRow === index ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                     onClick={() => setExpandedRow(expandedRow === index ? null : index)}
-                                  >
-                                    {expandedRow === index ? (
-                                      <ChevronUp className="w-4 h-4" />
-                                    ) : (
-                                      <ChevronDown className="w-4 h-4" />
-                                    )}
-                                  </button>
+                                  />
                                 )}
                               </div>
                             </td>
                             <td className="px-4 py-2">
                               {log.traceId && (
-                                <button
-                                  type="button"
-                                  className="font-mono text-xs text-accent hover:underline truncate max-w-[150px] flex items-center gap-1"
+                                <Button
+                                  variant="ghost"
+                                  size="xs"
+                                  className="font-mono text-accent hover:underline truncate max-w-[150px]"
                                   onClick={() => navigate(`/operations/telemetry/traces?traceId=${log.traceId}`)}
                                 >
                                   {log.traceId.substring(0, 16)}…
                                   <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                                </button>
+                                </Button>
                               )}
                             </td>
                           </tr>

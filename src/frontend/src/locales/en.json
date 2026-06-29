@@ -8146,6 +8146,7 @@
     "riskHeatmap": "Risk Heatmap",
     "runbooks": "Runbooks",
     "runtimeIntelligence": "Runtime Intelligence",
+    "runtimeDashboard": "Runtime Dashboard",
     "scoreMaturity": "Score & Maturity",
     "sectionAdmin": "Administration",
     "sectionAiHub": "AI Hub",
@@ -16355,5 +16356,97 @@
     "successTitle": "Check your email",
     "successMessage": "We sent an activation link to {{email}}. Open it to set your password and access your workspace.",
     "backToLogin": "Back to sign in"
+  },
+  "runtimeIntelligence": {
+    "title": "Runtime Intelligence",
+    "subtitle": "Real-time monitoring of service health and performance",
+    "actions": {
+      "ingest": "Ingest Snapshot",
+      "refresh": "Refresh"
+    },
+    "toast": {
+      "ingestSuccess": "Snapshot ingested successfully",
+      "ingestError": "Failed to ingest snapshot"
+    },
+    "filters": {
+      "service": "Service",
+      "allServices": "All Services",
+      "environment": "Environment",
+      "period": "Period"
+    },
+    "env": {
+      "production": "Production",
+      "staging": "Staging",
+      "development": "Development"
+    },
+    "period": {
+      "1h": "Last Hour",
+      "6h": "Last 6 Hours",
+      "24h": "Last 24 Hours",
+      "7d": "Last 7 Days"
+    },
+    "kpi": {
+      "avgLatency": "Average Latency",
+      "avgLatencyHint": "Average response time",
+      "errorRate": "Error Rate",
+      "errorRateHint": "Failed requests",
+      "throughput": "Throughput",
+      "throughputHint": "Requests per second",
+      "healthyServices": "Healthy Services",
+      "healthyHint": "{{percent}}% healthy"
+    },
+    "tabs": {
+      "health": "Health Distribution",
+      "latency": "Latency Trend",
+      "drift": "Drift Detection",
+      "observability": "Observability Score"
+    },
+    "health": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "unhealthy": "Unhealthy",
+      "title": "Service Health Distribution",
+      "description": "Visualization of the current health of monitored services"
+    },
+    "latency": {
+      "title": "Latency Trend",
+      "description": "Evolution of average, p95 and p99 latency over time",
+      "avg": "Average",
+      "p95": "P95",
+      "p99": "P99"
+    },
+    "drift": {
+      "title": "Detected Drift Findings",
+      "description": "Deviations identified between the expected baseline and actual behavior",
+      "service": "Service",
+      "environment": "Environment",
+      "severity": "Severity",
+      "deviation": "Deviation",
+      "expected": "Expected",
+      "actual": "Actual",
+      "detectedAt": "Detected at",
+      "emptyTitle": "No drift detected",
+      "emptyDescription": "All services are within the expected baseline"
+    },
+    "observability": {
+      "title": "Observability Score",
+      "description": "Observability maturity per service (0-100%)",
+      "score": "Score",
+      "critical": "Critical",
+      "normal": "Normal",
+      "emptyTitle": "No score available",
+      "emptyDescription": "Configure observability profiles for the services"
+    },
+    "snapshots": {
+      "title": "Recent Snapshots",
+      "description": "Latest captured health snapshots",
+      "service": "Service",
+      "environment": "Environment",
+      "health": "Health",
+      "latency": "Latency (ms)",
+      "errorRate": "Error Rate",
+      "throughput": "Throughput",
+      "timestamp": "Timestamp"
+    }
   }
 }

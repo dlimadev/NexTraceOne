@@ -4,8 +4,9 @@ import { NavLink } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Activity, CheckCircle2, AlertTriangle, XCircle,
-  TrendingUp, TrendingDown, Minus, Shield, Search,
+  TrendingUp, TrendingDown, Minus, Shield,
 } from 'lucide-react';
+import { Button, SearchInput } from '../../../shared/ui';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
@@ -87,31 +88,24 @@ export function TeamReliabilityPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            id="reliability-search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t('reliability.searchPlaceholder')}
-            aria-label={t('reliability.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-input border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </div>
+        <SearchInput
+          className="flex-1 max-w-xs"
+          size="sm"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder={t('reliability.searchPlaceholder')}
+          aria-label={t('reliability.searchPlaceholder')}
+        />
         {(['all', 'Healthy', 'Degraded', 'Unavailable', 'NeedsAttention'] as StatusFilter[]).map(f => (
-          <button
+          <Button
             key={f}
-            type="button"
+            variant={filter === f ? 'subtle' : 'ghost'}
+            size="xs"
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
-              filter === f
-                ? 'bg-accent/10 text-accent border-accent/30'
-                : 'bg-card text-muted border-edge hover:text-body'
-            }`}
+            className={filter === f ? 'text-accent' : undefined}
           >
             {t(`reliability.filter.${f}`)}
-          </button>
+          </Button>
         ))}
       </div>
 

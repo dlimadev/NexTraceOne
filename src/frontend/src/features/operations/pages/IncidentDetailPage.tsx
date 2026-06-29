@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../shared/ui';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type IncidentDetailResponse, type DynamicCorrelatedChange } from '../api/incidents';
@@ -289,32 +290,34 @@ export function IncidentDetailPage() {
                   <GitBranch size={16} className="text-accent" aria-hidden="true" /> {t('incidents.correlation.title')}
                 </h2>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={triggerCorrelationMutation.isPending || refreshCorrelationMutation.isPending}
+                    loading={triggerCorrelationMutation.isPending}
                     onClick={() => {
                       setRefreshFeedback(null);
                       triggerCorrelationMutation.mutate();
                     }}
-                    disabled={triggerCorrelationMutation.isPending || refreshCorrelationMutation.isPending}
-                    className="px-2.5 py-1.5 text-xs rounded-md border border-accent/30 text-accent hover:bg-accent/10 disabled:opacity-60"
                   >
                     {triggerCorrelationMutation.isPending
                       ? t('common.loading', 'Loading...')
                       : t('incidents.correlation.runEngineAction', 'Run correlation engine')}
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={refreshCorrelationMutation.isPending || triggerCorrelationMutation.isPending}
+                    loading={refreshCorrelationMutation.isPending}
                     onClick={() => {
                       setRefreshFeedback(null);
                       refreshCorrelationMutation.mutate();
                     }}
-                    disabled={refreshCorrelationMutation.isPending || triggerCorrelationMutation.isPending}
-                    className="px-2.5 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body disabled:opacity-60"
                   >
                     {refreshCorrelationMutation.isPending
                       ? t('common.loading', 'Loading...')
                       : t('incidents.correlation.refreshAction', 'Refresh correlation')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </CardHeader>

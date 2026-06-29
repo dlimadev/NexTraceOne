@@ -7,6 +7,11 @@ import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -92,10 +97,6 @@ function ServiceFailurePredictionForm() {
     onSuccess: (data) => setResult(data),
   });
 
-  const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
-  const labelClass = 'mb-1 block text-xs font-medium text-body';
-
   return (
     <div className="space-y-4">
       <Card>
@@ -108,100 +109,75 @@ function ServiceFailurePredictionForm() {
             className="space-y-4"
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.serviceId')}</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={form.serviceId}
-                  onChange={(e) => setForm((f) => ({ ...f, serviceId: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.serviceName')}</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={form.serviceName}
-                  onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.environment')}</label>
-                <select
-                  className={inputClass}
-                  value={form.environment}
-                  onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                >
-                  {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{env}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.predictionHorizon')}</label>
-                <select
-                  className={inputClass}
-                  value={form.predictionHorizon}
-                  onChange={(e) => setForm((f) => ({ ...f, predictionHorizon: e.target.value }))}
-                >
-                  {PREDICTION_HORIZONS.map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.errorRatePercent')}</label>
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={form.errorRatePercent}
-                  min={0}
-                  max={100}
-                  onChange={(e) => setForm((f) => ({ ...f, errorRatePercent: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.incidentCount')}</label>
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={form.incidentCountLast30Days}
-                  min={0}
-                  onChange={(e) => setForm((f) => ({ ...f, incidentCountLast30Days: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.changeFrequencyScore')}</label>
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={form.changeFrequencyScore}
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  onChange={(e) => setForm((f) => ({ ...f, changeFrequencyScore: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.additionalContext')}</label>
-                <textarea
-                  className={inputClass}
-                  value={form.additionalContext}
-                  rows={2}
-                  onChange={(e) => setForm((f) => ({ ...f, additionalContext: e.target.value }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('predictiveIntelligence.serviceId')}
+                value={form.serviceId}
+                onChange={(e) => setForm((f) => ({ ...f, serviceId: e.target.value }))}
+                required
+              />
+              <TextField
+                size="sm"
+                label={t('predictiveIntelligence.serviceName')}
+                value={form.serviceName}
+                onChange={(e) => setForm((f) => ({ ...f, serviceName: e.target.value }))}
+                required
+              />
+              <Select
+                size="sm"
+                label={t('predictiveIntelligence.environment')}
+                value={form.environment}
+                onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
+                options={ENVIRONMENTS.map((env) => ({ value: env, label: env }))}
+              />
+              <Select
+                size="sm"
+                label={t('predictiveIntelligence.predictionHorizon')}
+                value={form.predictionHorizon}
+                onChange={(e) => setForm((f) => ({ ...f, predictionHorizon: e.target.value }))}
+                options={PREDICTION_HORIZONS.map((h) => ({ value: h, label: h }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('predictiveIntelligence.errorRatePercent')}
+                value={form.errorRatePercent}
+                min={0}
+                max={100}
+                onChange={(e) => setForm((f) => ({ ...f, errorRatePercent: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('predictiveIntelligence.incidentCount')}
+                value={form.incidentCountLast30Days}
+                min={0}
+                onChange={(e) => setForm((f) => ({ ...f, incidentCountLast30Days: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('predictiveIntelligence.changeFrequencyScore')}
+                value={form.changeFrequencyScore}
+                min={0}
+                max={10}
+                step={0.1}
+                onChange={(e) => setForm((f) => ({ ...f, changeFrequencyScore: Number(e.target.value) }))}
+              />
+              <TextArea
+                label={t('predictiveIntelligence.additionalContext')}
+                value={form.additionalContext}
+                rows={2}
+                onChange={(e) => setForm((f) => ({ ...f, additionalContext: e.target.value }))}
+              />
             </div>
 
             {mutation.isError && (
-              <p className="text-sm text-red-600 dark:text-red-400">{t('predictiveIntelligence.error')}</p>
+              <p className="text-sm text-critical">{t('predictiveIntelligence.error')}</p>
             )}
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={mutation.isPending}>
+              <Button type="submit" disabled={mutation.isPending} loading={mutation.isPending}>
                 {mutation.isPending ? t('predictiveIntelligence.loading') : t('predictiveIntelligence.submit')}
               </Button>
             </div>
@@ -240,7 +216,7 @@ function ServiceFailurePredictionForm() {
                 {result.causalFactors.map((factor, i) => (
                   <span
                     key={i}
-                    className="rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-300"
+                    className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent"
                   >
                     {factor}
                   </span>
@@ -300,11 +276,6 @@ function ChangeRiskAssessmentForm() {
     onSuccess: (data) => setResult(data),
   });
 
-  const inputClass =
-    'w-full rounded border border-edge bg-card px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent';
-  const labelClass = 'mb-1 block text-xs font-medium text-body';
-  const checkboxClass = 'mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-accent';
-
   return (
     <div className="space-y-4">
       <Card>
@@ -317,91 +288,66 @@ function ChangeRiskAssessmentForm() {
             className="space-y-4"
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.serviceId')}</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={form.serviceId}
-                  onChange={(e) => setForm((f) => ({ ...f, serviceId: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.environment')}</label>
-                <select
-                  className={inputClass}
-                  value={form.environment}
-                  onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                >
-                  {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{env}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.changeType')}</label>
-                <select
-                  className={inputClass}
-                  value={form.changeType}
-                  onChange={(e) => setForm((f) => ({ ...f, changeType: e.target.value }))}
-                >
-                  {CHANGE_TYPES.map((ct) => (
-                    <option key={ct} value={ct}>{ct}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.priorIncidentRate')}</label>
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={form.priorIncidentRate}
-                  min={0}
-                  step={0.01}
-                  onChange={(e) => setForm((f) => ({ ...f, priorIncidentRate: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('predictiveIntelligence.blastRadius')}</label>
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={form.blastRadius}
-                  min={0}
-                  max={100}
-                  onChange={(e) => setForm((f) => ({ ...f, blastRadius: Number(e.target.value) }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('predictiveIntelligence.serviceId')}
+                value={form.serviceId}
+                onChange={(e) => setForm((f) => ({ ...f, serviceId: e.target.value }))}
+                required
+              />
+              <Select
+                size="sm"
+                label={t('predictiveIntelligence.environment')}
+                value={form.environment}
+                onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
+                options={ENVIRONMENTS.map((env) => ({ value: env, label: env }))}
+              />
+              <Select
+                size="sm"
+                label={t('predictiveIntelligence.changeType')}
+                value={form.changeType}
+                onChange={(e) => setForm((f) => ({ ...f, changeType: e.target.value }))}
+                options={CHANGE_TYPES.map((ct) => ({ value: ct, label: ct }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('predictiveIntelligence.priorIncidentRate')}
+                value={form.priorIncidentRate}
+                min={0}
+                step={0.01}
+                onChange={(e) => setForm((f) => ({ ...f, priorIncidentRate: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('predictiveIntelligence.blastRadius')}
+                value={form.blastRadius}
+                min={0}
+                max={100}
+                onChange={(e) => setForm((f) => ({ ...f, blastRadius: Number(e.target.value) }))}
+              />
             </div>
 
             <div className="flex flex-col gap-3">
-              <label className="flex items-center text-sm text-body">
-                <input
-                  type="checkbox"
-                  className={checkboxClass}
-                  checked={form.hasTestEvidence}
-                  onChange={(e) => setForm((f) => ({ ...f, hasTestEvidence: e.target.checked }))}
-                />
-                {t('predictiveIntelligence.hasTestEvidence')}
-              </label>
-              <label className="flex items-center text-sm text-body">
-                <input
-                  type="checkbox"
-                  className={checkboxClass}
-                  checked={form.isBusinessHours}
-                  onChange={(e) => setForm((f) => ({ ...f, isBusinessHours: e.target.checked }))}
-                />
-                {t('predictiveIntelligence.isBusinessHours')}
-              </label>
+              <Checkbox
+                label={t('predictiveIntelligence.hasTestEvidence')}
+                checked={form.hasTestEvidence}
+                onChange={(e) => setForm((f) => ({ ...f, hasTestEvidence: e.target.checked }))}
+              />
+              <Checkbox
+                label={t('predictiveIntelligence.isBusinessHours')}
+                checked={form.isBusinessHours}
+                onChange={(e) => setForm((f) => ({ ...f, isBusinessHours: e.target.checked }))}
+              />
             </div>
 
             {mutation.isError && (
-              <p className="text-sm text-red-600 dark:text-red-400">{t('predictiveIntelligence.error')}</p>
+              <p className="text-sm text-critical">{t('predictiveIntelligence.error')}</p>
             )}
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={mutation.isPending}>
+              <Button type="submit" disabled={mutation.isPending} loading={mutation.isPending}>
                 {mutation.isPending ? t('predictiveIntelligence.loading') : t('predictiveIntelligence.submit')}
               </Button>
             </div>
@@ -437,7 +383,7 @@ function ChangeRiskAssessmentForm() {
                 <ul className="space-y-1">
                   {result.riskFactors.map((factor, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-body">
-                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500 shrink-0" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-warning shrink-0" />
                       {factor}
                     </li>
                   ))}
@@ -453,7 +399,7 @@ function ChangeRiskAssessmentForm() {
                 <ul className="space-y-1">
                   {result.recommendations.map((rec, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-body">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
                       {rec}
                     </li>
                   ))}
@@ -483,13 +429,6 @@ export function PredictiveIntelligencePage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ActiveTab>('serviceFailure');
 
-  const tabClass = (tab: ActiveTab) =>
-    `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors ${
-      activeTab === tab
-        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-        : 'border-transparent text-muted hover:text-heading'
-    }`;
-
   return (
     <PageContainer>
       <PageHeader
@@ -499,22 +438,15 @@ export function PredictiveIntelligencePage() {
       />
 
       <PageSection title={t('predictiveIntelligence.analysisPanel')}>
-        <div className="mb-4 flex gap-1 border-b border-edge">
-          <button
-            type="button"
-            className={tabClass('serviceFailure')}
-            onClick={() => setActiveTab('serviceFailure')}
-          >
-            {t('predictiveIntelligence.serviceFailurePrediction')}
-          </button>
-          <button
-            type="button"
-            className={tabClass('changeRisk')}
-            onClick={() => setActiveTab('changeRisk')}
-          >
-            {t('predictiveIntelligence.changeRiskAssessment')}
-          </button>
-        </div>
+        <Tabs
+          className="mb-4"
+          items={[
+            { id: 'serviceFailure', label: t('predictiveIntelligence.serviceFailurePrediction') },
+            { id: 'changeRisk', label: t('predictiveIntelligence.changeRiskAssessment') },
+          ]}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as ActiveTab)}
+        />
 
         {activeTab === 'serviceFailure' && <ServiceFailurePredictionForm />}
         {activeTab === 'changeRisk' && <ChangeRiskAssessmentForm />}
