@@ -6,6 +6,7 @@ import {
   User,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
+import { IconButton } from '../../../components/IconButton';
 import type { AgentItem } from './AiAssistantTypes';
 
 interface Props {
@@ -28,12 +29,13 @@ export function AgentsSidePanel({ agents, isOpen, onClose }: Props) {
           <Users size={16} className="text-accent" />
           <h2 className="text-sm font-semibold text-heading">{t('aiHub.agentsPanel')}</h2>
         </div>
-        <button
+        <IconButton
+          variant="ghost"
+          size="sm"
           onClick={onClose}
-          className="text-muted hover:text-body transition-colors"
-        >
-          <ChevronUp size={14} />
-        </button>
+          label={t('common.close', 'Close')}
+          icon={<ChevronUp size={14} />}
+        />
       </div>
       <div className="flex-1 overflow-y-auto">
         {agents.map(agent => (
