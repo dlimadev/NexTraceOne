@@ -14,6 +14,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { Tabs } from '../../../components/Tabs';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
@@ -399,22 +400,14 @@ export function AiRoutingPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 mb-6">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-              activeTab === tab.key
-                ? 'bg-accent text-heading'
-                : 'bg-elevated text-muted hover:text-body'
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        variant="pill"
+        size="sm"
+        className="mb-6"
+        items={tabs.map(tab => ({ id: tab.key, label: tab.label, icon: tab.icon }))}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* Tab content */}
       {(isLoadingStrategies || isLoadingWeights) && (
