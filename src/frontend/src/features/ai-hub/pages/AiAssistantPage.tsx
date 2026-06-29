@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { PageContainer } from '../../../components/shell';
 import { aiGovernanceApi } from '../api/aiGovernance';
@@ -774,15 +775,15 @@ export function AiAssistantPage() {
           {/* ── Input field ────────────────────────────────────────────── */}
           <div className="px-6 py-4 border-t border-edge">
             <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={t('aiHub.inputPlaceholder')}
-                className="flex-1 bg-elevated border border-edge rounded-lg px-4 py-2.5 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-                disabled={isTyping || isStreaming}
-              />
+              <div className="flex-1">
+                <TextField
+                  value={inputValue}
+                  onChange={e => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('aiHub.inputPlaceholder')}
+                  disabled={isTyping || isStreaming}
+                />
+              </div>
               <Button variant="primary" size="md" disabled={!inputValue.trim() || isTyping || isStreaming} onClick={() => void handleSendMessage()}>
                 <Send size={16} />
                 {t('aiHub.send')}
