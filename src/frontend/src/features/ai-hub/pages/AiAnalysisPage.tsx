@@ -5,6 +5,9 @@ import { AlertTriangle, ArrowUpCircle, ArrowLeftRight, Loader2, XCircle } from '
 import { PageContainer } from '../../../components/shell';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Tabs } from '../../../components/Tabs';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { aiGovernanceApi } from '../api/aiGovernance';
@@ -387,37 +390,31 @@ function ReadinessTab({
         <p className="text-xs text-muted mb-4">{t('aiAnalysis.readiness.description')}</p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.serviceName')}</label>
-            <input
-              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
-              value={serviceName}
-              onChange={e => setServiceName(e.target.value)}
-              placeholder={t('aiHub.analysis.placeholder.serviceName', 'e.g. payment-service')}
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.version')}</label>
-            <input
-              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
-              value={version}
-              onChange={e => setVersion(e.target.value)}
-              placeholder={t('aiHub.analysis.placeholder.version', 'e.g. 2.1.0')}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.targetEnvironment')}</label>
-            <select
-              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
-              value={targetId}
-              onChange={e => setTargetId(e.target.value)}
-            >
-              <option value="">{t('aiAnalysis.readiness.selectTarget')}</option>
-              {otherEnvs.map(e => (
-                <option key={e.id} value={e.id}>{e.name}</option>
-              ))}
-            </select>
-          </div>
+          <TextField
+            size="sm"
+            label={t('aiAnalysis.readiness.serviceName')}
+            value={serviceName}
+            onChange={e => setServiceName(e.target.value)}
+            placeholder={t('aiHub.analysis.placeholder.serviceName', 'e.g. payment-service')}
+          />
+          <TextField
+            size="sm"
+            label={t('aiAnalysis.readiness.version')}
+            value={version}
+            onChange={e => setVersion(e.target.value)}
+            placeholder={t('aiHub.analysis.placeholder.version', 'e.g. 2.1.0')}
+          />
+          <Select
+            size="sm"
+            className="sm:col-span-2"
+            label={t('aiAnalysis.readiness.targetEnvironment')}
+            value={targetId}
+            onChange={e => setTargetId(e.target.value)}
+            options={[
+              { value: '', label: t('aiAnalysis.readiness.selectTarget') },
+              ...otherEnvs.map(e => ({ value: e.id, label: e.name })),
+            ]}
+          />
         </div>
 
         <div className="mt-4">
@@ -541,22 +538,12 @@ export function AiAnalysisPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? 'border-accent text-accent'
-                : 'border-transparent text-muted hover:text-muted'
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mb-6"
+        items={tabs.map(tab => ({ id: tab.key, label: tab.label, icon: tab.icon }))}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as AnalysisTab)}
+      />
 
       {/* Tab content */}
       {activeTab === 'non-prod' && (
