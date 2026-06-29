@@ -8,6 +8,11 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Checkbox } from '../../../components/Checkbox';
 import { incidentsApi, type RunbookStepDto } from '../api/incidents';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -221,13 +226,15 @@ export function RunbookBuilderPage() {
       />
 
       <PageSection>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate('/operations/runbooks')}
-          className="flex items-center gap-1 text-sm text-muted hover:text-body transition-colors mb-4"
+          className="mb-4"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={14} className="mr-1" />
           {t('runbooks.builder.back')}
-        </button>
+        </Button>
 
         {errors.length > 0 && (
           <div className="mb-4 p-3 rounded-md bg-critical/10 border border-critical/30">
@@ -249,66 +256,42 @@ export function RunbookBuilderPage() {
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('runbooks.builder.fieldTitle')} *
-                </label>
-                <input
-                  type="text"
-                  value={form.title}
-                  onChange={(e) => updateField('title', e.target.value)}
-                  placeholder={t('runbooks.builder.fieldTitlePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('runbooks.builder.fieldMaintainedBy')} *
-                </label>
-                <input
-                  type="text"
-                  value={form.maintainedBy}
-                  onChange={(e) => updateField('maintainedBy', e.target.value)}
-                  placeholder={t('runbooks.builder.fieldMaintainedByPlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('runbooks.builder.fieldDescription')} *
-                </label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => updateField('description', e.target.value)}
-                  placeholder={t('runbooks.builder.fieldDescriptionPlaceholder')}
-                  rows={3}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('runbooks.builder.fieldLinkedService')}
-                </label>
-                <input
-                  type="text"
-                  value={form.linkedService}
-                  onChange={(e) => updateField('linkedService', e.target.value)}
-                  placeholder={t('runbooks.builder.fieldLinkedServicePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('runbooks.builder.fieldLinkedIncidentType')}
-                </label>
-                <input
-                  type="text"
-                  value={form.linkedIncidentType}
-                  onChange={(e) => updateField('linkedIncidentType', e.target.value)}
-                  placeholder={t('runbooks.builder.fieldLinkedIncidentTypePlaceholder')}
-                  className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={`${t('runbooks.builder.fieldTitle')} *`}
+                value={form.title}
+                onChange={(e) => updateField('title', e.target.value)}
+                placeholder={t('runbooks.builder.fieldTitlePlaceholder')}
+              />
+              <TextField
+                size="sm"
+                label={`${t('runbooks.builder.fieldMaintainedBy')} *`}
+                value={form.maintainedBy}
+                onChange={(e) => updateField('maintainedBy', e.target.value)}
+                placeholder={t('runbooks.builder.fieldMaintainedByPlaceholder')}
+              />
+              <TextArea
+                className="md:col-span-2"
+                label={`${t('runbooks.builder.fieldDescription')} *`}
+                value={form.description}
+                onChange={(e) => updateField('description', e.target.value)}
+                placeholder={t('runbooks.builder.fieldDescriptionPlaceholder')}
+                rows={3}
+              />
+              <TextField
+                size="sm"
+                label={t('runbooks.builder.fieldLinkedService')}
+                value={form.linkedService}
+                onChange={(e) => updateField('linkedService', e.target.value)}
+                placeholder={t('runbooks.builder.fieldLinkedServicePlaceholder')}
+              />
+              <TextField
+                size="sm"
+                label={t('runbooks.builder.fieldLinkedIncidentType')}
+                value={form.linkedIncidentType}
+                onChange={(e) => updateField('linkedIncidentType', e.target.value)}
+                placeholder={t('runbooks.builder.fieldLinkedIncidentTypePlaceholder')}
+              />
             </div>
           </CardBody>
         </Card>
@@ -318,13 +301,10 @@ export function RunbookBuilderPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-heading">{t('runbooks.builder.stepsSection')}</h3>
-              <button
-                onClick={addStep}
-                className="flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
-              >
-                <Plus size={14} />
+              <Button variant="ghost" size="sm" onClick={addStep}>
+                <Plus size={14} className="mr-1" />
                 {t('runbooks.builder.addStep')}
-              </button>
+              </Button>
             </div>
           </CardHeader>
           <CardBody>
@@ -336,37 +316,33 @@ export function RunbookBuilderPage() {
                     <span className="text-xs font-mono ml-1">{index + 1}</span>
                   </div>
                   <div className="flex-1 space-y-2">
-                    <input
-                      type="text"
+                    <TextField
+                      size="sm"
                       value={step.title}
                       onChange={(e) => updateStep(index, 'title', e.target.value)}
                       placeholder={t('runbooks.builder.stepTitlePlaceholder')}
-                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                     />
-                    <textarea
+                    <TextArea
                       value={step.description ?? ''}
                       onChange={(e) => updateStep(index, 'description', e.target.value)}
                       placeholder={t('runbooks.builder.stepDescriptionPlaceholder')}
                       rows={2}
-                      className="w-full px-3 py-1.5 rounded-md border border-edge bg-input text-xs text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
                     />
-                    <label className="flex items-center gap-2 text-xs text-muted">
-                      <input
-                        type="checkbox"
-                        checked={step.isOptional}
-                        onChange={(e) => updateStep(index, 'isOptional', e.target.checked)}
-                        className="rounded border-edge"
-                      />
-                      {t('runbooks.builder.stepOptional')}
-                    </label>
+                    <Checkbox
+                      label={t('runbooks.builder.stepOptional')}
+                      checked={step.isOptional}
+                      onChange={(e) => updateStep(index, 'isOptional', e.target.checked)}
+                    />
                   </div>
                   {form.steps.length > 1 && (
-                    <button
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      className="self-start hover:text-critical"
+                      label={t('runbooks.builder.removeStep', 'Remove step')}
+                      icon={<Trash2 size={14} />}
                       onClick={() => removeStep(index)}
-                      className="text-muted hover:text-critical transition-colors self-start"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    />
                   )}
                 </div>
               ))}
@@ -379,13 +355,10 @@ export function RunbookBuilderPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-heading">{t('runbooks.builder.prerequisitesSection')}</h3>
-              <button
-                onClick={addPrerequisite}
-                className="flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
-              >
-                <Plus size={14} />
+              <Button variant="ghost" size="sm" onClick={addPrerequisite}>
+                <Plus size={14} className="mr-1" />
                 {t('runbooks.builder.addPrerequisite')}
-              </button>
+              </Button>
             </div>
           </CardHeader>
           <CardBody>
@@ -397,19 +370,22 @@ export function RunbookBuilderPage() {
               <div className="space-y-2">
                 {form.prerequisites.map((prereq, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={prereq}
-                      onChange={(e) => updatePrerequisite(index, e.target.value)}
-                      placeholder={t('runbooks.builder.prerequisitePlaceholder')}
-                      className="flex-1 px-3 py-1.5 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                    />
-                    <button
+                    <div className="flex-1">
+                      <TextField
+                        size="sm"
+                        value={prereq}
+                        onChange={(e) => updatePrerequisite(index, e.target.value)}
+                        placeholder={t('runbooks.builder.prerequisitePlaceholder')}
+                      />
+                    </div>
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      className="hover:text-critical"
+                      label={t('runbooks.builder.removePrerequisite', 'Remove prerequisite')}
+                      icon={<Trash2 size={14} />}
                       onClick={() => removePrerequisite(index)}
-                      className="text-muted hover:text-critical transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    />
                   </div>
                 ))}
               </div>
@@ -420,35 +396,25 @@ export function RunbookBuilderPage() {
         {/* Post-Execution Notes */}
         <Card className="mb-4">
           <CardBody>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('runbooks.builder.fieldPostNotes')}
-            </label>
-            <textarea
+            <TextArea
+              label={t('runbooks.builder.fieldPostNotes')}
               value={form.postNotes}
               onChange={(e) => updateField('postNotes', e.target.value)}
               placeholder={t('runbooks.builder.fieldPostNotesPlaceholder')}
               rows={3}
-              className="w-full px-3 py-2 rounded-md border border-edge bg-input text-sm text-body placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
             />
           </CardBody>
         </Card>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-3">
-          <button
-            onClick={() => navigate('/operations/runbooks')}
-            className="px-4 py-2 text-sm text-muted hover:text-body transition-colors"
-          >
+          <Button variant="ghost" onClick={() => navigate('/operations/runbooks')}>
             {t('runbooks.builder.cancel')}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90 disabled:opacity-50 transition-colors"
-          >
-            <Save size={14} />
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving} loading={isSaving}>
+            <Save size={14} className="mr-2" />
             {isSaving ? t('runbooks.builder.saving') : t('runbooks.builder.save')}
-          </button>
+          </Button>
         </div>
       </PageSection>
     </PageContainer>
