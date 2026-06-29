@@ -17670,5 +17670,97 @@
     "successTitle": "Revisa tu correo",
     "successMessage": "Enviamos un enlace de activación a {{email}}. Ábrelo para definir tu contraseña y acceder a tu workspace.",
     "backToLogin": "Volver al inicio de sesión"
+  },
+  "runtimeIntelligence": {
+    "title": "Inteligencia de Runtime",
+    "subtitle": "Monitorización en tiempo real de la salud y el rendimiento de los servicios",
+    "actions": {
+      "ingest": "Ingerir Snapshot",
+      "refresh": "Actualizar"
+    },
+    "toast": {
+      "ingestSuccess": "Snapshot ingerido con éxito",
+      "ingestError": "Error al ingerir el snapshot"
+    },
+    "filters": {
+      "service": "Servicio",
+      "allServices": "Todos los Servicios",
+      "environment": "Entorno",
+      "period": "Período"
+    },
+    "env": {
+      "production": "Producción",
+      "staging": "Staging",
+      "development": "Desarrollo"
+    },
+    "period": {
+      "1h": "Última Hora",
+      "6h": "Últimas 6 Horas",
+      "24h": "Últimas 24 Horas",
+      "7d": "Últimos 7 Días"
+    },
+    "kpi": {
+      "avgLatency": "Latencia Media",
+      "avgLatencyHint": "Tiempo medio de respuesta",
+      "errorRate": "Tasa de Error",
+      "errorRateHint": "Solicitudes fallidas",
+      "throughput": "Throughput",
+      "throughputHint": "Solicitudes por segundo",
+      "healthyServices": "Servicios Saludables",
+      "healthyHint": "{{percent}}% saludables"
+    },
+    "tabs": {
+      "health": "Distribución de Salud",
+      "latency": "Tendencia de Latencia",
+      "drift": "Detección de Drift",
+      "observability": "Puntuación de Observabilidad"
+    },
+    "health": {
+      "healthy": "Saludable",
+      "degraded": "Degradado",
+      "unhealthy": "No Saludable",
+      "title": "Distribución de Salud de los Servicios",
+      "description": "Visualización de la salud actual de los servicios monitorizados"
+    },
+    "latency": {
+      "title": "Tendencia de Latencia",
+      "description": "Evolución de la latencia media, p95 y p99 a lo largo del tiempo",
+      "avg": "Media",
+      "p95": "P95",
+      "p99": "P99"
+    },
+    "drift": {
+      "title": "Hallazgos de Drift Detectados",
+      "description": "Desviaciones identificadas entre la línea base esperada y el comportamiento real",
+      "service": "Servicio",
+      "environment": "Entorno",
+      "severity": "Severidad",
+      "deviation": "Desviación",
+      "expected": "Esperado",
+      "actual": "Actual",
+      "detectedAt": "Detectado el",
+      "emptyTitle": "No se detectó drift",
+      "emptyDescription": "Todos los servicios están dentro de la línea base esperada"
+    },
+    "observability": {
+      "title": "Puntuación de Observabilidad",
+      "description": "Madurez de observabilidad por servicio (0-100%)",
+      "score": "Puntuación",
+      "critical": "Crítico",
+      "normal": "Normal",
+      "emptyTitle": "No hay puntuación disponible",
+      "emptyDescription": "Configure perfiles de observabilidad para los servicios"
+    },
+    "snapshots": {
+      "title": "Snapshots Recientes",
+      "description": "Últimos snapshots de salud capturados",
+      "service": "Servicio",
+      "environment": "Entorno",
+      "health": "Salud",
+      "latency": "Latencia (ms)",
+      "errorRate": "Tasa de Error",
+      "throughput": "Throughput",
+      "timestamp": "Marca de tiempo"
+    }
   }
 }

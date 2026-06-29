@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { 
-  Activity, 
-  AlertTriangle, 
+import * as React from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import {
+  Activity,
+  AlertTriangle,
   CheckCircle2,
   Server,
   Zap,
   BarChart3,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { runtimeIntelligenceApi, type DriftFindingItem, type ObservabilityScoreItem, type RuntimeSnapshot } from '@/features/operations/api/runtimeIntelligence';
+import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Button } from '../../../components/Button';
+import { Badge } from '../../../components/Badge';
+import { Tabs } from '../../../components/Tabs';
+import { Select } from '../../../components/Select';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { runtimeIntelligenceApi, type DriftFindingItem, type ObservabilityScoreItem, type RuntimeSnapshot } from '../api/runtimeIntelligence';
+
+// Cores de data-viz (recharts) — categóricas semânticas, exceção documentada.
+const VIZ_HEALTHY = '#10b981';
+const VIZ_DEGRADED = '#f59e0b';
+const VIZ_UNHEALTHY = '#ef4444';
+
+type TabId = 'health' | 'latency' | 'drift' | 'observability';
 
 /**
  * RuntimeIntelligenceDashboardPage
- * 
+ *
  * Dashboard principal de Runtime Intelligence que exibe:
  * - Saúde atual dos serviços (health status)
  * - Score de observabilidade por serviço
@@ -30,9 +41,11 @@ import { runtimeIntelligenceApi, type DriftFindingItem, type ObservabilityScoreI
  * - Análise comparativa entre ambientes
  */
 export function RuntimeIntelligenceDashboardPage() {
+  const { t } = useTranslation();
   const [selectedService, setSelectedService] = useState<string>('all');
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>('production');
   const [timeRange, setTimeRange] = useState<string>('24h');
+  const [activeTab, setActiveTab] = useState<TabId>('health');
 
   // Buscar snapshots de runtime
   const { data: snapshots, isLoading: loadingSnapshots } = useQuery({
@@ -52,7 +65,7 @@ export function RuntimeIntelligenceDashboardPage() {
     queryKey: ['drift-findings', selectedService, selectedEnvironment],
     queryFn: () => runtimeIntelligenceApi.getDriftFindings({
       serviceName: selectedService === 'all' ? undefined : selectedService,
-      environment: selectedEnvironment
+      environment: selectedEnvironment,
     }),
   });
 
@@ -85,13 +98,13 @@ export function RuntimeIntelligenceDashboardPage() {
   // Dados para gráfico de saúde
   const healthDistributionData = React.useMemo(() => {
     if (!aggregatedMetrics) return [];
-    
+
     return [
-      { name: 'Saudável', value: aggregatedMetrics.healthyCount, color: '#10b981' },
-      { name: 'Degradado', value: aggregatedMetrics.degradedCount, color: '#f59e0b' },
-      { name: 'Não Saudável', value: aggregatedMetrics.unhealthyCount, color: '#ef4444' },
-    ].filter(item => item.value > 0);
-  }, [aggregatedMetrics]);
+      { name: t('runtimeIntelligence.health.healthy'), value: aggregatedMetrics.healthyCount, color: VIZ_HEALTHY },
+      { name: t('runtimeIntelligence.health.degraded'), value: aggregatedMetrics.degradedCount, color: VIZ_DEGRADED },
+      { name: t('runtimeIntelligence.health.unhealthy'), value: aggregatedMetrics.unhealthyCount, color: VIZ_UNHEALTHY },
+    ].filter((item) => item.value > 0);
+  }, [aggregatedMetrics, t]);
 
   // Dados para gráfico de latência ao longo do tempo
   const latencyTrendData = React.useMemo(() => {
@@ -123,171 +136,173 @@ export function RuntimeIntelligenceDashboardPage() {
         cpuUsagePercent: Math.random() * 60 + 20,
         memoryUsageMb: Math.random() * 512 + 256,
       });
-      
-      toast.success('Snapshot ingerido com sucesso');
+
+      toast.success(t('runtimeIntelligence.toast.ingestSuccess'));
     } catch {
       // Erro tratado via toast - logging estruturado deve ser feito pelo backend
-      toast.error('Falha ao ingerir snapshot');
+      toast.error(t('runtimeIntelligence.toast.ingestError'));
     }
+  };
+
+  const healthBadgeVariant = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+    if (status === 'Healthy') return 'success';
+    if (status === 'Degraded') return 'warning';
+    if (status === 'Unhealthy') return 'danger';
+    return 'neutral';
   };
 
   if (loadingSnapshots || loadingScores || loadingDrifts) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-accent" />
-      </div>
+      <PageContainer>
+        <PageLoadingState />
+      </PageContainer>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Runtime Intelligence</h1>
-          <p className="text-muted">
-            Monitoramento em tempo real da saúde e performance dos serviços
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={handleIngestSnapshot} variant="outline">
+    <PageContainer>
+      <div className="flex flex-col gap-1 mb-4 sm:flex-row sm:items-start sm:justify-between">
+        <PageHeader
+          title={t('runtimeIntelligence.title')}
+          subtitle={t('runtimeIntelligence.subtitle')}
+          icon={<Activity className="w-5 h-5" />}
+        />
+        <div className="flex gap-2 flex-wrap">
+          <Button onClick={handleIngestSnapshot} variant="outline" size="sm">
             <Zap className="mr-2 h-4 w-4" />
-            Ingerir Snapshot
+            {t('runtimeIntelligence.actions.ingest')}
           </Button>
-          <Button onClick={() => window.location.reload()} variant="outline">
+          <Button onClick={() => window.location.reload()} variant="outline" size="sm">
             <RefreshCw className="mr-2 h-4 w-4" />
-            Atualizar
+            {t('runtimeIntelligence.actions.refresh')}
           </Button>
         </div>
       </div>
 
       {/* Filtros */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Serviço</label>
-              <Select value={selectedService} onValueChange={setSelectedService}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar serviço" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os Serviços</SelectItem>
-                  <SelectItem value="order-api">Order API</SelectItem>
-                  <SelectItem value="payment-service">Payment Service</SelectItem>
-                  <SelectItem value="user-service">User Service</SelectItem>
-                  <SelectItem value="inventory-service">Inventory Service</SelectItem>
-                </SelectContent>
-              </Select>
+      <PageSection>
+        <Card>
+          <CardBody>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Select
+                size="sm"
+                label={t('runtimeIntelligence.filters.service')}
+                value={selectedService}
+                onChange={(e) => setSelectedService(e.target.value)}
+                options={[
+                  { value: 'all', label: t('runtimeIntelligence.filters.allServices') },
+                  { value: 'order-api', label: 'Order API' },
+                  { value: 'payment-service', label: 'Payment Service' },
+                  { value: 'user-service', label: 'User Service' },
+                  { value: 'inventory-service', label: 'Inventory Service' },
+                ]}
+              />
+              <Select
+                size="sm"
+                label={t('runtimeIntelligence.filters.environment')}
+                value={selectedEnvironment}
+                onChange={(e) => setSelectedEnvironment(e.target.value)}
+                options={[
+                  { value: 'production', label: t('runtimeIntelligence.env.production') },
+                  { value: 'staging', label: t('runtimeIntelligence.env.staging') },
+                  { value: 'development', label: t('runtimeIntelligence.env.development') },
+                ]}
+              />
+              <Select
+                size="sm"
+                label={t('runtimeIntelligence.filters.period')}
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                options={[
+                  { value: '1h', label: t('runtimeIntelligence.period.1h') },
+                  { value: '6h', label: t('runtimeIntelligence.period.6h') },
+                  { value: '24h', label: t('runtimeIntelligence.period.24h') },
+                  { value: '7d', label: t('runtimeIntelligence.period.7d') },
+                ]}
+              />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Ambiente</label>
-              <Select value={selectedEnvironment} onValueChange={setSelectedEnvironment}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar ambiente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="production">Produção</SelectItem>
-                  <SelectItem value="staging">Staging</SelectItem>
-                  <SelectItem value="development">Desenvolvimento</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Período</label>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar período" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1h">Última Hora</SelectItem>
-                  <SelectItem value="6h">Últimas 6 Horas</SelectItem>
-                  <SelectItem value="24h">Últimas 24 Horas</SelectItem>
-                  <SelectItem value="7d">Últimos 7 Dias</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardBody>
+        </Card>
+      </PageSection>
 
       {/* KPIs Principais */}
       {aggregatedMetrics && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Latência Média</CardTitle>
-              <Activity className="h-4 w-4 text-muted" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{aggregatedMetrics.avgLatency} ms</div>
-              <p className="text-xs text-muted">
-                Tempo médio de resposta
-              </p>
-            </CardContent>
-          </Card>
+        <PageSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardBody>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-body">{t('runtimeIntelligence.kpi.avgLatency')}</span>
+                  <Activity className="h-4 w-4 text-muted" />
+                </div>
+                <div className="text-2xl font-bold tabular-nums text-heading">{aggregatedMetrics.avgLatency} ms</div>
+                <p className="text-xs text-muted">{t('runtimeIntelligence.kpi.avgLatencyHint')}</p>
+              </CardBody>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa de Erro</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{aggregatedMetrics.avgErrorRate}%</div>
-              <p className="text-xs text-muted">
-                Requisições com falha
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardBody>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-body">{t('runtimeIntelligence.kpi.errorRate')}</span>
+                  <AlertTriangle className="h-4 w-4 text-muted" />
+                </div>
+                <div className="text-2xl font-bold tabular-nums text-heading">{aggregatedMetrics.avgErrorRate}%</div>
+                <p className="text-xs text-muted">{t('runtimeIntelligence.kpi.errorRateHint')}</p>
+              </CardBody>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Throughput</CardTitle>
-              <Server className="h-4 w-4 text-muted" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{aggregatedMetrics.avgThroughput} req/s</div>
-              <p className="text-xs text-muted">
-                Requisições por segundo
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardBody>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-body">{t('runtimeIntelligence.kpi.throughput')}</span>
+                  <Server className="h-4 w-4 text-muted" />
+                </div>
+                <div className="text-2xl font-bold tabular-nums text-heading">{aggregatedMetrics.avgThroughput} req/s</div>
+                <p className="text-xs text-muted">{t('runtimeIntelligence.kpi.throughputHint')}</p>
+              </CardBody>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Serviços Saudáveis</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-muted" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {aggregatedMetrics.healthyCount}/{aggregatedMetrics.totalSnapshots}
-              </div>
-              <p className="text-xs text-muted">
-                {Math.round((aggregatedMetrics.healthyCount / aggregatedMetrics.totalSnapshots) * 100)}% saudáveis
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            <Card>
+              <CardBody>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-body">{t('runtimeIntelligence.kpi.healthyServices')}</span>
+                  <CheckCircle2 className="h-4 w-4 text-muted" />
+                </div>
+                <div className="text-2xl font-bold tabular-nums text-heading">
+                  {aggregatedMetrics.healthyCount}/{aggregatedMetrics.totalSnapshots}
+                </div>
+                <p className="text-xs text-muted">
+                  {t('runtimeIntelligence.kpi.healthyHint', {
+                    percent: Math.round((aggregatedMetrics.healthyCount / aggregatedMetrics.totalSnapshots) * 100),
+                  })}
+                </p>
+              </CardBody>
+            </Card>
+          </div>
+        </PageSection>
       )}
 
       {/* Gráficos Principais */}
-      <Tabs defaultValue="health" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="health">Distribuição de Saúde</TabsTrigger>
-          <TabsTrigger value="latency">Tendência de Latência</TabsTrigger>
-          <TabsTrigger value="drift">Detecção de Drift</TabsTrigger>
-          <TabsTrigger value="observability">Score de Observabilidade</TabsTrigger>
-        </TabsList>
+      <PageSection>
+        <Tabs
+          className="mb-4"
+          items={[
+            { id: 'health', label: t('runtimeIntelligence.tabs.health') },
+            { id: 'latency', label: t('runtimeIntelligence.tabs.latency') },
+            { id: 'drift', label: t('runtimeIntelligence.tabs.drift') },
+            { id: 'observability', label: t('runtimeIntelligence.tabs.observability') },
+          ]}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as TabId)}
+        />
 
-        <TabsContent value="health" className="space-y-4">
+        {activeTab === 'health' && (
           <Card>
             <CardHeader>
-              <CardTitle>Distribuição de Saúde dos Serviços</CardTitle>
-              <CardDescription>
-                Visualização da saúde atual dos serviços monitorados
-              </CardDescription>
+              <h3 className="text-sm font-semibold text-heading">{t('runtimeIntelligence.health.title')}</h3>
+              <p className="text-xs text-muted mt-1">{t('runtimeIntelligence.health.description')}</p>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -310,19 +325,17 @@ export function RuntimeIntelligenceDashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="latency" className="space-y-4">
+        {activeTab === 'latency' && (
           <Card>
             <CardHeader>
-              <CardTitle>Tendência de Latência</CardTitle>
-              <CardDescription>
-                Evolução da latência média, p95 e p99 ao longo do tempo
-              </CardDescription>
+              <h3 className="text-sm font-semibold text-heading">{t('runtimeIntelligence.latency.title')}</h3>
+              <p className="text-xs text-muted mt-1">{t('runtimeIntelligence.latency.description')}</p>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={latencyTrendData}>
@@ -331,81 +344,80 @@ export function RuntimeIntelligenceDashboardPage() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="latency" stroke="#10b981" name="Média" strokeWidth={2} />
-                    <Line type="monotone" dataKey="p95" stroke="#f59e0b" name="P95" strokeWidth={2} />
-                    <Line type="monotone" dataKey="p99" stroke="#ef4444" name="P99" strokeWidth={2} />
+                    <Line type="monotone" dataKey="latency" stroke={VIZ_HEALTHY} name={t('runtimeIntelligence.latency.avg')} strokeWidth={2} />
+                    <Line type="monotone" dataKey="p95" stroke={VIZ_DEGRADED} name={t('runtimeIntelligence.latency.p95')} strokeWidth={2} />
+                    <Line type="monotone" dataKey="p99" stroke={VIZ_UNHEALTHY} name={t('runtimeIntelligence.latency.p99')} strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="drift" className="space-y-4">
+        {activeTab === 'drift' && (
           <Card>
             <CardHeader>
-              <CardTitle>Drift Findings Detectados</CardTitle>
-              <CardDescription>
-                Desvios identificados entre baseline esperada e comportamento real
-              </CardDescription>
+              <h3 className="text-sm font-semibold text-heading">{t('runtimeIntelligence.drift.title')}</h3>
+              <p className="text-xs text-muted mt-1">{t('runtimeIntelligence.drift.description')}</p>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               {driftFindings?.items && driftFindings.items.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {driftFindings.items.slice(0, 10).map((finding: DriftFindingItem) => (
-                    <Alert key={finding.id} variant={finding.severity === 'Critical' ? 'destructive' : 'default'}>
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>{finding.metricName}</AlertTitle>
-                      <AlertDescription>
-                        <div className="mt-2 space-y-1">
-                          <p><strong>Serviço:</strong> {finding.serviceName}</p>
-                          <p><strong>Ambiente:</strong> {finding.environment}</p>
-                          <p><strong>Severidade:</strong> {finding.severity}</p>
-                          <p><strong>Desvio:</strong> {finding.deviationPercent.toFixed(2)}%</p>
-                          <p><strong>Esperado:</strong> {finding.expectedValue} | <strong>Atual:</strong> {finding.actualValue}</p>
-                          <p><strong>Detectado em:</strong> {new Date(finding.detectedAt).toLocaleString('pt-BR')}</p>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
+                    <div
+                      key={finding.id}
+                      className={`rounded-md border border-edge border-l-2 p-4 ${finding.severity === 'Critical' ? 'border-l-critical' : 'border-l-warning'}`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className={`h-4 w-4 ${finding.severity === 'Critical' ? 'text-critical' : 'text-warning'}`} />
+                        <span className="text-sm font-semibold text-heading">{finding.metricName}</span>
+                      </div>
+                      <div className="space-y-1 text-sm text-body">
+                        <p><strong>{t('runtimeIntelligence.drift.service')}:</strong> {finding.serviceName}</p>
+                        <p><strong>{t('runtimeIntelligence.drift.environment')}:</strong> {finding.environment}</p>
+                        <p><strong>{t('runtimeIntelligence.drift.severity')}:</strong> {finding.severity}</p>
+                        <p><strong>{t('runtimeIntelligence.drift.deviation')}:</strong> {finding.deviationPercent.toFixed(2)}%</p>
+                        <p><strong>{t('runtimeIntelligence.drift.expected')}:</strong> {finding.expectedValue} | <strong>{t('runtimeIntelligence.drift.actual')}:</strong> {finding.actualValue}</p>
+                        <p><strong>{t('runtimeIntelligence.drift.detectedAt')}:</strong> {new Date(finding.detectedAt).toLocaleString('pt-BR')}</p>
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <p className="text-lg font-medium">Nenhum drift detectado</p>
-                  <p className="text-muted">Todos os serviços estão dentro da baseline esperada</p>
+                  <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-4" />
+                  <p className="text-lg font-medium text-heading">{t('runtimeIntelligence.drift.emptyTitle')}</p>
+                  <p className="text-muted">{t('runtimeIntelligence.drift.emptyDescription')}</p>
                 </div>
               )}
-            </CardContent>
+            </CardBody>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="observability" className="space-y-4">
+        {activeTab === 'observability' && (
           <Card>
             <CardHeader>
-              <CardTitle>Score de Observabilidade</CardTitle>
-              <CardDescription>
-                Maturidade de observabilidade por serviço (0-100%)
-              </CardDescription>
+              <h3 className="text-sm font-semibold text-heading">{t('runtimeIntelligence.observability.title')}</h3>
+              <p className="text-xs text-muted mt-1">{t('runtimeIntelligence.observability.description')}</p>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               {observabilityScores?.items && observabilityScores.items.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {observabilityScores.items.map((score: ObservabilityScoreItem) => (
-                    <div key={score.serviceName} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={score.serviceName} className="flex items-center justify-between p-4 border border-edge rounded-lg">
                       <div className="flex-1">
-                        <h4 className="font-semibold">{score.serviceName}</h4>
+                        <h4 className="font-semibold text-heading">{score.serviceName}</h4>
                         <p className="text-sm text-muted">{score.environment}</p>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="text-2xl font-bold" style={{ color: score.score >= 80 ? '#10b981' : score.score >= 60 ? '#f59e0b' : '#ef4444' }}>
+                          <div className={`text-2xl font-bold tabular-nums ${score.score >= 0.8 ? 'text-success' : score.score >= 0.6 ? 'text-warning' : 'text-critical'}`}>
                             {(score.score * 100).toFixed(0)}%
                           </div>
-                          <p className="text-xs text-muted">Score</p>
+                          <p className="text-xs text-muted">{t('runtimeIntelligence.observability.score')}</p>
                         </div>
-                        <Badge variant={score.hasCriticalDrift ? 'destructive' : 'default'}>
-                          {score.hasCriticalDrift ? 'Crítico' : 'Normal'}
+                        <Badge variant={score.hasCriticalDrift ? 'danger' : 'success'}>
+                          {score.hasCriticalDrift ? t('runtimeIntelligence.observability.critical') : t('runtimeIntelligence.observability.normal')}
                         </Badge>
                       </div>
                     </div>
@@ -414,67 +426,60 @@ export function RuntimeIntelligenceDashboardPage() {
               ) : (
                 <div className="text-center py-12">
                   <BarChart3 className="h-12 w-12 text-muted mx-auto mb-4" />
-                  <p className="text-lg font-medium">Nenhum score disponível</p>
-                  <p className="text-muted">Configure perfis de observabilidade para os serviços</p>
+                  <p className="text-lg font-medium text-heading">{t('runtimeIntelligence.observability.emptyTitle')}</p>
+                  <p className="text-muted">{t('runtimeIntelligence.observability.emptyDescription')}</p>
                 </div>
               )}
-            </CardContent>
+            </CardBody>
           </Card>
-        </TabsContent>
-      </Tabs>
+        )}
+      </PageSection>
 
       {/* Tabela de Snapshots Recentes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Snapshots Recentes</CardTitle>
-          <CardDescription>
-            Últimos snapshots de saúde capturados
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="text-left p-3 font-medium">Serviço</th>
-                  <th className="text-left p-3 font-medium">Ambiente</th>
-                  <th className="text-left p-3 font-medium">Saúde</th>
-                  <th className="text-left p-3 font-medium">Latência (ms)</th>
-                  <th className="text-left p-3 font-medium">Error Rate</th>
-                  <th className="text-left p-3 font-medium">Throughput</th>
-                  <th className="text-left p-3 font-medium">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                {snapshots?.items?.slice(0, 10).map((snapshot: RuntimeSnapshot) => (
-                  <tr key={snapshot.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">{snapshot.serviceName}</td>
-                    <td className="p-3">
-                      <Badge variant="outline">{snapshot.environment}</Badge>
-                    </td>
-                    <td className="p-3">
-                      <Badge 
-                        variant={
-                          snapshot.healthStatus === 'Healthy' ? 'default' :
-                          snapshot.healthStatus === 'Degraded' ? 'secondary' : 'destructive'
-                        }
-                      >
-                        {snapshot.healthStatus}
-                      </Badge>
-                    </td>
-                    <td className="p-3">{snapshot.avgLatencyMs.toFixed(2)}</td>
-                    <td className="p-3">{(snapshot.errorRate * 100).toFixed(2)}%</td>
-                    <td className="p-3">{snapshot.requestsPerSecond.toFixed(0)} req/s</td>
-                    <td className="p-3 text-sm text-muted">
-                      {new Date(snapshot.timestamp).toLocaleString('pt-BR')}
-                    </td>
+      <PageSection>
+        <Card>
+          <CardHeader>
+            <h3 className="text-sm font-semibold text-heading">{t('runtimeIntelligence.snapshots.title')}</h3>
+            <p className="text-xs text-muted mt-1">{t('runtimeIntelligence.snapshots.description')}</p>
+          </CardHeader>
+          <CardBody className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-edge bg-muted/40 text-xs text-muted">
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.service')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.environment')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.health')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.latency')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.errorRate')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.throughput')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium">{t('runtimeIntelligence.snapshots.timestamp')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                </thead>
+                <tbody>
+                  {snapshots?.items?.slice(0, 10).map((snapshot: RuntimeSnapshot) => (
+                    <tr key={snapshot.id} className="border-b border-edge/50 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-2.5 font-medium text-heading">{snapshot.serviceName}</td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant="neutral">{snapshot.environment}</Badge>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant={healthBadgeVariant(snapshot.healthStatus)}>{snapshot.healthStatus}</Badge>
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums">{snapshot.avgLatencyMs.toFixed(2)}</td>
+                      <td className="px-4 py-2.5 tabular-nums">{(snapshot.errorRate * 100).toFixed(2)}%</td>
+                      <td className="px-4 py-2.5 tabular-nums">{snapshot.requestsPerSecond.toFixed(0)} req/s</td>
+                      <td className="px-4 py-2.5 text-sm text-muted">
+                        {new Date(snapshot.timestamp).toLocaleString('pt-BR')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
+      </PageSection>
+    </PageContainer>
   );
 }
