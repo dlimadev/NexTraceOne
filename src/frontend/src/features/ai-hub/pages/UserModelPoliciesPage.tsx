@@ -5,6 +5,9 @@ import { Plus, Trash2, Pencil, Shield } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
@@ -152,86 +155,62 @@ export function UserModelPoliciesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {!editingId && (
                 <>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      {t('ai.userModelPolicies.userId', 'ID do Utilizador')}
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded px-3 py-2 text-sm"
-                      placeholder="user@empresa.com ou UUID"
-                      value={form.userId}
-                      onChange={e => setForm(f => ({ ...f, userId: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      {t('ai.userModelPolicies.userName', 'Nome do Utilizador')}
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded px-3 py-2 text-sm"
-                      placeholder="Maria Silva"
-                      value={form.userDisplayName}
-                      onChange={e => setForm(f => ({ ...f, userDisplayName: e.target.value }))}
-                    />
-                  </div>
+                  <TextField
+                    size="sm"
+                    label={t('ai.userModelPolicies.userId', 'ID do Utilizador')}
+                    placeholder="user@empresa.com ou UUID"
+                    value={form.userId}
+                    onChange={e => setForm(f => ({ ...f, userId: e.target.value }))}
+                  />
+                  <TextField
+                    size="sm"
+                    label={t('ai.userModelPolicies.userName', 'Nome do Utilizador')}
+                    placeholder="Maria Silva"
+                    value={form.userDisplayName}
+                    onChange={e => setForm(f => ({ ...f, userDisplayName: e.target.value }))}
+                  />
                 </>
               )}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userModelPolicies.allowedModels', 'Modelos Permitidos (IDs separados por vírgula)')}
-                  <span className="text-muted ml-1 text-xs">— vazio = todos permitidos</span>
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm font-mono"
+                <TextField
+                  size="sm"
+                  className="font-mono"
+                  label={t('ai.userModelPolicies.allowedModels', 'Modelos Permitidos (IDs separados por vírgula)')}
+                  helperText={t('ai.userModelPolicies.allowedModelsHint', '— vazio = todos permitidos')}
                   placeholder="uuid1,uuid2,uuid3"
                   value={form.allowedModelIds}
                   onChange={e => setForm(f => ({ ...f, allowedModelIds: e.target.value }))}
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userModelPolicies.blockedModels', 'Modelos Bloqueados (IDs separados por vírgula)')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm font-mono"
+                <TextField
+                  size="sm"
+                  className="font-mono"
+                  label={t('ai.userModelPolicies.blockedModels', 'Modelos Bloqueados (IDs separados por vírgula)')}
                   placeholder="uuid1,uuid2"
                   value={form.blockedModelIds}
                   onChange={e => setForm(f => ({ ...f, blockedModelIds: e.target.value }))}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userModelPolicies.maxTokens', 'Máx. Tokens/Pedido')}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  min={1}
-                  value={form.maxTokensPerRequest}
-                  onChange={e => setForm(f => ({ ...f, maxTokensPerRequest: Number(e.target.value) }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                type="number"
+                label={t('ai.userModelPolicies.maxTokens', 'Máx. Tokens/Pedido')}
+                min={1}
+                value={form.maxTokensPerRequest}
+                onChange={e => setForm(f => ({ ...f, maxTokensPerRequest: Number(e.target.value) }))}
+              />
               <div className="flex items-center gap-6 pt-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.allowExternalAI}
-                    onChange={e => setForm(f => ({ ...f, allowExternalAI: e.target.checked }))}
-                  />
-                  <span className="text-sm">{t('ai.userModelPolicies.allowExternal', 'Permitir IA Externa')}</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.internalOnly}
-                    onChange={e => setForm(f => ({ ...f, internalOnly: e.target.checked }))}
-                  />
-                  <span className="text-sm">{t('ai.userModelPolicies.internalOnly', 'Apenas Interna')}</span>
-                </label>
+                <Checkbox
+                  checked={form.allowExternalAI}
+                  onChange={e => setForm(f => ({ ...f, allowExternalAI: e.target.checked }))}
+                  label={t('ai.userModelPolicies.allowExternal', 'Permitir IA Externa')}
+                />
+                <Checkbox
+                  checked={form.internalOnly}
+                  onChange={e => setForm(f => ({ ...f, internalOnly: e.target.checked }))}
+                  label={t('ai.userModelPolicies.internalOnly', 'Apenas Interna')}
+                />
               </div>
             </div>
             <div className="flex gap-2 mt-4">
@@ -270,41 +249,44 @@ export function UserModelPoliciesPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{policy.userId}</span>
                     <Badge variant={policy.isActive ? 'success' : 'default'}>
-                      {policy.isActive ? 'Ativo' : 'Inativo'}
+                      {policy.isActive ? t('common.active', 'Ativo') : t('common.inactive', 'Inativo')}
                     </Badge>
                     {policy.internalOnly && (
-                      <Badge variant="warning">Apenas Interna</Badge>
+                      <Badge variant="warning">{t('ai.userModelPolicies.internalOnly', 'Apenas Interna')}</Badge>
                     )}
                     {policy.allowExternalAI && !policy.internalOnly && (
-                      <Badge variant="info">IA Externa Permitida</Badge>
+                      <Badge variant="info">{t('ai.userModelPolicies.externalAllowed', 'IA Externa Permitida')}</Badge>
                     )}
                   </div>
                   <div className="text-xs text-muted space-y-0.5 mt-1">
                     {policy.allowedModelIds && (
-                      <p><span className="font-medium">Permitidos: </span>{policy.allowedModelIds}</p>
+                      <p><span className="font-medium">{t('ai.userModelPolicies.allowed', 'Permitidos')}: </span>{policy.allowedModelIds}</p>
                     )}
                     {policy.blockedModelIds && (
-                      <p><span className="font-medium">Bloqueados: </span>{policy.blockedModelIds}</p>
+                      <p><span className="font-medium">{t('ai.userModelPolicies.blocked', 'Bloqueados')}: </span>{policy.blockedModelIds}</p>
                     )}
-                    <p><span className="font-medium">Máx. tokens/pedido: </span>{policy.maxTokensPerRequest.toLocaleString()}</p>
+                    <p><span className="font-medium">{t('ai.userModelPolicies.maxTokensLabel', 'Máx. tokens/pedido')}: </span>{policy.maxTokensPerRequest.toLocaleString()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleEdit(policy)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-body transition-colors"
+                    label={t('common.edit', 'Editar')}
                     title={t('common.edit', 'Editar')}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
+                    icon={<Pencil className="w-4 h-4" />}
+                  />
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    className="hover:text-critical"
                     onClick={() => deleteMutation.mutate(policy.policyId)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-critical transition-colors"
+                    label={t('common.delete', 'Eliminar')}
                     title={t('common.delete', 'Eliminar')}
                     disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    icon={<Trash2 className="w-4 h-4" />}
+                  />
                 </div>
               </CardBody>
             </Card>

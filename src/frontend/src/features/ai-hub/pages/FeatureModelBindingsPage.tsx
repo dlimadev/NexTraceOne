@@ -5,6 +5,8 @@ import { Plus, Trash2, Pencil, GitBranch } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
@@ -164,108 +166,70 @@ export function FeatureModelBindingsPage() {
                 : t('ai.featureBindings.createTitle', 'Nova Vinculação')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.featureKey', 'Chave da Funcionalidade')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="catalog.contract-draft"
-                  value={form.featureKey}
-                  onChange={e => setForm(f => ({ ...f, featureKey: e.target.value }))}
-                  disabled={!!editingId}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('common.description', 'Descrição')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  value={form.description}
-                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.requiredModelId', 'ID Modelo Obrigatório')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm font-mono"
-                  placeholder="UUID do modelo"
-                  value={form.requiredModelId}
-                  onChange={e => setForm(f => ({ ...f, requiredModelId: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.requiredModelName', 'Nome Modelo Obrigatório')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="claude-sonnet-4-6"
-                  value={form.requiredModelName}
-                  onChange={e => setForm(f => ({ ...f, requiredModelName: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.requiredProvider', 'Provider Obrigatório')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="anthropic"
-                  value={form.requiredProviderId}
-                  onChange={e => setForm(f => ({ ...f, requiredProviderId: e.target.value }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('ai.featureBindings.featureKey', 'Chave da Funcionalidade')}
+                placeholder="catalog.contract-draft"
+                value={form.featureKey}
+                onChange={e => setForm(f => ({ ...f, featureKey: e.target.value }))}
+                disabled={!!editingId}
+              />
+              <TextField
+                size="sm"
+                label={t('common.description', 'Descrição')}
+                value={form.description}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                className="font-mono"
+                label={t('ai.featureBindings.requiredModelId', 'ID Modelo Obrigatório')}
+                placeholder="UUID do modelo"
+                value={form.requiredModelId}
+                onChange={e => setForm(f => ({ ...f, requiredModelId: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('ai.featureBindings.requiredModelName', 'Nome Modelo Obrigatório')}
+                placeholder="claude-sonnet-4-6"
+                value={form.requiredModelName}
+                onChange={e => setForm(f => ({ ...f, requiredModelName: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('ai.featureBindings.requiredProvider', 'Provider Obrigatório')}
+                placeholder="anthropic"
+                value={form.requiredProviderId}
+                onChange={e => setForm(f => ({ ...f, requiredProviderId: e.target.value }))}
+              />
             </div>
 
             <h4 className="text-sm font-medium mt-4 mb-2 text-muted">
               {t('ai.featureBindings.fallback', 'Fallback (opcional)')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.fallbackModelId', 'ID Fallback')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm font-mono"
-                  placeholder="UUID (opcional)"
-                  value={form.fallbackModelId}
-                  onChange={e => setForm(f => ({ ...f, fallbackModelId: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.fallbackModelName', 'Nome Fallback')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="llama3.2:3b"
-                  value={form.fallbackModelName}
-                  onChange={e => setForm(f => ({ ...f, fallbackModelName: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.featureBindings.fallbackProvider', 'Provider Fallback')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="ollama"
-                  value={form.fallbackProviderId}
-                  onChange={e => setForm(f => ({ ...f, fallbackProviderId: e.target.value }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                className="font-mono"
+                label={t('ai.featureBindings.fallbackModelId', 'ID Fallback')}
+                placeholder="UUID (opcional)"
+                value={form.fallbackModelId}
+                onChange={e => setForm(f => ({ ...f, fallbackModelId: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('ai.featureBindings.fallbackModelName', 'Nome Fallback')}
+                placeholder="llama3.2:3b"
+                value={form.fallbackModelName}
+                onChange={e => setForm(f => ({ ...f, fallbackModelName: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('ai.featureBindings.fallbackProvider', 'Provider Fallback')}
+                placeholder="ollama"
+                value={form.fallbackProviderId}
+                onChange={e => setForm(f => ({ ...f, fallbackProviderId: e.target.value }))}
+              />
             </div>
 
             <div className="flex gap-2 mt-4">
@@ -304,40 +268,43 @@ export function FeatureModelBindingsPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-sm font-semibold">{binding.featureKey}</span>
                     <Badge variant={binding.isActive ? 'success' : 'default'}>
-                      {binding.isActive ? 'Ativo' : 'Inativo'}
+                      {binding.isActive ? t('common.active', 'Ativo') : t('common.inactive', 'Inativo')}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted truncate">{binding.description}</p>
                   <div className="flex flex-wrap gap-3 mt-2 text-xs">
                     <span>
-                      <span className="text-muted">Modelo: </span>
+                      <span className="text-muted">{t('ai.featureBindings.modelLabel', 'Modelo')}: </span>
                       <span className="font-medium">{binding.requiredModelName}</span>
                       <span className="text-muted ml-1">({binding.requiredProviderId})</span>
                     </span>
                     {binding.fallbackModelName && (
                       <span>
-                        <span className="text-muted">Fallback: </span>
+                        <span className="text-muted">{t('ai.featureBindings.fallbackLabel', 'Fallback')}: </span>
                         <span className="font-medium">{binding.fallbackModelName}</span>
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleEdit(binding)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-body transition-colors"
+                    label={t('common.edit', 'Editar')}
                     title={t('common.edit', 'Editar')}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
+                    icon={<Pencil className="w-4 h-4" />}
+                  />
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    className="hover:text-critical"
                     onClick={() => deleteMutation.mutate(binding.id)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-critical transition-colors"
+                    label={t('common.delete', 'Eliminar')}
                     title={t('common.delete', 'Eliminar')}
                     disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    icon={<Trash2 className="w-4 h-4" />}
+                  />
                 </div>
               </CardBody>
             </Card>

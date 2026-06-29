@@ -22,6 +22,11 @@ import {
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { aiGovernanceApi } from '../api/aiGovernance';
@@ -225,9 +230,9 @@ export function AgentDetailPage() {
       <div className="space-y-6">
         {/* Back + Header */}
         <div>
-          <button onClick={() => navigate('/ai/agents')} className="text-xs text-muted hover:text-body flex items-center gap-1 mb-3">
-            <ArrowLeft size={12} /> {t('agents.backToList')}
-          </button>
+          <Button variant="ghost" size="sm" className="mb-3" onClick={() => navigate('/ai/agents')}>
+            <ArrowLeft size={12} className="mr-1" /> {t('agents.backToList')}
+          </Button>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center text-lg">
@@ -279,19 +284,14 @@ export function AgentDetailPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-edge flex items-center gap-4">
-          {(['overview', 'definition', ...(isSystem ? [] : ['edit'])] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as 'overview' | 'definition' | 'edit')}
-              className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab ? 'border-accent text-accent' : 'border-transparent text-muted hover:text-body'
-              }`}
-            >
-              {t(`agents.tab.${tab}`)}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          items={(['overview', 'definition', ...(isSystem ? [] : ['edit'])] as const).map(tab => ({
+            id: tab,
+            label: t(`agents.tab.${tab}`),
+          }))}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as 'overview' | 'definition' | 'edit')}
+        />
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
@@ -411,65 +411,49 @@ export function AgentDetailPage() {
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('agents.fieldDisplayName')}</label>
-                <input
-                  type="text"
-                  value={editForm.displayName}
-                  onChange={e => setEditForm(f => ({ ...f, displayName: e.target.value }))}
-                  className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('agents.fieldVisibility')}</label>
-                <select
-                  value={editForm.visibility}
-                  onChange={e => setEditForm(f => ({ ...f, visibility: e.target.value }))}
-                  className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent"
-                >
-                  <option value="Private">{t('agents.visibility.Private')}</option>
-                  <option value="Team">{t('agents.visibility.Team')}</option>
-                  <option value="Tenant">{t('agents.visibility.Tenant')}</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">{t('agents.fieldDescription')}</label>
-              <textarea
-                value={editForm.description}
-                onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                rows={3}
-                className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent resize-none"
+              <TextField
+                size="sm"
+                label={t('agents.fieldDisplayName')}
+                value={editForm.displayName}
+                onChange={e => setEditForm(f => ({ ...f, displayName: e.target.value }))}
+              />
+              <Select
+                size="sm"
+                label={t('agents.fieldVisibility')}
+                value={editForm.visibility}
+                onChange={e => setEditForm(f => ({ ...f, visibility: e.target.value }))}
+                options={[
+                  { value: 'Private', label: t('agents.visibility.Private') },
+                  { value: 'Team', label: t('agents.visibility.Team') },
+                  { value: 'Tenant', label: t('agents.visibility.Tenant') },
+                ]}
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">{t('agents.fieldObjective')}</label>
-              <input
-                type="text"
-                value={editForm.objective}
-                onChange={e => setEditForm(f => ({ ...f, objective: e.target.value }))}
-                className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">{t('agents.fieldSystemPrompt')}</label>
-              <textarea
-                value={editForm.systemPrompt}
-                onChange={e => setEditForm(f => ({ ...f, systemPrompt: e.target.value }))}
-                rows={8}
-                className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent resize-none font-mono text-xs"
-              />
-            </div>
+            <TextArea
+              label={t('agents.fieldDescription')}
+              value={editForm.description}
+              onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+              rows={3}
+            />
+            <TextField
+              size="sm"
+              label={t('agents.fieldObjective')}
+              value={editForm.objective}
+              onChange={e => setEditForm(f => ({ ...f, objective: e.target.value }))}
+            />
+            <TextArea
+              label={t('agents.fieldSystemPrompt')}
+              textareaClassName="font-mono text-xs"
+              value={editForm.systemPrompt}
+              onChange={e => setEditForm(f => ({ ...f, systemPrompt: e.target.value }))}
+              rows={8}
+            />
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm text-body cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={editForm.allowModelOverride}
-                  onChange={e => setEditForm(f => ({ ...f, allowModelOverride: e.target.checked }))}
-                  className="rounded border-edge"
-                />
-                {t('agents.allowModelOverrideLabel')}
-              </label>
+              <Checkbox
+                checked={editForm.allowModelOverride}
+                onChange={e => setEditForm(f => ({ ...f, allowModelOverride: e.target.checked }))}
+                label={t('agents.allowModelOverrideLabel')}
+              />
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="ghost" size="sm" onClick={() => setActiveTab('overview')} disabled={isSaving}>
@@ -497,12 +481,11 @@ export function AgentDetailPage() {
             )}
             {!executeResult && (
               <>
-                <textarea
+                <TextArea
                   value={executeInput}
                   onChange={e => setExecuteInput(e.target.value)}
                   rows={4}
                   placeholder={t('agents.inputPlaceholder')}
-                  className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted focus:outline-none focus:ring-1 focus:ring-accent resize-none"
                 />
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="sm" onClick={() => { setIsExecuteOpen(false); setExecuteInput(''); }}>

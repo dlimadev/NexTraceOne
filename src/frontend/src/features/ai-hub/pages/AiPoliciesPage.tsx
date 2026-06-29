@@ -12,6 +12,8 @@ import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Tabs } from '../../../components/Tabs';
 import { aiGovernanceApi } from '../api';
 
 interface Policy {
@@ -108,29 +110,23 @@ export function AiPoliciesPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
+        <div className="flex-1 min-w-[200px] max-w-xs">
+          <TextField
+            size="sm"
+            leadingIcon={<Search size={16} />}
             placeholder={t('aiHub.searchPolicies')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label={t('aiHub.searchPolicies')}
-            className="w-full pl-9 pr-3 py-2 rounded-md bg-input border border-edge text-body text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
-        <div className="flex gap-1.5" role="group" aria-label={t('aiHub.filterByStatus')}>
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              aria-pressed={filter === f.key}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filter === f.key ? 'bg-accent text-heading' : 'bg-elevated text-muted hover:text-body'}`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          variant="pill"
+          size="sm"
+          items={filters.map((f) => ({ id: f.key, label: f.label }))}
+          activeId={filter}
+          onChange={(id) => setFilter(id as typeof filter)}
+        />
       </div>
 
       {/* Policy list */}

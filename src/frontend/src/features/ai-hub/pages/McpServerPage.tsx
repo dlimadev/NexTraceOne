@@ -6,6 +6,7 @@ import {
   Layers, Zap, RefreshCw, ExternalLink,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { IconButton } from '../../../components/IconButton';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
@@ -208,16 +209,16 @@ export function McpServerPage() {
               <code className="text-xs text-accent flex-1 truncate font-mono">
                 {window.location.origin}/api/v1{serverInfo.endpointUrl}
               </code>
-              <button
-                type="button"
-                className="text-muted hover:text-heading transition-colors flex-shrink-0"
+              <IconButton
+                variant="ghost"
+                size="sm"
+                className="flex-shrink-0"
                 onClick={handleCopyEndpoint}
-                aria-label={t('mcpServer.connection.copyAriaLabel')}
-              >
-                {copiedEndpoint
+                label={t('mcpServer.connection.copyAriaLabel')}
+                icon={copiedEndpoint
                   ? <Check className="w-4 h-4 text-success" />
                   : <Copy className="w-4 h-4" />}
-              </button>
+              />
             </div>
             <div className="mt-3 space-y-1 text-xs text-body">
               <p className="flex items-center gap-1">

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { aiGovernanceApi } from '../api/aiGovernance';
 import { mapAiError } from '../../../utils/apiErrors';
@@ -434,16 +435,17 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
       {/* ── Input ─────────────────────────────────────────────────────── */}
       <div className="px-4 py-3 border-t border-edge shrink-0">
         <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t(`assistantPanel.placeholder.${contextType}`)}
-            className="flex-1 bg-elevated border border-edge rounded-lg px-3 py-2 text-xs text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-            disabled={isTyping}
-            data-testid="assistant-input"
-          />
+          <div className="flex-1">
+            <TextField
+              size="sm"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t(`assistantPanel.placeholder.${contextType}`)}
+              disabled={isTyping}
+              data-testid="assistant-input"
+            />
+          </div>
           <Button variant="primary" size="sm" disabled={!inputValue.trim() || isTyping} onClick={() => handleSendMessage()}>
             <Send size={14} />
           </Button>
