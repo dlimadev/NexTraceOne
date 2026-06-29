@@ -41,10 +41,19 @@ const ServiceMaturitySrePage = lazy(() => import('../features/operations/pages/S
 const AiAnomalyPage = lazy(() => import('../features/operations/pages/AiAnomalyPage').then(m => ({ default: m.AiAnomalyPage })));
 const AiIncidentSummarizerPage = lazy(() => import('../features/operations/pages/AiIncidentSummarizerPage').then(m => ({ default: m.AiIncidentSummarizerPage })));
 const AiRunbookSuggesterPage = lazy(() => import('../features/operations/pages/AiRunbookSuggesterPage').then(m => ({ default: m.AiRunbookSuggesterPage })));
+const RuntimeIntelligenceDashboardPage = lazy(() => import('../features/operations/pages/RuntimeIntelligenceDashboardPage').then(m => ({ default: m.RuntimeIntelligenceDashboardPage })));
 
 export function OperationsRoutes() {
   return (
     <>
+      <Route
+        path="/operations/runtime-intelligence"
+        element={
+          <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
+            <RuntimeIntelligenceDashboardPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/operations/incidents"
         element={
