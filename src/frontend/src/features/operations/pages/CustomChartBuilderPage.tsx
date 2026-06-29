@@ -8,6 +8,9 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { Modal } from '../../../components/Modal';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -216,159 +219,140 @@ export function CustomChartBuilderPage() {
       </PageSection>
 
       {/* Builder Modal */}
-      {showBuilder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card rounded-lg shadow-xl w-full max-w-lg p-6">
-            <h2 className="text-lg font-semibold text-heading mb-1">
-              {t('customCharts.builder.title')}
-            </h2>
-            <p className="text-sm text-muted mb-5">
-              {t('customCharts.builder.step', { step: builder.step, total: 5 })}
-            </p>
-
-            {builder.step === 1 && (
-              <div>
-                <p className="text-sm font-medium text-body mb-3">
-                  {t('customCharts.builder.chooseMetric')}
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {METRIC_SOURCES.map((src) => (
-                    <button
-                      key={src}
-                      onClick={() => setBuilder((b) => ({ ...b, source: src }))}
-                      className={`text-sm border rounded-lg p-3 text-left transition-colors ${
-                        builder.source === src
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                          : 'border-edge hover:border-blue-300'
-                      }`}
-                    >
-                      {src}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {builder.step === 2 && (
-              <div>
-                <p className="text-sm font-medium text-body mb-3">
-                  {t('customCharts.builder.chooseChartType')}
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {CHART_TYPES.map((ct) => (
-                    <button
-                      key={ct}
-                      onClick={() => setBuilder((b) => ({ ...b, chartType: ct }))}
-                      className={`text-sm border rounded-lg p-3 text-left transition-colors ${
-                        builder.chartType === ct
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-edge hover:border-blue-300'
-                      }`}
-                    >
-                      {ct}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {builder.step === 3 && (
-              <div className="space-y-4">
-                <p className="text-sm font-medium text-body">
-                  {t('customCharts.builder.defineFilters')}
-                </p>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('customCharts.builder.groupBy')}
-                  </label>
-                  <input
-                    type="text"
-                    value={builder.groupBy}
-                    onChange={(e) => setBuilder((b) => ({ ...b, groupBy: e.target.value }))}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                    placeholder={t('customCharts.builder.groupByPlaceholder')}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('customCharts.builder.timeRange')}
-                  </label>
-                  <select
-                    value={builder.timeRange}
-                    onChange={(e) => setBuilder((b) => ({ ...b, timeRange: e.target.value as TimeRange }))}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  >
-                    {TIME_RANGES.map((tr) => (
-                      <option key={tr} value={tr}>{tr}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {builder.step === 4 && (
-              <div>
-                <p className="text-sm font-medium text-body mb-3">
-                  {t('customCharts.builder.preview')}
-                </p>
-                <div className="border border-dashed border-edge rounded-lg p-8 flex items-center justify-center">
-                  <div className="text-center text-faded">
-                    <BarChart2 className="w-10 h-10 mx-auto mb-2" />
-                    <p className="text-sm">{builder.source} / {builder.chartType} / {builder.timeRange}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {builder.step === 5 && (
-              <div>
-                <p className="text-sm font-medium text-body mb-3">
-                  {t('customCharts.builder.saveName')}
-                </p>
-                <input
-                  type="text"
-                  value={builder.name}
-                  onChange={(e) => setBuilder((b) => ({ ...b, name: e.target.value }))}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder={t('customCharts.builder.namePlaceholder')}
-                  autoFocus
-                />
-              </div>
-            )}
-
-            <div className="mt-6 flex items-center justify-between">
+      <Modal
+        open={showBuilder}
+        onClose={() => { setShowBuilder(false); setBuilder(initialBuilder); }}
+        title={t('customCharts.builder.title')}
+        description={t('customCharts.builder.step', { step: builder.step, total: 5 })}
+        footer={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (builder.step === 1) { setShowBuilder(false); setBuilder(initialBuilder); }
+                else setBuilder((b) => ({ ...b, step: (b.step - 1) as BuilderState['step'] }));
+              }}
+            >
+              {builder.step === 1 ? t('common.cancel') : t('common.back')}
+            </Button>
+            {builder.step < 5 ? (
               <Button
-                variant="outline"
                 size="sm"
-                onClick={() => {
-                  if (builder.step === 1) { setShowBuilder(false); setBuilder(initialBuilder); }
-                  else setBuilder((b) => ({ ...b, step: (b.step - 1) as BuilderState['step'] }));
-                }}
+                disabled={!canAdvance()}
+                onClick={() => setBuilder((b) => ({ ...b, step: (b.step + 1) as BuilderState['step'] }))}
               >
-                {builder.step === 1 ? t('common.cancel') : t('common.back')}
+                {t('common.next')}
               </Button>
-              {builder.step < 5 ? (
-                <Button
-                  size="sm"
-                  disabled={!canAdvance()}
-                  onClick={() => setBuilder((b) => ({ ...b, step: (b.step + 1) as BuilderState['step'] }))}
+            ) : (
+              <Button
+                size="sm"
+                disabled={!builder.name || createChart.isPending}
+                loading={createChart.isPending}
+                onClick={handleCreate}
+              >
+                <Save className="w-4 h-4 mr-1" />
+                {t('customCharts.builder.save')}
+              </Button>
+            )}
+          </>
+        }
+      >
+        {builder.step === 1 && (
+          <div>
+            <p className="text-sm font-medium text-body mb-3">
+              {t('customCharts.builder.chooseMetric')}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {METRIC_SOURCES.map((src) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setBuilder((b) => ({ ...b, source: src }))}
+                  className={`text-sm border rounded-lg p-3 text-left transition-colors ${
+                    builder.source === src
+                      ? 'border-accent bg-accent/10 text-accent'
+                      : 'border-edge hover:border-accent text-body'
+                  }`}
                 >
-                  {t('common.next')}
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  disabled={!builder.name || createChart.isPending}
-                  onClick={handleCreate}
-                >
-                  <Save className="w-4 h-4 mr-1" />
-                  {t('customCharts.builder.save')}
-                </Button>
-              )}
+                  {src}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {builder.step === 2 && (
+          <div>
+            <p className="text-sm font-medium text-body mb-3">
+              {t('customCharts.builder.chooseChartType')}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {CHART_TYPES.map((ct) => (
+                <button
+                  key={ct}
+                  type="button"
+                  onClick={() => setBuilder((b) => ({ ...b, chartType: ct }))}
+                  className={`text-sm border rounded-lg p-3 text-left transition-colors ${
+                    builder.chartType === ct
+                      ? 'border-accent bg-accent/10 text-accent'
+                      : 'border-edge hover:border-accent text-body'
+                  }`}
+                >
+                  {ct}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {builder.step === 3 && (
+          <div className="space-y-4">
+            <p className="text-sm font-medium text-body">
+              {t('customCharts.builder.defineFilters')}
+            </p>
+            <TextField
+              size="sm"
+              label={t('customCharts.builder.groupBy')}
+              value={builder.groupBy}
+              onChange={(e) => setBuilder((b) => ({ ...b, groupBy: e.target.value }))}
+              placeholder={t('customCharts.builder.groupByPlaceholder')}
+            />
+            <Select
+              size="sm"
+              label={t('customCharts.builder.timeRange')}
+              value={builder.timeRange}
+              onChange={(e) => setBuilder((b) => ({ ...b, timeRange: e.target.value as TimeRange }))}
+              options={TIME_RANGES.map((tr) => ({ value: tr, label: tr }))}
+            />
+          </div>
+        )}
+
+        {builder.step === 4 && (
+          <div>
+            <p className="text-sm font-medium text-body mb-3">
+              {t('customCharts.builder.preview')}
+            </p>
+            <div className="border border-dashed border-edge rounded-lg p-8 flex items-center justify-center">
+              <div className="text-center text-faded">
+                <BarChart2 className="w-10 h-10 mx-auto mb-2" />
+                <p className="text-sm">{builder.source} / {builder.chartType} / {builder.timeRange}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {builder.step === 5 && (
+          <TextField
+            size="sm"
+            label={t('customCharts.builder.saveName')}
+            value={builder.name}
+            onChange={(e) => setBuilder((b) => ({ ...b, name: e.target.value }))}
+            placeholder={t('customCharts.builder.namePlaceholder')}
+            autoFocus
+          />
+        )}
+      </Modal>
     </PageContainer>
   );
 }
