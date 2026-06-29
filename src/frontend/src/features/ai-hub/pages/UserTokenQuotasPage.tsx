@@ -5,6 +5,9 @@ import { Plus, Trash2, Pencil, Coins, Search } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
@@ -155,11 +158,10 @@ export function UserTokenQuotasPage() {
         }
       />
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
-        <input
-          type="text"
-          className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm"
+      <div className="mb-4">
+        <TextField
+          size="sm"
+          leadingIcon={<Search className="w-4 h-4" />}
           placeholder={t('ai.userTokenQuotas.searchPlaceholder', 'Filtrar por utilizador...')}
           value={searchUser}
           onChange={e => setSearchUser(e.target.value)}
@@ -177,102 +179,68 @@ export function UserTokenQuotasPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {!editingId && (
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    {t('ai.userTokenQuotas.userId', 'ID do Utilizador')}
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border rounded px-3 py-2 text-sm"
+                  <TextField
+                    size="sm"
+                    label={t('ai.userTokenQuotas.userId', 'ID do Utilizador')}
                     placeholder="user@empresa.com ou UUID"
                     value={form.userId}
                     onChange={e => setForm(f => ({ ...f, userId: e.target.value }))}
                   />
                 </div>
               )}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.provider', 'Provider (vazio = todos)')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="anthropic, ollama, openai..."
-                  value={form.providerId}
-                  onChange={e => setForm(f => ({ ...f, providerId: e.target.value }))}
+              <TextField
+                size="sm"
+                label={t('ai.userTokenQuotas.provider', 'Provider (vazio = todos)')}
+                placeholder="anthropic, ollama, openai..."
+                value={form.providerId}
+                onChange={e => setForm(f => ({ ...f, providerId: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('ai.userTokenQuotas.model', 'Modelo (vazio = todos)')}
+                placeholder="claude-sonnet-4-6..."
+                value={form.modelId}
+                onChange={e => setForm(f => ({ ...f, modelId: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('ai.userTokenQuotas.maxInputPerReq', 'Máx. Input Tokens/Pedido')}
+                min={1}
+                value={form.maxInputTokensPerRequest}
+                onChange={e => setForm(f => ({ ...f, maxInputTokensPerRequest: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('ai.userTokenQuotas.maxOutputPerReq', 'Máx. Output Tokens/Pedido')}
+                min={1}
+                value={form.maxOutputTokensPerRequest}
+                onChange={e => setForm(f => ({ ...f, maxOutputTokensPerRequest: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('ai.userTokenQuotas.maxPerDay', 'Máx. Tokens/Dia')}
+                min={1}
+                value={form.maxTokensPerDay}
+                onChange={e => setForm(f => ({ ...f, maxTokensPerDay: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('ai.userTokenQuotas.maxPerMonth', 'Máx. Tokens/Mês')}
+                min={1}
+                value={form.maxTokensPerMonth}
+                onChange={e => setForm(f => ({ ...f, maxTokensPerMonth: Number(e.target.value) }))}
+              />
+              <div className="flex items-center pt-6">
+                <Checkbox
+                  checked={form.isHardLimit}
+                  onChange={e => setForm(f => ({ ...f, isHardLimit: e.target.checked }))}
+                  label={t('ai.userTokenQuotas.hardLimit', 'Limite Rígido (bloqueia)')}
+                  description={t('ai.userTokenQuotas.hardLimitHint', '— desmarcado = aviso')}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.model', 'Modelo (vazio = todos)')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  placeholder="claude-sonnet-4-6..."
-                  value={form.modelId}
-                  onChange={e => setForm(f => ({ ...f, modelId: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.maxInputPerReq', 'Máx. Input Tokens/Pedido')}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  min={1}
-                  value={form.maxInputTokensPerRequest}
-                  onChange={e => setForm(f => ({ ...f, maxInputTokensPerRequest: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.maxOutputPerReq', 'Máx. Output Tokens/Pedido')}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  min={1}
-                  value={form.maxOutputTokensPerRequest}
-                  onChange={e => setForm(f => ({ ...f, maxOutputTokensPerRequest: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.maxPerDay', 'Máx. Tokens/Dia')}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  min={1}
-                  value={form.maxTokensPerDay}
-                  onChange={e => setForm(f => ({ ...f, maxTokensPerDay: Number(e.target.value) }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t('ai.userTokenQuotas.maxPerMonth', 'Máx. Tokens/Mês')}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                  min={1}
-                  value={form.maxTokensPerMonth}
-                  onChange={e => setForm(f => ({ ...f, maxTokensPerMonth: Number(e.target.value) }))}
-                />
-              </div>
-              <div className="flex items-center gap-2 pt-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.isHardLimit}
-                    onChange={e => setForm(f => ({ ...f, isHardLimit: e.target.checked }))}
-                  />
-                  <span className="text-sm">
-                    {t('ai.userTokenQuotas.hardLimit', 'Limite Rígido (bloqueia)')}
-                    <span className="text-muted text-xs ml-1">— desmarcado = aviso</span>
-                  </span>
-                </label>
               </div>
             </div>
             <div className="flex gap-2 mt-4">
@@ -311,9 +279,9 @@ export function UserTokenQuotasPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{quota.userId}</span>
                     <Badge variant={quota.isEnabled ? 'success' : 'default'}>
-                      {quota.isEnabled ? 'Ativo' : 'Inativo'}
+                      {quota.isEnabled ? t('common.active', 'Ativo') : t('common.inactive', 'Inativo')}
                     </Badge>
-                    {quota.isHardLimit && <Badge variant="critical">Rígido</Badge>}
+                    {quota.isHardLimit && <Badge variant="critical">{t('ai.userTokenQuotas.hard', 'Rígido')}</Badge>}
                     {quota.providerId && (
                       <Badge variant="info">{quota.providerId}</Badge>
                     )}
@@ -323,35 +291,38 @@ export function UserTokenQuotasPage() {
                   </div>
                   <div className="text-xs text-muted space-y-0.5 mt-1">
                     <p>
-                      <span className="font-medium">Por pedido: </span>
+                      <span className="font-medium">{t('ai.userTokenQuotas.perRequest', 'Por pedido')}: </span>
                       {quota.maxInputTokensPerRequest.toLocaleString()} input +{' '}
                       {quota.maxOutputTokensPerRequest.toLocaleString()} output
                     </p>
                     <p>
-                      <span className="font-medium">Diário: </span>
+                      <span className="font-medium">{t('ai.userTokenQuotas.daily', 'Diário')}: </span>
                       {quota.maxTokensPerDay.toLocaleString()} tokens
                       <span className="mx-2">·</span>
-                      <span className="font-medium">Mensal: </span>
+                      <span className="font-medium">{t('ai.userTokenQuotas.monthly', 'Mensal')}: </span>
                       {quota.maxTokensPerMonth.toLocaleString()} tokens
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleEdit(quota)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-body transition-colors"
+                    label={t('common.edit', 'Editar')}
                     title={t('common.edit', 'Editar')}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
+                    icon={<Pencil className="w-4 h-4" />}
+                  />
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    className="hover:text-critical"
                     onClick={() => deleteMutation.mutate(quota.quotaId)}
-                    className="p-1.5 rounded hover:bg-hover text-muted hover:text-critical transition-colors"
+                    label={t('common.delete', 'Eliminar')}
                     title={t('common.delete', 'Eliminar')}
                     disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    icon={<Trash2 className="w-4 h-4" />}
+                  />
                 </div>
               </CardBody>
             </Card>
