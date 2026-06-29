@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, TrendingUp, Award, Layers, Link2, BarChart3 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { Tabs } from '../../../components/Tabs';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
@@ -466,23 +467,12 @@ export function AiMemoryIntelligencePage() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={[
-              'flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors',
-              activeTab === tab.key
-                ? 'text-accent border-b-2 border-accent -mb-px'
-                : 'text-muted hover:text-heading',
-            ].join(' ')}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mb-6"
+        items={tabs.map(tab => ({ id: tab.key, label: tab.label, icon: tab.icon }))}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* Panel */}
       {activeTab === 'memory' && <MemoryHealthPanel tenantId={tenantId} />}
