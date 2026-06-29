@@ -349,7 +349,7 @@ describe('AiIntegrationsConfigurationPage', () => {
     renderPage();
     const effectiveButton = screen.getByText('Effective Settings');
     await user.click(effectiveButton);
-    // The button should now be highlighted (has brand class)
-    expect(effectiveButton.closest('button')).toHaveClass('bg-brand-50');
+    // The button should now be highlighted (DS primary variant = accent background)
+    expect(effectiveButton.closest('button')).toHaveClass('bg-accent');
   });
 });
