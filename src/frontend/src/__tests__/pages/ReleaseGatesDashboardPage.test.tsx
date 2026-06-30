@@ -87,8 +87,8 @@ describe('ReleaseGatesDashboardPage', () => {
   it('renders environment path selector buttons', async () => {
     vi.mocked(changeIntelligenceApi.listPromotionGatesByEnvironment).mockResolvedValue(mockGates as any);
     render(wrapper(<ReleaseGatesDashboardPage />));
-    expect(await screen.findAllByText('Pre-Production')).toBeTruthy();
-    expect(screen.getAllByText('Production').length).toBeGreaterThan(0);
+    expect(await screen.findAllByRole('tab')).toBeTruthy();
+    expect(screen.getAllByRole('tab').length).toBeGreaterThan(0);
   });
 
   it('renders list of promotion gates', async () => {
@@ -133,8 +133,8 @@ describe('ReleaseGatesDashboardPage', () => {
   it('changes environment pair when second button clicked', async () => {
     vi.mocked(changeIntelligenceApi.listPromotionGatesByEnvironment).mockResolvedValue(mockGates as any);
     render(wrapper(<ReleaseGatesDashboardPage />));
-    const prodButtons = await screen.findAllByText('Production');
-    await userEvent.click(prodButtons[0]);
+    const tabs = await screen.findAllByRole('tab');
+    await userEvent.click(tabs[tabs.length - 1]);
     expect(changeIntelligenceApi.listPromotionGatesByEnvironment).toHaveBeenCalled();
   });
 

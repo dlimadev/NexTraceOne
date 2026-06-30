@@ -220,8 +220,8 @@ describe('WorkflowConfigurationPage', () => {
     expect(screen.getByText('Types & Templates')).toBeInTheDocument();
     expect(screen.getByText('Stages & Quorum')).toBeInTheDocument();
     expect(screen.getByText('Approvers & Escalation')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /SLA/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Gates/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /SLA/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Gates/ })).toBeInTheDocument();
     expect(screen.getByText('Promotion Governance')).toBeInTheDocument();
     expect(screen.getByText(/Release Windows/)).toBeInTheDocument();
   });
@@ -249,14 +249,14 @@ describe('WorkflowConfigurationPage', () => {
   it('switches to SLA section when clicked', async () => {
     renderPage();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /SLA/ }));
+    await user.click(screen.getByRole('tab', { name: /SLA/ }));
     expect(screen.getByText('Default Workflow SLA (Hours)')).toBeInTheDocument();
   });
 
   it('switches to gates section when clicked', async () => {
     renderPage();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Gates/ }));
+    await user.click(screen.getByRole('tab', { name: /Gates/ }));
     expect(screen.getByText('Gates Enabled')).toBeInTheDocument();
   });
 
