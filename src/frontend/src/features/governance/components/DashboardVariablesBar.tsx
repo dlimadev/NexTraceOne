@@ -9,6 +9,11 @@ import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Clock } from 'lucide-react';
 import { type DashboardVariable } from '../types/dashboardBuilder';
 import { TimeRangePicker } from './TimeRangePicker';
+import { Modal } from '../../../components/Modal';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 
 const REFRESH_OPTIONS = [
   { label: 'Off', value: '' },
@@ -57,100 +62,74 @@ function AddVariableModal({ onAdd, onClose }: AddVariableModalProps) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="bg-card rounded-lg shadow-2xl border border-edge w-[400px] p-5 flex flex-col gap-4">
-        <h3 className="text-sm font-semibold text-heading">
-          {t('governance.dashboardBuilder.variablesBar.addVariable', '+ Variable')}
-        </h3>
-
-        {error && <p className="text-xs text-red-500">{error}</p>}
-
-        <div className="flex flex-col gap-3">
-          <div>
-            <label className="text-xs font-medium text-muted mb-1 block">
-              {t('governance.dashboardBuilder.variablesBar.modal.nameLabel')}
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setError(''); }}
-              placeholder="service"
-              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent font-mono"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted mb-1 block">
-              {t('governance.dashboardBuilder.variablesBar.modal.labelLabel')}
-            </label>
-            <input
-              type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              placeholder="Serviço"
-              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted mb-1 block">
-              {t('governance.dashboardBuilder.variablesBar.modal.typeLabel')}
-            </label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as 'custom' | 'text' | 'interval')}
-              className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent"
-            >
-              <option value="custom">Custom (fixed list)</option>
-              <option value="text">Text (free input)</option>
-              <option value="interval">Interval (1m, 5m, 1h…)</option>
-            </select>
-          </div>
-          {type === 'custom' && (
-            <div>
-              <label className="text-xs font-medium text-muted mb-1 block">
-                {t('governance.dashboardBuilder.variablesBar.modal.optionsLabel')}
-              </label>
-              <input
-                type="text"
-                value={optionsRaw}
-                onChange={(e) => setOptionsRaw(e.target.value)}
-                placeholder="production, staging, dev"
-                className="w-full rounded border border-edge bg-card text-xs px-2 py-1.5 text-heading focus:outline-none focus:border-accent font-mono"
-              />
-            </div>
-          )}
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-1.5 text-xs text-muted cursor-pointer">
-              <input type="checkbox" checked={multi} onChange={(e) => setMulti(e.target.checked)} className="rounded" />
-              {t('governance.dashboardBuilder.variablesBar.modal.multiValue')}
-            </label>
-            <label className="flex items-center gap-1.5 text-xs text-muted cursor-pointer">
-              <input type="checkbox" checked={includeAll} onChange={(e) => setIncludeAll(e.target.checked)} className="rounded" />
-              {t('governance.dashboardBuilder.variablesBar.modal.includeAll')}
-            </label>
-          </div>
-        </div>
-
-        <div className="flex gap-2 justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-xs px-3 py-1.5 rounded border border-edge text-muted hover:bg-hover dark:hover:bg-elevated"
-          >
+    <Modal
+      open
+      onClose={onClose}
+      title={t('governance.dashboardBuilder.variablesBar.addVariable', '+ Variable')}
+      size="sm"
+      footer={
+        <div className="flex gap-2 justify-end w-full">
+          <Button variant="secondary" size="sm" onClick={onClose}>
             {t('governance.dashboardBuilder.variablesBar.modal.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="text-xs px-3 py-1.5 rounded bg-accent text-white hover:bg-accent/80 font-semibold"
-          >
+          </Button>
+          <Button size="sm" onClick={handleAdd}>
             {t('governance.dashboardBuilder.variablesBar.modal.add')}
-          </button>
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        {error && <p className="text-xs text-critical">{error}</p>}
+
+        <TextField
+          label={t('governance.dashboardBuilder.variablesBar.modal.nameLabel')}
+          type="text"
+          value={name}
+          onChange={(e) => { setName(e.target.value); setError(''); }}
+          placeholder="service"
+          className="font-mono"
+        />
+        <TextField
+          label={t('governance.dashboardBuilder.variablesBar.modal.labelLabel')}
+          type="text"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder="Serviço"
+        />
+        <Select
+          label={t('governance.dashboardBuilder.variablesBar.modal.typeLabel')}
+          value={type}
+          onChange={(e) => setType(e.target.value as 'custom' | 'text' | 'interval')}
+          options={[
+            { value: 'custom', label: 'Custom (fixed list)' },
+            { value: 'text', label: 'Text (free input)' },
+            { value: 'interval', label: 'Interval (1m, 5m, 1h…)' },
+          ]}
+        />
+        {type === 'custom' && (
+          <TextField
+            label={t('governance.dashboardBuilder.variablesBar.modal.optionsLabel')}
+            type="text"
+            value={optionsRaw}
+            onChange={(e) => setOptionsRaw(e.target.value)}
+            placeholder="production, staging, dev"
+            className="font-mono"
+          />
+        )}
+        <div className="flex items-center gap-4">
+          <Checkbox
+            label={t('governance.dashboardBuilder.variablesBar.modal.multiValue')}
+            checked={multi}
+            onChange={(e) => setMulti(e.target.checked)}
+          />
+          <Checkbox
+            label={t('governance.dashboardBuilder.variablesBar.modal.includeAll')}
+            checked={includeAll}
+            onChange={(e) => setIncludeAll(e.target.checked)}
+          />
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
