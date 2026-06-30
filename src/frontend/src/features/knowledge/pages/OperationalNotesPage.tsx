@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Tabs } from '../../../components/Tabs';
+import { IconButton } from '../../../components/IconButton';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -68,63 +70,29 @@ export function OperationalNotesPage() {
           <Filter size={14} className="text-muted" />
           <span className="text-xs text-body font-medium">{t('operationalNotes.filterSeverity')}</span>
         </div>
-        <button
-          onClick={() => { setSeverityFilter(''); setPage(1); }}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            severityFilter === ''
-              ? 'bg-accent text-white'
-              : 'bg-elevated text-body hover:bg-hover'
-          }`}
-        >
-          {t('operationalNotes.filterAll')}
-        </button>
-        {severities.map(s => (
-          <button
-            key={s}
-            onClick={() => { setSeverityFilter(s === severityFilter ? '' : s); setPage(1); }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              severityFilter === s
-                ? 'bg-accent text-white'
-                : 'bg-elevated text-body hover:bg-hover'
-            }`}
-          >
-            {SEVERITY_ICON[s]}
-            {t(`knowledgeHub.severity.${s}`)}
-          </button>
-        ))}
+        <Tabs
+          variant="pill"
+          size="sm"
+          items={[
+            { id: '', label: t('operationalNotes.filterAll') },
+            ...severities.map(s => ({ id: s, label: t(`knowledgeHub.severity.${s}`), icon: SEVERITY_ICON[s] })),
+          ]}
+          activeId={severityFilter}
+          onChange={(id) => { setSeverityFilter(id as NoteSeverity | ''); setPage(1); }}
+        />
 
-        <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={() => { setResolvedFilter(undefined); setPage(1); }}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              resolvedFilter === undefined
-                ? 'bg-accent text-white'
-                : 'bg-elevated text-body hover:bg-hover'
-            }`}
-          >
-            {t('operationalNotes.filterStatusAll')}
-          </button>
-          <button
-            onClick={() => { setResolvedFilter(false); setPage(1); }}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              resolvedFilter === false
-                ? 'bg-warning text-white'
-                : 'bg-elevated text-body hover:bg-hover'
-            }`}
-          >
-            {t('operationalNotes.filterOpen')}
-          </button>
-          <button
-            onClick={() => { setResolvedFilter(true); setPage(1); }}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              resolvedFilter === true
-                ? 'bg-success text-white'
-                : 'bg-elevated text-body hover:bg-hover'
-            }`}
-          >
-            <CheckCircle2 size={12} />
-            {t('operationalNotes.filterResolved')}
-          </button>
+        <div className="ml-auto">
+          <Tabs
+            variant="pill"
+            size="sm"
+            items={[
+              { id: 'all', label: t('operationalNotes.filterStatusAll') },
+              { id: 'open', label: t('operationalNotes.filterOpen') },
+              { id: 'resolved', label: t('operationalNotes.filterResolved'), icon: <CheckCircle2 size={12} /> },
+            ]}
+            activeId={resolvedFilter === undefined ? 'all' : resolvedFilter ? 'resolved' : 'open'}
+            onChange={(id) => { setResolvedFilter(id === 'all' ? undefined : id === 'resolved'); setPage(1); }}
+          />
         </div>
       </div>
 
@@ -194,21 +162,23 @@ export function OperationalNotesPage() {
               {data?.totalCount ?? 0} {t('common.total')}
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <IconButton
+                variant="outline"
+                size="sm"
                 disabled={page <= 1}
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="p-1.5 rounded-md bg-elevated border border-edge text-body hover:text-heading disabled:opacity-40 transition-colors"
-              >
-                <ChevronLeft size={16} />
-              </button>
+                label={t('common.previous', 'Previous')}
+                icon={<ChevronLeft size={16} />}
+              />
               <span className="text-xs text-body">{page} / {totalPages}</span>
-              <button
+              <IconButton
+                variant="outline"
+                size="sm"
                 disabled={page >= totalPages}
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-md bg-elevated border border-edge text-body hover:text-heading disabled:opacity-40 transition-colors"
-              >
-                <ChevronRight size={16} />
-              </button>
+                label={t('common.next', 'Next')}
+                icon={<ChevronRight size={16} />}
+              />
             </div>
           </div>
         )}
