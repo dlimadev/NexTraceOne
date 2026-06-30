@@ -5,6 +5,7 @@ import { Bot, Sparkles, CheckCircle2, XCircle, LayoutDashboard, AlertTriangle } 
 import { notebooksApi, type AiDashboardProposal, type ProposedWidgetDto } from '../api/notebooks';
 import { Modal } from '../../../components/Modal';
 import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { Badge } from '../../../components/Badge';
 
 interface Props {
@@ -126,8 +127,8 @@ export function AiComposeDashboardModal({
             <label className="block text-sm font-medium text-body">
               {t('aiCompose.promptLabel')}
             </label>
-            <textarea
-              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-heading placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent"
+            <TextArea
+              textareaClassName="resize-none"
               rows={4}
               placeholder={t('aiCompose.promptPlaceholder')}
               value={prompt}
