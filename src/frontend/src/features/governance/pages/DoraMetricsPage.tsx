@@ -11,6 +11,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Select } from '../../../components/Select';
 import client from '../../../api/client';
 
 interface DoraMetric {
@@ -151,15 +152,15 @@ export function DoraMetricsPage() {
             <label className="text-sm text-muted">
               {t('governance.dora.period')}:
             </label>
-            <select
-              value={periodDays}
+            <Select
+              size="sm"
+              value={String(periodDays)}
               onChange={(e) => setPeriodDays(Number(e.target.value))}
-              className="rounded border border-edge bg-card text-sm px-2 py-1"
-            >
-              {[7, 30, 60, 90].map((d) => (
-                <option key={d} value={d}>{t('common.daysN', { count: d })}</option>
-              ))}
-            </select>
+              options={[7, 30, 60, 90].map((d) => ({
+                value: String(d),
+                label: t('common.daysN', { count: d }),
+              }))}
+            />
             <Button size="sm" onClick={() => refetch()}>
               <RefreshCw size={14} className="mr-1" />
               {t('common.refresh')}
