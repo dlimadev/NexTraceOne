@@ -4,14 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { MapPin, CheckCircle2, Clock, AlertTriangle, ArrowRight, Lock } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { promotionApi } from '../api/promotion';
 import type { PromotionPathStep } from '../api/promotion';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 function stepStatusVariant(status: string): 'success' | 'warning' | 'danger' | 'info' | 'default' {
   if (status === 'Approved') return 'success';
@@ -110,19 +109,23 @@ export function EnvironmentPromotionPathPanel({ releaseId }: { releaseId?: strin
         </CardHeader>
         <CardBody>
           <div className="flex gap-2">
-            <input
-              className={INPUT_CLS}
-              placeholder={t('promotionPath.releasePlaceholder')}
-              value={inputId}
-              onChange={(e) => setInputId(e.target.value)}
-            />
-            <button
+            <div className="flex-1">
+              <TextField
+                size="sm"
+                placeholder={t('promotionPath.releasePlaceholder')}
+                value={inputId}
+                onChange={(e) => setInputId(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => refetch()}
               disabled={!inputId.trim() || isFetching}
-              className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium disabled:opacity-50 hover:bg-accent/90 transition-colors"
+              loading={isFetching}
             >
-              {isFetching ? t('common.loading') : t('common.search')}
-            </button>
+              {t('common.search')}
+            </Button>
           </div>
         </CardBody>
       </Card>
