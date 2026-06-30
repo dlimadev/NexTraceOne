@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ClipboardCheck, Clock, CheckCircle2, XCircle, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
@@ -144,30 +146,34 @@ export function FinOpsBudgetApprovalsPage() {
                 {item.status === 'Pending' && (
                   <div className="border-t border-edge pt-4">
                     <p className="text-xs text-muted mb-2">{t('finops.approvals.comment')}</p>
-                    <textarea
-                      className="input w-full text-sm min-h-[60px] mb-3"
-                      placeholder={t('finops.approvals.commentPlaceholder')}
-                      value={commentMap[item.approvalId] ?? ''}
-                      onChange={(e) => setCommentMap((m) => ({ ...m, [item.approvalId]: e.target.value }))}
-                      aria-label={t('finops.approvals.comment')}
-                    />
+                    <div className="mb-3">
+                      <TextArea
+                        rows={2}
+                        placeholder={t('finops.approvals.commentPlaceholder')}
+                        value={commentMap[item.approvalId] ?? ''}
+                        onChange={(e) => setCommentMap((m) => ({ ...m, [item.approvalId]: e.target.value }))}
+                        aria-label={t('finops.approvals.comment')}
+                      />
+                    </div>
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        icon={<CheckCircle2 size={14} />}
                         onClick={() => resolveMutation.mutate({ approvalId: item.approvalId, approved: true, comment: commentMap[item.approvalId] })}
                         disabled={resolveMutation.isPending}
-                        className="btn btn-primary btn-sm flex items-center gap-1"
                       >
-                        <CheckCircle2 size={14} />
                         {t('finops.approvals.approve')}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        icon={<XCircle size={14} />}
                         onClick={() => resolveMutation.mutate({ approvalId: item.approvalId, approved: false, comment: commentMap[item.approvalId] })}
                         disabled={resolveMutation.isPending}
-                        className="btn btn-danger btn-sm flex items-center gap-1"
                       >
-                        <XCircle size={14} />
                         {t('finops.approvals.reject')}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
