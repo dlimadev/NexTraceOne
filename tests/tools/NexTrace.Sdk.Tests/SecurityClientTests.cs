@@ -159,4 +159,22 @@ public class SecurityClientTests
 
         await act.Should().ThrowAsync<ArgumentNullException>();
     }
+
+    [Fact]
+    public async Task GenerateSbomAsync_Posts_To_Service_Sbom_Endpoint()
+    {
+        var handler = MockHttpMessageHandler.WithJsonResponse(
+            """{"sbomContent":"{\"bomFormat\":\"CycloneDX\"}","format":"CycloneDx"}""");
+
+        using var client = new NexTraceSdkClient(new HttpClient(handler) { BaseAddress = new Uri("http://localhost") });
+
+        var sbom = await client.Security.GenerateSbomAsync("11111111-1111-1111-1111-111111111111", "Spdx");
+
+        sbom.Should().NotBeNull();
+        sbom!.SbomContent.Should().NotBeNullOrEmpty();
+        sbom.Format.Should().Be("CycloneDx");
+        handler.Requests[0].Method.Should().Be(HttpMethod.Post);
+        handler.Requests[0].RequestUri!.PathAndQuery
+            .Should().Be("/api/v1/catalog/dependencies/11111111-1111-1111-1111-111111111111/sbom");
+    }
 }

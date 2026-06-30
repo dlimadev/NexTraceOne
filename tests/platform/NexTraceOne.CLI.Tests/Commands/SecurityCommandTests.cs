@@ -27,6 +27,25 @@ public sealed class SecurityCommandTests
         command.Name.Should().Be("security");
         command.Subcommands.Should().Contain(c => c.Name == "deps");
         command.Subcommands.Should().Contain(c => c.Name == "vulnerable");
+        command.Subcommands.Should().Contain(c => c.Name == "sbom");
+    }
+
+    [Fact]
+    public async Task SbomAsync_WithInvalidFormat_Returns_ExitError()
+    {
+        var exitCode = await InvokeSbomAsync("svc-1", "xml", null, "http://localhost", null);
+
+        exitCode.Should().Be(ExitError);
+    }
+
+    [Fact]
+    public async Task SbomAsync_WithMockApi_Returns_Success()
+    {
+        using var sdk = CreateMockSdk(_ => """{"sbomContent":"{\"bomFormat\":\"CycloneDX\"}","format":"CycloneDx"}""");
+
+        var exitCode = await InvokeSbomAsync("svc-1", null, null, "http://localhost", sdk);
+
+        exitCode.Should().Be(ExitSuccess);
     }
 
     [Fact]
@@ -104,6 +123,19 @@ public sealed class SecurityCommandTests
 
         var task = (Task<int>)method!.Invoke(null, [
             minSeverity, failOnFound, url, null, format, CancellationToken.None, injectedClient
+        ])!;
+        return await task;
+    }
+
+    private static async Task<int> InvokeSbomAsync(
+        string serviceId, string? format, string? output, string url, NexTraceSdkClient? injectedClient)
+    {
+        var method = typeof(NexTraceOne.CLI.Commands.SecurityCommand)
+            .GetMethod("SbomAsync", BindingFlags.NonPublic | BindingFlags.Static);
+        method.Should().NotBeNull();
+
+        var task = (Task<int>)method!.Invoke(null, [
+            serviceId, format, output, url, null, CancellationToken.None, injectedClient
         ])!;
         return await task;
     }

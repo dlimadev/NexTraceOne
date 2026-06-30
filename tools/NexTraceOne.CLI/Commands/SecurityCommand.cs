@@ -33,7 +33,96 @@ public static class SecurityCommand
         var command = new Command("security", "Dependency security governance (supply chain) for services.");
         command.Add(CreateDepsCommand());
         command.Add(CreateVulnerableCommand());
+        command.Add(CreateSbomCommand());
         return command;
+    }
+
+    private static readonly string[] SbomFormats = ["cyclonedx", "spdx"];
+
+    // ── SBOM subcommand ─────────────────────────────────────────────────────────
+
+    private static Command CreateSbomCommand()
+    {
+        var serviceArg = new Argument<string>("serviceId") { Description = "Service identifier (GUID)." };
+        var formatOpt = new Option<string?>("--format") { Description = "SBOM format: cyclonedx (default) or spdx." };
+        var outputOpt = new Option<string?>("--output") { Description = "Write the SBOM to this file instead of stdout." };
+        var urlOpt = CreateUrlOption();
+        var tokenOpt = CreateTokenOption();
+
+        var command = new Command("sbom", "Generate the Software Bill of Materials (SBOM) for a service.");
+        command.Add(serviceArg);
+        command.Add(formatOpt);
+        command.Add(outputOpt);
+        command.Add(urlOpt);
+        command.Add(tokenOpt);
+
+        command.SetAction(async (parseResult, ct) =>
+        {
+            var serviceId = parseResult.GetValue(serviceArg)!;
+            var format = parseResult.GetValue(formatOpt);
+            var output = parseResult.GetValue(outputOpt);
+            var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
+            var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
+
+            return await SbomAsync(serviceId, format, output, url, token, ct).ConfigureAwait(false);
+        });
+
+        return command;
+    }
+
+    private static async Task<int> SbomAsync(
+        string serviceId, string? format, string? output, string url, string? token,
+        CancellationToken ct, NexTraceSdkClient? injectedClient = null)
+    {
+        string? apiFormat = null;
+        if (!string.IsNullOrWhiteSpace(format))
+        {
+            if (!Array.Exists(SbomFormats, f => string.Equals(f, format, StringComparison.OrdinalIgnoreCase)))
+            {
+                AnsiConsole.MarkupLine($"[red]Error:[/] Invalid --format [yellow]{format.EscapeMarkup()}[/]. Use: {string.Join(", ", SbomFormats)}.");
+                return ExitError;
+            }
+            apiFormat = string.Equals(format, "spdx", StringComparison.OrdinalIgnoreCase) ? "Spdx" : "CycloneDx";
+        }
+
+        try
+        {
+            using var client = injectedClient ?? CreateSdkClient(url, token);
+            var sbom = await client.Security.GenerateSbomAsync(serviceId, apiFormat, ct).ConfigureAwait(false);
+
+            if (sbom?.SbomContent is null)
+            {
+                AnsiConsole.MarkupLine("[red]Error:[/] Empty response from API.");
+                return ExitError;
+            }
+
+            if (!string.IsNullOrWhiteSpace(output))
+            {
+                await File.WriteAllTextAsync(output, sbom.SbomContent, ct).ConfigureAwait(false);
+                AnsiConsole.MarkupLine($"[green]✓[/] SBOM ([blue]{sbom.Format ?? "-"}[/]) written to [grey]{output.EscapeMarkup()}[/]");
+            }
+            else
+            {
+                Console.WriteLine(sbom.SbomContent);
+            }
+
+            return ExitSuccess;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] No dependency profile found for service [yellow]{serviceId.EscapeMarkup()}[/].");
+            return ExitError;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Cannot connect to NexTraceOne API: [yellow]{ex.Message.EscapeMarkup()}[/]");
+            return ExitError;
+        }
+        catch (TaskCanceledException)
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] Request to NexTraceOne API timed out.");
+            return ExitError;
+        }
     }
 
     // ── DEPS subcommand ─────────────────────────────────────────────────────────

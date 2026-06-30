@@ -69,6 +69,25 @@ public sealed class SecurityClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<ArtifactVerification>(ct).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Gera o SBOM (Software Bill of Materials) de um serviço no formato solicitado.
+    /// </summary>
+    /// <param name="serviceId">Identificador do serviço.</param>
+    /// <param name="format">Formato do SBOM: CycloneDx (padrão do servidor) ou Spdx.</param>
+    public async Task<SbomResult?> GenerateSbomAsync(string serviceId, string? format = null, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(serviceId)) throw new ArgumentNullException(nameof(serviceId));
+
+        // Corpo vazio → servidor usa o formato padrão (CycloneDx). Enum serializado como string.
+        object body = new { };
+        if (!string.IsNullOrWhiteSpace(format))
+            body = new { format };
+        var response = await _http.PostAsJsonAsync(
+            $"/api/v1/catalog/dependencies/{Uri.EscapeDataString(serviceId)}/sbom", body, ct).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<SbomResult>(ct).ConfigureAwait(false);
+    }
 }
 
 /// <summary>Request para assinatura digital de um artefato.</summary>
@@ -211,4 +230,16 @@ public sealed class VulnerableService
 
     [JsonPropertyName("lastScanAt")]
     public DateTimeOffset LastScanAt { get; init; }
+}
+
+/// <summary>Resultado da geração de SBOM de um serviço.</summary>
+public sealed class SbomResult
+{
+    /// <summary>Conteúdo do SBOM (JSON do formato escolhido).</summary>
+    [JsonPropertyName("sbomContent")]
+    public string? SbomContent { get; init; }
+
+    /// <summary>Formato do SBOM gerado (CycloneDx ou Spdx).</summary>
+    [JsonPropertyName("format")]
+    public string? Format { get; init; }
 }
