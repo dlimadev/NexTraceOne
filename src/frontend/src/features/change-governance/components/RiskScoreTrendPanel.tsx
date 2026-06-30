@@ -4,13 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { TrendingUp, TrendingDown, Minus, AlertTriangle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import type { RiskScoreDataPoint } from '../api/changeIntelligence';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 function trendIcon(prev: number | null, curr: number | null) {
   if (prev === null || curr === null) return <Minus size={12} className="text-muted" />;
@@ -91,11 +90,9 @@ export function RiskScoreTrendPanel({ initialServiceName }: { initialServiceName
         <CardBody>
           <div className="flex flex-wrap gap-3">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('riskTrend.serviceLabel')}
-              </label>
-              <input
-                className={INPUT_CLS}
+              <TextField
+                size="sm"
+                label={t('riskTrend.serviceLabel')}
                 placeholder={t('riskTrend.servicePlaceholder')}
                 value={serviceName}
                 onChange={(e) => setServiceName(e.target.value)}
@@ -105,37 +102,35 @@ export function RiskScoreTrendPanel({ initialServiceName }: { initialServiceName
               />
             </div>
             <div className="w-40">
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('riskTrend.envLabel')}
-              </label>
-              <input
-                className={INPUT_CLS}
+              <TextField
+                size="sm"
+                label={t('riskTrend.envLabel')}
                 placeholder={t('riskTrend.envPlaceholder')}
                 value={environment}
                 onChange={(e) => setEnvironment(e.target.value)}
               />
             </div>
             <div className="w-24">
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('riskTrend.limitLabel')}
-              </label>
-              <input
+              <TextField
+                size="sm"
                 type="number"
                 min={5}
                 max={100}
-                className={INPUT_CLS}
+                label={t('riskTrend.limitLabel')}
                 value={limit}
                 onChange={(e) => setLimit(Number(e.target.value))}
               />
             </div>
             <div className="flex items-end">
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={handleSearch}
                 disabled={!serviceName.trim() || isFetching}
-                className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium disabled:opacity-50 hover:bg-accent/90 transition-colors"
+                loading={isFetching}
               >
-                {isFetching ? t('common.loading') : t('common.search')}
-              </button>
+                {t('common.search')}
+              </Button>
             </div>
           </div>
         </CardBody>
