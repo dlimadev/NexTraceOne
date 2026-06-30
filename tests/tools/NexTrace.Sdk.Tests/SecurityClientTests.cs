@@ -1,4 +1,5 @@
 using FluentAssertions;
+using NexTrace.Sdk.Clients;
 
 namespace NexTrace.Sdk.Tests;
 

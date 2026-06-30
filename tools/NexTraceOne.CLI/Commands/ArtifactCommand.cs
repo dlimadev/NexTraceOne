@@ -103,7 +103,7 @@ public static class ArtifactCommand
             }
             else
             {
-                AnsiConsole.MarkupLine($"[green]✓[/] Artifact signed: [blue]{(signed.ArtifactName ?? signed.ArtifactId).EscapeMarkup()}[/]");
+                AnsiConsole.MarkupLine($"[green]✓[/] Artifact signed: [blue]{(signed.ArtifactName ?? signed.ArtifactId ?? "-").EscapeMarkup()}[/]");
                 AnsiConsole.MarkupLine($"  Checksum: [grey]{(signed.Checksum ?? "-").EscapeMarkup()}[/]");
                 AnsiConsole.MarkupLine($"  Signer: [grey]{(signed.SignerIdentity ?? "-").EscapeMarkup()}[/]  ·  Signed at: [grey]{signed.SignedAt:u}[/]");
                 if (!string.IsNullOrWhiteSpace(signed.TransparencyLogEntry))
