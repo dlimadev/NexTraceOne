@@ -43,6 +43,106 @@ public sealed class SecurityClient
         var result = await _http.GetFromJsonAsync<List<VulnerableService>>(url, ct).ConfigureAwait(false);
         return result ?? [];
     }
+
+    /// <summary>
+    /// Assina digitalmente um artefato (docker-image, nuget-package, binary) via Cosign,
+    /// gerando SBOM e entrada no transparency log (Rekor).
+    /// </summary>
+    public async Task<SignedArtifact?> SignArtifactAsync(SignArtifactRequest request, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var response = await _http.PostAsJsonAsync(
+            "/api/v1/governance/artifact-signing/sign", request, ct).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<SignedArtifact>(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Verifica a assinatura digital de um artefato pelo seu identificador.
+    /// </summary>
+    public async Task<ArtifactVerification?> VerifyArtifactAsync(string artifactId, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(artifactId)) throw new ArgumentNullException(nameof(artifactId));
+        var response = await _http.PostAsJsonAsync(
+            "/api/v1/governance/artifact-signing/verify", new VerifyArtifactRequest { ArtifactId = artifactId }, ct)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ArtifactVerification>(ct).ConfigureAwait(false);
+    }
+}
+
+/// <summary>Request para assinatura digital de um artefato.</summary>
+public sealed class SignArtifactRequest
+{
+    [JsonPropertyName("artifactPath")]
+    public string ArtifactPath { get; set; } = string.Empty;
+
+    /// <summary>Tipo do artefato: docker-image, nuget-package ou binary.</summary>
+    [JsonPropertyName("artifactType")]
+    public string ArtifactType { get; set; } = string.Empty;
+
+    [JsonPropertyName("version")]
+    public string Version { get; set; } = string.Empty;
+
+    [JsonPropertyName("metadata")]
+    public IReadOnlyDictionary<string, string>? Metadata { get; set; }
+}
+
+/// <summary>Resultado da assinatura de um artefato.</summary>
+public sealed class SignedArtifact
+{
+    [JsonPropertyName("artifactId")]
+    public string? ArtifactId { get; init; }
+
+    [JsonPropertyName("artifactName")]
+    public string? ArtifactName { get; init; }
+
+    [JsonPropertyName("checksum")]
+    public string? Checksum { get; init; }
+
+    [JsonPropertyName("signature")]
+    public string? Signature { get; init; }
+
+    [JsonPropertyName("signedAt")]
+    public DateTimeOffset SignedAt { get; init; }
+
+    [JsonPropertyName("signerIdentity")]
+    public string? SignerIdentity { get; init; }
+
+    [JsonPropertyName("sbomJson")]
+    public string? SbomJson { get; init; }
+
+    [JsonPropertyName("transparencyLogEntry")]
+    public string? TransparencyLogEntry { get; init; }
+}
+
+/// <summary>Request para verificação de assinatura.</summary>
+public sealed class VerifyArtifactRequest
+{
+    [JsonPropertyName("artifactId")]
+    public string ArtifactId { get; set; } = string.Empty;
+}
+
+/// <summary>Resultado da verificação de assinatura de um artefato.</summary>
+public sealed class ArtifactVerification
+{
+    [JsonPropertyName("isValid")]
+    public bool IsValid { get; init; }
+
+    [JsonPropertyName("artifactId")]
+    public string? ArtifactId { get; init; }
+
+    [JsonPropertyName("verifiedAt")]
+    public DateTimeOffset? VerifiedAt { get; init; }
+
+    [JsonPropertyName("signerIdentity")]
+    public string? SignerIdentity { get; init; }
+
+    [JsonPropertyName("errors")]
+    public IReadOnlyList<string> Errors { get; init; } = [];
+
+    [JsonPropertyName("warnings")]
+    public IReadOnlyList<string> Warnings { get; init; } = [];
 }
 
 /// <summary>Painel de saúde de dependências de um serviço.</summary>

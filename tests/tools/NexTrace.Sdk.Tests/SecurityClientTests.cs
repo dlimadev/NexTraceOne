@@ -90,4 +90,72 @@ public class SecurityClientTests
 
         await act.Should().ThrowAsync<ArgumentNullException>();
     }
+
+    [Fact]
+    public async Task SignArtifactAsync_Sends_Post_And_Returns_Signed()
+    {
+        var handler = MockHttpMessageHandler.WithJsonResponse("""
+        {
+            "artifactId": "art-1",
+            "artifactName": "payments:1.2.3",
+            "checksum": "sha256:abc",
+            "signature": "MEUCIQ...",
+            "signedAt": "2026-06-30T10:00:00Z",
+            "signerIdentity": "ci@nextraceone",
+            "sbomJson": "{}",
+            "transparencyLogEntry": "rekor-123"
+        }
+        """);
+
+        using var client = new NexTraceSdkClient(new HttpClient(handler) { BaseAddress = new Uri("http://localhost") });
+
+        var signed = await client.Security.SignArtifactAsync(new SignArtifactRequest
+        {
+            ArtifactPath = "payments:1.2.3",
+            ArtifactType = "docker-image",
+            Version = "1.2.3"
+        });
+
+        signed.Should().NotBeNull();
+        signed!.ArtifactId.Should().Be("art-1");
+        signed.SignerIdentity.Should().Be("ci@nextraceone");
+        handler.Requests[0].Method.Should().Be(HttpMethod.Post);
+        handler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/api/v1/governance/artifact-signing/sign");
+    }
+
+    [Fact]
+    public async Task VerifyArtifactAsync_Returns_Verification()
+    {
+        var handler = MockHttpMessageHandler.WithJsonResponse("""
+        {
+            "isValid": false,
+            "artifactId": "art-1",
+            "verifiedAt": "2026-06-30T10:00:00Z",
+            "signerIdentity": "",
+            "errors": ["signature mismatch"],
+            "warnings": []
+        }
+        """);
+
+        using var client = new NexTraceSdkClient(new HttpClient(handler) { BaseAddress = new Uri("http://localhost") });
+
+        var result = await client.Security.VerifyArtifactAsync("art-1");
+
+        result.Should().NotBeNull();
+        result!.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain("signature mismatch");
+        handler.Requests[0].Method.Should().Be(HttpMethod.Post);
+        handler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/api/v1/governance/artifact-signing/verify");
+    }
+
+    [Fact]
+    public async Task VerifyArtifactAsync_Throws_On_Empty_Id()
+    {
+        var handler = MockHttpMessageHandler.WithJsonResponse("{}");
+        using var client = new NexTraceSdkClient(new HttpClient(handler) { BaseAddress = new Uri("http://localhost") });
+
+        var act = async () => await client.Security.VerifyArtifactAsync("");
+
+        await act.Should().ThrowAsync<ArgumentNullException>();
+    }
 }
