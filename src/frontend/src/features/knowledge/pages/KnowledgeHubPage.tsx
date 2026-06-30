@@ -24,6 +24,8 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Tabs } from '../../../components/Tabs';
 import {
   useKnowledgeDocuments,
   useOperationalNotes,
@@ -140,44 +142,24 @@ export function KnowledgeHubPage() {
       </StatsGrid>
 
       {/* Search bar */}
-      <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={e => handleSearchChange(e.target.value)}
-          placeholder={t('knowledgeHub.searchPlaceholder')}
-          className="w-full pl-9 pr-4 py-2 rounded-lg bg-input border border-edge text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50"
-        />
-      </div>
+      <TextField
+        leadingIcon={<Search size={16} />}
+        value={searchTerm}
+        onChange={e => handleSearchChange(e.target.value)}
+        placeholder={t('knowledgeHub.searchPlaceholder')}
+      />
 
       {/* Category filters */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <button
-          onClick={() => setCategoryFilter('')}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            categoryFilter === ''
-              ? 'bg-accent text-white'
-              : 'bg-elevated text-body hover:bg-hover'
-          }`}
-        >
-          {t('knowledgeHub.filterAll')}
-        </button>
-        {categories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setCategoryFilter(cat === categoryFilter ? '' : cat)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              categoryFilter === cat
-                ? 'bg-accent text-white'
-                : 'bg-elevated text-body hover:bg-hover'
-            }`}
-          >
-            {CATEGORY_ICONS[cat]}
-            {t(`knowledgeHub.category.${cat}`)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        variant="pill"
+        size="sm"
+        items={[
+          { id: '', label: t('knowledgeHub.filterAll') },
+          ...categories.map(cat => ({ id: cat, label: t(`knowledgeHub.category.${cat}`), icon: CATEGORY_ICONS[cat] })),
+        ]}
+        activeId={categoryFilter}
+        onChange={(id) => setCategoryFilter(id as DocumentCategory | '')}
+      />
 
       <PageSection>
         {/* Document list */}
