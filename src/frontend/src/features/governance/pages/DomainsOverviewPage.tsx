@@ -6,6 +6,7 @@ import {
   Globe, Search, Server, BarChart3, Users, ArrowRight, Tag,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
@@ -105,16 +106,7 @@ export function DomainsOverviewPage() {
       {/* Search + Domain cards */}
       <PageSection>
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="relative flex-1 max-w-xs">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('organization.domains.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
+          <SearchInput size="sm" className="flex-1 max-w-xs" value={search} onChange={e => setSearch(e.target.value)} placeholder={t('organization.domains.searchPlaceholder')} />
         </div>
 
         {domains.length === 0 ? (

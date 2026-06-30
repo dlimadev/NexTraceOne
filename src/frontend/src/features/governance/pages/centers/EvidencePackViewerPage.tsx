@@ -6,6 +6,7 @@ import { Package, ShieldCheck, Download, FileCheck, Lock, Clock, Tag } from 'luc
 import { PageContainer, PageSection } from '../../../../components/shell';
 import { PageHeader } from '../../../../components/PageHeader';
 import { Card, CardBody } from '../../../../components/Card';
+import { SearchInput } from '../../../../components/SearchInput';
 import { Badge } from '../../../../components/Badge';
 import { Button } from '../../../../components/Button';
 import { PageLoadingState } from '../../../../components/PageLoadingState';
@@ -137,12 +138,12 @@ export function EvidencePackViewerPage() {
               <h3 className="text-sm font-semibold">
                 {t('evidencePack.artifacts')} ({artifacts.length})
               </h3>
-              <input
-                type="text"
+              <SearchInput
+                size="sm"
+                className="ml-auto w-48"
                 placeholder={t('evidencePack.filterArtifacts')}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="ml-auto px-2 py-1 text-xs border rounded bg-elevated w-48"
               />
             </div>
 

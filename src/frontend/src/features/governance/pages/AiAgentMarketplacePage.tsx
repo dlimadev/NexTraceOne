@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Bot, Search, Star, Shield, Coins, Play, Pause } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { SearchInput } from '../../../components/SearchInput';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -90,16 +91,7 @@ export function AiAgentMarketplacePage() {
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-4">
-          <div className="relative flex-1 min-w-48">
-            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              placeholder={t('aiAgentMarketplace.search')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-7 pr-3 py-1.5 text-xs border rounded bg-elevated"
-            />
-          </div>
+          <SearchInput size="sm" className="flex-1 min-w-48" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('aiAgentMarketplace.search')} />
           <div className="flex gap-1 flex-wrap">
             {CATEGORIES.map((cat) => (
               <button

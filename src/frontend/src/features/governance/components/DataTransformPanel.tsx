@@ -48,14 +48,14 @@ function FilterTransformConfig({ config, onChange }: { config: Record<string, un
         <button
           type="button"
           onClick={() => onChange({ ...config, mode: 'include' })}
-          className={`text-[10px] px-2 py-1 rounded border ${mode === 'include' ? 'bg-accent text-white border-accent' : 'border-edge'}`}
+          className={`text-[10px] px-2 py-1 rounded border ${mode === 'include' ? 'bg-accent text-on-accent border-accent' : 'border-edge'}`}
         >
           {t('transforms.include', 'Include')}
         </button>
         <button
           type="button"
           onClick={() => onChange({ ...config, mode: 'exclude' })}
-          className={`text-[10px] px-2 py-1 rounded border ${mode === 'exclude' ? 'bg-accent text-white border-accent' : 'border-edge'}`}
+          className={`text-[10px] px-2 py-1 rounded border ${mode === 'exclude' ? 'bg-accent text-on-accent border-accent' : 'border-edge'}`}
         >
           {t('transforms.exclude', 'Exclude')}
         </button>
@@ -185,7 +185,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
         <button
           type="button"
           onClick={() => setShowAdd(v => !v)}
-          className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-0.5"
+          className="text-xs text-accent hover:text-accent/80 flex items-center gap-0.5"
         >
           <Plus size={10} />
           {t('transforms.add', 'Add')}
@@ -251,7 +251,7 @@ export function DataTransformPanel({ transforms, onChange }: DataTransformPanelP
                   <button
                     type="button"
                     onClick={() => removeTransform(transform.id)}
-                    className="text-faded hover:text-red-400 p-0.5"
+                    className="text-faded hover:text-critical p-0.5"
                   >
                     <X size={10} />
                   </button>

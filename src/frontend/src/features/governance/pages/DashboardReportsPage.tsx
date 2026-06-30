@@ -14,6 +14,10 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Modal } from '../../../components/Modal';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -166,18 +170,17 @@ export function DashboardReportsPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     {/* Left: toggle + info */}
                     <div className="flex items-start gap-3 min-w-0">
-                      <button
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        className="mt-0.5 shrink-0 hover:text-accent"
+                        icon={report.isActive
+                          ? <ToggleRight size={22} className="text-success" />
+                          : <ToggleLeft size={22} />}
                         onClick={() => handleToggle(report)}
-                        className="mt-0.5 shrink-0 text-muted hover:text-accent transition-colors"
-                        aria-label={report.isActive ? 'Deactivate schedule' : 'Activate schedule'}
+                        label={report.isActive ? 'Deactivate schedule' : 'Activate schedule'}
                         disabled={toggleReport.isPending}
-                      >
-                        {report.isActive ? (
-                          <ToggleRight size={22} className="text-success" />
-                        ) : (
-                          <ToggleLeft size={22} />
-                        )}
-                      </button>
+                      />
 
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-heading truncate">
@@ -242,108 +245,88 @@ export function DashboardReportsPage() {
       </PageSection>
 
       {/* New Schedule modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card rounded-md border border-edge shadow-elevated w-full max-w-md p-6">
-            <h2 className="text-base font-semibold text-heading mb-4">
-              {t('governance.dashboardReports.newSchedule', 'New Schedule')}
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('governance.dashboardReports.dashboardId', 'Dashboard ID')}
-                </label>
-                <input
-                  type="text"
-                  value={form.dashboardId}
-                  onChange={(e) => handleFormChange('dashboardId', e.target.value)}
-                  placeholder="db-engineer-home"
-                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('governance.dashboardReports.cron', 'Cron Expression')}
-                </label>
-                <input
-                  type="text"
-                  value={form.cronExpression}
-                  onChange={(e) => handleFormChange('cronExpression', e.target.value)}
-                  placeholder="0 8 * * 1"
-                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body font-mono focus:outline-none focus:border-accent"
-                />
-                <p className="mt-1 text-xs text-muted">{humanCron(form.cronExpression)}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('governance.dashboardReports.format', 'Format')}
-                  </label>
-                  <select
-                    value={form.format}
-                    onChange={(e) => handleFormChange('format', e.target.value as ReportFormat)}
-                    className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
-                  >
-                    <option value="PDF">PDF</option>
-                    <option value="PNG">PNG</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('governance.dashboardReports.retention', 'Retention (days)')}
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={365}
-                    value={form.retentionDays}
-                    onChange={(e) =>
-                      handleFormChange('retentionDays', parseInt(e.target.value, 10) || 30)
-                    }
-                    className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('governance.dashboardReports.recipients', 'Recipients (comma-separated emails)')}
-                </label>
-                <input
-                  type="text"
-                  value={form.recipients}
-                  onChange={(e) => handleFormChange('recipients', e.target.value)}
-                  placeholder="team@example.com, cto@example.com"
-                  className="w-full rounded-sm border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:border-accent"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-end gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  setShowForm(false);
-                  setForm(DEFAULT_FORM);
-                }}
-              >
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button
-                size="sm"
-                disabled={!form.dashboardId.trim() || !form.cronExpression.trim()}
-                onClick={handleSave}
-              >
-                {t('common.save', 'Save Schedule')}
-              </Button>
-            </div>
+      <Modal
+        open={showForm}
+        onClose={() => {
+          setShowForm(false);
+          setForm(DEFAULT_FORM);
+        }}
+        title={t('governance.dashboardReports.newSchedule', 'New Schedule')}
+        size="md"
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setShowForm(false);
+                setForm(DEFAULT_FORM);
+              }}
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!form.dashboardId.trim() || !form.cronExpression.trim()}
+              onClick={handleSave}
+            >
+              {t('common.save', 'Save Schedule')}
+            </Button>
           </div>
+        }
+      >
+        <div className="space-y-4">
+          <TextField
+            label={t('governance.dashboardReports.dashboardId', 'Dashboard ID')}
+            type="text"
+            value={form.dashboardId}
+            onChange={(e) => handleFormChange('dashboardId', e.target.value)}
+            placeholder="db-engineer-home"
+          />
+
+          <div>
+            <TextField
+              label={t('governance.dashboardReports.cron', 'Cron Expression')}
+              type="text"
+              value={form.cronExpression}
+              onChange={(e) => handleFormChange('cronExpression', e.target.value)}
+              placeholder="0 8 * * 1"
+              className="font-mono"
+            />
+            <p className="mt-1 text-xs text-muted">{humanCron(form.cronExpression)}</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label={t('governance.dashboardReports.format', 'Format')}
+              value={form.format}
+              onChange={(e) => handleFormChange('format', e.target.value as ReportFormat)}
+              options={[
+                { value: 'PDF', label: 'PDF' },
+                { value: 'PNG', label: 'PNG' },
+              ]}
+            />
+            <TextField
+              label={t('governance.dashboardReports.retention', 'Retention (days)')}
+              type="number"
+              min={1}
+              max={365}
+              value={form.retentionDays}
+              onChange={(e) =>
+                handleFormChange('retentionDays', parseInt(e.target.value, 10) || 30)
+              }
+            />
+          </div>
+
+          <TextField
+            label={t('governance.dashboardReports.recipients', 'Recipients (comma-separated emails)')}
+            type="text"
+            value={form.recipients}
+            onChange={(e) => handleFormChange('recipients', e.target.value)}
+            placeholder="team@example.com, cto@example.com"
+          />
         </div>
-      )}
+      </Modal>
     </PageContainer>
   );
 }

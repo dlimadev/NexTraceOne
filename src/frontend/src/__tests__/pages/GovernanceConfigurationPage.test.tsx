@@ -266,7 +266,7 @@ describe('GovernanceConfigurationPage', () => {
     expect(screen.getByText('Evidence')).toBeInTheDocument();
     expect(screen.getByText('Waivers')).toBeInTheDocument();
     expect(screen.getByText('Packs & Bindings')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Scorecards/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Scorecards/ })).toBeInTheDocument();
     expect(screen.getByText('Minimum Requirements')).toBeInTheDocument();
   });
 
@@ -301,7 +301,7 @@ describe('GovernanceConfigurationPage', () => {
   it('switches to scorecards section when clicked', async () => {
     renderPage();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Scorecards/ }));
+    await user.click(screen.getByRole('tab', { name: /Scorecards/ }));
     expect(screen.getByText('Governance Scorecard Enabled')).toBeInTheDocument();
     expect(screen.getByText('Risk Matrix Definition')).toBeInTheDocument();
   });

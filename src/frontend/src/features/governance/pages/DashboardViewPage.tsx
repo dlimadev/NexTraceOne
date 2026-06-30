@@ -38,6 +38,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
+import { Select } from '../../../components/Select';
 import { Badge } from '../../../components/Badge';
 import { Skeleton } from '../../../components/Skeleton';
 import client from '../../../api/client';
@@ -520,18 +521,16 @@ function DashboardViewInner() {
             {data.name}
           </span>
           <div className="flex items-center gap-2">
-            <select
+            <Select
+              size="sm"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="text-xs rounded border border-gray-700 bg-canvas text-faded px-2 py-1 focus:outline-none"
               aria-label={t('governance.dashboardView.timeRangeLabel', 'Time range')}
-            >
-              {TIME_RANGE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {t(opt.labelKey, opt.value)}
-                </option>
-              ))}
-            </select>
+              options={TIME_RANGE_OPTIONS.map((opt) => ({
+                value: opt.value,
+                label: t(opt.labelKey, opt.value),
+              }))}
+            />
             <Button
               size="sm"
               variant="secondary"
@@ -635,18 +634,18 @@ function DashboardViewInner() {
             <TimeRangePicker value={timeRange} onChange={setTimeRange} />
 
             {/* Auto-refresh */}
-            <select
-              value={autoRefreshSeconds}
+            <Select
+              size="sm"
+              value={String(autoRefreshSeconds)}
               onChange={(e) => setAutoRefreshSeconds(Number(e.target.value))}
-              className="text-xs rounded border border-edge bg-card text-body px-2 py-1 focus:outline-none"
               aria-label={t('governance.dashboardView.autoRefreshLabel', 'Auto-refresh')}
-            >
-              {AUTO_REFRESH_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label === 'Off' ? t('governance.dashboardView.autoRefreshOff', 'Auto-refresh Off') : `${t('governance.dashboardView.autoRefreshEvery', 'Every')} ${opt.label}`}
-                </option>
-              ))}
-            </select>
+              options={AUTO_REFRESH_OPTIONS.map((opt) => ({
+                value: String(opt.value),
+                label: opt.label === 'Off'
+                  ? t('governance.dashboardView.autoRefreshOff', 'Auto-refresh Off')
+                  : `${t('governance.dashboardView.autoRefreshEvery', 'Every')} ${opt.label}`,
+              }))}
+            />
 
             {/* Refresh */}
             <Button

@@ -182,9 +182,9 @@ export function NotebookEditorPage() {
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <BookOpen className="h-5 w-5 text-indigo-500" />
+        <BookOpen className="h-5 w-5 text-accent" />
         <input
-          className="flex-1 text-lg font-semibold bg-transparent border-none outline-none text-heading placeholder-gray-400"
+          className="flex-1 text-lg font-semibold bg-transparent border-none outline-none text-heading placeholder:text-faded"
           placeholder={t('notebook.edit')}
           value={title}
           onChange={(e) => { setTitle(e.target.value); setDirty(true); }}

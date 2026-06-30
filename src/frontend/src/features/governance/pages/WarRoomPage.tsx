@@ -7,6 +7,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -271,8 +272,8 @@ export function WarRoomPage() {
                   <Plus size={14} />
                   {t('warRoom.addComment')}
                 </h3>
-                <textarea
-                  className="w-full rounded border border-edge bg-elevated text-sm p-2 resize-none focus:outline-none focus:ring-1 focus:ring-accent"
+                <TextArea
+                  textareaClassName="resize-none"
                   rows={4}
                   placeholder={t('warRoom.commentPlaceholder')}
                   value={newComment}

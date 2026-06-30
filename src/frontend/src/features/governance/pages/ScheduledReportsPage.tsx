@@ -3,10 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BarChart3, Download, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { ExportModal, type ExportFormat } from '../../../components/ExportModal';
+import { Modal } from '../../../components/Modal';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -184,26 +188,24 @@ export function ScheduledReportsPage() {
                 <CardBody>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <button
+                      <IconButton
+                        variant="ghost"
+                        className="hover:text-accent"
+                        icon={report.isEnabled
+                          ? <ToggleRight className="w-6 h-6 text-accent" />
+                          : <ToggleLeft className="w-6 h-6" />}
                         onClick={() =>
                           toggleReport.mutate({
                             reportId: report.reportId,
                             enabled: !report.isEnabled,
                           })
                         }
-                        className="text-faded hover:text-blue-600 transition-colors"
-                        aria-label={
+                        label={
                           report.isEnabled
                             ? t('scheduledReports.disabled')
                             : t('scheduledReports.enabled')
                         }
-                      >
-                        {report.isEnabled ? (
-                          <ToggleRight className="w-6 h-6 text-blue-600" />
-                        ) : (
-                          <ToggleLeft className="w-6 h-6" />
-                        )}
-                      </button>
+                      />
                       <div>
                         <p className="text-sm font-medium text-heading">
                           {report.name}
@@ -230,13 +232,14 @@ export function ScheduledReportsPage() {
                           ? t('scheduledReports.enabled')
                           : t('scheduledReports.disabled')}
                       </Badge>
-                      <button
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        className="ml-2 hover:text-critical"
+                        icon={<Trash2 className="w-4 h-4" />}
                         onClick={() => deleteReport.mutate(report.reportId)}
-                        className="text-faded hover:text-red-500 transition-colors ml-2"
-                        aria-label={t('common.delete')}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        label={t('common.delete')}
+                      />
                     </div>
                   </div>
                 </CardBody>
@@ -246,114 +249,85 @@ export function ScheduledReportsPage() {
         )}
       </PageSection>
 
-      {showBuilder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold text-heading mb-4">
-              {t('scheduledReports.create')}
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.name')}
-                </label>
-                <input
-                  type="text"
-                  value={reportName}
-                  onChange={(e) => setReportName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.type')}
-                </label>
-                <input
-                  type="text"
-                  value={reportType}
-                  onChange={(e) => setReportType(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder="compliance"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('scheduledReports.schedule')}
-                  </label>
-                  <select
-                    value={schedule}
-                    onChange={(e) => setSchedule(e.target.value as Schedule)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-body"
-                  >
-                    {SCHEDULES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('scheduledReports.format')}
-                  </label>
-                  <select
-                    value={format}
-                    onChange={(e) => setFormat(e.target.value as Format)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-card text-body"
-                  >
-                    {FORMATS.map((f) => (
-                      <option key={f} value={f}>
-                        {f.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('scheduledReports.recipients')} ({t('common.commaSeparated')})
-                </label>
-                <input
-                  type="text"
-                  value={recipients}
-                  onChange={(e) => setRecipients(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder="user@example.com, team@example.com"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setShowBuilder(false);
-                  setReportName('');
-                  setReportType('compliance');
-                  setSchedule('weekly');
-                  setFormat('pdf');
-                  setRecipients('');
-                }}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                size="sm"
-                disabled={!canCreate || createReport.isPending}
-                onClick={handleCreate}
-              >
-                {t('common.save')}
-              </Button>
-            </div>
+      <Modal
+        open={showBuilder}
+        onClose={() => {
+          setShowBuilder(false);
+          setReportName('');
+          setReportType('compliance');
+          setSchedule('weekly');
+          setFormat('pdf');
+          setRecipients('');
+        }}
+        title={t('scheduledReports.create')}
+        size="md"
+        footer={
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setShowBuilder(false);
+                setReportName('');
+                setReportType('compliance');
+                setSchedule('weekly');
+                setFormat('pdf');
+                setRecipients('');
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!canCreate || createReport.isPending}
+              loading={createReport.isPending}
+              onClick={handleCreate}
+            >
+              {t('common.save')}
+            </Button>
           </div>
+        }
+      >
+        <div className="space-y-4">
+          <TextField
+            label={t('common.name')}
+            type="text"
+            value={reportName}
+            onChange={(e) => setReportName(e.target.value)}
+          />
+
+          <TextField
+            label={t('common.type')}
+            type="text"
+            value={reportType}
+            onChange={(e) => setReportType(e.target.value)}
+            placeholder="compliance"
+          />
+
+          <div className="grid grid-cols-2 gap-2">
+            <Select
+              label={t('scheduledReports.schedule')}
+              value={schedule}
+              onChange={(e) => setSchedule(e.target.value as Schedule)}
+              options={SCHEDULES.map((s) => ({ value: s, label: s }))}
+            />
+            <Select
+              label={t('scheduledReports.format')}
+              value={format}
+              onChange={(e) => setFormat(e.target.value as Format)}
+              options={FORMATS.map((f) => ({ value: f, label: f.toUpperCase() }))}
+            />
+          </div>
+
+          <TextField
+            label={`${t('scheduledReports.recipients')} (${t('common.commaSeparated')})`}
+            type="text"
+            value={recipients}
+            onChange={(e) => setRecipients(e.target.value)}
+            placeholder="user@example.com, team@example.com"
+          />
         </div>
-      )}
+      </Modal>
 
       <ExportModal
         open={showExport}

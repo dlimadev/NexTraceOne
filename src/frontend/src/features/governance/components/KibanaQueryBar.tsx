@@ -95,7 +95,7 @@ export function KibanaQueryBar({ value, onChange, onSubmit, className = '' }: Ki
         <button
           type="button"
           onClick={() => onSubmit(value)}
-          className="rounded bg-accent px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-accent/90 transition-colors"
+          className="rounded bg-accent px-2.5 py-1 text-[10px] font-semibold text-on-accent hover:bg-accent/90 transition-colors"
         >
           {t('common.search', 'Search')}
         </button>

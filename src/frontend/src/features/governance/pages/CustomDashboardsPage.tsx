@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutGrid, Plus, Eye, Settings, Copy, Trash2,
-  Layout as LayoutIcon, Search, ArrowUpDown, Tag, Star,
+  Layout as LayoutIcon, ArrowUpDown, Tag, Star,
   Clock, Filter, X, Globe, Lock, Users,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -17,6 +17,9 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { SearchInput } from '../../../components/SearchInput';
+import { Modal } from '../../../components/Modal';
 import { DashboardTemplatePicker } from '../../../components/DashboardTemplatePicker';
 import type { TemplatePreview } from '../../../components/DashboardTemplatePicker';
 import client from '../../../api/client';
@@ -303,7 +306,7 @@ function DashboardCard({
               variant="secondary"
               onClick={onDelete}
               aria-label={t('governance.customDashboards.deleteDashboard', 'Delete')}
-              className="text-red-500 hover:text-red-700"
+              className="text-critical hover:text-critical"
             >
               <Trash2 size={12} />
             </Button>
@@ -462,60 +465,59 @@ export function CustomDashboardsPage() {
       />
 
       {/* Clone Dialog */}
-      {cloneTargetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card rounded-lg shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-heading mb-3">
-              {t('governance.customDashboards.cloneTitle', 'Clone Dashboard')}
-            </h2>
-            <input
-              type="text"
-              value={cloneName}
-              onChange={(e) => setCloneName(e.target.value)}
-              maxLength={100}
-              className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading mb-3"
-              autoFocus
-            />
-            {cloneError && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{cloneError}</p>}
-            <div className="flex gap-2 justify-end">
-              <Button variant="secondary" size="sm" onClick={() => setCloneTargetId(null)}>
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button size="sm" onClick={handleCloneConfirm} disabled={cloneMutation.isPending || !cloneName.trim()}>
-                {t('governance.customDashboards.cloneDashboard', 'Clone')}
-              </Button>
-            </div>
+      <Modal
+        open={!!cloneTargetId}
+        onClose={() => setCloneTargetId(null)}
+        title={t('governance.customDashboards.cloneTitle', 'Clone Dashboard')}
+        size="sm"
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="secondary" size="sm" onClick={() => setCloneTargetId(null)}>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button size="sm" onClick={handleCloneConfirm} disabled={cloneMutation.isPending || !cloneName.trim()}>
+              {t('governance.customDashboards.cloneDashboard', 'Clone')}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <TextField
+          type="text"
+          value={cloneName}
+          onChange={(e) => setCloneName(e.target.value)}
+          maxLength={100}
+          autoFocus
+          error={cloneError ?? undefined}
+        />
+      </Modal>
 
       {/* Delete Confirm */}
-      {deleteTargetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card rounded-lg shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-heading mb-2">
-              {t('governance.customDashboards.confirmDeleteTitle', 'Delete Dashboard')}
-            </h2>
-            <p className="text-sm text-muted mb-4">
-              {t('governance.customDashboards.confirmDelete', 'This action cannot be undone. Are you sure?')}
-            </p>
-            {deleteError && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>}
-            <div className="flex gap-2 justify-end">
-              <Button variant="secondary" size="sm" onClick={() => setDeleteTargetId(null)}>
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleDeleteConfirm}
-                disabled={deleteMutation.isPending}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {t('governance.customDashboards.deleteDashboard', 'Delete')}
-              </Button>
-            </div>
+      <Modal
+        open={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        title={t('governance.customDashboards.confirmDeleteTitle', 'Delete Dashboard')}
+        size="sm"
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="secondary" size="sm" onClick={() => setDeleteTargetId(null)}>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending}
+            >
+              {t('governance.customDashboards.deleteDashboard', 'Delete')}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p className="text-sm text-muted">
+          {t('governance.customDashboards.confirmDelete', 'This action cannot be undone. Are you sure?')}
+        </p>
+        {deleteError && <p className="text-sm text-critical mt-2">{deleteError}</p>}
+      </Modal>
 
       {/* Create Dashboard CTA */}
       <PageSection title={t('governance.customDashboards.createDashboard', 'Create Dashboard')}>
@@ -550,14 +552,12 @@ export function CustomDashboardsPage() {
         <div className="mb-4 flex flex-col gap-3">
           {/* Search */}
           <div className="flex gap-2 flex-wrap items-center">
-            <div className="relative flex-1 min-w-48">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded" />
-              <input
-                type="search"
+            <div className="flex-1 min-w-48">
+              <SearchInput
+                size="sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('governance.customDashboards.searchPlaceholder', 'Search by name…')}
-                className="w-full rounded border border-edge bg-card text-sm pl-8 pr-3 py-2 text-heading"
               />
             </div>
 
@@ -594,7 +594,7 @@ export function CustomDashboardsPage() {
             </span>
             <button
               onClick={() => setPersonaFilter('')}
-              className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${!personaFilter ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
+              className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${!personaFilter ? 'bg-accent text-on-accent' : 'bg-elevated text-muted hover:bg-accent/20'}`}
             >
               {t('governance.customDashboards.allPersonas', 'All')}
             </button>
@@ -602,7 +602,7 @@ export function CustomDashboardsPage() {
               <button
                 key={p}
                 onClick={() => setPersonaFilter(personaFilter === p ? '' : p)}
-                className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${personaFilter === p ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
+                className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${personaFilter === p ? 'bg-accent text-on-accent' : 'bg-elevated text-muted hover:bg-accent/20'}`}
               >
                 {p}
               </button>
@@ -620,7 +620,7 @@ export function CustomDashboardsPage() {
                 <button
                   key={tag}
                   onClick={() => setTagFilter(tagFilter === tag ? '' : tag)}
-                  className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${tagFilter === tag ? 'bg-accent text-white' : 'bg-elevated text-muted hover:bg-accent/20'}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${tagFilter === tag ? 'bg-accent text-on-accent' : 'bg-elevated text-muted hover:bg-accent/20'}`}
                 >
                   #{tag}
                 </button>

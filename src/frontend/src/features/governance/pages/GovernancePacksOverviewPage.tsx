@@ -8,6 +8,7 @@ import {
   Activity, Settings, CheckCircle2, Archive,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
@@ -132,16 +133,7 @@ export function GovernancePacksOverviewPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t('governancePacks.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-input border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </div>
+        <SearchInput size="sm" className="flex-1 max-w-xs" value={search} onChange={e => setSearch(e.target.value)} placeholder={t('governancePacks.searchPlaceholder')} />
         {(['all', 'Draft', 'Published', 'Deprecated', 'Archived'] as StatusFilter[]).map(f => (
           <button
             key={f}

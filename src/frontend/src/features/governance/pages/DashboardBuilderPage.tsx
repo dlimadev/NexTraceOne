@@ -597,8 +597,8 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                     onClick={() => onUpdate({ chartType: ct })}
                     className={`flex-1 rounded border text-xs py-1 capitalize transition-colors ${
                       (slot.chartType || 'area') === ct
-                        ? 'border-blue-500 bg-blue-600 text-white'
-                        : 'border-edge bg-card text-body hover:border-blue-400'
+                        ? 'border-accent bg-accent text-on-accent'
+                        : 'border-edge bg-card text-body hover:border-accent'
                     }`}
                   >
                     {ct}
@@ -662,7 +662,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                 <button
                   type="button"
                   onClick={() => updateThresholds([...thresholds, { value: 0, color: CHART_SEMANTIC.critical, label: '' }])}
-                  className="text-xs text-blue-500 hover:text-blue-400"
+                  className="text-xs text-accent hover:text-accent/80"
                 >
                   + Add
                 </button>
@@ -698,7 +698,7 @@ function ConfigDrawer({ slot, onUpdate, onClose }: ConfigDrawerProps) {
                   <button
                     type="button"
                     onClick={() => updateThresholds(thresholds.filter((_, j) => j !== i))}
-                    className="text-faded hover:text-red-400 text-xs ml-auto"
+                    className="text-faded hover:text-critical text-xs ml-auto"
                   >
                     ✕
                   </button>
@@ -1504,7 +1504,7 @@ export function DashboardBuilderPage() {
         </div>
 
         {isReadOnly && (
-          <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-0.5 rounded shrink-0">
+          <span className="text-xs text-warning bg-warning/10 px-2 py-0.5 rounded shrink-0">
             {t('governance.dashboardBuilder.systemReadOnly', 'Read-only')}
           </span>
         )}
@@ -1565,14 +1565,14 @@ export function DashboardBuilderPage() {
       {/* ── Error banners ──────────────────────────────────────────────────── */}
       {(saveError || importError) && (
         <div
-          className="shrink-0 px-4 py-2 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300 flex items-center justify-between"
+          className="shrink-0 px-4 py-2 bg-critical/10 border-b border-critical/30 text-sm text-critical flex items-center justify-between"
           role="alert"
         >
           <span>{saveError ?? importError}</span>
           <button
             type="button"
             onClick={() => { setSaveError(null); setImportError(null); }}
-            className="ml-3 text-red-400 hover:text-red-600"
+            className="ml-3 text-critical hover:text-critical"
           >
             <X size={14} />
           </button>
@@ -1627,7 +1627,7 @@ export function DashboardBuilderPage() {
                   onClick={() => setPaletteCategory(cat.value)}
                   className={`rounded-full px-2 py-0.5 text-[9px] font-semibold transition-colors ${
                     paletteCategory === cat.value
-                      ? 'bg-accent text-white'
+                      ? 'bg-accent text-on-accent'
                       : 'bg-elevated text-muted hover:bg-accent/20'
                   }`}
                 >
