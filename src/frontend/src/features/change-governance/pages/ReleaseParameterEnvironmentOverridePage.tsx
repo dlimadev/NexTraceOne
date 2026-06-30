@@ -5,6 +5,9 @@ import { Layers, Plus, Pencil, Trash2, CheckCircle2, AlertTriangle } from 'lucid
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -148,59 +151,36 @@ export function ReleaseParameterEnvironmentOverridePage() {
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('releaseParameterOverride.colParameter')}
-                </label>
-                <input
-                  type="text"
-                  value={form.paramKey}
-                  onChange={e => setForm(prev => ({ ...prev, paramKey: e.target.value }))}
-                  placeholder="change.release…"
-                  disabled={form.editing}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm font-mono text-heading focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-60"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('releaseParameterOverride.environmentLabel')}
-                </label>
-                <select
-                  value={form.environment}
-                  onChange={e => setForm(prev => ({ ...prev, environment: e.target.value as Environment }))}
-                  disabled={form.editing}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-60"
-                >
-                  {ENVIRONMENTS.map(env => (
-                    <option key={env} value={env}>
-                      {env}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('releaseParameterOverride.valueLabel')}
-                </label>
-                <input
-                  type="text"
-                  value={form.value}
-                  onChange={e => setForm(prev => ({ ...prev, value: e.target.value }))}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('releaseParameterOverride.reasonLabel')}
-                </label>
-                <input
-                  type="text"
-                  value={form.reason}
-                  onChange={e => setForm(prev => ({ ...prev, reason: e.target.value }))}
-                  placeholder={t('releaseParameterOverride.reasonPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
-                />
-              </div>
+              <TextField
+                size="sm"
+                className="font-mono"
+                label={t('releaseParameterOverride.colParameter')}
+                value={form.paramKey}
+                onChange={e => setForm(prev => ({ ...prev, paramKey: e.target.value }))}
+                placeholder="change.release…"
+                disabled={form.editing}
+              />
+              <Select
+                size="sm"
+                label={t('releaseParameterOverride.environmentLabel')}
+                value={form.environment}
+                onChange={e => setForm(prev => ({ ...prev, environment: e.target.value as Environment }))}
+                disabled={form.editing}
+                options={ENVIRONMENTS.map(env => ({ value: env, label: env }))}
+              />
+              <TextField
+                size="sm"
+                label={t('releaseParameterOverride.valueLabel')}
+                value={form.value}
+                onChange={e => setForm(prev => ({ ...prev, value: e.target.value }))}
+              />
+              <TextField
+                size="sm"
+                label={t('releaseParameterOverride.reasonLabel')}
+                value={form.reason}
+                onChange={e => setForm(prev => ({ ...prev, reason: e.target.value }))}
+                placeholder={t('releaseParameterOverride.reasonPlaceholder')}
+              />
             </div>
             <div className="flex gap-2 mt-4">
               <Button
@@ -271,25 +251,28 @@ export function ReleaseParameterEnvironmentOverridePage() {
                       <td className="px-4 py-3 text-muted text-xs">{entry.updatedBy ?? '—'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <IconButton
+                            variant="ghost"
+                            size="sm"
                             onClick={() => openEdit(entry)}
-                            className="rounded p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
                             title={t('releaseParameterOverride.editOverride')}
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
+                            label={t('releaseParameterOverride.editOverride')}
+                            icon={<Pencil className="w-3.5 h-3.5" />}
+                          />
+                          <IconButton
+                            variant="ghost"
+                            size="sm"
+                            className="hover:text-critical"
                             onClick={() =>
                               removeMutation.mutate({
                                 key: entry.definitionKey,
                                 env: entry.scopeReferenceId ?? '',
                               })
                             }
-                            className="rounded p-1.5 text-muted hover:text-danger hover:bg-danger/10 transition-colors"
                             title={t('releaseParameterOverride.removeOverride')}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                            label={t('releaseParameterOverride.removeOverride')}
+                            icon={<Trash2 className="w-3.5 h-3.5" />}
+                          />
                         </div>
                       </td>
                     </tr>
