@@ -107,7 +107,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
   }, [draftSlot, onApply]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-canvas text-heading">
+    <div className="fixed inset-0 z-50 flex flex-col bg-canvas text-heading">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="flex items-center gap-3 px-4 py-2 border-b border-edge bg-card shrink-0">
@@ -145,7 +145,7 @@ export function PanelEditorOverlay({ slot, variables, onApply, onClose }: PanelE
           <button
             type="button"
             onClick={handleApply}
-            className="px-3 py-1.5 text-sm rounded bg-accent text-white hover:bg-accent/90 transition-colors font-semibold"
+            className="px-3 py-1.5 text-sm rounded bg-accent text-on-accent hover:bg-accent/90 transition-colors font-semibold"
           >
             {t('governance.dashboardBuilder.panelEditor.apply')}
           </button>

@@ -134,7 +134,7 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
                 className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-muted hover:bg-hover dark:hover:bg-elevated rounded"
               >
                 <span className={`w-3.5 h-3.5 rounded border ${selected.length === 0 ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center`}>
-                  {selected.length === 0 && <Check size={10} className="text-white" />}
+                  {selected.length === 0 && <Check size={10} className="text-on-accent" />}
                 </span>
                 {t('governance.dashboardView.varAll', 'All')}
               </button>
@@ -148,11 +148,11 @@ function VariableDropdown({ variable, selected, onChange }: VariableDropdownProp
               >
                 {variable.allowMultiple ? (
                   <span className={`w-3.5 h-3.5 rounded border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center shrink-0`}>
-                    {selected.includes(val) && <Check size={10} className="text-white" />}
+                    {selected.includes(val) && <Check size={10} className="text-on-accent" />}
                   </span>
                 ) : (
                   <span className={`w-3.5 h-3.5 rounded-full border ${selected.includes(val) ? 'bg-accent border-accent' : 'border-edge'} flex items-center justify-center shrink-0`}>
-                    {selected.includes(val) && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    {selected.includes(val) && <span className="w-1.5 h-1.5 rounded-full bg-on-accent" />}
                   </span>
                 )}
                 <span className="truncate">{val}</span>

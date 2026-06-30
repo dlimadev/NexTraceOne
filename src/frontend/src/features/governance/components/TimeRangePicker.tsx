@@ -321,7 +321,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                           onClick={() => handleQuickSelect(range.value)}
                           className={`flex items-center justify-between gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
                             isSelected
-                              ? 'bg-accent text-white'
+                              ? 'bg-accent text-on-accent'
                               : 'bg-elevated text-body hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
                           }`}
                         >
@@ -348,7 +348,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                           onClick={() => handleQuickSelect(range.value)}
                           className={`flex items-center justify-center gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${
                             isSelected
-                              ? 'bg-accent text-white'
+                              ? 'bg-accent text-on-accent'
                               : 'bg-elevated text-body hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20'
                           }`}
                         >
@@ -388,7 +388,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                   type="button"
                   onClick={handleAbsoluteApply}
                   disabled={!absFrom || !absTo}
-                  className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('timeRangePicker.apply', 'Apply')}
                 </button>
@@ -416,7 +416,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                       key={ex}
                       type="button"
                       onClick={() => { setCustomExpr(ex); }}
-                      className="block text-[10px] text-blue-500 hover:text-blue-400 font-mono"
+                      className="block text-[10px] text-accent hover:text-accent/80 font-mono"
                     >
                       {ex}
                     </button>
@@ -426,7 +426,7 @@ export function TimeRangePicker({ value, onChange, className = '' }: TimeRangePi
                   type="button"
                   onClick={handleCustomApply}
                   disabled={!customExpr.trim()}
-                  className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-full rounded bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {t('timeRangePicker.apply', 'Apply')}
                 </button>

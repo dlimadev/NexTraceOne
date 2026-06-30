@@ -185,7 +185,7 @@ export function PanelVisualizationPicker({
           <span
             className={`text-xs px-1.5 py-0.5 rounded border ${
               thresholdCount > 0
-                ? 'border-green-500 bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
+                ? 'border-success/50 bg-success/10 text-success'
                 : 'border-edge text-faded'
             }`}
           >

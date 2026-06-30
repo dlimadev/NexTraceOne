@@ -122,7 +122,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 onClick={() => updateRow(row.queryId, { mode: 'visual' })}
                 className={`px-2.5 py-1 font-semibold transition-colors ${
                   row.mode === 'visual'
-                    ? 'bg-accent text-white'
+                    ? 'bg-accent text-on-accent'
                     : 'bg-card text-muted hover:bg-hover dark:hover:bg-elevated'
                 }`}
               >
@@ -133,7 +133,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                 onClick={() => switchToNql(row.queryId)}
                 className={`px-2.5 py-1 font-mono font-semibold transition-colors ${
                   row.mode === 'nql'
-                    ? 'bg-accent text-white'
+                    ? 'bg-accent text-on-accent'
                     : 'bg-card text-muted hover:bg-hover dark:hover:bg-elevated'
                 }`}
               >
@@ -174,7 +174,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                   <button
                     type="button"
                     onClick={() => { removeRow(row.queryId); setOpenMenuId(null); }}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 disabled:opacity-40"
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-critical hover:bg-critical/10 disabled:opacity-40"
                     disabled={rows.length === 1}
                   >
                     <Trash2 size={11} />
@@ -236,7 +236,7 @@ export function VisualQueryBuilder({ rows, variables, onRowsChange }: VisualQuer
                         onClick={() => updateRow(row.queryId, {
                           filters: row.filters.filter((_, j) => j !== i),
                         })}
-                        className="ml-0.5 hover:text-red-400"
+                        className="ml-0.5 hover:text-critical"
                         aria-label="Remove filter"
                       >
                         ×
