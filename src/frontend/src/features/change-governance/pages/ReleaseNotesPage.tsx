@@ -13,6 +13,7 @@ import {
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -156,21 +157,13 @@ export function ReleaseNotesPage() {
                     <label className="block text-xs text-muted mb-1">
                       {t('releaseNotes.personaMode', 'Persona Mode')}
                     </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {PERSONA_MODES.map((mode) => (
-                        <button
-                          key={mode}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                            personaMode === mode
-                              ? 'bg-accent text-white border-accent'
-                              : 'border-edge text-muted hover:text-heading hover:border-accent'
-                          }`}
-                          onClick={() => setPersonaMode(mode)}
-                        >
-                          {mode}
-                        </button>
-                      ))}
-                    </div>
+                    <Tabs
+                      variant="pill"
+                      size="sm"
+                      items={PERSONA_MODES.map((mode) => ({ id: mode, label: mode }))}
+                      activeId={personaMode}
+                      onChange={(id) => setPersonaMode(id as typeof personaMode)}
+                    />
                   </div>
                 </div>
               </div>
