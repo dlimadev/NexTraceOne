@@ -4,15 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { FileBarChart2, AlertCircle, Users, GitCommit, Tag } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 function riskVariant(score: number | null | undefined): 'success' | 'warning' | 'danger' | 'default' {
   if (score == null) return 'default';
@@ -54,24 +53,22 @@ export function ReleaseImpactReportPage() {
         <CardBody>
           <div className="flex gap-3 items-end">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('impactReport.releaseIdLabel')}
-              </label>
-              <input
-                type="text"
+              <TextField
+                size="sm"
+                label={t('impactReport.releaseIdLabel')}
                 value={releaseId}
                 onChange={(e) => setReleaseId(e.target.value)}
                 placeholder={t('impactReport.releaseIdPlaceholder')}
-                className={INPUT_CLS}
               />
             </div>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setSubmittedId(releaseId)}
               disabled={!releaseId}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
             >
               {t('impactReport.generateBtn')}
-            </button>
+            </Button>
           </div>
         </CardBody>
       </Card>
