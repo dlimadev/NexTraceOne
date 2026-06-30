@@ -155,15 +155,7 @@ export function PluginMarketplacePage() {
       <PageSection>
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-6">
-          <div className="relative">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              className="pl-8 pr-3 py-1.5 text-sm rounded border border-edge bg-elevated focus:outline-none focus:ring-1 focus:ring-accent"
-              placeholder={t('pluginMarketplace.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <SearchInput size="sm" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('pluginMarketplace.searchPlaceholder')} />
 
           <div className="flex items-center gap-1 flex-wrap">
             <Filter size={12} className="text-muted" />
