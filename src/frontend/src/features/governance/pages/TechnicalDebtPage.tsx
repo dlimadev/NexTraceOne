@@ -11,6 +11,9 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -169,7 +172,7 @@ export function TechnicalDebtPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card>
               <CardBody className="text-center py-4">
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+                <p className="text-3xl font-bold text-critical">
                   {data.totalDebtScore}
                 </p>
                 <p className="text-sm text-muted mt-1">
@@ -299,108 +302,74 @@ export function TechnicalDebtPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Service Name + Debt Type */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('governance.technicalDebt.serviceName')}
-                  </label>
-                  <input
-                    type="text"
-                    value={serviceName}
-                    onChange={(e) => setServiceName(e.target.value)}
-                    required
-                    maxLength={200}
-                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('governance.technicalDebt.debtType')}
-                  </label>
-                  <select
-                    value={debtType}
-                    onChange={(e) => setDebtType(e.target.value)}
-                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                  >
-                    {DEBT_TYPES.map((dt) => (
-                      <option key={dt} value={dt}>
-                        {t(`governance.technicalDebt.${dt.replace('-', '')}`, {
-                          defaultValue: dt,
-                        })}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <TextField
+                  label={t('governance.technicalDebt.serviceName')}
+                  type="text"
+                  value={serviceName}
+                  onChange={(e) => setServiceName(e.target.value)}
+                  required
+                  maxLength={200}
+                />
+                <Select
+                  label={t('governance.technicalDebt.debtType')}
+                  value={debtType}
+                  onChange={(e) => setDebtType(e.target.value)}
+                  options={DEBT_TYPES.map((dt) => ({
+                    value: dt,
+                    label: t(`governance.technicalDebt.${dt.replace('-', '')}`, {
+                      defaultValue: dt,
+                    }),
+                  }))}
+                />
               </div>
 
               {/* Title */}
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('governance.technicalDebt.debtTitle')}
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  maxLength={200}
-                  className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                />
-              </div>
+              <TextField
+                label={t('governance.technicalDebt.debtTitle')}
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                maxLength={200}
+              />
 
               {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('governance.technicalDebt.debtDescription')}
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                  maxLength={1000}
-                  rows={3}
-                  className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                />
-              </div>
+              <TextArea
+                label={t('governance.technicalDebt.debtDescription')}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                maxLength={1000}
+                rows={3}
+              />
 
               {/* Severity + Effort Days */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('governance.technicalDebt.severity')}
-                  </label>
-                  <select
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                  >
-                    {SEVERITIES.map((s) => (
-                      <option key={s} value={s}>
-                        {t(`governance.technicalDebt.${s}`)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('governance.technicalDebt.effortDays')}
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={999}
-                    value={effortDays}
-                    onChange={(e) => setEffortDays(Number(e.target.value))}
-                    required
-                    className="w-full rounded border border-edge bg-card text-sm px-3 py-2 text-heading"
-                  />
-                </div>
+                <Select
+                  label={t('governance.technicalDebt.severity')}
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value)}
+                  options={SEVERITIES.map((s) => ({
+                    value: s,
+                    label: t(`governance.technicalDebt.${s}`),
+                  }))}
+                />
+                <TextField
+                  label={t('governance.technicalDebt.effortDays')}
+                  type="number"
+                  min={1}
+                  max={999}
+                  value={effortDays}
+                  onChange={(e) => setEffortDays(Number(e.target.value))}
+                  required
+                />
               </div>
 
               {formError && (
-                <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>
+                <p className="text-sm text-critical">{formError}</p>
               )}
               {formSuccess && (
-                <p className="text-sm text-green-600 dark:text-green-400">
+                <p className="text-sm text-success">
                   {t('governance.technicalDebt.createSuccess')}
                 </p>
               )}
