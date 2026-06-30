@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Package, Star, Download, Search, Filter, ExternalLink, ShieldCheck, AlertCircle } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { SearchInput } from '../../../components/SearchInput';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';

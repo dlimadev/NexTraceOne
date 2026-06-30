@@ -5,6 +5,7 @@ import {
   FileCheck, Search, Clock, CheckCircle2, XCircle, Shield,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';

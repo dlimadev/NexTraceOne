@@ -6,6 +6,7 @@ import {
   Shield, CheckCircle2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
