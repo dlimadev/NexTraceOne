@@ -4,15 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { ShieldAlert, Plus, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 const APPROVAL_TYPES = ['Manual', 'ExternalWebhook', 'ExternalServiceNow', 'AutoApprove'];
 
@@ -117,13 +119,10 @@ export function ReleaseApprovalPoliciesPage() {
         title={t('approvalPolicies.title')}
         subtitle={t('approvalPolicies.subtitle')}
         actions={
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
+          <Button variant="primary" size="sm" onClick={() => setShowForm(!showForm)}>
+            <Plus className="w-4 h-4 mr-2" />
             {t('approvalPolicies.newPolicy')}
-          </button>
+          </Button>
         }
       />
 
@@ -134,54 +133,40 @@ export function ReleaseApprovalPoliciesPage() {
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.nameLabel')}</label>
-                <input
-                  className={INPUT_CLS}
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder={t('approvalPolicies.namePlaceholder')}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.approvalTypeLabel')}</label>
-                <select
-                  className={INPUT_CLS}
-                  value={form.approvalType}
-                  onChange={e => setForm(f => ({ ...f, approvalType: e.target.value }))}
-                >
-                  {APPROVAL_TYPES.map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.environmentLabel')}</label>
-                <input
-                  className={INPUT_CLS}
-                  value={form.environmentId}
-                  onChange={e => setForm(f => ({ ...f, environmentId: e.target.value }))}
-                  placeholder={t('approvalPolicies.environmentPlaceholder')}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.serviceTagLabel')}</label>
-                <input
-                  className={INPUT_CLS}
-                  value={form.serviceTag}
-                  onChange={e => setForm(f => ({ ...f, serviceTag: e.target.value }))}
-                  placeholder={t('approvalPolicies.serviceTagPlaceholder')}
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('approvalPolicies.nameLabel')}
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder={t('approvalPolicies.namePlaceholder')}
+              />
+              <Select
+                size="sm"
+                label={t('approvalPolicies.approvalTypeLabel')}
+                value={form.approvalType}
+                onChange={e => setForm(f => ({ ...f, approvalType: e.target.value }))}
+                options={APPROVAL_TYPES.map(ty => ({ value: ty, label: ty }))}
+              />
+              <TextField
+                size="sm"
+                label={t('approvalPolicies.environmentLabel')}
+                value={form.environmentId}
+                onChange={e => setForm(f => ({ ...f, environmentId: e.target.value }))}
+                placeholder={t('approvalPolicies.environmentPlaceholder')}
+              />
+              <TextField
+                size="sm"
+                label={t('approvalPolicies.serviceTagLabel')}
+                value={form.serviceTag}
+                onChange={e => setForm(f => ({ ...f, serviceTag: e.target.value }))}
+                placeholder={t('approvalPolicies.serviceTagPlaceholder')}
+              />
 
               {form.approvalType === 'ExternalWebhook' && (
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.webhookUrlLabel')}</label>
-                  <input
-                    className={INPUT_CLS}
+                  <TextField
+                    size="sm"
+                    label={t('approvalPolicies.webhookUrlLabel')}
                     value={form.externalWebhookUrl}
                     onChange={e => setForm(f => ({ ...f, externalWebhookUrl: e.target.value }))}
                     placeholder="https://external-system.example.com/approval-request"
@@ -189,91 +174,71 @@ export function ReleaseApprovalPoliciesPage() {
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.minApproversLabel')}</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={20}
-                  className={INPUT_CLS}
-                  value={form.minApprovers}
-                  onChange={e => setForm(f => ({ ...f, minApprovers: Number(e.target.value) }))}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.expirationHoursLabel')}</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={168}
-                  className={INPUT_CLS}
-                  value={form.expirationHours}
-                  onChange={e => setForm(f => ({ ...f, expirationHours: Number(e.target.value) }))}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.minRiskScoreLabel')}</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={100}
-                  className={INPUT_CLS}
-                  value={form.minRiskScoreForManualApproval}
-                  onChange={e => setForm(f => ({ ...f, minRiskScoreForManualApproval: e.target.value }))}
-                  placeholder={t('approvalPolicies.minRiskScorePlaceholder')}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">{t('approvalPolicies.priorityLabel')}</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
-                  className={INPUT_CLS}
-                  value={form.priority}
-                  onChange={e => setForm(f => ({ ...f, priority: Number(e.target.value) }))}
-                />
-              </div>
+              <TextField
+                size="sm"
+                type="number"
+                label={t('approvalPolicies.minApproversLabel')}
+                min={1}
+                max={20}
+                value={form.minApprovers}
+                onChange={e => setForm(f => ({ ...f, minApprovers: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('approvalPolicies.expirationHoursLabel')}
+                min={1}
+                max={168}
+                value={form.expirationHours}
+                onChange={e => setForm(f => ({ ...f, expirationHours: Number(e.target.value) }))}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('approvalPolicies.minRiskScoreLabel')}
+                min={1}
+                max={100}
+                value={form.minRiskScoreForManualApproval}
+                onChange={e => setForm(f => ({ ...f, minRiskScoreForManualApproval: e.target.value }))}
+                placeholder={t('approvalPolicies.minRiskScorePlaceholder')}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('approvalPolicies.priorityLabel')}
+                min={1}
+                max={999}
+                value={form.priority}
+                onChange={e => setForm(f => ({ ...f, priority: Number(e.target.value) }))}
+              />
 
               <div className="flex items-center gap-4 sm:col-span-2">
-                <label className="flex items-center gap-2 text-sm text-heading cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.requireEvidencePack}
-                    onChange={e => setForm(f => ({ ...f, requireEvidencePack: e.target.checked }))}
-                    className="rounded border-edge"
-                  />
-                  {t('approvalPolicies.requireEvidencePack')}
-                </label>
-                <label className="flex items-center gap-2 text-sm text-heading cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.requireChecklistCompletion}
-                    onChange={e => setForm(f => ({ ...f, requireChecklistCompletion: e.target.checked }))}
-                    className="rounded border-edge"
-                  />
-                  {t('approvalPolicies.requireChecklist')}
-                </label>
+                <Checkbox
+                  checked={form.requireEvidencePack}
+                  onChange={e => setForm(f => ({ ...f, requireEvidencePack: e.target.checked }))}
+                  label={t('approvalPolicies.requireEvidencePack')}
+                />
+                <Checkbox
+                  checked={form.requireChecklistCompletion}
+                  onChange={e => setForm(f => ({ ...f, requireChecklistCompletion: e.target.checked }))}
+                  label={t('approvalPolicies.requireChecklist')}
+                />
               </div>
             </div>
 
             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-edge">
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => createMutation.mutate()}
                 disabled={!form.name || createMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50 transition-colors"
+                loading={createMutation.isPending}
               >
                 {t('approvalPolicies.savePolicy')}
-              </button>
-              <button
-                onClick={() => setShowForm(false)}
-                className="text-sm text-muted hover:text-heading transition-colors"
-              >
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>
                 {t('common.cancel')}
-              </button>
+              </Button>
             </div>
           </CardBody>
         </Card>
@@ -317,15 +282,16 @@ export function ReleaseApprovalPoliciesPage() {
                       )}
                     </div>
                   </div>
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    className="ml-4 hover:text-critical"
                     onClick={() => deleteMutation.mutate(policy.id)}
                     disabled={deleteMutation.isPending}
-                    className="ml-4 text-muted hover:text-danger transition-colors"
-                    aria-label={t('approvalPolicies.deletePolicy')}
+                    label={t('approvalPolicies.deletePolicy')}
                     title={t('approvalPolicies.deletePolicy')}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    icon={<Trash2 className="w-4 h-4" />}
+                  />
                 </div>
               ))}
             </div>

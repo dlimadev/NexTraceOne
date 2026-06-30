@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -558,11 +560,11 @@ export function ChangeDetailPage() {
                   <label className="text-xs text-muted block mb-1">
                     {t('changeConfidence.detail.decisionRationale')} *
                   </label>
-                  <textarea
+                  <TextArea
                     value={decisionRationale}
                     onChange={(e) => setDecisionRationale(e.target.value)}
                     placeholder={t('changeConfidence.detail.decisionRationalePlaceholder')}
-                    className="w-full px-3 py-2 rounded-md bg-input border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[80px]"
+                    textareaClassName="min-h-[80px]"
                     rows={3}
                   />
                 </div>
@@ -572,34 +574,37 @@ export function ChangeDetailPage() {
                     <label className="text-xs text-muted block mb-1">
                       {t('changeConfidence.detail.decisionConditions')}
                     </label>
-                    <textarea
+                    <TextArea
                       value={decisionConditions}
                       onChange={(e) => setDecisionConditions(e.target.value)}
                       placeholder={t('changeConfidence.detail.decisionConditionsPlaceholder')}
-                      className="w-full px-3 py-2 rounded-md bg-input border border-edge text-sm text-heading placeholder:text-muted outline-none focus:border-accent transition-colors resize-y min-h-[60px]"
+                      textareaClassName="min-h-[60px]"
                       rows={2}
                     />
                   </div>
                 )}
 
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => decisionMutation.mutate()}
                     disabled={!decisionRationale.trim() || decisionMutation.isPending}
-                    className="px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/80 disabled:opacity-40 transition-colors"
+                    loading={decisionMutation.isPending}
                   >
-                    {decisionMutation.isPending ? t('common.loading') : t('changeConfidence.detail.submitDecision')}
-                  </button>
-                  <button
+                    {t('changeConfidence.detail.submitDecision')}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => {
                       setSelectedDecision('');
                       setDecisionRationale('');
                       setDecisionConditions('');
                     }}
-                    className="px-4 py-2 rounded-md bg-elevated border border-edge text-sm text-body hover:text-heading transition-colors"
                   >
                     {t('common.cancel')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Select } from '../../../components/Select';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -79,39 +81,35 @@ export function ReleaseGatesDashboardPage() {
       {/* Environment pair selector */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <span className="text-sm text-muted">{t('releaseGatesDashboard.environment', 'Environment path:')}</span>
-        <div className="flex gap-2">
-          {ENV_PAIRS.map((pair) => (
-            <button
-              key={`${pair.from}-${pair.to}`}
-              type="button"
-              onClick={() => setSelectedPair(pair)}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                selectedPair.from === pair.from && selectedPair.to === pair.to
-                  ? 'bg-accent text-white'
-                  : 'bg-canvas border border-edge text-heading hover:bg-hover'
-              }`}
-            >
-              <span>{pair.from}</span>
-              <ArrowRight size={12} />
-              <span>{pair.to}</span>
-            </button>
-          ))}
-        </div>
+        <Tabs
+          variant="pill"
+          size="sm"
+          items={ENV_PAIRS.map((pair) => ({
+            id: `${pair.from}-${pair.to}`,
+            label: `${pair.from} → ${pair.to}`,
+          }))}
+          activeId={`${selectedPair.from}-${selectedPair.to}`}
+          onChange={(id) => {
+            const pair = ENV_PAIRS.find((p) => `${p.from}-${p.to}` === id);
+            if (pair) setSelectedPair(pair);
+          }}
+        />
 
         {/* Filter */}
         <div className="ml-auto flex items-center gap-2">
           <Filter size={14} className="text-muted" />
-          <select
-            className="rounded-md bg-canvas border border-edge px-2 py-1.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
+          <Select
+            size="sm"
             value={filterActive === null ? 'all' : filterActive ? 'active' : 'inactive'}
             onChange={(e) =>
               setFilterActive(e.target.value === 'all' ? null : e.target.value === 'active')
             }
-          >
-            <option value="all">{t('releaseGatesDashboard.filterAll', 'All gates')}</option>
-            <option value="active">{t('releaseGatesDashboard.filterActive', 'Active only')}</option>
-            <option value="inactive">{t('releaseGatesDashboard.filterInactive', 'Inactive only')}</option>
-          </select>
+            options={[
+              { value: 'all', label: t('releaseGatesDashboard.filterAll', 'All gates') },
+              { value: 'active', label: t('releaseGatesDashboard.filterActive', 'Active only') },
+              { value: 'inactive', label: t('releaseGatesDashboard.filterInactive', 'Inactive only') },
+            ]}
+          />
         </div>
       </div>
 

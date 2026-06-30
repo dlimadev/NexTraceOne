@@ -19,6 +19,8 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { EmptyState } from '../../../components/EmptyState';
@@ -28,9 +30,6 @@ import type {
   TrainReleaseItem,
   PromotionReadinessDeltaResponse,
 } from '../api/changeIntelligence';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 function readinessBadge(
   readiness: string,
@@ -155,52 +154,36 @@ function PromotionReadinessDeltaSection() {
       <CardBody>
         {/* Form */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('promotionReadinessDelta.serviceLabel')}
-            </label>
-            <input
-              className={INPUT_CLS}
-              placeholder={t('promotionReadinessDelta.servicePlaceholder')}
-              value={service}
-              onChange={(e) => { setService(e.target.value); setEnabled(false); }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('promotionReadinessDelta.fromEnvLabel')}
-            </label>
-            <input
-              className={INPUT_CLS}
-              placeholder={t('promotionReadinessDelta.fromEnvPlaceholder')}
-              value={fromEnv}
-              onChange={(e) => { setFromEnv(e.target.value); setEnabled(false); }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('promotionReadinessDelta.toEnvLabel')}
-            </label>
-            <input
-              className={INPUT_CLS}
-              placeholder={t('promotionReadinessDelta.toEnvPlaceholder')}
-              value={toEnv}
-              onChange={(e) => { setToEnv(e.target.value); setEnabled(false); }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted mb-1">
-              {t('promotionReadinessDelta.daysLabel')}
-            </label>
-            <input
-              type="number"
-              min={1}
-              max={60}
-              className={INPUT_CLS}
-              value={days}
-              onChange={(e) => { setDays(Number(e.target.value)); setEnabled(false); }}
-            />
-          </div>
+          <TextField
+            size="sm"
+            label={t('promotionReadinessDelta.serviceLabel')}
+            placeholder={t('promotionReadinessDelta.servicePlaceholder')}
+            value={service}
+            onChange={(e) => { setService(e.target.value); setEnabled(false); }}
+          />
+          <TextField
+            size="sm"
+            label={t('promotionReadinessDelta.fromEnvLabel')}
+            placeholder={t('promotionReadinessDelta.fromEnvPlaceholder')}
+            value={fromEnv}
+            onChange={(e) => { setFromEnv(e.target.value); setEnabled(false); }}
+          />
+          <TextField
+            size="sm"
+            label={t('promotionReadinessDelta.toEnvLabel')}
+            placeholder={t('promotionReadinessDelta.toEnvPlaceholder')}
+            value={toEnv}
+            onChange={(e) => { setToEnv(e.target.value); setEnabled(false); }}
+          />
+          <TextField
+            size="sm"
+            type="number"
+            min={1}
+            max={60}
+            label={t('promotionReadinessDelta.daysLabel')}
+            value={days}
+            onChange={(e) => { setDays(Number(e.target.value)); setEnabled(false); }}
+          />
         </div>
         <Button
           variant="secondary"
@@ -345,17 +328,13 @@ export function ReleaseTrainPage() {
         <CardBody>
           <div className="space-y-4">
             {/* Train name */}
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('releaseTrain.nameLabel')}
-              </label>
-              <input
-                className={INPUT_CLS}
-                placeholder={t('releaseTrain.namePlaceholder')}
-                value={trainName}
-                onChange={(e) => setTrainName(e.target.value)}
-              />
-            </div>
+            <TextField
+              size="sm"
+              label={t('releaseTrain.nameLabel')}
+              placeholder={t('releaseTrain.namePlaceholder')}
+              value={trainName}
+              onChange={(e) => setTrainName(e.target.value)}
+            />
 
             {/* Release ID input */}
             <div>
@@ -363,15 +342,17 @@ export function ReleaseTrainPage() {
                 {t('releaseTrain.addReleaseLabel')}
               </label>
               <div className="flex gap-2">
-                <input
-                  className={INPUT_CLS}
-                  placeholder={t('releaseTrain.addReleasePlaceholder')}
-                  value={releaseIdInput}
-                  onChange={(e) => setReleaseIdInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addReleaseId();
-                  }}
-                />
+                <div className="flex-1">
+                  <TextField
+                    size="sm"
+                    placeholder={t('releaseTrain.addReleasePlaceholder')}
+                    value={releaseIdInput}
+                    onChange={(e) => setReleaseIdInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') addReleaseId();
+                    }}
+                  />
+                </div>
                 <Button variant="secondary" onClick={addReleaseId}>
                   <Plus size={16} />
                   {t('releaseTrain.addButton')}
@@ -394,13 +375,14 @@ export function ReleaseTrainPage() {
                     className="flex items-center justify-between bg-card rounded-md px-3 py-2"
                   >
                     <span className="font-mono text-xs text-heading">{id}</span>
-                    <button
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      className="hover:text-critical"
                       onClick={() => removeReleaseId(id)}
-                      className="text-muted hover:text-critical transition-colors"
-                      aria-label={t('releaseTrain.removeRelease')}
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                      label={t('releaseTrain.removeRelease')}
+                      icon={<Trash2 size={14} />}
+                    />
                   </div>
                 ))}
               </div>

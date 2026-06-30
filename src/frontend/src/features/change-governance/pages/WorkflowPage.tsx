@@ -4,6 +4,7 @@ import { CheckSquare, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -155,12 +156,11 @@ export function WorkflowPage() {
                     {/* Reject form */}
                     {rejectTarget?.instanceId === inst.id && (
                       <div className="mt-3 space-y-2">
-                        <textarea
+                        <TextArea
                           value={rejectReason}
                           onChange={(e) => setRejectReason(e.target.value)}
                           placeholder={t('workflow.rejectPlaceholder')}
                           rows={2}
-                          className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-critical focus:border-critical transition-colors"
                         />
                         <div className="flex gap-2 justify-end">
                           <Button

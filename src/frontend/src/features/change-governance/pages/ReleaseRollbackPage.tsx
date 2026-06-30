@@ -14,6 +14,9 @@ import {
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -84,9 +87,6 @@ export function ReleaseRollbackPage() {
     if (score >= 40) return 'warning';
     return 'danger';
   }
-
-  const inputCls =
-    'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
   return (
     <PageContainer>
@@ -163,71 +163,48 @@ export function ReleaseRollbackPage() {
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-muted mb-1">
-                  {t('releaseRollback.previousVersion', 'Previous Version')}
-                </label>
-                <input
-                  className={inputCls}
-                  value={assessForm.previousVersion}
-                  onChange={(e) => setAssessForm((f) => ({ ...f, previousVersion: e.target.value }))}
-                  placeholder={t('releaseRollback.previousVersionPlaceholder', 'e.g. 1.0.4')}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted mb-1">
-                  {t('releaseRollback.totalConsumers', 'Total Consumers Impacted')}
-                </label>
-                <input
-                  type="number"
-                  className={inputCls}
-                  value={assessForm.totalConsumersImpacted}
-                  onChange={(e) =>
-                    setAssessForm((f) => ({ ...f, totalConsumersImpacted: Number(e.target.value) }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted mb-1">
-                  {t('releaseRollback.consumersAlreadyMigrated', 'Consumers Already Migrated')}
-                </label>
-                <input
-                  type="number"
-                  className={inputCls}
-                  value={assessForm.consumersAlreadyMigrated}
-                  onChange={(e) =>
-                    setAssessForm((f) => ({ ...f, consumersAlreadyMigrated: Number(e.target.value) }))
-                  }
-                />
-              </div>
+              <TextField
+                size="sm"
+                label={t('releaseRollback.previousVersion', 'Previous Version')}
+                value={assessForm.previousVersion}
+                onChange={(e) => setAssessForm((f) => ({ ...f, previousVersion: e.target.value }))}
+                placeholder={t('releaseRollback.previousVersionPlaceholder', 'e.g. 1.0.4')}
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('releaseRollback.totalConsumers', 'Total Consumers Impacted')}
+                value={assessForm.totalConsumersImpacted}
+                onChange={(e) =>
+                  setAssessForm((f) => ({ ...f, totalConsumersImpacted: Number(e.target.value) }))
+                }
+              />
+              <TextField
+                size="sm"
+                type="number"
+                label={t('releaseRollback.consumersAlreadyMigrated', 'Consumers Already Migrated')}
+                value={assessForm.consumersAlreadyMigrated}
+                onChange={(e) =>
+                  setAssessForm((f) => ({ ...f, consumersAlreadyMigrated: Number(e.target.value) }))
+                }
+              />
               <div className="flex items-center gap-4 pt-4">
-                <label className="flex items-center gap-2 text-sm text-heading cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={assessForm.isViable}
-                    onChange={(e) => setAssessForm((f) => ({ ...f, isViable: e.target.checked }))}
-                    className="rounded"
-                  />
-                  {t('releaseRollback.isViable', 'Rollback is Viable')}
-                </label>
-                <label className="flex items-center gap-2 text-sm text-heading cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={assessForm.hasReversibleMigrations}
-                    onChange={(e) =>
-                      setAssessForm((f) => ({ ...f, hasReversibleMigrations: e.target.checked }))
-                    }
-                    className="rounded"
-                  />
-                  {t('releaseRollback.reversibleMigrations', 'Reversible Migrations')}
-                </label>
+                <Checkbox
+                  checked={assessForm.isViable}
+                  onChange={(e) => setAssessForm((f) => ({ ...f, isViable: e.target.checked }))}
+                  label={t('releaseRollback.isViable', 'Rollback is Viable')}
+                />
+                <Checkbox
+                  checked={assessForm.hasReversibleMigrations}
+                  onChange={(e) =>
+                    setAssessForm((f) => ({ ...f, hasReversibleMigrations: e.target.checked }))
+                  }
+                  label={t('releaseRollback.reversibleMigrations', 'Reversible Migrations')}
+                />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs text-muted mb-1">
-                  {t('releaseRollback.recommendation', 'Recommendation *')}
-                </label>
-                <textarea
-                  className={inputCls}
+                <TextArea
+                  label={t('releaseRollback.recommendation', 'Recommendation *')}
                   rows={3}
                   value={assessForm.recommendation}
                   onChange={(e) => setAssessForm((f) => ({ ...f, recommendation: e.target.value }))}
@@ -236,11 +213,9 @@ export function ReleaseRollbackPage() {
               </div>
               {!assessForm.isViable && (
                 <div className="md:col-span-2">
-                  <label className="block text-xs text-muted mb-1">
-                    {t('releaseRollback.inviabilityReason', 'Reason for Inviability')}
-                  </label>
-                  <input
-                    className={inputCls}
+                  <TextField
+                    size="sm"
+                    label={t('releaseRollback.inviabilityReason', 'Reason for Inviability')}
                     value={assessForm.inviabilityReason}
                     onChange={(e) =>
                       setAssessForm((f) => ({ ...f, inviabilityReason: e.target.value }))
@@ -357,8 +332,7 @@ export function ReleaseRollbackPage() {
                   <p className="text-sm font-medium text-heading mb-2">
                     {t('releaseRollback.rollbackConfirmation', 'Confirm Rollback — this action will be audited')}
                   </p>
-                  <textarea
-                    className={inputCls}
+                  <TextArea
                     rows={3}
                     placeholder={t('releaseRollback.rollbackReasonPlaceholder', 'Describe the reason for rollback…')}
                     value={rollbackReason}

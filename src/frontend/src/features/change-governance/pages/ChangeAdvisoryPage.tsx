@@ -15,9 +15,8 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 
 function riskVariant(score: number | null): 'success' | 'warning' | 'danger' | 'default' {
   if (score === null) return 'default';
@@ -80,47 +79,34 @@ export function ChangeAdvisoryPage() {
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('changeAdvisory.filterService')}
-              </label>
-              <input
-                type="text"
-                value={serviceName}
-                onChange={(e) => setServiceName(e.target.value)}
-                placeholder={t('changeAdvisory.filterServicePlaceholder')}
-                className={INPUT_CLS}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('changeAdvisory.filterEnvironment')}
-              </label>
-              <input
-                type="text"
-                value={environment}
-                onChange={(e) => setEnvironment(e.target.value)}
-                placeholder={t('changeAdvisory.filterEnvironmentPlaceholder')}
-                className={INPUT_CLS}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">
-                {t('changeAdvisory.filterStatus')}
-              </label>
-              <select
-                value={confidenceStatus}
-                onChange={(e) => setConfidenceStatus(e.target.value)}
-                className={INPUT_CLS}
-              >
-                <option value="">{t('changeAdvisory.allStatuses')}</option>
-                <option value="NeedsAttention">{t('changeConfidence.confidenceStatus.NeedsAttention')}</option>
-                <option value="SuspectedRegression">{t('changeConfidence.confidenceStatus.SuspectedRegression')}</option>
-                <option value="CorrelatedWithIncident">{t('changeConfidence.confidenceStatus.CorrelatedWithIncident')}</option>
-                <option value="NotAssessed">{t('changeConfidence.confidenceStatus.NotAssessed')}</option>
-                <option value="Validated">{t('changeConfidence.confidenceStatus.Validated')}</option>
-              </select>
-            </div>
+            <TextField
+              size="sm"
+              label={t('changeAdvisory.filterService')}
+              value={serviceName}
+              onChange={(e) => setServiceName(e.target.value)}
+              placeholder={t('changeAdvisory.filterServicePlaceholder')}
+            />
+            <TextField
+              size="sm"
+              label={t('changeAdvisory.filterEnvironment')}
+              value={environment}
+              onChange={(e) => setEnvironment(e.target.value)}
+              placeholder={t('changeAdvisory.filterEnvironmentPlaceholder')}
+            />
+            <Select
+              size="sm"
+              label={t('changeAdvisory.filterStatus')}
+              value={confidenceStatus}
+              onChange={(e) => setConfidenceStatus(e.target.value)}
+              options={[
+                { value: '', label: t('changeAdvisory.allStatuses') },
+                { value: 'NeedsAttention', label: t('changeConfidence.confidenceStatus.NeedsAttention') },
+                { value: 'SuspectedRegression', label: t('changeConfidence.confidenceStatus.SuspectedRegression') },
+                { value: 'CorrelatedWithIncident', label: t('changeConfidence.confidenceStatus.CorrelatedWithIncident') },
+                { value: 'NotAssessed', label: t('changeConfidence.confidenceStatus.NotAssessed') },
+                { value: 'Validated', label: t('changeConfidence.confidenceStatus.Validated') },
+              ]}
+            />
           </div>
         </CardBody>
       </Card>

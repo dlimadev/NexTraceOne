@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { History, Download, Filter, Clock } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -84,14 +87,10 @@ export function ReleaseParameterAuditPage() {
         title={t('releaseParameterAudit.title')}
         subtitle={t('releaseParameterAudit.subtitle')}
         actions={
-          <button
-            onClick={handleExport}
-            disabled={!entries.length}
-            className="inline-flex items-center gap-2 rounded-md border border-edge bg-card px-4 py-2 text-sm font-medium text-heading hover:bg-card/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" />
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={!entries.length}>
+            <Download className="w-4 h-4 mr-2" />
             {t('releaseParameterAudit.exportButton')}
-          </button>
+          </Button>
         }
       />
 
@@ -100,31 +99,24 @@ export function ReleaseParameterAuditPage() {
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
             <div className="flex items-center gap-2 flex-1">
               <Filter className="w-4 h-4 text-muted" />
-              <input
-                type="text"
-                value={filterKey}
-                onChange={e => setFilterKey(e.target.value)}
-                placeholder={t('releaseParameterAudit.filterLabel')}
-                className="flex-1 rounded-md bg-canvas border border-edge px-3 py-1.5 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-              />
+              <div className="flex-1">
+                <TextField
+                  size="sm"
+                  value={filterKey}
+                  onChange={e => setFilterKey(e.target.value)}
+                  placeholder={t('releaseParameterAudit.filterLabel')}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted">{t('releaseParameterAudit.scopeFilter')}:</span>
-              <div className="flex gap-1">
-                {scopes.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setScopeFilter(s)}
-                    className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                      scopeFilter === s
-                        ? 'bg-accent text-white'
-                        : 'bg-card border border-edge text-muted hover:text-heading'
-                    }`}
-                  >
-                    {s === 'all' ? t('releaseParameterAudit.allScopes') : s}
-                  </button>
-                ))}
-              </div>
+              <Tabs
+                variant="pill"
+                size="sm"
+                items={scopes.map(s => ({ id: s, label: s === 'all' ? t('releaseParameterAudit.allScopes') : s }))}
+                activeId={scopeFilter}
+                onChange={(id) => setScopeFilter(id as typeof scopeFilter)}
+              />
             </div>
           </div>
         </CardHeader>

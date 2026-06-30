@@ -15,6 +15,11 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Tabs } from '../../../components/Tabs';
 import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -30,9 +35,6 @@ import {
 } from '../api/changeIntelligence';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 type TabId = 'calendar' | 'freezeWindows';
 
@@ -250,22 +252,16 @@ export function ReleaseCalendarPage() {
       />
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
-        {tabs.map(({ id, icon: Icon, labelKey }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
-              activeTab === id
-                ? 'border-accent text-accent'
-                : 'border-transparent text-muted hover:text-body hover:border-edge'
-            }`}
-          >
-            <Icon size={16} />
-            {t(labelKey)}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mb-6"
+        items={tabs.map(({ id, icon: Icon, labelKey }) => ({
+          id,
+          label: t(labelKey),
+          icon: <Icon size={16} />,
+        }))}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* Filters */}
       <PageSection>
@@ -278,29 +274,28 @@ export function ReleaseCalendarPage() {
           </CardHeader>
           <CardBody>
             <div className="flex flex-wrap gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-muted">{t('releaseCalendar.from')}</label>
-                <input
+              <div className="w-44">
+                <TextField
+                  size="sm"
                   type="date"
-                  className={INPUT_CLS + ' w-44'}
+                  label={t('releaseCalendar.from')}
                   value={from}
                   onChange={(e) => setFrom(e.target.value)}
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-muted">{t('releaseCalendar.to')}</label>
-                <input
+              <div className="w-44">
+                <TextField
+                  size="sm"
                   type="date"
-                  className={INPUT_CLS + ' w-44'}
+                  label={t('releaseCalendar.to')}
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-muted">{t('releaseCalendar.environment')}</label>
-                <input
-                  type="text"
-                  className={INPUT_CLS + ' w-48'}
+              <div className="w-48">
+                <TextField
+                  size="sm"
+                  label={t('releaseCalendar.environment')}
                   placeholder={t('releases.freezeEnvironmentPlaceholder')}
                   value={envFilter}
                   onChange={(e) => setEnvFilter(e.target.value)}
@@ -620,70 +615,53 @@ function FreezeWindowsTab({
             <CardBody>
               <form onSubmit={onSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-muted">{t('releases.freeze.name')}</label>
-                    <input
-                      type="text"
-                      className={INPUT_CLS}
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-muted">{t('releases.freeze.scope')}</label>
-                    <select
-                      className={INPUT_CLS}
-                      value={form.scope}
-                      onChange={(e) => setForm({ ...form, scope: Number(e.target.value) })}
-                    >
-                      {SCOPE_OPTIONS.map((s) => (
-                        <option key={s.value} value={s.value}>
-                          {t(s.labelKey)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="text-xs text-muted">{t('releases.freeze.reason')}</label>
-                    <textarea
-                      className={INPUT_CLS + ' min-h-[60px]'}
+                  <TextField
+                    size="sm"
+                    label={t('releases.freeze.name')}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                  <Select
+                    size="sm"
+                    label={t('releases.freeze.scope')}
+                    value={String(form.scope)}
+                    onChange={(e) => setForm({ ...form, scope: Number(e.target.value) })}
+                    options={SCOPE_OPTIONS.map((s) => ({ value: String(s.value), label: t(s.labelKey) }))}
+                  />
+                  <div className="md:col-span-2">
+                    <TextArea
+                      label={t('releases.freeze.reason')}
+                      textareaClassName="min-h-[60px]"
                       value={form.reason}
                       onChange={(e) => setForm({ ...form, reason: e.target.value })}
                       required
                     />
                   </div>
                   {form.scope > 0 && (
-                    <div className="flex flex-col gap-1">
-                      <label className="text-xs text-muted">{t('releases.freeze.scopeValue')}</label>
-                      <input
-                        type="text"
-                        className={INPUT_CLS}
-                        value={form.scopeValue}
-                        onChange={(e) => setForm({ ...form, scopeValue: e.target.value })}
-                      />
-                    </div>
+                    <TextField
+                      size="sm"
+                      label={t('releases.freeze.scopeValue')}
+                      value={form.scopeValue}
+                      onChange={(e) => setForm({ ...form, scopeValue: e.target.value })}
+                    />
                   )}
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-muted">{t('releases.freeze.startsAt')}</label>
-                    <input
-                      type="datetime-local"
-                      className={INPUT_CLS}
-                      value={form.startsAt}
-                      onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-muted">{t('releases.freeze.endsAt')}</label>
-                    <input
-                      type="datetime-local"
-                      className={INPUT_CLS}
-                      value={form.endsAt}
-                      onChange={(e) => setForm({ ...form, endsAt: e.target.value })}
-                      required
-                    />
-                  </div>
+                  <TextField
+                    size="sm"
+                    type="datetime-local"
+                    label={t('releases.freeze.startsAt')}
+                    value={form.startsAt}
+                    onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
+                    required
+                  />
+                  <TextField
+                    size="sm"
+                    type="datetime-local"
+                    label={t('releases.freeze.endsAt')}
+                    value={form.endsAt}
+                    onChange={(e) => setForm({ ...form, endsAt: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="flex gap-2 pt-2">
                   <Button type="submit" disabled={isSaving}>
@@ -758,20 +736,23 @@ function FreezeWindowsTab({
                           <div className="flex gap-1">
                             {fw.isActive && (
                               <>
-                                <button
+                                <IconButton
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => onEdit(fw)}
-                                  className="p-1.5 rounded hover:bg-hover text-muted hover:text-heading transition-colors"
                                   title={t('common.edit')}
-                                >
-                                  <Edit size={14} />
-                                </button>
-                                <button
+                                  label={t('common.edit')}
+                                  icon={<Edit size={14} />}
+                                />
+                                <IconButton
+                                  variant="ghost"
+                                  size="sm"
+                                  className="hover:text-critical"
                                   onClick={() => onDeactivate(fw.id)}
-                                  className="p-1.5 rounded hover:bg-danger/10 text-muted hover:text-danger transition-colors"
                                   title={t('releaseCalendar.deactivate')}
-                                >
-                                  <Power size={14} />
-                                </button>
+                                  label={t('releaseCalendar.deactivate')}
+                                  icon={<Power size={14} />}
+                                />
                               </>
                             )}
                           </div>

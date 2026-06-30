@@ -4,6 +4,7 @@ import { ArrowUpCircle, CheckCircle2, XCircle, Plus, ChevronDown, ChevronUp, Shi
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -557,19 +558,20 @@ export function PromotionPage() {
 
       {/* Override Gate Dialog */}
       {overrideTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay">
           <div className="bg-canvas rounded-lg border border-edge shadow-xl p-6 w-full max-w-md">
             <h2 className="text-base font-semibold text-heading mb-1">
               {t('promotion.overrideGateTitle')}
             </h2>
             <p className="text-xs text-muted mb-4">{t('promotion.overrideGateSubtitle')}</p>
-            <textarea
-              value={overrideJustification}
-              onChange={(e) => setOverrideJustification(e.target.value)}
-              rows={4}
-              placeholder={t('promotion.overrideJustificationPlaceholder')}
-              className="w-full rounded-md bg-elevated border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent mb-4 resize-none"
-            />
+            <div className="mb-4">
+              <TextArea
+                value={overrideJustification}
+                onChange={(e) => setOverrideJustification(e.target.value)}
+                rows={4}
+                placeholder={t('promotion.overrideJustificationPlaceholder')}
+              />
+            </div>
             <div className="flex justify-end gap-3">
               <Button
                 variant="secondary"
