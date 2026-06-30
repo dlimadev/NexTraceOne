@@ -39,13 +39,10 @@ export function KnowledgeDocumentPage() {
   return (
     <PageContainer>
       <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => navigate('/knowledge')}
-          className="flex items-center gap-1.5 text-sm text-body hover:text-heading transition-colors"
-        >
-          <ArrowLeft size={16} />
+        <Button variant="ghost" size="sm" onClick={() => navigate('/knowledge')}>
+          <ArrowLeft size={16} className="mr-1.5" />
           {t('knowledgeHub.backToHub')}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
