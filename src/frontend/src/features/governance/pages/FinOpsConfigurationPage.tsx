@@ -4,6 +4,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Settings, DollarSign, Shield, CheckCircle2, AlertTriangle, Plus, X, Activity, Trash2, BookOpen, Eye } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
@@ -107,16 +112,12 @@ export function FinOpsConfigurationPage() {
           </CardHeader>
           <CardBody>
             <p className="text-xs text-muted mb-3">{t('finops.config.currency.description')}</p>
-            <select
+            <Select
               value={data.currency}
               onChange={(e) => saveMutation.mutate({ currency: e.target.value })}
-              className="input w-full text-sm"
               aria-label={t('finops.config.currency.selectLabel')}
-            >
-              {SUPPORTED_CURRENCIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+              options={SUPPORTED_CURRENCIES.map((c) => ({ value: c, label: c }))}
+            />
             {saveMutation.isPending && (
               <p className="text-xs text-muted mt-2">{t('common.saving')}</p>
             )}
@@ -136,47 +137,39 @@ export function FinOpsConfigurationPage() {
             <p className="text-xs text-muted mb-4">{t('finops.config.gate.description')}</p>
 
             <div className="space-y-3">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={data.budgetGateEnabled}
-                  onChange={(e) => saveMutation.mutate({ budgetGateEnabled: e.target.checked })}
-                  aria-label={t('finops.config.gate.enabled')}
-                />
-                <span className="text-sm">{t('finops.config.gate.enabled')}</span>
-              </label>
+              <Checkbox
+                label={t('finops.config.gate.enabled')}
+                checked={data.budgetGateEnabled}
+                onChange={(e) => saveMutation.mutate({ budgetGateEnabled: e.target.checked })}
+                aria-label={t('finops.config.gate.enabled')}
+              />
 
-              <label className={`flex items-center gap-3 cursor-pointer ${!data.budgetGateEnabled ? 'opacity-40 pointer-events-none' : ''}`}>
-                <input
-                  type="checkbox"
-                  className="checkbox"
+              <div className={!data.budgetGateEnabled ? 'opacity-40 pointer-events-none' : ''}>
+                <Checkbox
+                  label={t('finops.config.gate.blockOnExceed')}
                   checked={data.blockOnExceed}
                   onChange={(e) => saveMutation.mutate({ blockOnExceed: e.target.checked })}
                   disabled={!data.budgetGateEnabled}
                   aria-label={t('finops.config.gate.blockOnExceed')}
                 />
-                <span className="text-sm">{t('finops.config.gate.blockOnExceed')}</span>
-              </label>
+              </div>
 
-              <label className={`flex items-center gap-3 cursor-pointer ${(!data.budgetGateEnabled || !data.blockOnExceed) ? 'opacity-40 pointer-events-none' : ''}`}>
-                <input
-                  type="checkbox"
-                  className="checkbox"
+              <div className={(!data.budgetGateEnabled || !data.blockOnExceed) ? 'opacity-40 pointer-events-none' : ''}>
+                <Checkbox
+                  label={t('finops.config.gate.requireApproval')}
                   checked={data.requireApproval}
                   onChange={(e) => saveMutation.mutate({ requireApproval: e.target.checked })}
                   disabled={!data.budgetGateEnabled || !data.blockOnExceed}
                   aria-label={t('finops.config.gate.requireApproval')}
                 />
-                <span className="text-sm">{t('finops.config.gate.requireApproval')}</span>
-              </label>
+              </div>
 
               <div className={!data.budgetGateEnabled ? 'opacity-40' : ''}>
                 <label className="text-xs text-muted mb-1 block">{t('finops.config.gate.alertThreshold')}</label>
                 <div className="flex items-center gap-2">
-                  <input
+                  <TextField
                     type="number"
-                    className="input w-20 text-sm"
+                    className="w-20"
                     min={1}
                     max={200}
                     value={data.alertThresholdPct}
@@ -214,13 +207,14 @@ export function FinOpsConfigurationPage() {
               {data.approvers.map((email) => (
                 <div key={email} className="flex items-center gap-1.5 bg-hover rounded-md px-2 py-1">
                   <span className="text-xs">{email}</span>
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 w-5 hover:text-critical"
+                    icon={<X size={12} />}
                     onClick={() => handleRemoveApprover(email)}
-                    className="text-muted hover:text-critical transition-colors"
-                    aria-label={t('finops.config.approvers.remove', { email })}
-                  >
-                    <X size={12} />
-                  </button>
+                    label={t('finops.config.approvers.remove', { email })}
+                  />
                 </div>
               ))}
               {data.approvers.length === 0 && (
@@ -229,23 +223,25 @@ export function FinOpsConfigurationPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <input
-                type="email"
-                className="input flex-1 text-sm"
-                placeholder={t('finops.config.approvers.placeholder')}
-                value={newApprover}
-                onChange={(e) => setNewApprover(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddApprover(); }}
-                aria-label={t('finops.config.approvers.placeholder')}
-              />
-              <button
+              <div className="flex-1">
+                <TextField
+                  type="email"
+                  placeholder={t('finops.config.approvers.placeholder')}
+                  value={newApprover}
+                  onChange={(e) => setNewApprover(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddApprover(); }}
+                  aria-label={t('finops.config.approvers.placeholder')}
+                />
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={<Plus size={14} />}
                 onClick={handleAddApprover}
                 disabled={!newApprover.trim()}
-                className="btn btn-primary btn-sm flex items-center gap-1"
               >
-                <Plus size={14} />
                 {t('finops.config.approvers.add')}
-              </button>
+              </Button>
             </div>
           </CardBody>
         </Card>
