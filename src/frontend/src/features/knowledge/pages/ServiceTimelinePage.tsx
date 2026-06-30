@@ -19,6 +19,8 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { Tabs } from '../../../components/Tabs';
+import { Select } from '../../../components/Select';
 import { useServiceOperationalTimeline } from '../hooks';
 import type { NoteSeverity, ServiceTimelineEntryDto } from '../../../types';
 
@@ -140,27 +142,22 @@ export function ServiceTimelinePage() {
           <div className="flex items-center gap-2 text-sm">
             <Filter size={14} className="text-muted" />
             <span className="text-muted">{t('knowledge.serviceTimeline.filterBySeverity')}:</span>
-            {(['', 'Info', 'Warning', 'Critical'] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => {
-                  setSeverityFilter(s);
-                  setPage(1);
-                }}
-                className={`px-2 py-0.5 rounded text-xs border transition-colors ${
-                  severityFilter === s
-                    ? 'bg-accent border-accent text-white'
-                    : 'border-edge text-secondary hover:border-accent'
-                }`}
-              >
-                {s === '' ? t('common.all') : s}
-              </button>
-            ))}
+            <Tabs
+              variant="pill"
+              size="sm"
+              items={(['', 'Info', 'Warning', 'Critical'] as const).map((s) => ({
+                id: s,
+                label: s === '' ? t('common.all') : s,
+              }))}
+              activeId={severityFilter}
+              onChange={(id) => { setSeverityFilter(id as typeof severityFilter); setPage(1); }}
+            />
           </div>
 
           <div className="flex items-center gap-2 text-sm ml-auto">
             <span className="text-muted">{t('knowledge.serviceTimeline.filterByStatus')}:</span>
-            <select
+            <Select
+              size="sm"
               value={resolvedFilter === undefined ? '' : resolvedFilter ? 'resolved' : 'open'}
               onChange={(e) => {
                 setResolvedFilter(
@@ -168,12 +165,12 @@ export function ServiceTimelinePage() {
                 );
                 setPage(1);
               }}
-              className="text-xs border border-edge rounded px-2 py-1 bg-input"
-            >
-              <option value="">{t('common.all')}</option>
-              <option value="open">{t('knowledge.serviceTimeline.open')}</option>
-              <option value="resolved">{t('knowledge.serviceTimeline.resolved')}</option>
-            </select>
+              options={[
+                { value: '', label: t('common.all') },
+                { value: 'open', label: t('knowledge.serviceTimeline.open') },
+                { value: 'resolved', label: t('knowledge.serviceTimeline.resolved') },
+              ]}
+            />
           </div>
         </div>
 
