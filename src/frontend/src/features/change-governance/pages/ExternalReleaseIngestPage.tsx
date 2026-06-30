@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Download, Plus, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 const EXTERNAL_SYSTEMS = ['AzureDevOps', 'Jira', 'Jenkins', 'GitLab', 'GitHub', 'Custom'];
 
@@ -78,122 +80,78 @@ export function ExternalReleaseIngestPage() {
           <CardBody>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.externalSystem')}
-                  </label>
-                  <select
-                    value={externalSystem}
-                    onChange={(e) => setExternalSystem(e.target.value)}
-                    className={INPUT_CLS}
-                  >
-                    {EXTERNAL_SYSTEMS.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.externalReleaseId')}
-                  </label>
-                  <input
-                    type="text"
-                    value={externalReleaseId}
-                    onChange={(e) => setExternalReleaseId(e.target.value)}
-                    placeholder="ADO-RELEASE-2024.1"
-                    className={INPUT_CLS}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.serviceName')}
-                  </label>
-                  <input
-                    type="text"
-                    value={serviceName}
-                    onChange={(e) => setServiceName(e.target.value)}
-                    placeholder="payment-service"
-                    className={INPUT_CLS}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.version')}
-                  </label>
-                  <input
-                    type="text"
-                    value={version}
-                    onChange={(e) => setVersion(e.target.value)}
-                    placeholder="2.1.0"
-                    className={INPUT_CLS}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.targetEnvironment')}
-                  </label>
-                  <select
-                    value={targetEnvironment}
-                    onChange={(e) => setTargetEnvironment(e.target.value)}
-                    className={INPUT_CLS}
-                  >
-                    <option value="PreProduction">PreProduction</option>
-                    <option value="Production">Production</option>
-                    <option value="Staging">Staging</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('externalReleaseIngest.description')}
-                  </label>
-                  <input
-                    type="text"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder={t('externalReleaseIngest.descriptionPlaceholder')}
-                    className={INPUT_CLS}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">
-                  {t('externalReleaseIngest.commitShas')}
-                </label>
-                <textarea
-                  value={commitShas}
-                  onChange={(e) => setCommitShas(e.target.value)}
-                  placeholder={t('externalReleaseIngest.commitShasPlaceholder')}
-                  rows={3}
-                  className={INPUT_CLS}
+                <Select
+                  size="sm"
+                  label={t('externalReleaseIngest.externalSystem')}
+                  value={externalSystem}
+                  onChange={(e) => setExternalSystem(e.target.value)}
+                  options={EXTERNAL_SYSTEMS.map((s) => ({ value: s, label: s }))}
+                />
+                <TextField
+                  size="sm"
+                  label={t('externalReleaseIngest.externalReleaseId')}
+                  value={externalReleaseId}
+                  onChange={(e) => setExternalReleaseId(e.target.value)}
+                  placeholder="ADO-RELEASE-2024.1"
+                />
+                <TextField
+                  size="sm"
+                  label={t('externalReleaseIngest.serviceName')}
+                  value={serviceName}
+                  onChange={(e) => setServiceName(e.target.value)}
+                  placeholder="payment-service"
+                />
+                <TextField
+                  size="sm"
+                  label={t('externalReleaseIngest.version')}
+                  value={version}
+                  onChange={(e) => setVersion(e.target.value)}
+                  placeholder="2.1.0"
+                />
+                <Select
+                  size="sm"
+                  label={t('externalReleaseIngest.targetEnvironment')}
+                  value={targetEnvironment}
+                  onChange={(e) => setTargetEnvironment(e.target.value)}
+                  options={[
+                    { value: 'PreProduction', label: 'PreProduction' },
+                    { value: 'Production', label: 'Production' },
+                    { value: 'Staging', label: 'Staging' },
+                  ]}
+                />
+                <TextField
+                  size="sm"
+                  label={t('externalReleaseIngest.description')}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t('externalReleaseIngest.descriptionPlaceholder')}
                 />
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={triggerPromotion}
-                  onChange={(e) => setTriggerPromotion(e.target.checked)}
-                  className="rounded border-edge"
-                />
-                <span className="text-sm text-heading">
-                  {t('externalReleaseIngest.triggerPromotion')}
-                </span>
-              </label>
+              <TextArea
+                label={t('externalReleaseIngest.commitShas')}
+                value={commitShas}
+                onChange={(e) => setCommitShas(e.target.value)}
+                placeholder={t('externalReleaseIngest.commitShasPlaceholder')}
+                rows={3}
+              />
 
-              <button
+              <Checkbox
+                checked={triggerPromotion}
+                onChange={(e) => setTriggerPromotion(e.target.checked)}
+                label={t('externalReleaseIngest.triggerPromotion')}
+              />
+
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => ingestMutation.mutate()}
-                disabled={
-                  !externalReleaseId ||
-                  !serviceName ||
-                  !version ||
-                  ingestMutation.isPending
-                }
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                disabled={!externalReleaseId || !serviceName || !version || ingestMutation.isPending}
+                loading={ingestMutation.isPending}
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 mr-2" />
                 {t('externalReleaseIngest.ingestBtn')}
-              </button>
+              </Button>
             </div>
           </CardBody>
         </Card>
