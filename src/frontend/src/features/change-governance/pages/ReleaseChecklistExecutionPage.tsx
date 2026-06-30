@@ -8,17 +8,17 @@ import {
   AlertCircle,
   Save,
   User,
+  X,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { workflowApi } from '../api/workflow';
 import type { ChecklistItemInput, ChecklistEvidenceResponse } from '../api/workflow';
-
-const INPUT_CLS =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 
 interface ChecklistItem extends ChecklistItemInput {
   id: string;
@@ -139,43 +139,29 @@ export function ReleaseChecklistExecutionPage() {
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">
-                    {t('checklist.instanceIdLabel')}
-                  </label>
-                  <input
-                    className={INPUT_CLS}
-                    placeholder={t('checklist.instanceIdPlaceholder')}
-                    value={instanceId}
-                    onChange={(e) => setInstanceId(e.target.value)}
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('checklist.instanceIdLabel')}
+                  placeholder={t('checklist.instanceIdPlaceholder')}
+                  value={instanceId}
+                  onChange={(e) => setInstanceId(e.target.value)}
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-muted mb-1">
-                      {t('checklist.nameLabel')}
-                    </label>
-                    <input
-                      className={INPUT_CLS}
-                      placeholder={t('checklist.namePlaceholder')}
-                      value={checklistName}
-                      onChange={(e) => setChecklistName(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted mb-1">
-                      {t('checklist.executedByLabel')}
-                    </label>
-                    <div className="relative">
-                      <User size={14} className="absolute left-3 top-2.5 text-muted" />
-                      <input
-                        className={`${INPUT_CLS} pl-8`}
-                        placeholder={t('checklist.executedByPlaceholder')}
-                        value={executedBy}
-                        onChange={(e) => setExecutedBy(e.target.value)}
-                      />
-                    </div>
-                  </div>
+                  <TextField
+                    size="sm"
+                    label={t('checklist.nameLabel')}
+                    placeholder={t('checklist.namePlaceholder')}
+                    value={checklistName}
+                    onChange={(e) => setChecklistName(e.target.value)}
+                  />
+                  <TextField
+                    size="sm"
+                    leadingIcon={<User size={14} />}
+                    label={t('checklist.executedByLabel')}
+                    placeholder={t('checklist.executedByPlaceholder')}
+                    value={executedBy}
+                    onChange={(e) => setExecutedBy(e.target.value)}
+                  />
                 </div>
               </div>
             </CardBody>
@@ -208,26 +194,27 @@ export function ReleaseChecklistExecutionPage() {
                         )}
                       </button>
                       <div className="flex-1 space-y-2">
-                        <input
-                          className={INPUT_CLS}
+                        <TextField
+                          size="sm"
                           placeholder={t('checklist.itemNamePlaceholder', { num: idx + 1 })}
                           value={item.name}
                           onChange={(e) => updateItemName(item.id, e.target.value)}
                         />
-                        <input
-                          className={INPUT_CLS}
+                        <TextField
+                          size="sm"
                           placeholder={t('checklist.itemNotesPlaceholder')}
                           value={item.notes ?? ''}
                           onChange={(e) => updateItemNotes(item.id, e.target.value)}
                         />
                       </div>
-                      <button
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 shrink-0 hover:text-critical"
                         onClick={() => removeItem(item.id)}
-                        className="mt-2 shrink-0 text-muted hover:text-critical transition-colors"
-                        aria-label={t('checklist.removeItem')}
-                      >
-                        ×
-                      </button>
+                        label={t('checklist.removeItem')}
+                        icon={<X size={16} />}
+                      />
                     </div>
                   </div>
                 ))}
