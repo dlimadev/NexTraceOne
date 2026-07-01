@@ -5,9 +5,9 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Search,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageHeader } from '../../../components/PageHeader';
@@ -93,14 +93,11 @@ export function ModuleAdoptionPage() {
 
       {/* Search */}
       <div className="flex items-center gap-2 mb-6">
-        <div className="relative flex-1 max-w-sm">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded" />
-          <input
-            type="text"
+        <div className="flex-1 max-w-sm">
+          <SearchInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('analytics.adoption.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 rounded-lg bg-input border border-edge text-heading placeholder-faded focus:border-accent/50 focus:outline-none text-sm"
           />
         </div>
       </div>

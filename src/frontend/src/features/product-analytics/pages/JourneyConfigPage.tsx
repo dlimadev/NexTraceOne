@@ -2,7 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Globe, Building2, CheckCircle2, XCircle, Route } from 'lucide-react';
-import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { Card, CardBody } from '../../../components/Card';
+import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Checkbox } from '../../../components/Checkbox';
+import { Modal } from '../../../components/Modal';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -73,93 +79,67 @@ function JourneyFormModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-panel border border-edge rounded-md shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit}>
-          <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
-            <h2 className="text-sm font-semibold text-heading">
-              {isEdit ? t('analytics.journeyConfig.editJourney') : t('analytics.journeyConfig.addJourney')}
-            </h2>
-            <button type="button" onClick={onCancel} className="text-muted hover:text-heading">
-              <XCircle className="w-4 h-4" />
-            </button>
-          </div>
+    <Modal
+      open
+      onClose={onCancel}
+      title={isEdit ? t('analytics.journeyConfig.editJourney') : t('analytics.journeyConfig.addJourney')}
+      size="lg"
+      footer={
+        <div className="flex justify-end gap-2 w-full">
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" size="sm" form="journey-form">
+            {t('common.save')}
+          </Button>
+        </div>
+      }
+    >
+      <form id="journey-form" onSubmit={handleSubmit} className="space-y-4">
+        {/* Name */}
+        <TextField
+          label={`${t('analytics.journeyConfig.journeyName')} *`}
+          type="text"
+          required
+          maxLength={100}
+          value={form.name}
+          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+        />
 
-          <div className="px-6 py-4 space-y-4">
-            {/* Name */}
-            <div>
-              <label className="block text-xs text-muted mb-1">{t('analytics.journeyConfig.journeyName')} *</label>
-              <input
-                type="text"
-                required
-                maxLength={100}
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full bg-bg border border-edge rounded-md px-3 py-2 text-xs text-heading focus:outline-none focus:border-accent/70"
-              />
-            </div>
+        {/* Key */}
+        {!isEdit && (
+          <TextField
+            label={`${t('analytics.journeyConfig.journeyId')} *`}
+            type="text"
+            required
+            maxLength={50}
+            pattern="[a-z0-9_]+"
+            value={form.key}
+            onChange={(e) => setForm((f) => ({ ...f, key: e.target.value }))}
+            placeholder="e.g. my_custom_journey"
+            helperText="Lowercase letters, numbers and underscores only. At least 1 character required."
+          />
+        )}
 
-            {/* Key */}
-            {!isEdit && (
-              <div>
-                <label className="block text-xs text-muted mb-1">{t('analytics.journeyConfig.journeyId')} *</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={50}
-                  pattern="[a-z0-9_]+"
-                  value={form.key}
-                  onChange={(e) => setForm((f) => ({ ...f, key: e.target.value }))}
-                  className="w-full bg-bg border border-edge rounded-md px-3 py-2 text-xs text-heading focus:outline-none focus:border-accent/70"
-                  placeholder="e.g. my_custom_journey"
-                />
-                <p className="text-xs text-muted mt-1">Lowercase letters, numbers and underscores only. At least 1 character required.</p>
-              </div>
-            )}
+        {/* Steps JSON */}
+        <TextArea
+          label={`${t('analytics.journeyConfig.steps')} *`}
+          required
+          rows={10}
+          value={form.stepsJson}
+          onChange={(e) => setForm((f) => ({ ...f, stepsJson: e.target.value }))}
+          textareaClassName="font-mono"
+          error={jsonError ?? undefined}
+        />
 
-            {/* Steps JSON */}
-            <div>
-              <label className="block text-xs text-muted mb-1">{t('analytics.journeyConfig.steps')} *</label>
-              <textarea
-                required
-                rows={10}
-                value={form.stepsJson}
-                onChange={(e) => setForm((f) => ({ ...f, stepsJson: e.target.value }))}
-                className="w-full bg-bg border border-edge rounded-md px-3 py-2 text-xs text-heading font-mono focus:outline-none focus:border-accent/70"
-              />
-              {jsonError && <p className="text-xs text-critical mt-1">{jsonError}</p>}
-            </div>
-
-            {/* Active */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-                className="accent-accent"
-              />
-              <span className="text-xs text-heading">{t('analytics.journeyConfig.isActive')}</span>
-            </label>
-          </div>
-
-          <div className="flex justify-end gap-2 px-6 py-4 border-t border-edge">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
-            >
-              {t('common.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="px-3 py-2 rounded-md bg-accent text-white text-xs hover:bg-accent/80"
-            >
-              {t('common.save')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Active */}
+        <Checkbox
+          label={t('analytics.journeyConfig.isActive')}
+          checked={form.isActive}
+          onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+        />
+      </form>
+    </Modal>
   );
 }
 
@@ -229,13 +209,9 @@ export function JourneyConfigPage() {
       <PageContainer>
         <PageErrorState
           action={
-            <button
-              type="button"
-              onClick={() => refetch()}
-              className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
-            >
+            <Button type="button" variant="secondary" size="sm" onClick={() => refetch()}>
               {t('common.retry')}
-            </button>
+            </Button>
           }
         />
       </PageContainer>
@@ -250,14 +226,14 @@ export function JourneyConfigPage() {
         title={t('analytics.journeyConfig.title')}
         subtitle={t('analytics.journeyConfig.subtitle')}
         actions={
-          <button
+          <Button
             type="button"
+            size="sm"
+            icon={<Plus className="w-3.5 h-3.5" />}
             onClick={() => setModal({ mode: 'create' })}
-            className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent text-white text-xs hover:bg-accent/80"
           >
-            <Plus className="w-3.5 h-3.5" />
             {t('analytics.journeyConfig.addJourney')}
-          </button>
+          </Button>
         }
       />
 
@@ -277,14 +253,14 @@ export function JourneyConfigPage() {
               title={t('analytics.journeyConfig.empty.title')}
               description={t('analytics.journeyConfig.empty.description')}
               action={
-                <button
+                <Button
                   type="button"
+                  size="sm"
+                  icon={<Plus className="w-3.5 h-3.5" />}
                   onClick={() => setModal({ mode: 'create' })}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent text-white text-xs hover:bg-accent/80"
                 >
-                  <Plus className="w-3.5 h-3.5" />
                   {t('analytics.journeyConfig.addJourney')}
-                </button>
+                </Button>
               }
             />
           </CardBody>
@@ -332,22 +308,25 @@ export function JourneyConfigPage() {
                     <td className="py-3 px-4">
                       {!def.isGlobal && (
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <IconButton
                             type="button"
+                            variant="ghost"
+                            size="sm"
+                            icon={<Pencil className="w-3.5 h-3.5" />}
                             onClick={() => setModal({ mode: 'edit', item: def })}
-                            className="text-muted hover:text-accent p-1"
+                            label={t('analytics.journeyConfig.editJourney')}
                             title={t('analytics.journeyConfig.editJourney')}
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
+                          />
+                          <IconButton
                             type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="hover:text-critical"
+                            icon={<Trash2 className="w-3.5 h-3.5" />}
                             onClick={() => setDeleteTarget(def)}
-                            className="text-muted hover:text-critical p-1"
+                            label={t('analytics.journeyConfig.deleteJourney')}
                             title={t('analytics.journeyConfig.deleteJourney')}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          />
                         </div>
                       )}
                     </td>
@@ -379,31 +358,31 @@ export function JourneyConfigPage() {
       )}
 
       {/* Delete confirm dialog */}
-      {deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-panel border border-edge rounded-md shadow-xl max-w-sm w-full p-6 space-y-4">
-            <p className="text-sm text-heading">{t('analytics.journeyConfig.deleteConfirm')}</p>
-            <p className="text-xs text-muted font-medium">{deleteTarget.name}</p>
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={() => deleteMutation.mutate(deleteTarget.id)}
-                disabled={deleteMutation.isPending}
-                className="px-3 py-2 rounded-md bg-critical text-white text-xs hover:bg-critical/80 disabled:opacity-50"
-              >
-                {t('common.delete')}
-              </button>
-            </div>
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title={t('analytics.journeyConfig.deleteJourney')}
+        size="sm"
+        footer={
+          <div className="flex justify-end gap-2 w-full">
+            <Button type="button" variant="secondary" size="sm" onClick={() => setDeleteTarget(null)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {t('common.delete')}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <p className="text-sm text-heading">{t('analytics.journeyConfig.deleteConfirm')}</p>
+        <p className="text-xs text-muted font-medium mt-2">{deleteTarget?.name}</p>
+      </Modal>
     </PageContainer>
   );
 }
