@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Select } from '../../../components/Select';
 import { observabilityService } from '../services/ObservabilityService';
 import type { RequestMetrics, DashboardFilters } from '../types/ObservabilityTypes';
 import { CHART_SEMANTIC } from '../../../lib/chartColors';
@@ -68,15 +69,11 @@ export const RequestMetricsDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="text-sm font-medium text-body mb-2 block">Time Range</label>
-              <select
+              <Select
                 value={filters.timeRange}
                 onChange={(e) => setFilters({ ...filters, timeRange: e.target.value as DashboardFilters['timeRange'] })}
-                className="w-full h-9 rounded-md border border-edge bg-card text-body text-sm px-3 focus:outline-none focus:ring-2 focus:ring-accent/40"
-              >
-                {timeRangeOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={timeRangeOptions.map(opt => ({ value: opt.value, label: opt.label }))}
+              />
             </div>
           </div>
         </CardBody>
