@@ -40,6 +40,35 @@ public sealed class CliConfigTests
         result.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Fact]
+    public void DefaultUrl_PointsToApiHostPort()
+    {
+        // O default deve apontar para a porta do ApiHost (5000), alinhado com o SDK
+        // e as extensões IDE. Regressão do antigo valor incorreto :8080.
+        CliConfig.DefaultUrl.Should().Be("http://localhost:5000");
+    }
+
+    [Fact]
+    public void ResolveUrl_FallsBackToDefault_WhenNoEnvOrConfig()
+    {
+        var original = Environment.GetEnvironmentVariable("NEX_API_URL");
+        try
+        {
+            Environment.SetEnvironmentVariable("NEX_API_URL", null);
+
+            var result = CliConfig.ResolveUrl(null);
+
+            // Sem env var e sem URL em config, deve cair no default.
+            // Se houver config local na máquina, o valor de config tem precedência.
+            if (string.IsNullOrWhiteSpace(CliConfig.Load().Url))
+                result.Should().Be(CliConfig.DefaultUrl);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("NEX_API_URL", original);
+        }
+    }
+
     // ── ResolveToken tests ─────────────────────────────────────────────────────
 
     [Fact]

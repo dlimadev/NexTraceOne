@@ -113,6 +113,8 @@ jobs:
           # Corre os testes unitários por projeto, excluindo os projetos Integration/E2E
           # (que têm jobs dedicados). Tolera "nenhum teste corresponde ao filtro" sem falhar,
           # mas falha em falhas de teste reais.
+          # NexTraceOne.VisualStudio.Tests tem como alvo net48 (extensão VSIX/WPF) e não
+          # executa no runner Linux; é coberto pelo job build-vsix (windows-latest).
           while IFS= read -r proj; do
             echo "──► dotnet test $proj"
             if ! out=$(dotnet test "$proj" \
@@ -134,7 +136,8 @@ jobs:
             fi
           done < <(find tests -name '*.csproj' \
                     ! -path '*NexTraceOne.IntegrationTests*' \
-                    ! -path '*NexTraceOne.E2E.Tests*' | sort)
+                    ! -path '*NexTraceOne.E2E.Tests*' \
+                    ! -path '*NexTraceOne.VisualStudio.Tests*' | sort)
           exit $failed
 
       - name: Upload test results

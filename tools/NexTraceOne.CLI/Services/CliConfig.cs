@@ -14,6 +14,9 @@ public sealed class CliConfig
 
     private static readonly string ConfigPath = Path.Combine(ConfigDir, "config.json");
 
+    /// <summary>URL padrão do ApiHost local quando nenhuma outra fonte está configurada.</summary>
+    public const string DefaultUrl = "http://localhost:5000";
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
@@ -78,7 +81,7 @@ public sealed class CliConfig
         if (!string.IsNullOrWhiteSpace(config.Url))
             return config.Url;
 
-        return "http://localhost:8080";
+        return DefaultUrl;
     }
 
     /// <summary>Resolve o token: usa o valor fornecido explicitamente, depois env var, depois config.</summary>
