@@ -14,6 +14,7 @@ import { saasApi, type TenantPlan, type ProvisionTenantResponse } from '../api/s
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { Card, CardBody } from '../../../components/Card';
 
 type Step = 1 | 2 | 3;
@@ -140,12 +141,11 @@ export function TenantProvisioningPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('step1.name')} <span className="text-critical">*</span>
                   </label>
-                  <input
+                  <TextField
                     type="text"
                     value={form.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                     placeholder={t('step1.namePlaceholder')}
-                    className="w-full border border-edge rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-card text-body"
                   />
                 </div>
 
@@ -153,12 +153,12 @@ export function TenantProvisioningPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('step1.slug')} <span className="text-critical">*</span>
                   </label>
-                  <input
+                  <TextField
                     type="text"
                     value={form.slug}
                     onChange={(e) => setForm((f) => ({ ...f, slug: slugify(e.target.value) }))}
                     placeholder="my-tenant"
-                    className="w-full border border-edge rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent bg-card text-body"
+                    className="font-mono"
                   />
                   <p className="text-xs text-faded mt-1">{t('step1.slugHint')}</p>
                 </div>
@@ -167,12 +167,11 @@ export function TenantProvisioningPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('step1.legalName')}
                   </label>
-                  <input
+                  <TextField
                     type="text"
                     value={form.legalName}
                     onChange={(e) => setForm((f) => ({ ...f, legalName: e.target.value }))}
                     placeholder={t('step1.legalNamePlaceholder')}
-                    className="w-full border border-edge rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-card text-body"
                   />
                 </div>
 
@@ -180,12 +179,11 @@ export function TenantProvisioningPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('step1.taxId')}
                   </label>
-                  <input
+                  <TextField
                     type="text"
                     value={form.taxId}
                     onChange={(e) => setForm((f) => ({ ...f, taxId: e.target.value }))}
                     placeholder="123-456-789"
-                    className="w-full border border-edge rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-card text-body"
                   />
                 </div>
 
@@ -240,7 +238,7 @@ export function TenantProvisioningPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('step2.includedHostUnits')}
                   </label>
-                  <input
+                  <TextField
                     type="number"
                     min={0}
                     max={1000}
@@ -248,7 +246,7 @@ export function TenantProvisioningPage() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, includedHostUnits: Math.max(0, parseInt(e.target.value) || 0) }))
                     }
-                    className="w-32 border border-edge rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-card text-body"
+                    className="w-32"
                   />
                   <p className="text-xs text-faded mt-1">{t('step2.hostUnitsHint')}</p>
                 </div>
