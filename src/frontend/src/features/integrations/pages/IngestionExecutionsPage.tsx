@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Activity, Search, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Play,
+  Activity, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Play,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { SearchInput } from '../../../components/SearchInput';
+import { Select } from '../../../components/Select';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
@@ -114,36 +116,35 @@ export function IngestionExecutionsPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
+        <div className="flex-1 max-w-xs">
+          <SearchInput
+            size="sm"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t('integrations.search')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
-        <select
+        <Select
+          size="sm"
           value={connectorFilter}
           onChange={e => setConnectorFilter(e.target.value)}
-          className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-        >
-          <option value="all">{t('integrations.connector')}</option>
-          {connectorNames.map(cn => (
-            <option key={cn} value={cn}>{cn}</option>
-          ))}
-        </select>
-        <select
+          options={[
+            { value: 'all', label: t('integrations.connector') },
+            ...connectorNames.map(cn => ({ value: cn, label: cn })),
+          ]}
+        />
+        <Select
+          size="sm"
           value={resultFilter}
           onChange={e => setResultFilter(e.target.value as ResultFilter)}
-          className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
-        >
-          <option value="all">{t('integrations.result')}</option>
-          {(['Success', 'PartialSuccess', 'Failed'] as const).map(r => (
-            <option key={r} value={r}>{t(`integrations.${r === 'PartialSuccess' ? 'partialSuccess' : r.toLowerCase()}`)}</option>
-          ))}
-        </select>
+          options={[
+            { value: 'all', label: t('integrations.result') },
+            ...(['Success', 'PartialSuccess', 'Failed'] as const).map(r => ({
+              value: r,
+              label: t(`integrations.${r === 'PartialSuccess' ? 'partialSuccess' : r.toLowerCase()}`),
+            })),
+          ]}
+        />
       </div>
 
       {/* Table */}
