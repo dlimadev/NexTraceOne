@@ -19,6 +19,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { setupWizardApi } from '../api/setupWizard';
 
 // ─── Wizard step definitions ──────────────────────────────────────────────────
@@ -104,12 +105,11 @@ interface InputFieldProps {
 
 function InputField({ placeholder, type = 'text', value, onChange }: InputFieldProps) {
   return (
-    <input
+    <TextField
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-3 py-2 bg-input border border-edge rounded-lg text-sm text-heading placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/40"
     />
   );
 }
