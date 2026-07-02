@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Shield, RefreshCw, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
 import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -138,65 +139,76 @@ export function AuditPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="flex flex-wrap gap-3 items-center">
-              <Search size={16} className="text-muted shrink-0" />
-              <input
-                type="text"
-                value={eventTypeFilter}
-                onChange={(e) => {
-                  setEventTypeFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={t('audit.filterPlaceholder')}
-                aria-label={t('audit.filterPlaceholder')}
-                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-              />
-              <input
-                type="text"
-                value={sourceModuleFilter}
-                onChange={(e) => {
-                  setSourceModuleFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={t('audit.sourceModulePlaceholder')}
-                aria-label={t('audit.sourceModulePlaceholder')}
-                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-              />
-              <input
-                type="text"
-                value={correlationFilter}
-                onChange={(e) => {
-                  setCorrelationFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={t('audit.correlationIdPlaceholder')}
-                aria-label={t('audit.correlationIdPlaceholder')}
-                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-              />
-              <input
-                type="text"
-                value={resourceTypeFilter}
-                onChange={(e) => {
-                  setResourceTypeFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={t('audit.resourceTypePlaceholder')}
-                aria-label={t('audit.resourceTypePlaceholder')}
-                className="min-w-[150px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-              />
-              <input
-                type="text"
-                value={resourceIdFilter}
-                onChange={(e) => {
-                  setResourceIdFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={t('audit.resourceIdPlaceholder')}
-                aria-label={t('audit.resourceIdPlaceholder')}
-                className="min-w-[150px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-              />
+              <div className="flex-1 min-w-[180px]">
+                <TextField
+                  size="sm"
+                  leadingIcon={<Search size={14} />}
+                  type="text"
+                  value={eventTypeFilter}
+                  onChange={(e) => {
+                    setEventTypeFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={t('audit.filterPlaceholder')}
+                  aria-label={t('audit.filterPlaceholder')}
+                />
+              </div>
+              <div className="flex-1 min-w-[180px]">
+                <TextField
+                  size="sm"
+                  type="text"
+                  value={sourceModuleFilter}
+                  onChange={(e) => {
+                    setSourceModuleFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={t('audit.sourceModulePlaceholder')}
+                  aria-label={t('audit.sourceModulePlaceholder')}
+                />
+              </div>
+              <div className="flex-1 min-w-[180px]">
+                <TextField
+                  size="sm"
+                  type="text"
+                  value={correlationFilter}
+                  onChange={(e) => {
+                    setCorrelationFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={t('audit.correlationIdPlaceholder')}
+                  aria-label={t('audit.correlationIdPlaceholder')}
+                />
+              </div>
+              <div className="flex-1 min-w-[150px]">
+                <TextField
+                  size="sm"
+                  type="text"
+                  value={resourceTypeFilter}
+                  onChange={(e) => {
+                    setResourceTypeFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={t('audit.resourceTypePlaceholder')}
+                  aria-label={t('audit.resourceTypePlaceholder')}
+                />
+              </div>
+              <div className="flex-1 min-w-[150px]">
+                <TextField
+                  size="sm"
+                  type="text"
+                  value={resourceIdFilter}
+                  onChange={(e) => {
+                    setResourceIdFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder={t('audit.resourceIdPlaceholder')}
+                  aria-label={t('audit.resourceIdPlaceholder')}
+                />
+              </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted">{t('audit.fromDate')}</span>
-                <input
+                <TextField
+                  size="sm"
                   type="date"
                   value={fromDate}
                   onChange={(e) => {
@@ -204,12 +216,12 @@ export function AuditPage() {
                     setPage(1);
                   }}
                   aria-label={t('audit.fromDate')}
-                  className="text-sm bg-transparent text-heading focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted">{t('audit.toDate')}</span>
-                <input
+                <TextField
+                  size="sm"
                   type="date"
                   value={toDate}
                   onChange={(e) => {
@@ -217,7 +229,6 @@ export function AuditPage() {
                     setPage(1);
                   }}
                   aria-label={t('audit.toDate')}
-                  className="text-sm bg-transparent text-heading focus:outline-none"
                 />
               </div>
               <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
