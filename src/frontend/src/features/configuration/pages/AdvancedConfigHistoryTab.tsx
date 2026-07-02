@@ -6,9 +6,10 @@
  */
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, History } from 'lucide-react';
+import { History } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { SearchInput } from '../../../components/SearchInput';
 import type { ConfigurationAuditEntryDto } from '../types';
 
 // ── Props ──────────────────────────────────────────────────────────────
@@ -40,12 +41,9 @@ export const AdvancedConfigHistoryTab = memo(function AdvancedConfigHistoryTab({
             {t('advancedConfig.history.description', 'View all configuration changes across domains. Filter by key, user, or time period.')}
           </p>
 
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-            <input
-              type="text"
+          <div className="mb-4">
+            <SearchInput
               placeholder={t('advancedConfig.history.searchPlaceholder', 'Search by key...')}
-              className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
               onChange={(e) => {
                 if (e.target.value.length > 2) setSelectedAuditKey(e.target.value);
               }}
