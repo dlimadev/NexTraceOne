@@ -15,6 +15,7 @@ import {
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { platformAdminApi, type GreenOpsConfigUpdate } from '../api/platformAdmin';
 
 export function GreenOpsPage() {
@@ -355,11 +356,10 @@ function ConfigField({
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-body">{label}</label>
-      <input
+      <TextField
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 border border-edge rounded-lg bg-canvas text-body text-sm focus:ring-1 focus:ring-accent/50 focus:border-accent/50"
         aria-label={label}
       />
       <p className="text-xs text-muted">{hint}</p>

@@ -214,9 +214,9 @@ function StepIndicator({
             <div
               className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold ${
                 isDone
-                  ? 'bg-success text-white'
+                  ? 'bg-success text-on-accent'
                   : isActive
-                  ? 'bg-accent text-white'
+                  ? 'bg-accent text-on-accent'
                   : 'bg-elevated text-muted'
               }`}
             >
@@ -296,7 +296,7 @@ function Step1ChooseRestorePoint({
         <button
           onClick={onNext}
           disabled={!selected}
-          className="px-5 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90 disabled:opacity-50"
+          className="px-5 py-2 bg-accent text-on-accent text-sm rounded-lg hover:bg-accent/90 disabled:opacity-50"
         >
           {t('next')}
         </button>
@@ -389,7 +389,7 @@ function Step2ChooseScope({
         </button>
         <button
           onClick={onNext}
-          className="px-5 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90"
+          className="px-5 py-2 bg-accent text-on-accent text-sm rounded-lg hover:bg-accent/90"
         >
           {t('next')}
         </button>
@@ -459,7 +459,7 @@ function Step3Confirm({
         </button>
         <button
           onClick={onExecute}
-          className={`px-5 py-2 text-sm rounded-lg text-white ${
+          className={`px-5 py-2 text-sm rounded-lg text-on-accent ${
             dryRun ? 'bg-warning hover:bg-warning/90' : 'bg-critical hover:bg-critical/90'
           }`}
         >

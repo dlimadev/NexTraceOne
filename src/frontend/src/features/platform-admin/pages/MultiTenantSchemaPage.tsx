@@ -13,6 +13,7 @@ import {
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { platformAdminApi, type TenantSchemaEntry } from '../api/platformAdmin';
 
 export function MultiTenantSchemaPage() {
@@ -93,12 +94,11 @@ export function MultiTenantSchemaPage() {
           <h2 className="text-sm font-semibold text-heading mb-3">{t('provisionTitle')}</h2>
           <div className="flex items-start gap-3">
             <div className="flex-1">
-              <input
+              <TextField
                 type="text"
                 value={newSlug}
                 onChange={(e) => setNewSlug(e.target.value.toLowerCase())}
                 placeholder={t('slugPlaceholder')}
-                className="w-full px-3 py-2 text-sm border border-edge rounded-lg bg-canvas text-body focus:outline-none focus:ring-2 focus:ring-accent/50"
               />
               {provisionError && (
                 <p className="mt-1 text-xs text-critical">{provisionError}</p>
