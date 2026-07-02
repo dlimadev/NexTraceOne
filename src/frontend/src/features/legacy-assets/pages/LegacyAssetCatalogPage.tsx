@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
-  Search,
   Database,
   Users,
   ChevronRight,
@@ -11,6 +10,9 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { SearchInput } from '../../../components/SearchInput';
+import { Select } from '../../../components/Select';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -135,16 +137,11 @@ export function LegacyAssetCatalogPage() {
           <CardBody>
             <div className="flex flex-col gap-4">
               {/* Barra de pesquisa */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
-                <input
-                  type="text"
-                  className="w-full pl-10 pr-4 py-2 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                  placeholder={t('legacyCatalog.filters.search')}
-                  value={filters.search}
-                  onChange={(e) => setFilter('search', e.target.value)}
-                />
-              </div>
+              <SearchInput
+                placeholder={t('legacyCatalog.filters.search')}
+                value={filters.search}
+                onChange={(e) => setFilter('search', e.target.value)}
+              />
 
               {/* Filtros dropdown */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -162,26 +159,22 @@ export function LegacyAssetCatalogPage() {
                   options={CRITICALITY_VALUES.map((v) => ({ value: v, label: t(`catalog.badges.criticality.${v}`) }))}
                   allLabel={t('legacyCatalog.filters.allTypes')}
                 />
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-muted">{t('legacyCatalog.filters.teamName')}</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-1.5 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                    placeholder={t('legacyCatalog.filters.teamName')}
-                    value={filters.teamName}
-                    onChange={(e) => setFilter('teamName', e.target.value)}
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-muted">{t('legacyCatalog.filters.domain')}</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-1.5 bg-elevated border border-edge rounded-md text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-                    placeholder={t('legacyCatalog.filters.domain')}
-                    value={filters.domain}
-                    onChange={(e) => setFilter('domain', e.target.value)}
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('legacyCatalog.filters.teamName')}
+                  type="text"
+                  placeholder={t('legacyCatalog.filters.teamName')}
+                  value={filters.teamName}
+                  onChange={(e) => setFilter('teamName', e.target.value)}
+                />
+                <TextField
+                  size="sm"
+                  label={t('legacyCatalog.filters.domain')}
+                  type="text"
+                  placeholder={t('legacyCatalog.filters.domain')}
+                  value={filters.domain}
+                  onChange={(e) => setFilter('domain', e.target.value)}
+                />
               </div>
             </div>
           </CardBody>
@@ -316,21 +309,13 @@ function FilterSelect({
   allLabel: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs text-muted">{label}</label>
-      <select
-        className="w-full px-3 py-1.5 bg-elevated border border-edge rounded-md text-sm text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">{allLabel}</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      size="sm"
+      label={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      options={[{ value: '', label: allLabel }, ...options]}
+    />
   );
 }
 
