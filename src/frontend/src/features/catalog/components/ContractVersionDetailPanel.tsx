@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -441,21 +443,19 @@ export function ContractVersionDetailPanel({
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-body mb-1">{t('contracts.deprecationNotice')}</label>
-                    <textarea
+                    <TextArea
                       value={deprecateNotice}
                       onChange={(e) => setDeprecateNotice(e.target.value)}
                       rows={3}
                       required
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-body mb-1">{t('contracts.sunsetDate')}</label>
-                    <input
+                    <TextField
                       type="date"
                       value={deprecateSunsetDate}
                       onChange={(e) => setDeprecateSunsetDate(e.target.value)}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                     />
                   </div>
                   <div className="flex gap-2 justify-end">

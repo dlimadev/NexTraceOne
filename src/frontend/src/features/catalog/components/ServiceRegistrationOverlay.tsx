@@ -7,11 +7,11 @@ import {
 } from 'lucide-react';
 import { WizardOverlay } from './WizardOverlay';
 import { ServiceTypeIconPicker } from './ServiceTypeIconPicker';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
 import { serviceCatalogApi } from '../api';
 
-const inputClass =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
-const selectClass = inputClass;
 const labelClass = 'block text-sm font-medium text-body mb-1';
 
 interface ServiceRegistrationOverlayProps {
@@ -117,9 +117,8 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
           <div className="space-y-4">
             <div>
               <label className={labelClass}>{t('serviceCatalog.name')} <span className="text-danger">*</span></label>
-              <input
+              <TextField
                 type="text"
-                className={inputClass}
                 value={form.name}
                 onChange={(e) => { set('name', e.target.value); clearError('name'); }}
                 placeholder="e.g., payment-service"
@@ -128,9 +127,8 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
             </div>
             <div>
               <label className={labelClass}>{t('serviceCatalog.domain', { defaultValue: 'Domain' })} <span className="text-danger">*</span></label>
-              <input
+              <TextField
                 type="text"
-                className={inputClass}
                 value={form.domain}
                 onChange={(e) => { set('domain', e.target.value); clearError('domain'); }}
                 placeholder="e.g., payments, identity, orders"
@@ -139,12 +137,12 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
             </div>
             <div>
               <label className={labelClass}>{t('serviceCatalog.subDomain', { defaultValue: 'Sub-Domain' })}</label>
-              <input type="text" className={inputClass} value={form.subDomain}
+              <TextField type="text" value={form.subDomain}
                 onChange={(e) => set('subDomain', e.target.value)} placeholder="e.g., billing" />
             </div>
             <div>
               <label className={labelClass}>{t('serviceCatalog.capability', { defaultValue: 'Capability' })}</label>
-              <input type="text" className={inputClass} value={form.capability}
+              <TextField type="text" value={form.capability}
                 onChange={(e) => set('capability', e.target.value)} placeholder="e.g., payment-processing" />
             </div>
           </div>
@@ -160,29 +158,37 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
                 <label className={labelClass}>{t('serviceCatalog.criticality', { defaultValue: 'Criticality' })}</label>
-                <select className={selectClass} value={form.criticality} onChange={(e) => set('criticality', e.target.value)}>
-                  <option value="Critical">{t('catalog.badges.criticality.Critical')}</option>
-                  <option value="High">{t('catalog.badges.criticality.High')}</option>
-                  <option value="Medium">{t('catalog.badges.criticality.Medium')}</option>
-                  <option value="Low">{t('catalog.badges.criticality.Low')}</option>
-                </select>
+                <Select
+                  value={form.criticality}
+                  onChange={(e) => set('criticality', e.target.value)}
+                  options={[
+                    { value: 'Critical', label: t('catalog.badges.criticality.Critical') },
+                    { value: 'High', label: t('catalog.badges.criticality.High') },
+                    { value: 'Medium', label: t('catalog.badges.criticality.Medium') },
+                    { value: 'Low', label: t('catalog.badges.criticality.Low') },
+                  ]}
+                />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.exposureType', { defaultValue: 'Exposure' })}</label>
-                <select className={selectClass} value={form.exposureType} onChange={(e) => set('exposureType', e.target.value)}>
-                  <option value="Internal">{t('catalog.badges.exposure.Internal')}</option>
-                  <option value="External">{t('catalog.badges.exposure.External')}</option>
-                  <option value="Partner">{t('catalog.badges.exposure.Partner')}</option>
-                </select>
+                <Select
+                  value={form.exposureType}
+                  onChange={(e) => set('exposureType', e.target.value)}
+                  options={[
+                    { value: 'Internal', label: t('catalog.badges.exposure.Internal') },
+                    { value: 'External', label: t('catalog.badges.exposure.External') },
+                    { value: 'Partner', label: t('catalog.badges.exposure.Partner') },
+                  ]}
+                />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.dataClassification', { defaultValue: 'Data Classification' })}</label>
-                <input type="text" className={inputClass} value={form.dataClassification}
+                <TextField type="text" value={form.dataClassification}
                   onChange={(e) => set('dataClassification', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.infrastructureProvider', { defaultValue: 'Infrastructure' })}</label>
-                <input type="text" className={inputClass} value={form.infrastructureProvider}
+                <TextField type="text" value={form.infrastructureProvider}
                   onChange={(e) => set('infrastructureProvider', e.target.value)} />
               </div>
             </div>
@@ -194,9 +200,8 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
           <div className="space-y-4">
             <div>
               <label className={labelClass}>{t('serviceCatalog.team')} <span className="text-danger">*</span></label>
-              <input
+              <TextField
                 type="text"
-                className={inputClass}
                 value={form.team}
                 onChange={(e) => { set('team', e.target.value); clearError('team'); }}
                 placeholder="e.g., platform-team"
@@ -206,22 +211,22 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>{t('serviceCatalog.technicalOwner', { defaultValue: 'Technical Owner' })}</label>
-                <input type="text" className={inputClass} value={form.technicalOwner}
+                <TextField type="text" value={form.technicalOwner}
                   onChange={(e) => set('technicalOwner', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.businessOwner', { defaultValue: 'Business Owner' })}</label>
-                <input type="text" className={inputClass} value={form.businessOwner}
+                <TextField type="text" value={form.businessOwner}
                   onChange={(e) => set('businessOwner', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.productOwner', { defaultValue: 'Product Owner' })}</label>
-                <input type="text" className={inputClass} value={form.productOwner}
+                <TextField type="text" value={form.productOwner}
                   onChange={(e) => set('productOwner', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>{t('serviceCatalog.contactChannel', { defaultValue: 'Contact Channel' })}</label>
-                <input type="text" className={inputClass} value={form.contactChannel}
+                <TextField type="text" value={form.contactChannel}
                   onChange={(e) => set('contactChannel', e.target.value)} placeholder="#slack-channel" />
               </div>
             </div>
@@ -233,8 +238,8 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
           <div className="space-y-4">
             <div>
               <label className={labelClass}>{t('serviceCatalog.description', { defaultValue: 'Description' })}</label>
-              <textarea
-                className={`${inputClass} resize-none`}
+              <TextArea
+                textareaClassName="resize-none"
                 rows={3}
                 value={form.description}
                 onChange={(e) => set('description', e.target.value)}
@@ -242,12 +247,12 @@ export function ServiceRegistrationOverlay({ onClose, onSuccess }: ServiceRegist
             </div>
             <div>
               <label className={labelClass}>{t('serviceCatalog.documentationUrl', { defaultValue: 'Documentation URL' })}</label>
-              <input type="url" className={inputClass} value={form.documentationUrl}
+              <TextField type="url" value={form.documentationUrl}
                 onChange={(e) => set('documentationUrl', e.target.value)} placeholder="https://docs.example.com" />
             </div>
             <div>
               <label className={labelClass}>{t('serviceCatalog.repositoryUrl', { defaultValue: 'Repository URL' })}</label>
-              <input type="url" className={inputClass} value={form.repositoryUrl}
+              <TextField type="url" value={form.repositoryUrl}
                 onChange={(e) => set('repositoryUrl', e.target.value)} placeholder="https://github.com/org/repo" />
             </div>
           </div>

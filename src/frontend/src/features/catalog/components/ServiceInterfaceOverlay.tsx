@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 import { Plug, Settings2, ClipboardCheck } from 'lucide-react';
 import { WizardOverlay } from './WizardOverlay';
 import { ServiceTypeIconPicker } from './ServiceTypeIconPicker';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import { serviceCatalogApi } from '../api';
 import type { InterfaceType } from '../../../types';
 
-const inputClass =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
-const selectClass = inputClass;
 const labelClass = 'block text-sm font-medium text-body mb-1';
 
 interface ServiceInterfaceOverlayProps {
@@ -106,9 +106,8 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
             </div>
             <div className="mt-4">
               <label className={labelClass}>{t('serviceCatalog.name')} <span className="text-danger">*</span></label>
-              <input
+              <TextField
                 type="text"
-                className={inputClass}
                 value={form.name}
                 onChange={(e) => { set('name', e.target.value); clearError('name'); }}
                 placeholder="Interface name, e.g., POST /payments"
@@ -117,11 +116,15 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
             </div>
             <div>
               <label className={labelClass}>{t('catalog.interface.exposureScope', { defaultValue: 'Exposure Scope' })}</label>
-              <select className={selectClass} value={form.exposureScope} onChange={(e) => set('exposureScope', e.target.value)}>
-                <option value="Internal">{t('catalog.badges.exposure.Internal')}</option>
-                <option value="External">{t('catalog.badges.exposure.External')}</option>
-                <option value="Partner">{t('catalog.badges.exposure.Partner')}</option>
-              </select>
+              <Select
+                value={form.exposureScope}
+                onChange={(e) => set('exposureScope', e.target.value)}
+                options={[
+                  { value: 'Internal', label: t('catalog.badges.exposure.Internal') },
+                  { value: 'External', label: t('catalog.badges.exposure.External') },
+                  { value: 'Partner', label: t('catalog.badges.exposure.Partner') },
+                ]}
+              />
             </div>
           </div>
         );
@@ -133,51 +136,49 @@ export function ServiceInterfaceOverlay({ serviceId, serviceName, onClose, onSuc
             {TYPES_WITH_BASE_PATH.includes(ifType) && (
               <div>
                 <label className={labelClass}>{t('catalog.interface.basePath', { defaultValue: 'Base Path' })}</label>
-                <input type="text" className={`${inputClass} font-mono`} value={form.basePath}
+                <TextField type="text" className="font-mono" value={form.basePath}
                   onChange={(e) => set('basePath', e.target.value)} placeholder="/api/v1" />
               </div>
             )}
             {TYPES_WITH_WSDL.includes(ifType) && (
               <div>
                 <label className={labelClass}>{t('catalog.interface.wsdlNamespace', { defaultValue: 'WSDL Namespace' })}</label>
-                <input type="text" className={`${inputClass} font-mono`} value={form.wsdlNamespace}
+                <TextField type="text" className="font-mono" value={form.wsdlNamespace}
                   onChange={(e) => set('wsdlNamespace', e.target.value)} placeholder="http://example.com/service" />
               </div>
             )}
             {TYPES_WITH_TOPIC.includes(ifType) && (
               <div>
                 <label className={labelClass}>{t('catalog.interface.topicName', { defaultValue: 'Topic Name' })}</label>
-                <input type="text" className={`${inputClass} font-mono`} value={form.topicName}
+                <TextField type="text" className="font-mono" value={form.topicName}
                   onChange={(e) => set('topicName', e.target.value)} placeholder="topic.name.v1" />
               </div>
             )}
             {TYPES_WITH_GRPC.includes(ifType) && (
               <div>
                 <label className={labelClass}>{t('catalog.interface.grpcServiceName', { defaultValue: 'gRPC Service Name' })}</label>
-                <input type="text" className={`${inputClass} font-mono`} value={form.grpcServiceName}
+                <TextField type="text" className="font-mono" value={form.grpcServiceName}
                   onChange={(e) => set('grpcServiceName', e.target.value)} placeholder="PaymentService" />
               </div>
             )}
             {TYPES_WITH_CRON.includes(ifType) && (
               <div>
                 <label className={labelClass}>{t('catalog.interface.scheduleCron', { defaultValue: 'Schedule (cron)' })}</label>
-                <input type="text" className={`${inputClass} font-mono`} value={form.scheduleCron}
+                <TextField type="text" className="font-mono" value={form.scheduleCron}
                   onChange={(e) => set('scheduleCron', e.target.value)} placeholder="0 */6 * * *" />
               </div>
             )}
             <div>
               <label className={labelClass}>{t('serviceCatalog.documentationUrl', { defaultValue: 'Documentation URL' })}</label>
-              <input type="url" className={inputClass} value={form.documentationUrl}
+              <TextField type="url" value={form.documentationUrl}
                 onChange={(e) => set('documentationUrl', e.target.value)} />
             </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="requiresContract" checked={form.requiresContract}
-                onChange={(e) => set('requiresContract', e.target.checked)}
-                className="rounded border-edge text-accent" />
-              <label htmlFor="requiresContract" className="text-sm text-body">
-                {t('catalog.interface.requiresContract', { defaultValue: 'Requires contract' })}
-              </label>
-            </div>
+            <Checkbox
+              id="requiresContract"
+              label={t('catalog.interface.requiresContract', { defaultValue: 'Requires contract' })}
+              checked={form.requiresContract}
+              onChange={(e) => set('requiresContract', e.target.checked)}
+            />
           </div>
         );
       }
