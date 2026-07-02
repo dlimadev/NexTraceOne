@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -126,37 +129,28 @@ export function WebhookTemplatesPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('common.name', 'Name')}</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
-                  placeholder={t('common.name', 'Name')}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('webhookTemplates.eventType')}</label>
-                <select
+              <TextField
+                label={t('common.name', 'Name')}
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder={t('common.name', 'Name')}
+              />
+              <div className="w-64">
+                <Select
+                  label={t('webhookTemplates.eventType')}
                   value={eventType}
                   onChange={e => setEventType(e.target.value as EventType)}
-                  className="w-64 px-3 py-1.5 text-sm border rounded bg-elevated"
-                >
-                  {EVENT_TYPES.map(et => (
-                    <option key={et} value={et}>{et}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('webhookTemplates.payload')}</label>
-                <textarea
-                  value={payloadTemplate}
-                  onChange={e => setPayloadTemplate(e.target.value)}
-                  rows={6}
-                  className="w-full px-3 py-2 text-sm border rounded bg-transparent font-mono"
+                  options={EVENT_TYPES.map(et => ({ value: et, label: et }))}
                 />
               </div>
+              <TextArea
+                label={t('webhookTemplates.payload')}
+                value={payloadTemplate}
+                onChange={e => setPayloadTemplate(e.target.value)}
+                rows={6}
+                textareaClassName="font-mono"
+              />
               <div className="flex gap-2">
                 <Button
                   variant="primary"
