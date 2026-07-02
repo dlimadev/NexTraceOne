@@ -6,6 +6,9 @@ import {
 } from 'lucide-react';
 import { EmptyState } from '../../../components/EmptyState';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Checkbox } from '../../../components/Checkbox';
 import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -192,34 +195,26 @@ export function WebhookSubscriptionsPage() {
             </CardHeader>
             <CardBody>
               <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
-                <div>
-                  <label className="block text-xs font-medium text-secondary mb-1">
-                    {t('webhookSubscriptions.webhookName')}
-                  </label>
-                  <input
-                    type="text"
-                    className="input input-sm w-full"
-                    value={form.name}
-                    onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                    required
-                    maxLength={100}
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('webhookSubscriptions.webhookName')}
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                  required
+                  maxLength={100}
+                />
 
-                <div>
-                  <label className="block text-xs font-medium text-secondary mb-1">
-                    {t('webhookSubscriptions.targetUrl')}
-                  </label>
-                  <input
-                    type="url"
-                    className="input input-sm w-full"
-                    value={form.targetUrl}
-                    onChange={e => setForm(p => ({ ...p, targetUrl: e.target.value }))}
-                    placeholder={t('webhookSubscriptions.placeholder.targetUrl', 'https://')}
-                    required
-                    maxLength={500}
-                  />
-                </div>
+                <TextField
+                  size="sm"
+                  label={t('webhookSubscriptions.targetUrl')}
+                  type="url"
+                  value={form.targetUrl}
+                  onChange={e => setForm(p => ({ ...p, targetUrl: e.target.value }))}
+                  placeholder={t('webhookSubscriptions.placeholder.targetUrl', 'https://')}
+                  required
+                  maxLength={500}
+                />
 
                 <div>
                   <label className="block text-xs font-medium text-secondary mb-2">
@@ -227,26 +222,21 @@ export function WebhookSubscriptionsPage() {
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
                     {ALL_EVENT_TYPE_CODES.map(code => (
-                      <label key={code} className="flex items-center gap-2 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={form.selectedEvents.includes(code)}
-                          onChange={() => handleEventToggle(code)}
-                          className="checkbox checkbox-sm"
-                        />
-                        <span className="text-xs text-secondary font-mono">{code}</span>
-                      </label>
+                      <Checkbox
+                        key={code}
+                        label={code}
+                        checked={form.selectedEvents.includes(code)}
+                        onChange={() => handleEventToggle(code)}
+                      />
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-secondary mb-1">
-                    {t('webhookSubscriptions.secret')}
-                  </label>
-                  <input
+                  <TextField
+                    size="sm"
+                    label={t('webhookSubscriptions.secret')}
                     type="password"
-                    className="input input-sm w-full"
                     value={form.secret}
                     onChange={e => setForm(p => ({ ...p, secret: e.target.value }))}
                     autoComplete="new-password"
@@ -254,30 +244,19 @@ export function WebhookSubscriptionsPage() {
                   <p className="text-xs text-muted mt-1">{t('webhookSubscriptions.secretHint')}</p>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-secondary mb-1">
-                    {t('webhookSubscriptions.description')}
-                  </label>
-                  <textarea
-                    className="input input-sm w-full min-h-[60px]"
-                    value={form.description}
-                    onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                    maxLength={500}
-                  />
-                </div>
+                <TextArea
+                  label={t('webhookSubscriptions.description')}
+                  value={form.description}
+                  onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                  maxLength={500}
+                  rows={2}
+                />
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="webhook-active"
-                    className="checkbox checkbox-sm"
-                    checked={form.isActive}
-                    onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))}
-                  />
-                  <label htmlFor="webhook-active" className="text-xs text-secondary cursor-pointer">
-                    {t('webhookSubscriptions.isActive')}
-                  </label>
-                </div>
+                <Checkbox
+                  label={t('webhookSubscriptions.isActive')}
+                  checked={form.isActive}
+                  onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))}
+                />
 
                 {formError && (
                   <p className="text-xs text-critical">{formError}</p>
