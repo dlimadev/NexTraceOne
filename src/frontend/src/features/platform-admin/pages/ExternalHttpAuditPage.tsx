@@ -5,6 +5,7 @@ import { Globe, RefreshCw, ShieldOff, Filter } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { platformAdminApi, type ExternalHttpAuditParams } from '../api/platformAdmin';
 
 export function ExternalHttpAuditPage() {
@@ -48,14 +49,15 @@ export function ExternalHttpAuditPage() {
         {/* Filter bar */}
         <div className="flex items-center gap-3 p-4 bg-elevated border border-edge rounded-lg">
           <Filter size={16} className="text-faded" />
-          <input
-            type="text"
-            value={destinationFilter}
-            onChange={(e) => setDestinationFilter(e.target.value)}
-            placeholder={t('filterPlaceholder')}
-            className="flex-1 text-sm border border-edge rounded px-2 py-1 bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-accent/50"
-            onKeyDown={(e) => e.key === 'Enter' && applyFilter()}
-          />
+          <div className="flex-1">
+            <TextField
+              type="text"
+              value={destinationFilter}
+              onChange={(e) => setDestinationFilter(e.target.value)}
+              placeholder={t('filterPlaceholder')}
+              onKeyDown={(e) => e.key === 'Enter' && applyFilter()}
+            />
+          </div>
           <button
             onClick={applyFilter}
             className="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-accent/90"
