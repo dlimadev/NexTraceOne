@@ -8,6 +8,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeftRight, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { Select } from '../../../components/Select';
 import type {
   ConfigurationDefinitionDto,
   ConfigurationScope,
@@ -50,28 +51,28 @@ export const AdvancedConfigDiffTab = memo(function AdvancedConfigDiffTab({
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.leftScope', 'Left Scope')}</label>
-              <select
+              <Select
                 value={selectedScope}
                 onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-              >
-                <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
-                <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
-                <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
-              </select>
+                options={[
+                  { value: 'System', label: t('advancedConfig.scopeOptions.system', 'System') },
+                  { value: 'Tenant', label: t('advancedConfig.scopeOptions.tenant', 'Tenant') },
+                  { value: 'Environment', label: t('advancedConfig.scopeOptions.environment', 'Environment') },
+                ]}
+              />
             </div>
             <ArrowLeftRight className="w-5 h-5 text-muted mt-5" />
             <div className="flex-1">
               <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.rightScope', 'Right Scope')}</label>
-              <select
+              <Select
                 value={compareScope}
                 onChange={(e) => setCompareScope(e.target.value as ConfigurationScope)}
-                className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-              >
-                <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
-                <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
-                <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
-              </select>
+                options={[
+                  { value: 'System', label: t('advancedConfig.scopeOptions.system', 'System') },
+                  { value: 'Tenant', label: t('advancedConfig.scopeOptions.tenant', 'Tenant') },
+                  { value: 'Environment', label: t('advancedConfig.scopeOptions.environment', 'Environment') },
+                ]}
+              />
             </div>
           </div>
         </CardBody>
