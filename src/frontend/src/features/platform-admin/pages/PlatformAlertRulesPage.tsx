@@ -10,6 +10,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import {
@@ -237,45 +239,55 @@ function RuleRow({
           <div className="text-xs text-muted">{rule.description}</div>
         </td>
         <td className="px-4 py-3">
-          <input
-            type="number"
-            value={editValues.warning ?? ''}
-            onChange={(e) => setEditValues({ ...editValues, warning: e.target.value })}
-            className="w-20 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
-            aria-label={t('colWarning')}
-          />
-          <span className="ml-1 text-xs text-muted">{rule.unit}</span>
+          <span className="inline-flex items-center gap-1">
+            <TextField
+              type="number"
+              size="sm"
+              value={editValues.warning ?? ''}
+              onChange={(e) => setEditValues({ ...editValues, warning: e.target.value })}
+              className="w-20"
+              aria-label={t('colWarning')}
+            />
+            <span className="text-xs text-muted">{rule.unit}</span>
+          </span>
         </td>
         <td className="px-4 py-3">
-          <input
-            type="number"
-            value={editValues.critical ?? ''}
-            onChange={(e) => setEditValues({ ...editValues, critical: e.target.value })}
-            className="w-20 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
-            aria-label={t('colCritical')}
-          />
-          <span className="ml-1 text-xs text-muted">{rule.unit}</span>
+          <span className="inline-flex items-center gap-1">
+            <TextField
+              type="number"
+              size="sm"
+              value={editValues.critical ?? ''}
+              onChange={(e) => setEditValues({ ...editValues, critical: e.target.value })}
+              className="w-20"
+              aria-label={t('colCritical')}
+            />
+            <span className="text-xs text-muted">{rule.unit}</span>
+          </span>
         </td>
         <td className="px-4 py-3">
-          <input
-            type="number"
-            value={editValues.cooldown ?? ''}
-            onChange={(e) => setEditValues({ ...editValues, cooldown: e.target.value })}
-            className="w-16 px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
-            aria-label={t('colCooldown')}
-          />
-          <span className="ml-1 text-xs text-muted">{t('minutes')}</span>
+          <span className="inline-flex items-center gap-1">
+            <TextField
+              type="number"
+              size="sm"
+              value={editValues.cooldown ?? ''}
+              onChange={(e) => setEditValues({ ...editValues, cooldown: e.target.value })}
+              className="w-16"
+              aria-label={t('colCooldown')}
+            />
+            <span className="text-xs text-muted">{t('minutes')}</span>
+          </span>
         </td>
         <td className="px-4 py-3">
-          <select
+          <Select
+            size="sm"
             value={editValues.enabled ?? 'true'}
             onChange={(e) => setEditValues({ ...editValues, enabled: e.target.value })}
-            className="px-2 py-1 border border-edge rounded bg-canvas text-body text-sm"
             aria-label={t('colStatus')}
-          >
-            <option value="true">{t('enabled')}</option>
-            <option value="false">{t('disabled')}</option>
-          </select>
+            options={[
+              { value: 'true', label: t('enabled') },
+              { value: 'false', label: t('disabled') },
+            ]}
+          />
         </td>
         <td className="px-4 py-3 flex gap-2">
           <button
