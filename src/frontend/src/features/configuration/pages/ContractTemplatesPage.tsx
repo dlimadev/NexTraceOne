@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileCode, Plus, Trash2 } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -208,47 +210,27 @@ export function ContractTemplatesPage() {
             </h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.name')}
-                </label>
-                <input
-                  type="text"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder={t('workflows.contractTemplates.title')}
-                />
-              </div>
+              <TextField
+                label={t('common.name')}
+                type="text"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder={t('workflows.contractTemplates.title')}
+              />
 
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('workflows.contractTemplates.type')}
-                </label>
-                <select
-                  value={contractType}
-                  onChange={(e) => setContractType(e.target.value as ContractType)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
-                >
-                  {CONTRACT_TYPES.map((ct) => (
-                    <option key={ct} value={ct}>
-                      {ct}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label={t('workflows.contractTemplates.type')}
+                value={contractType}
+                onChange={(e) => setContractType(e.target.value as ContractType)}
+                options={CONTRACT_TYPES.map((ct) => ({ value: ct, label: ct }))}
+              />
 
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.description')}
-                </label>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                />
-              </div>
+              <TextField
+                label={t('common.description')}
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
 
             <div className="mt-6 flex items-center justify-between">

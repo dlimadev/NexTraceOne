@@ -14,7 +14,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Search,
   ArrowLeftRight,
   Download,
   RotateCcw,
@@ -26,6 +25,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { SearchInput } from '../../../components/SearchInput';
 import {
   useConfigurationDefinitions,
   useEffectiveSettings,
@@ -251,14 +251,11 @@ export function AdvancedConfigurationConsolePage() {
       </div>
 
       {/* ── Search ────────────────────────────────────────────────────── */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-        <input
-          type="text"
+      <div className="mb-6">
+        <SearchInput
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t('advancedConfig.searchPlaceholder', 'Search by key or name...')}
-          className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
         />
       </div>
 

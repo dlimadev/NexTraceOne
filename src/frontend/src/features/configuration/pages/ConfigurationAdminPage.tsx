@@ -6,9 +6,7 @@ import {
   Unlock,
   Shield,
   History,
-  Search,
   Filter,
-  ChevronDown,
   Check,
   X,
   RefreshCw,
@@ -18,6 +16,10 @@ import {
   ToggleRight,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { SearchInput } from '../../../components/SearchInput';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -324,18 +326,17 @@ export function ConfigurationAdminPage() {
                   </span>
                 </button>
               ) : isJson ? (
-                <textarea
+                <TextArea
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   rows={6}
-                  className="w-full text-sm font-mono bg-elevated border border-edge rounded px-3 py-2 text-heading focus:outline-none focus:ring-1 focus:ring-accent"
+                  textareaClassName="font-mono"
                 />
               ) : (
-                <input
+                <TextField
                   type={valueType === 'Integer' || valueType === 'Decimal' ? 'number' : 'text'}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="w-full text-sm bg-elevated border border-edge rounded px-3 py-2 text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               )}
             </div>
@@ -345,12 +346,11 @@ export function ConfigurationAdminPage() {
               <label className="block text-xs font-medium text-muted mb-1">
                 {t('configuration.edit.changeReason')}
               </label>
-              <input
+              <TextField
                 type="text"
                 value={editReason}
                 onChange={(e) => setEditReason(e.target.value)}
                 placeholder={t('configuration.edit.changeReasonPlaceholder')}
-                className="w-full text-sm bg-elevated border border-edge rounded px-3 py-2 text-heading focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
           </div>
@@ -470,23 +470,14 @@ export function ConfigurationAdminPage() {
               <label className="block text-xs font-medium text-muted mb-1">
                 {t('configuration.filters.scope')}
               </label>
-              <div className="relative">
-                <select
-                  value={scope}
-                  onChange={(e) => setScope(e.target.value as ConfigurationScope)}
-                  className="w-full text-sm bg-elevated border border-edge rounded px-3 py-2 text-heading appearance-none focus:outline-none focus:ring-1 focus:ring-accent pr-8"
-                >
-                  {SCOPES.map((s) => (
-                    <option key={s} value={s}>
-                      {t(`configuration.scope.${s.toLowerCase()}`)}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
-                />
-              </div>
+              <Select
+                value={scope}
+                onChange={(e) => setScope(e.target.value as ConfigurationScope)}
+                options={SCOPES.map((s) => ({
+                  value: s,
+                  label: t(`configuration.scope.${s.toLowerCase()}`),
+                }))}
+              />
             </div>
 
             {/* Scope Reference ID */}
@@ -495,12 +486,11 @@ export function ConfigurationAdminPage() {
                 <label className="block text-xs font-medium text-muted mb-1">
                   {t('configuration.filters.scopeReferenceId')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={scopeRefId}
                   onChange={(e) => setScopeRefId(e.target.value)}
                   placeholder={t('configuration.filters.scopeReferenceIdPlaceholder')}
-                  className="w-full text-sm bg-elevated border border-edge rounded px-3 py-2 text-heading focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
             )}
@@ -510,19 +500,11 @@ export function ConfigurationAdminPage() {
               <label className="block text-xs font-medium text-muted mb-1">
                 {t('configuration.filters.search')}
               </label>
-              <div className="relative">
-                <Search
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={t('configuration.filters.searchPlaceholder')}
-                  className="w-full text-sm bg-elevated border border-edge rounded pl-9 pr-3 py-2 text-heading focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
+              <SearchInput
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t('configuration.filters.searchPlaceholder')}
+              />
             </div>
 
             {/* Category filter */}
@@ -531,24 +513,17 @@ export function ConfigurationAdminPage() {
                 <Filter size={12} />
                 {t('configuration.filters.category')}
               </label>
-              <div className="relative">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full text-sm bg-elevated border border-edge rounded px-3 py-2 text-heading appearance-none focus:outline-none focus:ring-1 focus:ring-accent pr-8"
-                >
-                  <option value="">{t('configuration.filters.allCategories')}</option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {t(`configuration.category.${c.toLowerCase()}`)}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
-                />
-              </div>
+              <Select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                options={[
+                  { value: '', label: t('configuration.filters.allCategories') },
+                  ...CATEGORIES.map((c) => ({
+                    value: c,
+                    label: t(`configuration.category.${c.toLowerCase()}`),
+                  })),
+                ]}
+              />
             </div>
           </div>
         </CardBody>

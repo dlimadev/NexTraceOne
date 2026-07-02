@@ -6,9 +6,10 @@
  */
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Clock, RotateCcw } from 'lucide-react';
+import { Clock, RotateCcw } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { SearchInput } from '../../../components/SearchInput';
 import type {
   ConfigurationDefinitionDto,
   ConfigurationAuditEntryDto,
@@ -47,12 +48,9 @@ export const AdvancedConfigRollbackTab = memo(function AdvancedConfigRollbackTab
             {t('advancedConfig.rollback.description', 'Select a configuration key to view its version history and restore a previous value. All rollbacks are audited and validated.')}
           </p>
 
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-            <input
-              type="text"
+          <div className="mb-4">
+            <SearchInput
               placeholder={t('advancedConfig.rollback.searchKey', 'Search key to rollback...')}
-              className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 if (e.target.value.length > 3) {

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Select } from '../../../components/Select';
 import { renderValuePreview } from './AdvancedConfigConsoleTypes';
 import type {
   ConfigurationDefinitionDto,
@@ -57,15 +58,15 @@ export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-4 mb-4">
-        <select
+        <Select
           value={selectedScope}
           onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-          className="px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-        >
-          <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
-          <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
-          <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
-        </select>
+          options={[
+            { value: 'System', label: t('advancedConfig.scopeOptions.system', 'System') },
+            { value: 'Tenant', label: t('advancedConfig.scopeOptions.tenant', 'Tenant') },
+            { value: 'Environment', label: t('advancedConfig.scopeOptions.environment', 'Environment') },
+          ]}
+        />
         <span className="text-sm text-faded">
           {t('advancedConfig.explorer.showing', 'Showing')} {filteredDefs.length} {t('advancedConfig.explorer.definitions', 'definitions')}
           {loadingEffective && <RefreshCw className="w-3 h-3 ml-2 animate-spin inline" />}

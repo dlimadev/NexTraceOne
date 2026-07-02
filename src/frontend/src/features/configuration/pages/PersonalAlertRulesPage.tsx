@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -242,91 +244,51 @@ export function PersonalAlertRulesPage() {
             </h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('alertRules.builder.name')}
-                </label>
-                <input
-                  type="text"
-                  value={ruleName}
-                  onChange={(e) => setRuleName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder={t('alertRules.builder.namePlaceholder')}
+              <TextField
+                label={t('alertRules.builder.name')}
+                type="text"
+                value={ruleName}
+                onChange={(e) => setRuleName(e.target.value)}
+                placeholder={t('alertRules.builder.namePlaceholder')}
+              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <Select
+                  label={t('alertRules.builder.entity')}
+                  value={condition.entity}
+                  onChange={(e) =>
+                    setCondition((c) => ({ ...c, entity: e.target.value, field: '', operator: '' }))
+                  }
+                  options={ENTITIES.map((e) => ({ value: e, label: e }))}
+                />
+                <Select
+                  label={t('alertRules.builder.field')}
+                  value={condition.field}
+                  onChange={(e) =>
+                    setCondition((c) => ({ ...c, field: e.target.value as EntityField }))
+                  }
+                  placeholder={t('alertRules.builder.selectField')}
+                  options={(ENTITY_FIELDS[condition.entity] ?? []).map((f) => ({ value: f, label: f }))}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('alertRules.builder.entity')}
-                  </label>
-                  <select
-                    value={condition.entity}
-                    onChange={(e) =>
-                      setCondition((c) => ({ ...c, entity: e.target.value, field: '', operator: '' }))
-                    }
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
-                  >
-                    {ENTITIES.map((e) => (
-                      <option key={e} value={e}>
-                        {e}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('alertRules.builder.field')}
-                  </label>
-                  <select
-                    value={condition.field}
-                    onChange={(e) =>
-                      setCondition((c) => ({ ...c, field: e.target.value as EntityField }))
-                    }
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
-                  >
-                    <option value="">{t('alertRules.builder.selectField')}</option>
-                    {(ENTITY_FIELDS[condition.entity] ?? []).map((f) => (
-                      <option key={f} value={f}>
-                        {f}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('alertRules.builder.operator')}
-                  </label>
-                  <select
-                    value={condition.operator}
-                    onChange={(e) =>
-                      setCondition((c) => ({ ...c, operator: e.target.value as Operator }))
-                    }
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
-                  >
-                    <option value="">{t('alertRules.builder.selectOperator')}</option>
-                    {OPERATORS.map((op) => (
-                      <option key={op} value={op}>
-                        {op}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('alertRules.builder.value')}
-                  </label>
-                  <input
-                    type="text"
-                    value={condition.value}
-                    onChange={(e) => setCondition((c) => ({ ...c, value: e.target.value }))}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                    placeholder="high"
-                  />
-                </div>
+                <Select
+                  label={t('alertRules.builder.operator')}
+                  value={condition.operator}
+                  onChange={(e) =>
+                    setCondition((c) => ({ ...c, operator: e.target.value as Operator }))
+                  }
+                  placeholder={t('alertRules.builder.selectOperator')}
+                  options={OPERATORS.map((op) => ({ value: op, label: op }))}
+                />
+                <TextField
+                  label={t('alertRules.builder.value')}
+                  type="text"
+                  value={condition.value}
+                  onChange={(e) => setCondition((c) => ({ ...c, value: e.target.value }))}
+                  placeholder="high"
+                />
               </div>
 
               <div>
