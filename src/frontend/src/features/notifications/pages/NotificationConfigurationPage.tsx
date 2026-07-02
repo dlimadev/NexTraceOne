@@ -20,6 +20,13 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { Button } from '../../../components/Button';
+import { IconButton } from '../../../components/IconButton';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { SearchInput } from '../../../components/SearchInput';
+import { Tabs } from '../../../components/Tabs';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -225,13 +232,13 @@ export function NotificationConfigurationPage() {
             'Could not load notification configuration definitions.'
           )}
           action={
-            <button
+            <Button
+              variant="primary"
+              icon={<RefreshCw className="w-4 h-4" />}
               onClick={() => refetchDefinitions()}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15"
             >
-              <RefreshCw className="w-4 h-4" />
               {t('notificationConfig.error.retry', 'Retry')}
-            </button>
+            </Button>
           }
         />
       </PageContainer>
@@ -249,21 +256,17 @@ export function NotificationConfigurationPage() {
       />
 
       {/* ── Section Tabs ─────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {SECTIONS.map((section) => (
-          <button
-            key={section.key}
-            onClick={() => setActiveSection(section.key)}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
-              activeSection === section.key
-                ? 'bg-info/15 border-info/25 text-info'
-                : 'bg-card border-edge text-faded hover:bg-subtle'
-            }`}
-          >
-            {section.icon}
-            {t(`notificationConfig.sections.${section.key}`, section.key)}
-          </button>
-        ))}
+      <div className="mb-6">
+        <Tabs
+          variant="pill"
+          items={SECTIONS.map((section) => ({
+            id: section.key,
+            label: t(`notificationConfig.sections.${section.key}`, section.key),
+            icon: section.icon,
+          }))}
+          activeId={activeSection}
+          onChange={(id) => setActiveSection(id as typeof activeSection)}
+        />
       </div>
 
       {/* ── Scope & Search Controls ──────────────────────────────── */}
@@ -271,32 +274,23 @@ export function NotificationConfigurationPage() {
         <CardBody>
           <div className="flex flex-wrap gap-4 items-end">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-body mb-1">
-                {t('notificationConfig.scope', 'Scope')}
-              </label>
-              <select
+              <Select
+                label={t('notificationConfig.scope', 'Scope')}
                 value={scope}
                 onChange={(e) => setScope(e.target.value as ConfigurationScope)}
-                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
-              >
-                {SCOPES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(`configuration.scope.${s.toLowerCase()}`, s)}
-                  </option>
-                ))}
-              </select>
+                options={SCOPES.map((s) => ({
+                  value: s,
+                  label: t(`configuration.scope.${s.toLowerCase()}`, s),
+                }))}
+              />
             </div>
             {scope !== 'System' && (
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-body mb-1">
-                  {t('notificationConfig.scopeReference', 'Scope Reference ID')}
-                </label>
-                <input
-                  type="text"
+                <TextField
+                  label={t('notificationConfig.scopeReference', 'Scope Reference ID')}
                   value={scopeReferenceId}
                   onChange={(e) => setScopeReferenceId(e.target.value)}
                   placeholder={t('notificationConfig.scopeReferencePlaceholder', 'Enter tenant/environment ID...')}
-                  className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                 />
               </div>
             )}
@@ -305,12 +299,10 @@ export function NotificationConfigurationPage() {
                 <Search className="w-3 h-3 inline mr-1" />
                 {t('notificationConfig.search', 'Search')}
               </label>
-              <input
-                type="text"
+              <SearchInput
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('notificationConfig.searchPlaceholder', 'Search by key or name...')}
-                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -422,57 +414,54 @@ export function NotificationConfigurationPage() {
                             {t('notificationConfig.edit.value', 'Value')}
                           </label>
                           {def.valueType === 'Boolean' ? (
-                            <button
+                            <Button
+                              variant={editValue === 'true' ? 'primary' : 'subtle'}
+                              size="sm"
                               onClick={() => setEditValue(editValue === 'true' ? 'false' : 'true')}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                editValue === 'true'
-                                  ? 'bg-success/15 text-success'
-                                  : 'bg-critical/15 text-critical'
-                              }`}
                             >
                               {editValue === 'true' ? 'Enabled' : 'Disabled'}
-                            </button>
+                            </Button>
                           ) : def.valueType === 'Json' ? (
-                            <textarea
+                            <TextArea
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               rows={6}
-                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm font-mono"
+                              textareaClassName="font-mono"
                             />
                           ) : (
-                            <input
+                            <TextField
                               type={def.valueType === 'Integer' || def.valueType === 'Decimal' ? 'number' : 'text'}
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                             />
                           )}
                           <label className="block text-xs font-medium text-body mt-2 mb-1">
                             {t('notificationConfig.edit.reason', 'Change Reason')}
                           </label>
-                          <input
+                          <TextField
                             type="text"
                             value={editReason}
                             onChange={(e) => setEditReason(e.target.value)}
                             placeholder={t('notificationConfig.edit.reasonPlaceholder', 'Optional reason for this change...')}
-                            className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                           />
                           <div className="flex gap-2 mt-3">
-                            <button
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              icon={<Check className="w-3 h-3" />}
                               onClick={handleSave}
-                              disabled={setValueMutation.isPending}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15 disabled:opacity-50"
+                              loading={setValueMutation.isPending}
                             >
-                              <Check className="w-3 h-3" />
                               {t('notificationConfig.edit.save', 'Save')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="subtle"
+                              size="sm"
+                              icon={<X className="w-3 h-3" />}
                               onClick={handleCancelEdit}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-faded bg-subtle rounded-lg hover:bg-subtle"
                             >
-                              <X className="w-3 h-3" />
                               {t('notificationConfig.edit.cancel', 'Cancel')}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       )}
@@ -481,27 +470,23 @@ export function NotificationConfigurationPage() {
                     {/* Actions */}
                     <div className="flex items-center gap-1 shrink-0">
                       {def.isEditable && !isEditing && (
-                        <button
+                        <IconButton
+                          variant="ghost"
+                          size="sm"
+                          icon={<Pencil className="w-4 h-4" />}
                           onClick={() => handleEdit(def)}
-                          className="p-2 rounded-lg text-muted hover:text-info hover:bg-info/15 transition-colors"
+                          label={t('notificationConfig.actions.edit', 'Edit')}
                           title={t('notificationConfig.actions.edit', 'Edit')}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
+                        />
                       )}
-                      <button
-                        onClick={() =>
-                          setExpandedAudit(isAuditExpanded ? null : def.key)
-                        }
-                        className="p-2 rounded-lg text-muted hover:text-warning hover:bg-warning/15 transition-colors"
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        icon={isAuditExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        onClick={() => setExpandedAudit(isAuditExpanded ? null : def.key)}
+                        label={t('notificationConfig.actions.audit', 'Audit History')}
                         title={t('notificationConfig.actions.audit', 'Audit History')}
-                      >
-                        {isAuditExpanded ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
+                      />
                     </div>
                   </div>
 
