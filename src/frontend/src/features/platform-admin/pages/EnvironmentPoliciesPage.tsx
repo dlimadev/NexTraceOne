@@ -5,6 +5,7 @@ import { Lock, RefreshCw, Pencil, Save, X } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { TextArea } from '../../../components/TextArea';
 import {
   platformAdminApi,
   type EnvironmentAccessPolicy,
@@ -141,11 +142,10 @@ export function EnvironmentPoliciesPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-body mb-1">{t('descriptionLabel')}</label>
-                    <textarea
+                    <TextArea
                       value={editForm.description}
                       onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
                       rows={2}
-                      className="w-full text-sm border border-edge rounded px-2 py-1 bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-accent/50"
                     />
                   </div>
                   <div className="flex gap-2 justify-end">
