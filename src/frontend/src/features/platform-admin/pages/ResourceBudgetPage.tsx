@@ -14,6 +14,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -68,7 +69,7 @@ function QuotaEditor({ entry, onSave, onCancel, saving }: QuotaEditorProps) {
       <label className="block text-xs text-muted mb-1">
         {label} <span className="text-muted/60">({unit})</span>
       </label>
-      <input
+      <TextField
         type="number"
         min={0}
         value={form[key] ?? ''}
@@ -79,7 +80,6 @@ function QuotaEditor({ entry, onSave, onCancel, saving }: QuotaEditorProps) {
           }))
         }
         placeholder={t('resourceBudget.unlimited')}
-        className="w-full text-sm px-2.5 py-1.5 rounded border border-edge bg-input focus:outline-none focus:ring-1 focus:ring-accent"
       />
     </div>
   );
