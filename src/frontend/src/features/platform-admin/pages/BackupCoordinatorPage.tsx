@@ -15,6 +15,8 @@ import {
   Timer,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { platformAdminApi } from '../api/platformAdmin';
@@ -125,25 +127,17 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
     <div className="bg-card border border-edge rounded-md p-5 space-y-4">
       <h2 className="text-base font-semibold text-heading">{t('backup.scheduleTitle')}</h2>
 
-      <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          id="backup-enabled"
-          checked={form.enabled}
-          onChange={(e) => setForm((p) => ({ ...p, enabled: e.target.checked }))}
-          className="w-4 h-4 accent-accent"
-        />
-        <label htmlFor="backup-enabled" className="text-sm text-heading">
-          {t('backup.enabledLabel')}
-        </label>
-      </div>
+      <Checkbox
+        label={t('backup.enabledLabel')}
+        checked={form.enabled}
+        onChange={(e) => setForm((p) => ({ ...p, enabled: e.target.checked }))}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-muted mb-1">{t('backup.cronLabel')}</label>
-          <input
+          <TextField
             type="text"
-            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="0 3 * * *"
             {...field('cronExpression')}
           />
@@ -151,36 +145,29 @@ function ScheduleForm({ initial }: { initial: BackupScheduleConfig }) {
         </div>
         <div>
           <label className="block text-xs text-muted mb-1">{t('backup.retentionLabel')}</label>
-          <input
+          <TextField
             type="number"
             min={1}
             max={365}
-            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading focus:outline-none focus:border-accent"
             {...field('retentionDays')}
           />
           <p className="text-xs text-muted mt-1">{t('backup.retentionHint')}</p>
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs text-muted mb-1">{t('backup.destinationLabel')}</label>
-          <input
+          <TextField
             type="text"
-            className="w-full px-3 py-2 text-sm bg-input border border-edge rounded-lg text-heading placeholder:text-muted focus:outline-none focus:border-accent"
             placeholder="/data/backups"
             {...field('destination')}
           />
           <p className="text-xs text-muted mt-1">{t('backup.destinationHint')}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            id="backup-compression"
+        <div className="flex items-center">
+          <Checkbox
+            label={t('backup.compressionLabel')}
             checked={form.compressionEnabled}
             onChange={(e) => setForm((p) => ({ ...p, compressionEnabled: e.target.checked }))}
-            className="w-4 h-4 accent-accent"
           />
-          <label htmlFor="backup-compression" className="text-sm text-heading">
-            {t('backup.compressionLabel')}
-          </label>
         </div>
       </div>
 
