@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { UserCheck, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
@@ -104,40 +105,37 @@ export function DelegationPage() {
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.delegation.delegateeId')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.delegateeId}
                   onChange={(e) => setForm((f) => ({ ...f, delegateeId: e.target.value }))}
                   required
                   placeholder={t('identity.delegation.delegateeIdPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.delegation.permissions')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.permissions}
                   onChange={(e) => setForm((f) => ({ ...f, permissions: e.target.value }))}
                   required
                   placeholder={t('identity.delegation.permissionsPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.delegation.reason')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.reason}
                   onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))}
                   required
                   maxLength={500}
                   placeholder={t('identity.delegation.reasonPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -145,24 +143,22 @@ export function DelegationPage() {
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('identity.delegation.validFrom')}
                   </label>
-                  <input
+                  <TextField
                     type="datetime-local"
                     value={form.validFrom}
                     onChange={(e) => setForm((f) => ({ ...f, validFrom: e.target.value }))}
                     required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">
                     {t('identity.delegation.validUntil')}
                   </label>
-                  <input
+                  <TextField
                     type="datetime-local"
                     value={form.validUntil}
                     onChange={(e) => setForm((f) => ({ ...f, validUntil: e.target.value }))}
                     required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   />
                 </div>
               </div>

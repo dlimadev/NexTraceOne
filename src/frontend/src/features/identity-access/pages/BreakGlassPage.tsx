@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextArea } from '../../../components/TextArea';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -93,7 +94,7 @@ export function BreakGlassPage() {
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.breakGlass.justification')}
                 </label>
-                <textarea
+                <TextArea
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
                   required
@@ -101,7 +102,6 @@ export function BreakGlassPage() {
                   maxLength={2000}
                   rows={3}
                   placeholder={t('identity.breakGlass.justificationPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div className="flex gap-2 justify-end">

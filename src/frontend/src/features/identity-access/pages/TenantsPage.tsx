@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Building2, ShieldOff, ShieldCheck, Pencil } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
@@ -186,27 +188,28 @@ export function TenantsPage() {
         {/* Search & filters */}
         <div className="flex flex-wrap gap-3 mb-4">
           <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[240px]">
-            <input
-              type="text"
-              placeholder={t('tenants.admin.searchPlaceholder')}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="flex-1 px-3 py-1.5 rounded border border-edge text-sm"
-            />
+            <div className="flex-1">
+              <TextField
+                type="text"
+                placeholder={t('tenants.admin.searchPlaceholder')}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
             <Button type="submit">{t('common.search')}</Button>
           </form>
-          <select
+          <Select
             value={filterActive === undefined ? '' : String(filterActive)}
             onChange={(e) => {
               const v = e.target.value;
               setFilterActive(v === '' ? undefined : v === 'true');
             }}
-            className="px-3 py-1.5 rounded border border-edge text-sm"
-          >
-            <option value="">{t('tenants.admin.filterAll')}</option>
-            <option value="true">{t('tenants.admin.filterActive')}</option>
-            <option value="false">{t('tenants.admin.filterInactive')}</option>
-          </select>
+            options={[
+              { value: '', label: t('tenants.admin.filterAll') },
+              { value: 'true', label: t('tenants.admin.filterActive') },
+              { value: 'false', label: t('tenants.admin.filterInactive') },
+            ]}
+          />
         </div>
 
         {/* Create/Edit Form */}
@@ -225,14 +228,13 @@ export function TenantsPage() {
                       <label htmlFor="tenant-name" className="block text-sm mb-1">
                         {t('tenants.admin.name')} *
                       </label>
-                      <input
+                      <TextField
                         id="tenant-name"
                         type="text"
                         required
                         maxLength={256}
                         value={form.name}
                         onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                        className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
                       />
                     </div>
                     {!editingId && (
@@ -240,7 +242,7 @@ export function TenantsPage() {
                         <label htmlFor="tenant-slug" className="block text-sm mb-1">
                           {t('tenants.admin.slug')} *
                         </label>
-                        <input
+                        <TextField
                           id="tenant-slug"
                           type="text"
                           required
@@ -248,7 +250,6 @@ export function TenantsPage() {
                           pattern="^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
                           value={form.slug}
                           onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value.toLowerCase() }))}
-                          className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
                         />
                         <small className="text-muted text-xs">{t('tenants.admin.slugHelp')}</small>
                       </div>
@@ -256,11 +257,10 @@ export function TenantsPage() {
                     {editingId && (
                       <div>
                         <label className="block text-sm mb-1">{t('tenants.admin.slug')}</label>
-                        <input
+                        <TextField
                           type="text"
                           disabled
                           value={form.slug}
-                          className="block w-full px-2 py-1.5 rounded border border-edge text-sm opacity-50 cursor-not-allowed"
                         />
                         <small className="text-muted text-xs">{t('tenants.admin.slugImmutable')}</small>
                       </div>
@@ -273,30 +273,25 @@ export function TenantsPage() {
                         <label htmlFor="tenant-type" className="block text-sm mb-1">
                           {t('tenants.admin.tenantType')} *
                         </label>
-                        <select
+                        <Select
                           id="tenant-type"
                           required
                           value={form.tenantType}
                           onChange={(e) => setForm((f) => ({ ...f, tenantType: e.target.value }))}
-                          className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
-                        >
-                          {TENANT_TYPE_OPTIONS.map((t) => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
+                          options={TENANT_TYPE_OPTIONS.map((tt) => ({ value: tt, label: tt }))}
+                        />
                       </div>
                       {(form.tenantType === 'Subsidiary' || form.tenantType === 'Department') && (
                         <div>
                           <label htmlFor="tenant-parent" className="block text-sm mb-1">
                             {t('tenants.admin.parentTenantId')}
                           </label>
-                          <input
+                          <TextField
                             id="tenant-parent"
                             type="text"
                             placeholder="UUID do tenant pai"
                             value={form.parentTenantId}
                             onChange={(e) => setForm((f) => ({ ...f, parentTenantId: e.target.value }))}
-                            className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
                           />
                         </div>
                       )}
@@ -308,26 +303,24 @@ export function TenantsPage() {
                       <label htmlFor="tenant-legal" className="block text-sm mb-1">
                         {t('tenants.admin.legalName')}
                       </label>
-                      <input
+                      <TextField
                         id="tenant-legal"
                         type="text"
                         maxLength={512}
                         value={form.legalName}
                         onChange={(e) => setForm((f) => ({ ...f, legalName: e.target.value }))}
-                        className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
                       />
                     </div>
                     <div>
                       <label htmlFor="tenant-taxid" className="block text-sm mb-1">
                         {t('tenants.admin.taxId')}
                       </label>
-                      <input
+                      <TextField
                         id="tenant-taxid"
                         type="text"
                         maxLength={50}
                         value={form.taxId}
                         onChange={(e) => setForm((f) => ({ ...f, taxId: e.target.value }))}
-                        className="block w-full px-2 py-1.5 rounded border border-edge text-sm"
                       />
                     </div>
                   </div>
