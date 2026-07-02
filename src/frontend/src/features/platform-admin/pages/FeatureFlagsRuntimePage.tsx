@@ -8,12 +8,13 @@ import {
   XCircle,
   AlertTriangle,
   CheckCircle2,
-  Search,
   Layers,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { SearchInput } from '../../../components/SearchInput';
+import { Select } from '../../../components/Select';
 import { platformAdminApi } from '../api/platformAdmin';
 
 export function FeatureFlagsRuntimePage() {
@@ -82,27 +83,21 @@ export function FeatureFlagsRuntimePage() {
 
         {/* Filters */}
         <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded" />
-            <input
-              type="text"
+          <div className="flex-1 max-w-sm">
+            <SearchInput
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-9 pr-4 py-2 text-sm border border-edge rounded-lg bg-canvas text-body focus:outline-none focus:ring-2 focus:ring-accent/50"
             />
           </div>
-          <select
+          <Select
             value={scopeFilter}
             onChange={(e) => setScopeFilter(e.target.value)}
-            className="text-sm border border-edge rounded-lg px-3 py-2 bg-canvas text-body focus:outline-none"
-          >
-            {scopes.map((s) => (
-              <option key={s} value={s}>
-                {s === 'all' ? t('allScopes') : s}
-              </option>
-            ))}
-          </select>
+            options={scopes.map((s) => ({
+              value: s,
+              label: s === 'all' ? t('allScopes') : s,
+            }))}
+          />
         </div>
 
         {isLoading && (
