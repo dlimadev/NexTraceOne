@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Layers, FileCode, Tag } from 'lucide-react';
 import { WizardOverlay } from './WizardOverlay';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
 import { contractsApi } from '../../contracts/api/contracts';
 import type { ContractProtocol } from '../../../types';
 
-const inputClass =
-  'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
 const labelClass = 'block text-sm font-medium text-body mb-1';
 
 interface ContractImportOverlayProps {
@@ -137,9 +138,9 @@ export function ContractImportOverlay({
                 {t('contracts.apiAssetId', 'API Asset ID')}{' '}
                 <span className="text-danger">*</span>
               </label>
-              <input
+              <TextField
                 type="text"
-                className={`${inputClass} font-mono`}
+                className="font-mono"
                 value={apiAssetId}
                 onChange={(e) => {
                   setApiAssetId(e.target.value);
@@ -232,9 +233,8 @@ export function ContractImportOverlay({
                 <label className={labelClass}>
                   {t('contracts.specUrl', { defaultValue: 'Specification URL' })}
                 </label>
-                <input
+                <TextField
                   type="url"
-                  className={inputClass}
                   value={specUrl}
                   onChange={(e) => setSpecUrl(e.target.value)}
                   placeholder="https://api.example.com/openapi.yaml"
@@ -243,8 +243,8 @@ export function ContractImportOverlay({
             )}
 
             {specTab === 'editor' && (
-              <textarea
-                className={`${inputClass} font-mono resize-none`}
+              <TextArea
+                textareaClassName="font-mono resize-none"
                 rows={12}
                 onChange={(e) => handleContentChange(e.target.value)}
                 placeholder={'openapi: "3.0.0"\ninfo:\n  title: My API\n  version: 1.0.0'}
@@ -265,9 +265,9 @@ export function ContractImportOverlay({
                 {t('contracts.version', { defaultValue: 'Version' })}{' '}
                 <span className="text-danger">*</span>
               </label>
-              <input
+              <TextField
                 type="text"
-                className={`${inputClass} font-mono`}
+                className="font-mono"
                 value={version}
                 onChange={(e) => {
                   setVersion(e.target.value);
@@ -283,22 +283,16 @@ export function ContractImportOverlay({
               <label className={labelClass}>
                 {t('contracts.protocol', { defaultValue: 'Protocol' })}
               </label>
-              <select
-                className={inputClass}
+              <Select
                 value={detectedProtocol ?? protocol}
                 onChange={(e) => {
                   setProtocol(e.target.value as ContractProtocol);
                   setDetectedProtocol(null);
                 }}
-              >
-                {(['OpenApi', 'Swagger', 'AsyncApi', 'Wsdl', 'Protobuf', 'GraphQl', 'WorkerService'] as ContractProtocol[]).map(
-                  (p) => (
-                    <option key={p} value={p}>
-                      {t(`contracts.protocols.${p}`, { defaultValue: p })}
-                    </option>
-                  )
+                options={(['OpenApi', 'Swagger', 'AsyncApi', 'Wsdl', 'Protobuf', 'GraphQl', 'WorkerService'] as ContractProtocol[]).map(
+                  (p) => ({ value: p, label: t(`contracts.protocols.${p}`, { defaultValue: p }) })
                 )}
-              </select>
+              />
             </div>
           </div>
         );
