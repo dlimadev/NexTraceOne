@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Clock, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
@@ -94,42 +95,39 @@ export function JitAccessPage() {
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.jitAccess.permissionCode')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.permissionCode}
                   onChange={(e) => setForm((f) => ({ ...f, permissionCode: e.target.value }))}
                   required
                   maxLength={100}
                   placeholder={t('identity.jitAccess.permissionCodePlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.jitAccess.scope')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.scope}
                   onChange={(e) => setForm((f) => ({ ...f, scope: e.target.value }))}
                   required
                   maxLength={200}
                   placeholder={t('identity.jitAccess.scopePlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.jitAccess.justification')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.justification}
                   onChange={(e) => setForm((f) => ({ ...f, justification: e.target.value }))}
                   required
                   maxLength={500}
                   placeholder={t('identity.jitAccess.justificationPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div className="md:col-span-3 flex gap-2 justify-end">
