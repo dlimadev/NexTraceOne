@@ -3,6 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Globe, Star, Shield } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Select } from '../../../components/Select';
+import { Checkbox } from '../../../components/Checkbox';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
@@ -205,21 +209,20 @@ export function EnvironmentsPage() {
                 <div className="grid gap-3">
                   <div>
                     <label htmlFor="env-name">{t('environments.name')} *</label>
-                    <input
+                    <TextField
                       id="env-name"
                       type="text"
                       required
                       maxLength={100}
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                     />
                   </div>
 
                   {!editingId && (
                     <div>
                       <label htmlFor="env-slug">{t('environments.slug')} *</label>
-                      <input
+                      <TextField
                         id="env-slug"
                         type="text"
                         required
@@ -227,7 +230,6 @@ export function EnvironmentsPage() {
                         pattern="^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
                         value={form.slug}
                         onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value.toLowerCase() }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                       <small className="text-muted">{t('environments.slugHelp')}</small>
                     </div>
@@ -236,100 +238,90 @@ export function EnvironmentsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label htmlFor="env-profile">{t('environments.profile')} *</label>
-                      <select
+                      <Select
                         id="env-profile"
                         required
                         value={form.profile}
                         onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
-                      >
-                        {PROFILE_OPTIONS.map((p) => (
-                          <option key={p} value={p}>
-                            {t(`environments.profiles.${p}`, { defaultValue: p })}
-                          </option>
-                        ))}
-                      </select>
+                        className="mt-1"
+                        options={PROFILE_OPTIONS.map((p) => ({
+                          value: p,
+                          label: t(`environments.profiles.${p}`, { defaultValue: p }),
+                        }))}
+                      />
                     </div>
 
                     <div>
                       <label htmlFor="env-criticality">{t('environments.criticality')} *</label>
-                      <select
+                      <Select
                         id="env-criticality"
                         required
                         value={form.criticality}
                         onChange={(e) => setForm((f) => ({ ...f, criticality: e.target.value }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
-                      >
-                        {CRITICALITY_OPTIONS.map((c) => (
-                          <option key={c} value={c}>
-                            {t(`environments.criticalities.${c}`, { defaultValue: c })}
-                          </option>
-                        ))}
-                      </select>
+                        className="mt-1"
+                        options={CRITICALITY_OPTIONS.map((c) => ({
+                          value: c,
+                          label: t(`environments.criticalities.${c}`, { defaultValue: c }),
+                        }))}
+                      />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label htmlFor="env-code">{t('environments.code')}</label>
-                      <input
+                      <TextField
                         id="env-code"
                         type="text"
                         maxLength={50}
                         value={form.code}
                         onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                       <small className="text-muted">{t('environments.codeHelp')}</small>
                     </div>
 
                     <div>
                       <label htmlFor="env-region">{t('environments.region')}</label>
-                      <input
+                      <TextField
                         id="env-region"
                         type="text"
                         maxLength={100}
                         value={form.region}
                         onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                     </div>
 
                     <div>
                       <label htmlFor="env-sortorder">{t('environments.sortOrder')} *</label>
-                      <input
+                      <TextField
                         id="env-sortorder"
                         type="number"
                         min={0}
                         required
                         value={form.sortOrder}
                         onChange={(e) => setForm((f) => ({ ...f, sortOrder: parseInt(e.target.value, 10) || 0 }))}
-                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="env-description">{t('environments.description')}</label>
-                    <textarea
+                    <TextArea
                       id="env-description"
                       rows={2}
                       value={form.description}
                       onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                      className="block w-full mt-1 px-2 py-1.5 rounded border border-edge resize-y"
+                      className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        id="env-is-primary"
-                        type="checkbox"
-                        checked={form.isPrimaryProduction}
-                        onChange={(e) => setForm((f) => ({ ...f, isPrimaryProduction: e.target.checked }))}
-                      />
-                      <span>{t('environments.isPrimaryProduction')}</span>
-                    </label>
+                    <Checkbox
+                      id="env-is-primary"
+                      label={t('environments.isPrimaryProduction')}
+                      checked={form.isPrimaryProduction}
+                      onChange={(e) => setForm((f) => ({ ...f, isPrimaryProduction: e.target.checked }))}
+                    />
                     <small className="text-muted ml-6">
                       {t('environments.isPrimaryProductionHelp')}
                     </small>
