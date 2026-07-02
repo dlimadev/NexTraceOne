@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { KeyRound, Plus, Copy, Trash2, Check } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -161,16 +162,13 @@ export function APIKeysPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('common.name', 'Name')}</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
-                  placeholder={t('common.name', 'Name')}
-                />
-              </div>
+              <TextField
+                label={t('common.name', 'Name')}
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder={t('common.name', 'Name')}
+              />
               <div>
                 <label className="block text-sm font-medium mb-2">{t('apiKeys.scopes')}</label>
                 <div className="flex flex-wrap gap-2">
@@ -192,11 +190,11 @@ export function APIKeysPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t('apiKeys.expires')}</label>
-                <input
+                <TextField
                   type="date"
                   value={expiresAt}
                   onChange={e => setExpiresAt(e.target.value)}
-                  className="w-48 px-3 py-1.5 text-sm border rounded bg-transparent"
+                  className="w-48"
                 />
               </div>
               <div className="flex gap-2">
