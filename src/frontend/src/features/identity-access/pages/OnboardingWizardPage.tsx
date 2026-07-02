@@ -14,12 +14,12 @@ import {
   Gauge,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { apiClient } from '@/lib/api-client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { Button } from '../../../components/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/Card';
+import { Progress } from '../../../components/Progress';
+import { Alert, AlertDescription, AlertTitle } from '../../../components/Alert';
+import client from '../../../api/client';
 
 interface OnboardingStep {
   id: string;
@@ -85,7 +85,6 @@ const STEPS: OnboardingStep[] = [
 export function OnboardingWizardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [status, setStatus] = useState<OnboardingStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [completingStep, setCompletingStep] = useState<string | null>(null);
@@ -96,7 +95,7 @@ export function OnboardingWizardPage() {
 
   const fetchStatus = async () => {
     try {
-      const response = await apiClient.get('/onboarding/status');
+      const response = await client.get('/onboarding/status');
       setStatus(response.data);
       
       // Se já está completo ou ignorado, redirecionar para dashboard
@@ -105,11 +104,7 @@ export function OnboardingWizardPage() {
       }
     } catch {
       // Erro tratado via toast - logging estruturado deve ser feito pelo backend
-      toast({
-        title: t('common.error'),
-        description: t('onboarding.errors.fetchFailed'),
-        variant: 'destructive',
-      });
+      toast.error(t('onboarding.errors.fetchFailed'));
     } finally {
       setLoading(false);
     }
@@ -118,13 +113,10 @@ export function OnboardingWizardPage() {
   const handleCompleteStep = async (stepId: string) => {
     setCompletingStep(stepId);
     try {
-      const response = await apiClient.post(`/onboarding/steps/${stepId}`);
+      const response = await client.post(`/onboarding/steps/${stepId}`);
       
       if (response.data.advanced) {
-        toast({
-          title: t('common.success'),
-          description: t('onboarding.messages.stepCompleted', { step: stepId }),
-        });
+        toast.success(t('onboarding.messages.stepCompleted', { step: stepId }));
         
         // Refetch status to update UI
         await fetchStatus();
@@ -136,11 +128,7 @@ export function OnboardingWizardPage() {
       }
     } catch {
       // Erro tratado via toast - logging estruturado deve ser feito pelo backend
-      toast({
-        title: t('common.error'),
-        description: t('onboarding.errors.stepFailed'),
-        variant: 'destructive',
-      });
+      toast.error(t('onboarding.errors.stepFailed'));
     } finally {
       setCompletingStep(null);
     }
@@ -150,22 +138,15 @@ export function OnboardingWizardPage() {
     try {
       // Marcar todos os passos como completados de uma vez
       for (const step of STEPS) {
-        await apiClient.post(`/onboarding/steps/${step.id}`);
+        await client.post(`/onboarding/steps/${step.id}`);
       }
       
-      toast({
-        title: t('common.success'),
-        description: t('onboarding.messages.wizardSkipped'),
-      });
+      toast.success(t('onboarding.messages.wizardSkipped'));
       
       navigate('/');
     } catch {
       // Erro tratado via toast - logging estruturado deve ser feito pelo backend
-      toast({
-        title: t('common.error'),
-        description: t('onboarding.errors.skipFailed'),
-        variant: 'destructive',
-      });
+      toast.error(t('onboarding.errors.skipFailed'));
     }
   };
 
@@ -227,17 +208,17 @@ export function OnboardingWizardPage() {
               key={step.id}
               className={`transition-all ${
                 isCurrent ? 'border-accent shadow-md' : ''
-              } ${isCompleted ? 'bg-muted/50' : ''}`}
+              } ${isCompleted ? 'bg-elevated/50' : ''}`}
             >
               <CardHeader>
                 <div className="flex items-start gap-4">
                   <div
                     className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
                       isCompleted
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-success text-on-accent'
                         : isCurrent
                         ? 'bg-accent text-on-accent'
-                        : 'bg-muted text-muted'
+                        : 'bg-elevated text-muted'
                     }`}
                   >
                     {isCompleted ? (
@@ -291,7 +272,7 @@ export function OnboardingWizardPage() {
                     </Button>
                   )}
                   {isCompleted && (
-                    <span className="text-sm text-green-600 font-medium">
+                    <span className="text-sm text-success font-medium">
                       {t('onboarding.step.completed')}
                     </span>
                   )}
