@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ClipboardCheck, RefreshCw, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
@@ -122,41 +123,38 @@ export function AccessReviewPage() {
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.accessReview.campaignName')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   required
                   maxLength={200}
                   placeholder={t('identity.accessReview.campaignNamePlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.accessReview.scope')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.scope}
                   onChange={(e) => setForm((f) => ({ ...f, scope: e.target.value }))}
                   required
                   maxLength={200}
                   placeholder={t('identity.accessReview.scopePlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">
                   {t('identity.accessReview.reviewerIds')}
                 </label>
-                <input
+                <TextField
                   type="text"
                   value={form.reviewerIds}
                   onChange={(e) => setForm((f) => ({ ...f, reviewerIds: e.target.value }))}
                   required
                   placeholder={t('identity.accessReview.reviewerIdsPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div className="md:col-span-3 flex gap-2 justify-end">
@@ -273,13 +271,13 @@ export function AccessReviewPage() {
                         <td className="px-6 py-3">
                           {(!item.decision || item.decision === 'Pending') && (
                             <div className="flex gap-2 items-center">
-                              <input
+                              <TextField
                                 type="text"
                                 placeholder={t('identity.accessReview.commentPlaceholder')}
                                 value={decisionComments[item.id] ?? ''}
                                 onChange={(e) => setDecisionComments((prev) => ({ ...prev, [item.id]: e.target.value }))}
                                 maxLength={500}
-                                className="rounded-md bg-canvas border border-edge px-2 py-1 text-xs text-heading placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent w-32"
+                                className="w-32"
                               />
                               <Button
                                 size="sm"
