@@ -7,6 +7,8 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -212,35 +214,20 @@ export function AutomationRulesPage() {
             </h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.name')}
-                </label>
-                <input
-                  type="text"
-                  value={ruleName}
-                  onChange={(e) => setRuleName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder={t('workflows.automationRules.title')}
-                />
-              </div>
+              <TextField
+                label={t('common.name')}
+                type="text"
+                value={ruleName}
+                onChange={(e) => setRuleName(e.target.value)}
+                placeholder={t('workflows.automationRules.title')}
+              />
 
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('workflows.automationRules.trigger')}
-                </label>
-                <select
-                  value={trigger}
-                  onChange={(e) => setTrigger(e.target.value as Trigger)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-elevated text-body"
-                >
-                  {TRIGGERS.map((tr) => (
-                    <option key={tr} value={tr}>
-                      {tr}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label={t('workflows.automationRules.trigger')}
+                value={trigger}
+                onChange={(e) => setTrigger(e.target.value as Trigger)}
+                options={TRIGGERS.map((tr) => ({ value: tr, label: tr }))}
+              />
             </div>
 
             <div className="mt-6 flex items-center justify-between">
