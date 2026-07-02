@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Clock, RefreshCw, Pencil, Save, X, Zap } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import {
@@ -152,12 +154,11 @@ export function NonProdSchedulerPage() {
                   <div className="text-sm font-medium text-warning">{t('overrideTitle')}</div>
                   <div>
                     <label className="block text-xs font-medium text-body mb-1">{t('overrideReasonLabel')}</label>
-                    <input
+                    <TextField
                       type="text"
                       value={overrideReason}
                       onChange={(e) => setOverrideReason(e.target.value)}
                       placeholder={t('overrideReasonPlaceholder')}
-                      className="w-full text-sm border border-edge rounded px-2 py-1 bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-accent/50"
                     />
                   </div>
                   <div className="flex gap-2 justify-end">
@@ -170,7 +171,7 @@ export function NonProdSchedulerPage() {
                     <button
                       onClick={() => overrideMutation.mutate({ id: schedule.environmentId, reason: overrideReason })}
                       disabled={!overrideReason.trim() || overrideMutation.isPending}
-                      className="px-3 py-1.5 text-xs bg-warning text-white rounded hover:bg-warning/90 disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs bg-warning text-on-accent rounded hover:bg-warning/90 disabled:opacity-50"
                     >
                       {overrideMutation.isPending ? t('saving') : t('overrideConfirm')}
                     </button>
@@ -180,18 +181,11 @@ export function NonProdSchedulerPage() {
 
               {editingId === schedule.environmentId ? (
                 <div className="p-4 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`enabled-${schedule.environmentId}`}
-                      checked={editForm.enabled}
-                      onChange={(e) => setEditForm((f) => ({ ...f, enabled: e.target.checked }))}
-                      className="accent-accent"
-                    />
-                    <label htmlFor={`enabled-${schedule.environmentId}`} className="text-sm text-body">
-                      {t('enabledLabel')}
-                    </label>
-                  </div>
+                  <Checkbox
+                    label={t('enabledLabel')}
+                    checked={editForm.enabled}
+                    onChange={(e) => setEditForm((f) => ({ ...f, enabled: e.target.checked }))}
+                  />
                   <div>
                     <label className="block text-xs font-medium text-body mb-1">{t('activeDaysLabel')}</label>
                     <div className="flex gap-2">
@@ -202,7 +196,7 @@ export function NonProdSchedulerPage() {
                           onClick={() => toggleDay(idx)}
                           className={`px-2 py-1 rounded text-xs font-medium border ${
                             editForm.activeDaysOfWeek.includes(idx)
-                              ? 'bg-accent text-white border-accent'
+                              ? 'bg-accent text-on-accent border-accent'
                               : 'bg-card text-body border-edge hover:bg-elevated'
                           }`}
                         >
@@ -214,24 +208,24 @@ export function NonProdSchedulerPage() {
                   <div className="flex gap-4">
                     <div>
                       <label className="block text-xs font-medium text-body mb-1">{t('fromHourLabel')}</label>
-                      <input
+                      <TextField
                         type="number"
                         min={0}
                         max={23}
                         value={editForm.activeFromHour}
                         onChange={(e) => setEditForm((f) => ({ ...f, activeFromHour: Number(e.target.value) }))}
-                        className="w-20 text-sm border border-edge rounded px-2 py-1 bg-canvas text-body"
+                        className="w-20"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-body mb-1">{t('toHourLabel')}</label>
-                      <input
+                      <TextField
                         type="number"
                         min={0}
                         max={23}
                         value={editForm.activeToHour}
                         onChange={(e) => setEditForm((f) => ({ ...f, activeToHour: Number(e.target.value) }))}
-                        className="w-20 text-sm border border-edge rounded px-2 py-1 bg-canvas text-body"
+                        className="w-20"
                       />
                     </div>
                   </div>
@@ -246,7 +240,7 @@ export function NonProdSchedulerPage() {
                     <button
                       onClick={() => updateMutation.mutate({ id: schedule.environmentId, update: editForm })}
                       disabled={updateMutation.isPending}
-                      className="flex items-center gap-1 px-3 py-1.5 text-sm bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
+                      className="flex items-center gap-1 px-3 py-1.5 text-sm bg-accent text-on-accent rounded hover:bg-accent/90 disabled:opacity-50"
                     >
                       <Save size={14} />
                       {updateMutation.isPending ? t('saving') : t('save')}
