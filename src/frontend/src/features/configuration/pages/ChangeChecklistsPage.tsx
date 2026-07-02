@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Plus, Trash2 } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { TextField } from '../../../components/TextField';
+import { TextArea } from '../../../components/TextArea';
+import { Checkbox } from '../../../components/Checkbox';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -190,70 +193,43 @@ export function ChangeChecklistsPage() {
             </h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.name')}
-                </label>
-                <input
-                  type="text"
-                  value={checklistName}
-                  onChange={(e) => setChecklistName(e.target.value)}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                />
-              </div>
+              <TextField
+                label={t('common.name')}
+                type="text"
+                value={checklistName}
+                onChange={(e) => setChecklistName(e.target.value)}
+              />
 
               <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('common.type')}
-                  </label>
-                  <input
-                    type="text"
-                    value={changeType}
-                    onChange={(e) => setChangeType(e.target.value)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                    placeholder={t('configuration.checklists.categoryPlaceholder', 'standard')}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">
-                    {t('common.environment')}
-                  </label>
-                  <input
-                    type="text"
-                    value={environment}
-                    onChange={(e) => setEnvironment(e.target.value)}
-                    className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                    placeholder={t('configuration.checklists.environmentPlaceholder', 'production')}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isRequired"
-                  checked={isRequired}
-                  onChange={(e) => setIsRequired(e.target.checked)}
-                  className="rounded"
+                <TextField
+                  label={t('common.type')}
+                  type="text"
+                  value={changeType}
+                  onChange={(e) => setChangeType(e.target.value)}
+                  placeholder={t('configuration.checklists.categoryPlaceholder', 'standard')}
                 />
-                <label htmlFor="isRequired" className="text-sm text-body">
-                  {t('workflows.checklists.required')}
-                </label>
-              </div>
-
-              <div>
-                <label className="text-xs text-muted mb-1 block">
-                  {t('common.items')} ({t('common.onePerLine')})
-                </label>
-                <textarea
-                  value={itemsText}
-                  onChange={(e) => setItemsText(e.target.value)}
-                  rows={4}
-                  className="w-full border border-edge rounded-lg p-2 text-sm bg-transparent text-body"
-                  placeholder={t('configuration.checklists.itemsPlaceholder', 'Review test results\nCheck rollback plan\nNotify stakeholders')}
+                <TextField
+                  label={t('common.environment')}
+                  type="text"
+                  value={environment}
+                  onChange={(e) => setEnvironment(e.target.value)}
+                  placeholder={t('configuration.checklists.environmentPlaceholder', 'production')}
                 />
               </div>
+
+              <Checkbox
+                label={t('workflows.checklists.required')}
+                checked={isRequired}
+                onChange={(e) => setIsRequired(e.target.checked)}
+              />
+
+              <TextArea
+                label={`${t('common.items')} (${t('common.onePerLine')})`}
+                value={itemsText}
+                onChange={(e) => setItemsText(e.target.value)}
+                rows={4}
+                placeholder={t('configuration.checklists.itemsPlaceholder', 'Review test results\nCheck rollback plan\nNotify stakeholders')}
+              />
             </div>
 
             <div className="mt-6 flex items-center justify-between">
