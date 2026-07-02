@@ -8,6 +8,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, Upload, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Select } from '../../../components/Select';
 import { DOMAINS } from './AdvancedConfigConsoleTypes';
 import type { ConfigDomain } from './AdvancedConfigConsoleTypes';
 import type { ConfigurationScope } from '../types';
@@ -51,25 +52,23 @@ export const AdvancedConfigImportExportTab = memo(function AdvancedConfigImportE
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.scope', 'Scope')}</label>
-                <select
+                <Select
                   value={selectedScope}
                   onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                  className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                >
-                  <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
-                  <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
-                  <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
-                </select>
+                  options={[
+                    { value: 'System', label: t('advancedConfig.scopeOptions.system', 'System') },
+                    { value: 'Tenant', label: t('advancedConfig.scopeOptions.tenant', 'Tenant') },
+                    { value: 'Environment', label: t('advancedConfig.scopeOptions.environment', 'Environment') },
+                  ]}
+                />
               </div>
               <div>
                 <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.domain', 'Domain')}</label>
-                <select
+                <Select
                   value={activeDomain}
                   onChange={(e) => setActiveDomain(e.target.value as ConfigDomain)}
-                  className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                >
-                  {DOMAINS.map(d => <option key={d.key} value={d.key}>{d.key}</option>)}
-                </select>
+                  options={DOMAINS.map(d => ({ value: d.key, label: d.key }))}
+                />
               </div>
               <div className="bg-warning/15 p-3 rounded-lg">
                 <div className="flex items-start gap-2 text-xs text-warning">
