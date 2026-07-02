@@ -19,6 +19,8 @@ import {
   X,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { TextField } from '../../../components/TextField';
+import { Select } from '../../../components/Select';
 import { serviceCatalogApi } from '../api';
 import type { LinkCategory, ServiceLinkItem, ServiceLinkPayload } from '../api/serviceCatalog';
 
@@ -289,28 +291,26 @@ function LinkForm({ initialData, onSubmit, onCancel, isSubmitting }: LinkFormPro
           <label className="block text-[10px] text-muted mb-0.5">
             {t('catalog.detail.serviceLinks.form.category')}
           </label>
-          <select
+          <Select
+            size="sm"
             value={category}
             onChange={(e) => setCategory(e.target.value as LinkCategory)}
-            className="w-full text-xs bg-panel border border-edge rounded px-2 py-1.5 text-body focus:outline-none focus:ring-1 focus:ring-accent"
-          >
-            {linkCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {t(`catalog.detail.serviceLinks.categories.${cat}`, cat)}
-              </option>
-            ))}
-          </select>
+            options={linkCategories.map((cat) => ({
+              value: cat,
+              label: t(`catalog.detail.serviceLinks.categories.${cat}`, cat),
+            }))}
+          />
         </div>
         <div>
           <label className="block text-[10px] text-muted mb-0.5">
             {t('catalog.detail.serviceLinks.form.title')}
           </label>
-          <input
+          <TextField
+            size="sm"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t('catalog.detail.serviceLinks.form.titlePlaceholder')}
-            className="w-full text-xs bg-panel border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
             required
           />
         </div>
@@ -320,12 +320,12 @@ function LinkForm({ initialData, onSubmit, onCancel, isSubmitting }: LinkFormPro
         <label className="block text-[10px] text-muted mb-0.5">
           {t('catalog.detail.serviceLinks.form.url')}
         </label>
-        <input
+        <TextField
+          size="sm"
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder={t('catalog.links.placeholder.url', 'https://...')}
-          className="w-full text-xs bg-panel border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
           required
         />
       </div>
@@ -334,12 +334,12 @@ function LinkForm({ initialData, onSubmit, onCancel, isSubmitting }: LinkFormPro
         <label className="block text-[10px] text-muted mb-0.5">
           {t('catalog.detail.serviceLinks.form.description')}
         </label>
-        <input
+        <TextField
+          size="sm"
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t('catalog.detail.serviceLinks.form.descriptionPlaceholder')}
-          className="w-full text-xs bg-panel border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
         />
       </div>
 
