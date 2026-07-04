@@ -207,7 +207,7 @@ export function ServiceResultCard({
                 size="xs"
                 className="ml-1"
               >
-                {service.health}
+                {t(`serviceCatalog.browse.health.${service.health.toLowerCase()}`)}
               </Badge>
             )}
           </div>
