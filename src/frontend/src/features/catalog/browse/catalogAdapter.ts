@@ -59,7 +59,7 @@ const asLifecycle = (v: unknown): Lifecycle =>
 export function toServiceVMs(graph: AssetGraph): ServiceVM[] {
   const apisByService = new Map<string, ApiVM[]>();
 
-  for (const rawApi of graph.apis) {
+  for (const rawApi of graph.apis ?? []) {
     const a = rawApi as unknown as Record<string, unknown>;
     const vm: ApiVM = {
       id: norm(a['apiAssetId']) ?? norm(a['id']) ?? '',
@@ -81,7 +81,7 @@ export function toServiceVMs(graph: AssetGraph): ServiceVM[] {
     apisByService.get(key)!.push(vm);
   }
 
-  return graph.services.map((rawSvc) => {
+  return (graph.services ?? []).map((rawSvc) => {
     const s = rawSvc as unknown as Record<string, unknown>;
     const svcId = norm(s['serviceAssetId']) ?? norm(s['id']) ?? '';
     const apis = apisByService.get(svcId) ?? [];

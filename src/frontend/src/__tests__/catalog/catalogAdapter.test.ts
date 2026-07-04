@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { toServiceVMs, computeFacets, filterServices, sortServices } from '../../features/catalog/browse/catalogAdapter';
+import { toServiceVMs, computeFacets, filterServices, sortServices, toApiVMs } from '../../features/catalog/browse/catalogAdapter';
 
 const graph = {
   services: [
@@ -47,4 +47,11 @@ it('filterServices combina pesquisa + facetas (AND entre grupos, OR dentro)', ()
 it('sortServices por nome é estável e A→Z', () => {
   const vms = toServiceVMs(graph);
   expect(sortServices(vms, 'name').map(s => s.name)).toEqual(['legacy-x', 'payment-service']);
+});
+
+it('toApiVMs achata todas as apis de todos os serviços', () => {
+  const apis = toApiVMs(toServiceVMs(graph));
+  expect(apis).toHaveLength(2);
+  expect(apis.map(a => a.id)).toContain('a1');
+  expect(apis.map(a => a.id)).toContain('a2');
 });
