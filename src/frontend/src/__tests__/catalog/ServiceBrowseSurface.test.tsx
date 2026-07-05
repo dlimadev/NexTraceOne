@@ -94,19 +94,19 @@ describe('ServiceBrowseSurface', () => {
       <ServiceBrowseSurface graph={MOCK_GRAPH} {...DEFAULT_HANDLERS} />,
       { routerProps: { initialEntries: ['/?domain=zzz-nope'] } },
     );
-    // i18next devolve key path → 'serviceCatalog.browse.noResults.title' → regex parcial
-    expect(screen.getByText(/noResults\.title/i)).toBeInTheDocument();
+    // i18next resolve a chave → 'No matching services'
+    expect(screen.getByText(/No matching services/i)).toBeInTheDocument();
     // CatalogFacetBar + EmptyState action renderizam ambos o botão clearAll
     // (quando hasActiveFilters=true, o FacetBar mostra o seu próprio ghost-button)
-    expect(screen.getAllByRole('button', { name: /clearAll/i }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('button', { name: /clear all/i }).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows EmptyState with onboarding message when graph has no services', () => {
     renderWithProviders(
       <ServiceBrowseSurface graph={EMPTY_GRAPH} {...DEFAULT_HANDLERS} />,
     );
-    // i18next devolve key path → 'serviceCatalog.browse.empty.title' → regex parcial
-    expect(screen.getByText(/browse\.empty\.title/i)).toBeInTheDocument();
+    // i18next resolve a chave → 'No services registered yet'
+    expect(screen.getByText(/No services registered yet/i)).toBeInTheDocument();
   });
 
   it('shows API rows when view mode is apis', () => {

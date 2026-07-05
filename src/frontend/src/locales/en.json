@@ -7928,6 +7928,62 @@
       "nameRequired": "Name is required",
       "domainRequired": "Domain is required",
       "teamRequired": "Team is required"
+    },
+    "browse": {
+      "searchPlaceholder": "Search services and APIs…",
+      "facets": {
+        "domain": "Domain",
+        "protocol": "Protocol",
+        "exposure": "Exposure",
+        "lifecycle": "Lifecycle",
+        "team": "Team"
+      },
+      "viewAs": {
+        "services": "Services",
+        "apis": "APIs"
+      },
+      "sort": {
+        "relevance": "Relevance",
+        "name": "Name",
+        "consumers": "Consumers",
+        "recent": "Recent"
+      },
+      "density": {
+        "comfortable": "Comfortable",
+        "compact": "Compact"
+      },
+      "clearAll": "Clear all",
+      "exposure": {
+        "public": "Public",
+        "internal": "Internal",
+        "partner": "Partner"
+      },
+      "lifecycle": {
+        "stable": "Stable",
+        "beta": "Beta",
+        "deprecated": "Deprecated",
+        "unknown": "Unknown"
+      },
+      "health": {
+        "ok": "Healthy",
+        "warn": "Warning",
+        "down": "Down"
+      },
+      "card": {
+        "viewContract": "View contract"
+      },
+      "empty": {
+        "title": "No services registered yet",
+        "desc": "Register your first service to start building the catalog."
+      },
+      "noResults": {
+        "title": "No matching services",
+        "desc": "Try adjusting your search or filters."
+      },
+      "segment": {
+        "browse": "Browse",
+        "explore": "Explore"
+      }
     }
   },
   "serviceMaturity": {

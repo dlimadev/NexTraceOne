@@ -95,15 +95,14 @@ describe('ServiceResultCard', () => {
 
     it('renders lifecycle dot with accessible aria-label', () => {
       renderCard();
-      // t() devolve o key path quando a tradução não existe no locale →
-      // aria-label contém 'lifecycle.stable'
-      expect(screen.getByRole('img', { name: /lifecycle\.stable/i })).toBeInTheDocument();
+      // t('serviceCatalog.browse.lifecycle.stable') → 'Stable'
+      expect(screen.getByRole('img', { name: /^Stable$/i })).toBeInTheDocument();
     });
 
     it('renders exposure badge', () => {
       renderCard();
-      // t('serviceCatalog.browse.exposure.public') → key path
-      expect(screen.getByText(/exposure\.public/i)).toBeInTheDocument();
+      // t('serviceCatalog.browse.exposure.public') → 'Public'
+      expect(screen.getByText(/^Public$/i)).toBeInTheDocument();
     });
 
     it('renders domain in context line', () => {

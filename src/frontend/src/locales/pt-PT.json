@@ -9226,6 +9226,62 @@
       "nameRequired": "Nome é obrigatório",
       "domainRequired": "Domínio é obrigatório",
       "teamRequired": "Equipa é obrigatória"
+    },
+    "browse": {
+      "searchPlaceholder": "Pesquisar serviços e APIs…",
+      "facets": {
+        "domain": "Domínio",
+        "protocol": "Protocolo",
+        "exposure": "Exposição",
+        "lifecycle": "Ciclo de vida",
+        "team": "Equipa"
+      },
+      "viewAs": {
+        "services": "Serviços",
+        "apis": "APIs"
+      },
+      "sort": {
+        "relevance": "Relevância",
+        "name": "Nome",
+        "consumers": "Consumidores",
+        "recent": "Recente"
+      },
+      "density": {
+        "comfortable": "Confortável",
+        "compact": "Compacto"
+      },
+      "clearAll": "Limpar tudo",
+      "exposure": {
+        "public": "Público",
+        "internal": "Interno",
+        "partner": "Parceiro"
+      },
+      "lifecycle": {
+        "stable": "Estável",
+        "beta": "Beta",
+        "deprecated": "Obsoleto",
+        "unknown": "Desconhecido"
+      },
+      "health": {
+        "ok": "Saudável",
+        "warn": "Alerta",
+        "down": "Indisponível"
+      },
+      "card": {
+        "viewContract": "Ver contrato"
+      },
+      "empty": {
+        "title": "Nenhum serviço registado ainda",
+        "desc": "Registe o seu primeiro serviço para começar a construir o catálogo."
+      },
+      "noResults": {
+        "title": "Nenhum serviço encontrado",
+        "desc": "Tente ajustar a sua pesquisa ou filtros."
+      },
+      "segment": {
+        "browse": "Navegar",
+        "explore": "Explorar"
+      }
     }
   },
   "serviceMaturity": {

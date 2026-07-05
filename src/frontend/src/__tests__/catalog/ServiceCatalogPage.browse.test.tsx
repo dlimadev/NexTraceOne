@@ -84,8 +84,8 @@ describe('ServiceCatalogPage — reshell Browse | Explorar', () => {
 
   it('exposes an "Explorar" segment control', async () => {
     render(<ServiceCatalogPage />);
-    // As chaves i18n do segmento são adicionadas na Task 7; até lá, t() devolve o path da chave.
-    expect(await screen.findByRole('tab', { name: /segment\.explore/i })).toBeInTheDocument();
+    // t('serviceCatalog.browse.segment.explore') → 'Explore'
+    expect(await screen.findByRole('tab', { name: /^Explore$/i })).toBeInTheDocument();
   });
 
   it('renders the "Register Service" CTA as a secondary (ghost) button, not primary', async () => {
