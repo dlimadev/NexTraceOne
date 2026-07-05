@@ -37,6 +37,8 @@ export function ApiResultRow({ api, onOpenApi, onViewContract }: ApiResultRowPro
 
   return (
     <div
+      role="button"
+      aria-label={api.name}
       className="flex items-center gap-3 px-4 py-3 bg-card rounded-lg border border-edge cursor-pointer hover:border-edge-strong transition-colors duration-[var(--nto-motion-base)] flex-wrap"
       onClick={() => onOpenApi(api.id)}
       onKeyDown={(e) => {
