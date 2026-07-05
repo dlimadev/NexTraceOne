@@ -11,6 +11,7 @@ vi.mock('../../features/catalog/api', () => ({
     getGraph: vi.fn(),
     registerService: vi.fn(),
     registerApi: vi.fn(),
+    getNodeHealth: vi.fn(),
     getImpactPropagation: vi.fn(),
     listSnapshots: vi.fn(),
     getTemporalDiff: vi.fn(),
@@ -68,9 +69,14 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
   }),
 }));
 
+// Reshell "browse-first": o topo é um segmento Browse | Explorar. Browse é a
+// superfície de descoberta (pesquisa + cartões de serviço); Explorar reagrupa as
+// abas de análise (overview/graph/impact/temporal) sem as redesenhar.
 describe('ServiceCatalogPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(serviceCatalogApi.getNodeHealth).mockResolvedValue({ nodes: [] } as never);
+    vi.mocked(serviceCatalogApi.listSnapshots).mockResolvedValue({ items: [] } as never);
   });
 
   it('exibe o título da página', () => {
@@ -79,67 +85,62 @@ describe('ServiceCatalogPage', () => {
     expect(screen.getByRole('heading', { name: /service catalog/i })).toBeInTheDocument();
   });
 
-  it('exibe as abas de navegação incluindo novas abas', () => {
+  it('exibe o segmento de topo Browse | Explorar', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    expect(screen.getByRole('tab', { name: /services/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /apis/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /graph/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /impact/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /temporal/i })).toBeInTheDocument();
+    // O componente Tabs do DS usa role="tab" (WCAG).
+    expect(screen.getByRole('tab', { name: /browse/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /explore/i })).toBeInTheDocument();
   });
 
-  it('exibe os serviços carregados na aba Services', async () => {
+  it('Browse (por defeito) exibe os serviços carregados como cartões', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    await userEvent.click(screen.getByRole('tab', { name: /services/i }));
     await waitFor(() => {
       expect(screen.getByText('payments-service')).toBeInTheDocument();
       expect(screen.getByText('auth-service')).toBeInTheDocument();
     });
   });
 
-  it('navega para a aba APIs e exibe as APIs', async () => {
+  it('a vista "APIs" do Browse exibe as APIs', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    await userEvent.click(screen.getByRole('tab', { name: /apis/i }));
+    // Alterna a facet bar do Browse para a vista de APIs.
+    await userEvent.click(await screen.findByRole('tab', { name: /apis/i }));
     await waitFor(() => {
       expect(screen.getByText('Payments API')).toBeInTheDocument();
       expect(screen.getByText('/api/payments')).toBeInTheDocument();
     });
   });
 
-  it('exibe estatísticas na aba Overview por defeito', async () => {
+  it('Explorar revela as sub-abas de análise (graph/impact/temporal)', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
+    await userEvent.click(screen.getByRole('tab', { name: /explore/i }));
     await waitFor(() => {
-      // Overview tab is active by default and shows stats
-      expect(screen.getByRole('heading', { name: /service catalog/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /graph/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /impact/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /temporal/i })).toBeInTheDocument();
     });
   });
 
-  it('exibe a aba Impact ao navegar para Impact Analysis', async () => {
+  it('navega para a aba Impact dentro de Explorar sem erro', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
-    vi.mocked(serviceCatalogApi.getImpactPropagation).mockResolvedValue({ nodes: [], edges: [] });
+    vi.mocked(serviceCatalogApi.getImpactPropagation).mockResolvedValue({ nodes: [], edges: [] } as never);
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    const impactBtn = screen.getByRole('tab', { name: /impact/i });
+    await userEvent.click(screen.getByRole('tab', { name: /explore/i }));
+    const impactBtn = await screen.findByRole('tab', { name: /impact/i });
     await userEvent.click(impactBtn);
     await waitFor(() => {
-      // Clicking impact tab should not throw
       expect(impactBtn).toBeInTheDocument();
     });
   });
 
-  it('exibe a aba Temporal ao navegar para Temporal Analysis', async () => {
+  it('navega para a aba Temporal dentro de Explorar sem erro', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
-    vi.mocked(serviceCatalogApi.listSnapshots).mockResolvedValue([]);
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    const temporalBtn = screen.getByRole('tab', { name: /temporal/i });
+    await userEvent.click(screen.getByRole('tab', { name: /explore/i }));
+    const temporalBtn = await screen.findByRole('tab', { name: /temporal/i });
     await userEvent.click(temporalBtn);
     await waitFor(() => {
       expect(temporalBtn).toBeInTheDocument();
@@ -149,8 +150,7 @@ describe('ServiceCatalogPage', () => {
   it('exibe mensagem quando não há serviços registados', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({ services: [], apis: [] });
     renderGraph();
-    // O componente Tabs do DS usa role="tab" (WCAG) em vez de role="button"
-    await userEvent.click(screen.getByRole('tab', { name: /services/i }));
+    // Browse é o segmento por defeito; um grafo vazio mostra o EmptyState.
     await waitFor(() => {
       expect(screen.getByText(/no services registered/i)).toBeInTheDocument();
     });
