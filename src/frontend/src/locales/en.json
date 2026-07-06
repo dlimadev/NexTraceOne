@@ -2951,6 +2951,50 @@
         "locked": "Locked",
         "total": "Total"
       },
+      "browse": {
+        "clearAll": "Clear all",
+        "density": {
+          "comfortable": "Comfortable",
+          "compact": "Compact"
+        },
+        "empty": {
+          "desc": "Register your first contract to start building the catalog.",
+          "title": "No contracts registered yet"
+        },
+        "facets": {
+          "approval": "Approval",
+          "criticality": "Criticality",
+          "domain": "Domain",
+          "exposure": "Exposure",
+          "lifecycle": "Lifecycle",
+          "serviceType": "Type",
+          "team": "Team"
+        },
+        "lifecycle": {
+          "approved": "Approved",
+          "deprecated": "Deprecated",
+          "draft": "Draft",
+          "inreview": "In Review",
+          "locked": "Locked",
+          "retired": "Retired",
+          "sunset": "Sunset"
+        },
+        "noResults": {
+          "desc": "Try adjusting your search or clearing filters.",
+          "title": "No contracts match your filters"
+        },
+        "searchPlaceholder": "Search contracts by name, domain, or team...",
+        "sort": {
+          "criticality": "Criticality",
+          "name": "Name",
+          "relevance": "Relevance",
+          "updated": "Updated"
+        },
+        "viewAs": {
+          "cards": "Cards",
+          "table": "Table"
+        }
+      },
       "title": "Contract Catalog"
     },
     "cdct": {

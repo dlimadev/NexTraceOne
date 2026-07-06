@@ -1,9 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody } from '../../../components/Card';
-import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { FilterChip } from '../../../components/FilterChip';
@@ -11,13 +9,14 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { useContractList, useContractsSummary } from '../hooks';
-import { CatalogToolbar, CatalogTable, CatalogSkeleton } from './components';
-import type { CatalogFilters, SortConfig, SortField, CatalogItem } from './types';
-import { EMPTY_FILTERS, toCatalogItem, extractFilterOptions } from './types';
+import { CatalogTable } from './components';
+import { ContractBrowseSurface } from './browse/ContractBrowseSurface';
+import type { SortConfig, SortField, CatalogItem } from './types';
+import { toCatalogItem } from './types';
 
 /**
- * Catálogo governado de contratos — listagem enterprise com filtros avançados,
- * sorting, badges semânticos e menu de acções por linha.
+ * Catálogo governado de contratos — superfície de descoberta "browse-first"
+ * com pesquisa, facetas e alternância Tabela|Cartões (ContractBrowseSurface).
  *
  * Suporta REST API, SOAP, Event API, Kafka Producer/Consumer e BackgroundService.
  * Dados enriquecidos (domain, team, owner, criticality) vêm do backend real.
@@ -28,44 +27,39 @@ export function ContractCatalogPage() {
   const { can } = usePermissions();
 
   // ── State ───────────────────────────────────────────────────────────────────
-  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  // O sort próprio da tabela mantém-se; filtros/pesquisa vivem no URL (browse surface).
   const [sort, setSort] = useState<SortConfig>({ field: 'updatedAt', direction: 'desc' });
-  const [lifecycleChip, setLifecycleChip] = useState<string>('');
+
+  // Ciclo de vida: fonte única de verdade = param `lifecycle` do URL (partilhado com a facet bar).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lifecycleParam = searchParams.get('lifecycle') ?? '';
+
+  const setLifecycle = (state: string) =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (state) {
+        next.set('lifecycle', state);
+      } else {
+        next.delete('lifecycle');
+      }
+      return next;
+    });
+
+  const toggleLifecycle = (state: string) =>
+    setLifecycle(lifecycleParam === state ? '' : state);
 
   // ── Data fetching ───────────────────────────────────────────────────────────
-  const listQuery = useContractList({
-    searchTerm: filters.search || undefined,
-    protocol: filters.protocol || undefined,
-    lifecycleState: filters.lifecycle || lifecycleChip || undefined,
-  });
+  // Fetch sem filtros — o ContractBrowseSurface filtra client-side via estado do URL.
+  const listQuery = useContractList();
 
   const summaryQuery = useContractsSummary();
   const summary = summaryQuery.data;
 
-  // ── Transform to catalog items & client-side filtering ────────────────────────
+  // ── Transform to catalog items ──────────────────────────────────────────────
   const catalogItems = useMemo(
     () => (listQuery.data?.items ?? []).map(toCatalogItem),
     [listQuery.data],
   );
-
-  const dynamicOptions = useMemo(
-    () => extractFilterOptions(catalogItems),
-    [catalogItems],
-  );
-
-  const filteredItems = useMemo(
-    () => applyClientFilters(catalogItems, filters, lifecycleChip),
-    [catalogItems, filters, lifecycleChip],
-  );
-
-  const sortedItems = useMemo(
-    () => applySorting(filteredItems, sort),
-    [filteredItems, sort],
-  );
-
-  // ── Lifecycle chip toggle ───────────────────────────────────────────────────
-  const toggleChip = (state: string) =>
-    setLifecycleChip((prev) => (prev === state ? '' : state));
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -88,50 +82,50 @@ export function ContractCatalogPage() {
         }
       />
 
-      {/* Summary chips */}
+      {/* Summary chips — sincronizados com o param `lifecycle` do URL */}
       {summary && (
         <div className="flex items-center gap-2 flex-wrap">
           <FilterChip
             icon={<Layers size={12} />}
             label={t('contracts.catalog.summary.total', 'Total')}
             count={summary.totalVersions}
-            active={lifecycleChip === ''}
-            onClick={() => setLifecycleChip('')}
+            active={lifecycleParam === ''}
+            onClick={() => setLifecycle('')}
           />
           <FilterChip
             icon={<FileCheck size={12} />}
             label={t('contracts.catalog.summary.drafts', 'Drafts')}
             count={summary.draftCount}
-            active={lifecycleChip === 'Draft'}
-            onClick={() => toggleChip('Draft')}
+            active={lifecycleParam === 'Draft'}
+            onClick={() => toggleLifecycle('Draft')}
           />
           <FilterChip
             icon={<Clock size={12} />}
             label={t('contracts.catalog.summary.inReview', 'In Review')}
             count={summary.inReviewCount}
-            active={lifecycleChip === 'InReview'}
-            onClick={() => toggleChip('InReview')}
+            active={lifecycleParam === 'InReview'}
+            onClick={() => toggleLifecycle('InReview')}
           />
           <FilterChip
             icon={<ShieldCheck size={12} />}
             label={t('contracts.catalog.summary.approved', 'Approved')}
             count={summary.approvedCount}
-            active={lifecycleChip === 'Approved'}
-            onClick={() => toggleChip('Approved')}
+            active={lifecycleParam === 'Approved'}
+            onClick={() => toggleLifecycle('Approved')}
           />
           <FilterChip
             icon={<Lock size={12} />}
             label={t('contracts.catalog.summary.locked', 'Locked')}
             count={summary.lockedCount}
-            active={lifecycleChip === 'Locked'}
-            onClick={() => toggleChip('Locked')}
+            active={lifecycleParam === 'Locked'}
+            onClick={() => toggleLifecycle('Locked')}
           />
           <FilterChip
             icon={<AlertTriangle size={12} />}
             label={t('contracts.catalog.summary.deprecated', 'Deprecated')}
             count={summary.deprecatedCount}
-            active={lifecycleChip === 'Deprecated'}
-            onClick={() => toggleChip('Deprecated')}
+            active={lifecycleParam === 'Deprecated'}
+            onClick={() => toggleLifecycle('Deprecated')}
           />
           <FilterChip
             icon={<ListTree size={12} />}
@@ -141,88 +135,28 @@ export function ContractCatalogPage() {
         </div>
       )}
 
-      {/* Toolbar: search + filters */}
-      <CatalogToolbar
-        filters={filters}
-        onChange={setFilters}
-        resultCount={sortedItems.length}
-        dynamicOptions={dynamicOptions}
-      />
-
-      {/* Table */}
-      <Card>
-        <CardBody className="p-0">
-          {listQuery.isLoading && <CatalogSkeleton />}
-
-          {listQuery.isError && (
-            <PageErrorState
-              variant="compact"
-              message={t('contracts.catalog.states.errorDescription', 'An error occurred while loading the contract catalog.')}
-              onRetry={() => listQuery.refetch()}
-            />
+      {/* Superfície de descoberta: pesquisa + facetas + Tabela|Cartões */}
+      {listQuery.isError ? (
+        <PageErrorState
+          variant="compact"
+          message={t('contracts.catalog.states.errorDescription', 'An error occurred while loading the contract catalog.')}
+          onRetry={() => listQuery.refetch()}
+        />
+      ) : (
+        <ContractBrowseSurface
+          items={catalogItems}
+          loading={listQuery.isLoading}
+          onOpen={(item) => navigate(`/contracts/${item.versionId}`)}
+          renderTable={(rows) => (
+            <CatalogTable items={applySorting(rows, sort)} sort={sort} onSort={setSort} />
           )}
-
-          {!listQuery.isLoading && !listQuery.isError && sortedItems.length === 0 && (
-            <EmptyState
-              title={
-                catalogItems.length === 0
-                  ? t('contracts.catalog.states.empty', 'No contracts in the catalog')
-                  : t('contracts.catalog.states.noResults', 'No contracts match your filters')
-              }
-              description={
-                catalogItems.length === 0
-                  ? t('contracts.catalog.states.emptyDescription', 'To create a contract, navigate to a service in the Service Catalog and use the Contracts tab.')
-                  : t('contracts.catalog.states.noResultsDescription', 'Try adjusting your search criteria or clearing some filters.')
-              }
-              action={
-                catalogItems.length === 0 ? (
-                  <Link to="/services">
-                    <Button variant="secondary" size="sm">
-                      {t('contracts.catalog.goToServices', 'Go to Service Catalog')}
-                    </Button>
-                  </Link>
-                ) : undefined
-              }
-              size="compact"
-            />
-          )}
-
-          {!listQuery.isLoading && sortedItems.length > 0 && (
-            <CatalogTable
-              items={sortedItems}
-              sort={sort}
-              onSort={setSort}
-            />
-          )}
-        </CardBody>
-      </Card>
+        />
+      )}
     </PageContainer>
   );
 }
 
-// ── Client-side filtering (for real backend fields) ──────────────────────────
-
-function applyClientFilters(
-  items: CatalogItem[],
-  filters: CatalogFilters,
-  lifecycleChip: string,
-): CatalogItem[] {
-  return items.filter((item) => {
-    if (filters.serviceType && item.catalogServiceType !== filters.serviceType) return false;
-    if (filters.domain && item.domain !== filters.domain) return false;
-    if (filters.owner && item.technicalOwner !== filters.owner) return false;
-    if (filters.team && item.team !== filters.team) return false;
-    if (filters.approvalState && item.approvalState !== filters.approvalState) return false;
-    if (filters.exposure && item.exposure !== filters.exposure) return false;
-    if (filters.risk && item.criticality !== filters.risk) return false;
-
-    if (lifecycleChip && item.lifecycleState !== lifecycleChip) return false;
-
-    return true;
-  });
-}
-
-// ── Client-side sorting ───────────────────────────────────────────────────────
+// ── Client-side sorting (aplica-se às linhas já filtradas pela browse surface) ──
 
 function applySorting(items: CatalogItem[], sort: SortConfig): CatalogItem[] {
   const sorted = [...items];
