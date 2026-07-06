@@ -11645,7 +11645,11 @@
     "tabObservability": "Observabilidad",
     "tabReliability": "Fiabilidad & SLOs",
     "tabIncidents": "Incidentes",
-    "tabScore": "Puntuación"
+    "tabScore": "Puntuación",
+    "health": {
+      "maturity": "Madurez",
+      "slo": "SLO"
+    }
   },
   "migrationPreview": {
     "title": "Vista Previa de Migraciones",

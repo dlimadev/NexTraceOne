@@ -10353,7 +10353,11 @@
     "tabObservability": "Observability",
     "tabReliability": "Reliability & SLOs",
     "tabIncidents": "Incidents",
-    "tabScore": "Score"
+    "tabScore": "Score",
+    "health": {
+      "maturity": "Maturity",
+      "slo": "SLO"
+    }
   },
   "migrationPreview": {
     "title": "Migration Preview",

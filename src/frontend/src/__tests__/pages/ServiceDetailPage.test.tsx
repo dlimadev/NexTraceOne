@@ -45,6 +45,7 @@ vi.mock('../../api/client', () => ({
 vi.mock('../../features/catalog/api', () => ({
   serviceCatalogApi: {
     getServiceDetail: vi.fn(),
+    getServiceMaturity: vi.fn(),
   },
 }));
 
@@ -129,6 +130,8 @@ function renderServiceDetail(serviceId = 's1') {
 describe('ServiceDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Por defeito, sem scorecard de maturidade → célula de maturidade honest-null.
+    vi.mocked(serviceCatalogApi.getServiceMaturity).mockRejectedValue(new Error('no maturity'));
   });
 
   it('exibe estado de loading', () => {
@@ -215,6 +218,31 @@ describe('ServiceDetailPage', () => {
       // v5: empty-contracts message appears in both the always-visible stacked section and the contracts tab content
       expect(screen.getAllByText(/no contracts linked/i).length).toBeGreaterThanOrEqual(1);
     });
+  });
+
+  it('health strip: liga maturidade + SLO reais quando disponíveis', async () => {
+    vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue({ ...mockService, sloTarget: '99.9%' });
+    vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
+    vi.mocked(serviceCatalogApi.getServiceMaturity).mockResolvedValue({
+      serviceId: 's1', serviceName: 'payments-service', displayName: 'Payments Service',
+      teamName: 'Payments Team', domain: 'Payments', level: 'Managed', overallScore: 82,
+      dimensions: [], computedAt: '2026-01-01T00:00:00Z',
+    });
+    renderServiceDetail();
+    await waitFor(() => {
+      expect(screen.getByText('Managed')).toBeInTheDocument();
+      expect(screen.getAllByText('99.9%').length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  it('health strip: honest-null — sem valores fabricados quando não há sinais', async () => {
+    // service sem sloTarget + maturidade a falhar (beforeEach) → nenhum sinal.
+    vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
+    vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
+    renderServiceDetail();
+    await waitFor(() => expect(screen.getAllByText('Payments Service')[0]).toBeInTheDocument());
+    // O placeholder de maturidade fabricado anterior ("B+") não deve existir.
+    expect(screen.queryByText('B+')).not.toBeInTheDocument();
   });
 
   it('exibe estado de erro quando serviço não é encontrado', async () => {

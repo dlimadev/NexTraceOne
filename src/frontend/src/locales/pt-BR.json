@@ -11660,7 +11660,11 @@
     "tabObservability": "Observabilidade",
     "tabReliability": "Confiabilidade & SLOs",
     "tabIncidents": "Incidentes",
-    "tabScore": "Score"
+    "tabScore": "Score",
+    "health": {
+      "maturity": "Maturidade",
+      "slo": "SLO"
+    }
   },
   "migrationPreview": {
     "title": "Pré-visualização de Migrações",
