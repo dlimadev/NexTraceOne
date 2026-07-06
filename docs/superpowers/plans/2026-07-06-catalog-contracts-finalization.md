@@ -34,25 +34,33 @@
 
 ---
 
-### Task 2: Forms standard dos builder panels → DS (preservando seletores color-coded)
+### Task 2: ~~Forms dos builder panels → DS~~ — RECLASSIFICADA (exceção deliberada, preservada)
 
-**Files:**
-- Modify: `src/frontend/src/features/contracts/workspace/builders/ParameterConstraintsPanel.tsx` (8 controlos: number/text/select de constraints)
-- Modify: `src/frontend/src/features/contracts/workspace/builders/shared/SchemaPropertyEditor.tsx` (13 controlos: text/number/checkbox/select standard **+ preservar** os seletores de tipo color-coded)
+**Decisão (2026-07-06, baseada em evidência de código):** os controlos de
+`ParameterConstraintsPanel.tsx` e `SchemaPropertyEditor.tsx` **NÃO** são
+"forms standard convertíveis" — são uma **camada de builder ultra-compacta
+deliberada**:
+- Primitivas centralizadas e **baseadas em tokens** (`shared/BuilderFormPrimitives.tsx`:
+  `Field/FieldArea/FieldSelect/FieldCheckbox/FieldTagInput` + `MiniField` local),
+  sem cores hardcoded (usam `bg-elevated`, `border-edge`, `text-body`,
+  `focus:ring-accent`, `accent-accent`).
+- Densidade micro (`text-[8px]/[9px]/[10px]`, `py-0.5`) **essencial** à grelha
+  multi-coluna de edição de schema. O menor DS `TextField size="sm"` é `h-9`/`text-sm`
+  → forçá-lo aqui ~duplicaria a altura de cada linha e partiria a grelha densa em
+  **todos** os builders (regressão de UX de larga superfície).
+- Seletores de tipo **color-coded** (`TYPE_COLORS`) + campo de nome inline
+  transparente com hover-reveal — afordâncias deliberadas.
 
-- [ ] **Step 1:** `ParameterConstraintsPanel` — todos os controlos são form standard (min/maxLength, pattern, min/max, format select, default, enum). Converter para `TextField` (com `type="number"` onde aplicável, preservando a coerção `Number(...)`), `Select` (format), preservando o `update({...})`.
-- [ ] **Step 2:** `SchemaPropertyEditor` — converter os inputs de texto/número → `TextField`, os `<input type="checkbox">` (exclusiveMin/Max, nullable) → DS `Checkbox`, o `<select format>` → `Select`. **NÃO tocar** nos seletores de tipo color-coded (`TYPE_COLORS`, object/$ref/oneOf) — são semântica por cor. Documentar no report o que foi preservado.
-- [ ] **Step 3:** Manter testes verdes / adicionar teste mínimo. `tsc`+`eslint`+`vitest` verdes. Commit — `refactor(contracts): DS form controls in builder constraint/schema panels (color-coded selectors preserved)`
+Converter violaria CLAUDE.md §1.2/§1.3 e contradiz os ciclos 12-13 (builders
+deixados intocados de propósito). **Preservado como exceção deliberada**, ao lado
+dos editores Monaco e dos `*BuilderPage`. Sem alteração de código.
 
 ---
 
-### Task 3: SoapWsdlBuilderPage — triagem + conversão se standard
+### Task 3: ~~SoapWsdlBuilderPage~~ — RECLASSIFICADA (exceção deliberada, preservada)
 
-**Files:**
-- Read/Modify: `src/frontend/src/features/contracts/pages/SoapWsdlBuilderPage.tsx` (4 controlos crus)
-
-- [ ] **Step 1:** Inspecionar os 4 controlos. Se forem form standard (nome/namespace/opções) → converter para DS. Se forem internos ao editor/preview de WSDL (parte da experiência de edição, análogo aos outros builders deferidos) → **deixar e documentar como exceção deliberada** no report (com a razão). Não fazer swap cego que parta o preview.
-- [ ] **Step 2:** Se convertido: manter teste verde. `tsc`+`eslint`+`vitest`. Commit — `refactor(contracts): DS controls in SoapWsdlBuilderPage` (ou, se deferido, sem commit de código — só nota no report).
+Pela mesma razão da Task 2, os controlos do `SoapWsdlBuilderPage.tsx` fazem parte
+da camada de builder deliberada. **Preservado.** Sem alteração de código.
 
 ---
 
