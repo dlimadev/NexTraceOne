@@ -4249,6 +4249,50 @@
         "locked": "Bloqueado",
         "total": "Total"
       },
+      "browse": {
+        "clearAll": "Limpiar todo",
+        "density": {
+          "comfortable": "Cómodo",
+          "compact": "Compacto"
+        },
+        "empty": {
+          "desc": "Registra tu primer contrato para comenzar a construir el catálogo.",
+          "title": "Aún no hay contratos registrados"
+        },
+        "facets": {
+          "approval": "Aprobación",
+          "criticality": "Criticidad",
+          "domain": "Dominio",
+          "exposure": "Exposición",
+          "lifecycle": "Ciclo de vida",
+          "serviceType": "Tipo",
+          "team": "Equipo"
+        },
+        "lifecycle": {
+          "approved": "Aprobado",
+          "deprecated": "Deprecado",
+          "draft": "Borrador",
+          "inreview": "En revisión",
+          "locked": "Bloqueado",
+          "retired": "Retirado",
+          "sunset": "Discontinuado"
+        },
+        "noResults": {
+          "desc": "Intenta ajustar tu búsqueda o limpiar los filtros.",
+          "title": "Ningún contrato coincide con tus filtros"
+        },
+        "searchPlaceholder": "Buscar contratos por nombre, dominio o equipo...",
+        "sort": {
+          "criticality": "Criticidad",
+          "name": "Nombre",
+          "relevance": "Relevancia",
+          "updated": "Actualizado"
+        },
+        "viewAs": {
+          "cards": "Tarjetas",
+          "table": "Tabla"
+        }
+      },
       "title": "Catálogo de Contratos"
     },
     "cdct": {

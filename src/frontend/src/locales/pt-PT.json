@@ -4249,6 +4249,50 @@
         "locked": "Bloqueado",
         "total": "Total"
       },
+      "browse": {
+        "clearAll": "Limpar tudo",
+        "density": {
+          "comfortable": "Confortável",
+          "compact": "Compacto"
+        },
+        "empty": {
+          "desc": "Registe o seu primeiro contrato para começar a construir o catálogo.",
+          "title": "Ainda não há contratos registados"
+        },
+        "facets": {
+          "approval": "Aprovação",
+          "criticality": "Criticidade",
+          "domain": "Domínio",
+          "exposure": "Exposição",
+          "lifecycle": "Ciclo de vida",
+          "serviceType": "Tipo",
+          "team": "Equipa"
+        },
+        "lifecycle": {
+          "approved": "Aprovado",
+          "deprecated": "Depreciado",
+          "draft": "Rascunho",
+          "inreview": "Em revisão",
+          "locked": "Bloqueado",
+          "retired": "Retirado",
+          "sunset": "Descontinuado"
+        },
+        "noResults": {
+          "desc": "Tente ajustar a sua pesquisa ou limpar os filtros.",
+          "title": "Nenhum contrato corresponde aos seus filtros"
+        },
+        "searchPlaceholder": "Pesquisar contratos por nome, domínio ou equipa...",
+        "sort": {
+          "criticality": "Criticidade",
+          "name": "Nome",
+          "relevance": "Relevância",
+          "updated": "Atualizado"
+        },
+        "viewAs": {
+          "cards": "Cartões",
+          "table": "Tabela"
+        }
+      },
       "title": "Catálogo de Contratos"
     },
     "cdct": {
