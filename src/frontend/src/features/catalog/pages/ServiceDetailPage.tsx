@@ -49,7 +49,6 @@ import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
 import { ServiceScoreTab } from '../components/ServiceScoreTab';
 import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import { cn } from '../../../lib/cn';
-import type { ServiceFormData } from '../components/ServiceRegistrationWizard';
 
 // ── Helpers de variante de badge ─────────────────────────────────────────────
 
