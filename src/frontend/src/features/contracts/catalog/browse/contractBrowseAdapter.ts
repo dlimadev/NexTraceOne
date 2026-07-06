@@ -15,9 +15,10 @@ import type {
 // ── Rank map para ordenação por criticality ───────────────────────────────────
 
 const CRITICALITY_RANK: Record<string, number> = {
-  High: 0,
-  Medium: 1,
-  Low: 2,
+  Critical: 0,
+  High: 1,
+  Medium: 2,
+  Low: 3,
 };
 
 // ── Helpers internos ──────────────────────────────────────────────────────────

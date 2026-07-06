@@ -308,15 +308,16 @@ describe('sortContracts', () => {
     expect(dates[dates.length - 1]).toBe('2025-12-01T00:00:00Z');
   });
 
-  it('sort by criticality produces High→Medium→Low, unknown last', () => {
+  it('sort by criticality produces Critical→High→Medium→Low, unknown last', () => {
     const items = [
       makeItem({ apiAssetId: 'c1', name: 'C1', criticality: 'Low' }),
       makeItem({ apiAssetId: 'c2', name: 'C2', criticality: 'High' }),
       makeItem({ apiAssetId: 'c3', name: 'C3', criticality: 'Medium' }),
       makeItem({ apiAssetId: 'c4', name: 'C4', criticality: '' }),  // unknown → last
+      makeItem({ apiAssetId: 'c5', name: 'C5', criticality: 'Critical' }),
     ];
     const result = sortContracts(items, 'criticality');
-    expect(result.map(i => i.criticality)).toEqual(['High', 'Medium', 'Low', '']);
+    expect(result.map(i => i.criticality)).toEqual(['Critical', 'High', 'Medium', 'Low', '']);
   });
 
   it('sort by relevance preserves input order', () => {
