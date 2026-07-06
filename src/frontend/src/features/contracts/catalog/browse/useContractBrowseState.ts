@@ -57,10 +57,10 @@ export function useContractBrowseState() {
     approvals: csvToArray(searchParams.get('approval')),
   }), [searchParams]);
 
-  const viewMode = useMemo<ContractViewMode>(
-    () => (searchParams.get('view') as ContractViewMode | null) ?? 'table',
-    [searchParams],
-  );
+  const viewMode = useMemo<ContractViewMode>(() => {
+    const rawView = searchParams.get('view');
+    return rawView === 'cards' ? 'cards' : 'table';
+  }, [searchParams]);
 
   const density = useMemo<ContractDensity>(
     () => (searchParams.get('density') as ContractDensity | null) ?? 'comfortable',

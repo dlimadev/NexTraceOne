@@ -62,6 +62,16 @@ describe('clearAll', () => {
   });
 });
 
+describe('viewMode whitelist guard', () => {
+  it('valor inválido em ?view=garbage resulta em viewMode === table', () => {
+    const invalidWrapper = ({ children }: { children: React.ReactNode }) => (
+      <MemoryRouter initialEntries={['/?view=garbage']}>{children}</MemoryRouter>
+    );
+    const { result } = renderHook(() => useContractBrowseState(), { wrapper: invalidWrapper });
+    expect(result.current.viewMode).toBe('table');
+  });
+});
+
 describe('setFilter — preservação de outros parâmetros', () => {
   it('setFilter preserva os outros parâmetros ao actualizar um único filtro', () => {
     const { result } = renderHook(() => useContractBrowseState(), { wrapper });

@@ -158,7 +158,7 @@ export function ContractBrowseSurface({
         >
           {filtered.map((item) => (
             <ContractResultCard
-              key={item.apiAssetId}
+              key={item.versionId ?? item.apiAssetId}
               item={item}
               density={density}
               onOpen={onOpen}
