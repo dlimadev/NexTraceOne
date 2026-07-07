@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Divider } from '../../../components/Divider';
 import { cn } from '../../../lib/cn';
 import type { ServiceVM, ApiVM, Density, Lifecycle, Exposure } from './catalogTypes';
 
@@ -216,7 +217,7 @@ export function ServiceResultCard({
         {/* ── Separador + chips de API ── */}
         {service.apis.length > 0 && (
           <>
-            <hr className="my-2 border-edge/60" />
+            <Divider variant="strong" className="my-2" />
             <div className="flex flex-wrap gap-1.5">
               {visibleApis.map((api) => (
                 <ApiChip

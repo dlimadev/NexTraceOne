@@ -4281,6 +4281,7 @@
           "desc": "Tente ajustar a sua pesquisa ou limpar os filtros.",
           "title": "Nenhum contrato corresponde aos seus filtros"
         },
+        "resultCount": "{{count}} resultados",
         "searchPlaceholder": "Pesquisar contratos por nome, domínio ou equipa...",
         "sort": {
           "criticality": "Criticidade",

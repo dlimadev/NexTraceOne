@@ -26,6 +26,7 @@ import {
   computeContractFacets,
   filterContracts,
   sortContracts,
+  isFiltersActive,
 } from './contractBrowseAdapter';
 import { useContractBrowseState } from './useContractBrowseState';
 import { ContractFacetBar } from './ContractFacetBar';
@@ -83,15 +84,7 @@ export function ContractBrowseSurface({
     [items, filters, sort],
   );
 
-  const hasActiveFilters =
-    filters.q !== '' ||
-    filters.serviceTypes.length > 0 ||
-    filters.lifecycles.length > 0 ||
-    filters.domains.length > 0 ||
-    filters.teams.length > 0 ||
-    filters.criticalities.length > 0 ||
-    filters.exposures.length > 0 ||
-    filters.approvals.length > 0;
+  const hasActiveFilters = isFiltersActive(filters);
 
   /* ── Estado 1: loading ── */
   if (loading) {

@@ -2983,6 +2983,7 @@
           "desc": "Try adjusting your search or clearing filters.",
           "title": "No contracts match your filters"
         },
+        "resultCount": "{{count}} results",
         "searchPlaceholder": "Search contracts by name, domain, or team...",
         "sort": {
           "criticality": "Criticality",

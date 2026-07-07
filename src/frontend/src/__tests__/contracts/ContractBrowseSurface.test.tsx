@@ -64,6 +64,8 @@ describe('ContractBrowseSurface', () => {
     expect(renderTable).toHaveBeenCalled();
     // Cartões NÃO devem aparecer no modo tabela
     expect(screen.queryByRole('heading', { name: /Payment API/i })).toBeNull();
+    // O Select de ordenação fica oculto no modo tabela (cabeçalhos ordenam).
+    expect(screen.queryByRole('combobox')).toBeNull();
   });
 
   it('(b) cartões: os nomes dos itens aparecem como headings h3', () => {
@@ -76,6 +78,8 @@ describe('ContractBrowseSurface', () => {
 
     expect(screen.getByRole('heading', { name: /Payment API/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Order API/i })).toBeInTheDocument();
+    // O Select de ordenação está presente no modo cartões.
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   it('(c) sem resultados: mostra estado noResults e pelo menos um botão de limpar', () => {
