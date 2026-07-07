@@ -134,7 +134,8 @@ test.describe('Contract Governance — listagem', () => {
 
   test('exibe o botão de criar novo contrato', async ({ page }) => {
     await page.goto('/contracts');
-    await expect(page.getByRole('link', { name: /create/i })).toBeVisible({ timeout: 5_000 });
+    // v5: o CTA é um Button "New contract" (navega via onClick), não um <link>.
+    await expect(page.getByRole('button', { name: /new contract/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe estado vazio quando a API devolve lista vazia', async ({ page }) => {
@@ -236,9 +237,10 @@ test.describe('Contract Governance — criar novo contrato', () => {
     );
 
     await page.goto('/contracts');
-    const createLink = page.getByRole('link', { name: /create/i });
-    await expect(createLink).toBeVisible({ timeout: 5_000 });
-    await createLink.click();
+    // v5: CTA é um Button "New contract" que navega para /contracts/new via onClick.
+    const createBtn = page.getByRole('button', { name: /new contract/i });
+    await expect(createBtn).toBeVisible({ timeout: 5_000 });
+    await createBtn.click();
     await expect(page).toHaveURL('/contracts/new');
   });
 
