@@ -16,6 +16,7 @@ import { Select } from '../../../../components/Select';
 import { Tabs } from '../../../../components/Tabs';
 import { IconButton } from '../../../../components/IconButton';
 import { Button } from '../../../../components/Button';
+import { isFiltersActive } from './contractBrowseAdapter';
 import type {
   ContractFacetGroups,
   ContractBrowseFilters,
@@ -79,15 +80,7 @@ export function ContractFacetBar({
 }: ContractFacetBarProps) {
   const { t } = useTranslation();
 
-  const hasActiveFilters =
-    filters.q !== '' ||
-    filters.serviceTypes.length > 0 ||
-    filters.lifecycles.length > 0 ||
-    filters.domains.length > 0 ||
-    filters.teams.length > 0 ||
-    filters.criticalities.length > 0 ||
-    filters.exposures.length > 0 ||
-    filters.approvals.length > 0;
+  const hasActiveFilters = isFiltersActive(filters);
 
   const sortOptions = [
     { value: 'relevance',   label: t('contracts.catalog.browse.sort.relevance') },
@@ -233,12 +226,15 @@ export function ContractFacetBar({
       {/* ── Controlos: ordenação, viewMode, densidade, limpar, contagem ───── */}
       <div className="flex items-center gap-2 flex-wrap">
 
-        <Select
-          options={sortOptions}
-          value={sort}
-          onChange={(e) => onSort(e.target.value as ContractSortKey)}
-          size="sm"
-        />
+        {/* Ordenação só é relevante nos cartões — na tabela, os cabeçalhos ordenam. */}
+        {viewMode !== 'table' && (
+          <Select
+            options={sortOptions}
+            value={sort}
+            onChange={(e) => onSort(e.target.value as ContractSortKey)}
+            size="sm"
+          />
+        )}
 
         <Tabs
           items={viewItems}
@@ -267,7 +263,7 @@ export function ContractFacetBar({
         />
 
         <span className="ml-auto text-xs text-muted tabular-nums">
-          {resultCount}
+          {t('contracts.catalog.browse.resultCount', { count: resultCount })}
         </span>
 
         {hasActiveFilters && (

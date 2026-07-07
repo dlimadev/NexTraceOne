@@ -40,6 +40,23 @@ const countBy = (values: string[]): ContractFacetCount[] => {
 // ── API pública ───────────────────────────────────────────────────────────────
 
 /**
+ * Indica se há algum filtro activo (pesquisa ou qualquer faceta selecionada).
+ * Fonte única de verdade partilhada por ContractFacetBar e ContractBrowseSurface.
+ */
+export function isFiltersActive(filters: ContractBrowseFilters): boolean {
+  return (
+    filters.q !== '' ||
+    filters.serviceTypes.length > 0 ||
+    filters.lifecycles.length > 0 ||
+    filters.domains.length > 0 ||
+    filters.teams.length > 0 ||
+    filters.criticalities.length > 0 ||
+    filters.exposures.length > 0 ||
+    filters.approvals.length > 0
+  );
+}
+
+/**
  * Calcula os grupos de facetas a partir de uma lista de CatalogItem.
  *
  * Mapeamento de campo → grupo:

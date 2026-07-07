@@ -4281,6 +4281,7 @@
           "desc": "Intenta ajustar tu búsqueda o limpiar los filtros.",
           "title": "Ningún contrato coincide con tus filtros"
         },
+        "resultCount": "{{count}} resultados",
         "searchPlaceholder": "Buscar contratos por nombre, dominio o equipo...",
         "sort": {
           "criticality": "Criticidad",
@@ -11645,7 +11646,11 @@
     "tabObservability": "Observabilidad",
     "tabReliability": "Fiabilidad & SLOs",
     "tabIncidents": "Incidentes",
-    "tabScore": "Puntuación"
+    "tabScore": "Puntuación",
+    "health": {
+      "maturity": "Madurez",
+      "slo": "SLO"
+    }
   },
   "migrationPreview": {
     "title": "Vista Previa de Migraciones",

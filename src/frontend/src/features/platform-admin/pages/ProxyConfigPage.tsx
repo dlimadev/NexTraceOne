@@ -12,7 +12,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
-import { TextField } from '../../../components/TextField';
+import { TextField as DsTextField } from '../../../components/TextField';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { platformAdminApi, type ProxyConfigUpdate } from '../api/platformAdmin';
@@ -347,7 +347,7 @@ function TextField({
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-body">{label}</label>
-      <TextField
+      <DsTextField
         type="text"
         value={value}
         placeholder={placeholder}
@@ -373,7 +373,7 @@ function PasswordField({
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-body">{label}</label>
-      <TextField
+      <DsTextField
         type="password"
         value={value}
         onChange={(e) => onChange(e.target.value)}

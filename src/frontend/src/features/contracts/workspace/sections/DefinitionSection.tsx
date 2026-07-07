@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, FileText, Building2, Shield, Link as LinkIcon, Calendar } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
-import { Button } from '../../../../shared/ui';
+import { Button, TextField, TextArea, Select } from '../../../../shared/ui';
 import { CONTRACT_TYPES, LIFECYCLE_STATES } from '../../shared/constants';
 import type { StudioContract } from '../studioTypes';
 
@@ -231,7 +231,7 @@ function Field({ label, value, onChange, placeholder, disabled }: { label: strin
   return (
     <div>
       <label className="block text-[10px] font-medium text-muted mb-0.5">{label}</label>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} className="w-full text-xs bg-elevated border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed" />
+      <TextField size="sm" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} />
     </div>
   );
 }
@@ -240,7 +240,7 @@ function FieldArea({ label, value, onChange, placeholder, disabled, rows = 3 }: 
   return (
     <div>
       <label className="block text-[10px] font-medium text-muted mb-0.5">{label}</label>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} rows={rows} className="w-full text-xs bg-elevated border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none disabled:opacity-50 disabled:cursor-not-allowed" />
+      <TextArea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} rows={rows} />
     </div>
   );
 }
@@ -249,9 +249,7 @@ function SelectField({ label, value, onChange, options, disabled }: { label: str
   return (
     <div>
       <label className="block text-[10px] font-medium text-muted mb-0.5">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} className="w-full text-xs bg-elevated border border-edge rounded px-2 py-1.5 text-body focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed">
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
+      <Select size="sm" value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} options={options.map((o) => ({ value: o, label: o }))} />
     </div>
   );
 }

@@ -49,7 +49,6 @@ import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
 import { ServiceScoreTab } from '../components/ServiceScoreTab';
 import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import { cn } from '../../../lib/cn';
-import type { ServiceFormData } from '../components/ServiceRegistrationWizard';
 
 // ── Helpers de variante de badge ─────────────────────────────────────────────
 
@@ -276,6 +275,13 @@ export function ServiceDetailPage() {
     enabled: !!serviceId && !isCreateRoute,
   });
 
+  // Scorecard de maturidade — alimenta o mini health strip (honest-null se indisponível).
+  const { data: maturity } = useQuery({
+    queryKey: ['catalog-service-maturity', serviceId],
+    queryFn: () => serviceCatalogApi.getServiceMaturity(serviceId!),
+    enabled: !!serviceId && !isCreateRoute,
+  });
+
   const contracts = serviceContracts?.contracts ?? serviceContracts?.items ?? [];
 
   // ── Mutations ─────────────────────────────────────────────────────────────────
@@ -404,6 +410,8 @@ export function ServiceDetailPage() {
         technicalOwner: service.technicalOwner,
         dependencyCount: service.apis?.length ?? 0,
         contractCount: contracts.length,
+        maturityLevel: maturity?.level,
+        sloTarget: service.sloTarget,
       };
     }
     // Em edit/create: reflete o formulário ao vivo
@@ -420,8 +428,10 @@ export function ServiceDetailPage() {
       technicalOwner: editForm.technicalOwner,
       dependencyCount: service?.apis?.length ?? 0,
       contractCount: contracts.length,
+      maturityLevel: maturity?.level,
+      sloTarget: service?.sloTarget,
     };
-  }, [mode, service, editForm, contracts.length]);
+  }, [mode, service, editForm, contracts.length, maturity]);
 
   // ── Loading / Error ───────────────────────────────────────────────────────────
 
@@ -662,6 +672,10 @@ interface SummaryData {
   technicalOwner: string;
   dependencyCount: number;
   contractCount: number;
+  /** Nível de maturidade (scorecard) — honest-null se indisponível. */
+  maturityLevel?: string;
+  /** Alvo de SLO do serviço — honest-null se indisponível. */
+  sloTarget?: string;
 }
 
 interface ServiceIdentityCardProps {
@@ -740,21 +754,17 @@ function ServiceIdentityCard({ mode, summaryData, t, criticalityBadgeVariant, li
         </div>
       </div>
 
-      {/* Mini health strip — placeholders em criação */}
-      <div className="grid grid-cols-3 gap-px bg-edge border-t border-b border-edge">
-        <div className="bg-deep text-center py-3">
-          <p className="text-sm font-bold text-heading">B+</p>
-          <p className="text-[10px] text-muted mt-0.5">Maturity</p>
-        </div>
-        <div className="bg-deep text-center py-3">
-          <p className="font-mono text-sm font-bold text-heading">—</p>
-          <p className="text-[10px] text-muted mt-0.5">SLO</p>
-        </div>
-        <div className="bg-deep text-center py-3">
-          <p className="text-sm font-bold text-heading">0</p>
-          <p className="text-[10px] text-muted mt-0.5">Incidents</p>
-        </div>
-      </div>
+      {/* Mini health strip — apenas sinais com dados reais (honest-null) */}
+      <HealthStrip
+        signals={[
+          summaryData.maturityLevel
+            ? { key: 'maturity', label: t('serviceDetail.health.maturity', 'Maturity'), value: summaryData.maturityLevel }
+            : null,
+          summaryData.sloTarget
+            ? { key: 'slo', label: t('serviceDetail.health.slo', 'SLO'), value: summaryData.sloTarget, mono: true }
+            : null,
+        ]}
+      />
 
       {/* Meta rows */}
       <div className="px-4 py-2 divide-y divide-edge/60">
@@ -770,6 +780,38 @@ function ServiceIdentityCard({ mode, summaryData, t, criticalityBadgeVariant, li
           {t('serviceDetail.livePreviewHint', 'Resumo atualiza ao vivo')}
         </p>
       )}
+    </div>
+  );
+}
+
+/** Sinal individual do mini health strip. */
+interface HealthSignal {
+  key: string;
+  label: string;
+  value: string;
+  mono?: boolean;
+}
+
+/**
+ * Mini health strip do cartão de identidade.
+ * Renderiza apenas os sinais com dados reais (honest-null) e distribui as
+ * colunas dinamicamente; oculta-se por completo quando não há sinais.
+ */
+function HealthStrip({ signals }: { signals: (HealthSignal | null)[] }) {
+  const present = signals.filter((s): s is HealthSignal => s !== null);
+  if (present.length === 0) return null;
+
+  return (
+    <div
+      className="grid gap-px bg-edge border-t border-b border-edge"
+      style={{ gridTemplateColumns: `repeat(${present.length}, minmax(0, 1fr))` }}
+    >
+      {present.map((s) => (
+        <div key={s.key} className="bg-deep text-center py-3">
+          <p className={cn('text-sm font-bold text-heading', s.mono && 'font-mono')}>{s.value}</p>
+          <p className="text-[10px] text-muted mt-0.5">{s.label}</p>
+        </div>
+      ))}
     </div>
   );
 }
