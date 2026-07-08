@@ -7831,6 +7831,54 @@
       }
     }
   },
+  "onboard": {
+    "title": "Registar um serviço",
+    "subtitle": "Registe um serviço e, opcionalmente, a sua interface e contrato num fluxo guiado.",
+    "steps": {
+      "identity": "Identidade e ownership",
+      "interface": "Interface",
+      "contract": "Contrato",
+      "review": "Revisão"
+    },
+    "optional": "Opcional",
+    "skip": "Ignorar este passo",
+    "finish": "Concluir",
+    "exitSaved": "O seu serviço foi guardado. Pode concluir os passos restantes depois na página do serviço.",
+    "identity": {
+      "heading": "Identidade e ownership",
+      "name": "Nome do serviço",
+      "domain": "Domínio",
+      "team": "Equipa",
+      "description": "Descrição",
+      "serviceType": "Tipo de serviço",
+      "criticality": "Criticidade",
+      "exposure": "Exposição",
+      "technicalOwner": "Owner técnico",
+      "businessOwner": "Owner de negócio",
+      "documentationUrl": "URL de documentação",
+      "repositoryUrl": "URL do repositório"
+    },
+    "interface": {
+      "heading": "Expor uma interface (opcional)",
+      "skipHint": "Pode adicionar interfaces depois."
+    },
+    "contract": {
+      "heading": "Definir um contrato (opcional)",
+      "skipHint": "Pode criar contratos depois."
+    },
+    "review": {
+      "heading": "Rever e criar",
+      "service": "Serviço",
+      "interface": "Interface",
+      "contract": "Contrato",
+      "skipped": "Ignorado"
+    },
+    "error": {
+      "create": "Não foi possível criar o serviço.",
+      "interface": "Não foi possível criar a interface.",
+      "contract": "Não foi possível criar o contrato."
+    }
+  },
   "onboarding": {
     "aiHub": {
       "hint1Desc": "Obtenha insights potenciados por IA sobre os seus serviços, contratos e incidentes",

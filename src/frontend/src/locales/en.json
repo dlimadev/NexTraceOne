@@ -6533,6 +6533,54 @@
       }
     }
   },
+  "onboard": {
+    "title": "Onboard a service",
+    "subtitle": "Register a service and, optionally, its interface and contract in one guided flow.",
+    "steps": {
+      "identity": "Identity & ownership",
+      "interface": "Interface",
+      "contract": "Contract",
+      "review": "Review"
+    },
+    "optional": "Optional",
+    "skip": "Skip this step",
+    "finish": "Finish",
+    "exitSaved": "Your service is saved. You can finish the remaining steps later from the service page.",
+    "identity": {
+      "heading": "Service identity & ownership",
+      "name": "Service name",
+      "domain": "Domain",
+      "team": "Team",
+      "description": "Description",
+      "serviceType": "Service type",
+      "criticality": "Criticality",
+      "exposure": "Exposure",
+      "technicalOwner": "Technical owner",
+      "businessOwner": "Business owner",
+      "documentationUrl": "Documentation URL",
+      "repositoryUrl": "Repository URL"
+    },
+    "interface": {
+      "heading": "Expose an interface (optional)",
+      "skipHint": "You can add interfaces later from the service page."
+    },
+    "contract": {
+      "heading": "Define a contract (optional)",
+      "skipHint": "You can create contracts later from the service page."
+    },
+    "review": {
+      "heading": "Review & create",
+      "service": "Service",
+      "interface": "Interface",
+      "contract": "Contract",
+      "skipped": "Skipped"
+    },
+    "error": {
+      "create": "Could not create the service. Please try again.",
+      "interface": "Could not create the interface. Please try again.",
+      "contract": "Could not create the contract. Please try again."
+    }
+  },
   "onboarding": {
     "aiHub": {
       "hint1Desc": "Get AI-powered insights about your services, contracts, and incidents",
