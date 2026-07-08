@@ -41,7 +41,7 @@ const HEALTH_DASHBOARD_NO_VIOLATIONS = {
 test.describe('Contract Health Dashboard — estrutura', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -69,7 +69,7 @@ test.describe('Contract Health Dashboard — health score', () => {
   });
 
   test('exibe o health score quando os dados são carregados', async ({ page }) => {
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -81,7 +81,7 @@ test.describe('Contract Health Dashboard — health score', () => {
   });
 
   test('exibe indicador /100 junto ao score', async ({ page }) => {
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -98,7 +98,7 @@ test.describe('Contract Health Dashboard — health score', () => {
 test.describe('Contract Health Dashboard — metric cards', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -136,7 +136,7 @@ test.describe('Contract Health Dashboard — violations', () => {
   });
 
   test('exibe a lista de top violations quando existem', async ({ page }) => {
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -149,7 +149,7 @@ test.describe('Contract Health Dashboard — violations', () => {
   });
 
   test('exibe contagem de violations por contrato', async ({ page }) => {
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -162,7 +162,7 @@ test.describe('Contract Health Dashboard — violations', () => {
   });
 
   test('exibe mensagem de sem violations quando lista está vazia', async ({ page }) => {
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -185,7 +185,7 @@ test.describe('Contract Health Dashboard — loading', () => {
       resolveRequest = resolve;
     });
 
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', async (route) => {
+    await page.route('**/api/v1/contracts/health-dashboard**', async (route) => {
       await pendingRequest;
       await route.fulfill({
         status: 200,
@@ -206,7 +206,7 @@ test.describe('Contract Health Dashboard — loading', () => {
 test.describe('Contract Health Dashboard — erro', () => {
   test('exibe estado de erro quando a API falha', async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/catalog/contracts/health-dashboard**', (route) =>
+    await page.route('**/api/v1/contracts/health-dashboard**', (route) =>
       route.fulfill({
         status: 500,
         contentType: 'application/json',
