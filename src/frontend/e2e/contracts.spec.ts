@@ -190,25 +190,35 @@ test.describe('Contract Governance — detalhe', () => {
   });
 
   test('exibe o fingerprint (hash) do contrato', async ({ page }) => {
-    await page.goto('/contracts/cv-pay-001');
-    // Mock the validation summary endpoint which the Validation tab calls
+    // v5: /contracts/:id é o ContractWorkspacePage. A Validação está na secção
+    // "Validation" do grupo "Governance" (WorkspaceTabs: grupo → secção).
     await page.route('**/api/v1/contracts/cv-pay-001/validation-summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          contractVersionId: 'cv-pay-001',
+          totalIssues: 0,
+          errorCount: 0,
+          warningCount: 0,
+          infoCount: 0,
+          hintCount: 0,
+          blockedCount: 0,
+          isPublishReady: true,
+          isReviewReady: true,
+          sources: [],
+          validatedAt: '2026-01-01T00:00:00Z',
           fingerprint: 'sha256:abc123def456',
-          spectralResults: [],
-          policyResults: [],
           overallStatus: 'Valid',
         }),
       }),
     );
-    // The fingerprint is shown in the Validation tab
-    const validationBtn = page.getByRole('button', { name: /validation/i });
-    await expect(validationBtn).toBeVisible({ timeout: 5_000 });
-    await validationBtn.click();
+    await page.goto('/contracts/cv-pay-001');
+
+    // Selecionar o grupo "Governance" (tab superior) e depois a secção "Validation".
+    await page.getByRole('tab', { name: /governance/i }).click();
+    await page.getByRole('button', { name: /^validation$/i }).click();
+
+    // O fingerprint é exibido na secção de validação.
     await expect(page.getByText(/sha256/i)).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -244,25 +254,62 @@ test.describe('Contract Governance — criar novo contrato', () => {
     await expect(page).toHaveURL('/contracts/new');
   });
 
-  test('página de criação exibe os tipos de serviço disponíveis', async ({ page }) => {
+  // v5: /contracts/new é um wizard de 4 passos (service → typeMode → details → confirm).
+  // O passo 1 lista serviços (GET /catalog/services); o tipo de contrato é o passo 2.
+  const SERVICES_FIXTURE = {
+    items: [
+      {
+        serviceId: 'svc-pay-001',
+        name: 'payments-service',
+        displayName: 'Payments Service',
+        serviceType: 'RestApi',
+        domain: 'Payments',
+        teamName: 'Payments Team',
+        criticality: 'High',
+        lifecycleStatus: 'Active',
+        exposureType: 'External',
+      },
+    ],
+    totalCount: 1,
+    page: 1,
+    pageSize: 20,
+  };
+
+  test('passo 1 do wizard lista os serviços disponíveis', async ({ page }) => {
+    await page.route('**/api/v1/catalog/services**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(SERVICES_FIXTURE),
+      }),
+    );
     await page.goto('/contracts/new');
-    // The page shows contract types as cards with headings
-    await expect(page.getByRole('heading', { name: /rest api/i })).toBeVisible({ timeout: 5_000 });
+    // Passo de seleção de serviço — cada serviço é um botão com o displayName.
+    await expect(page.getByRole('button', { name: /Payments Service/i })).toBeVisible({ timeout: 5_000 });
   });
 
-  test('selecionar tipo REST API avança para o passo de modo de criação', async ({ page }) => {
+  test('selecionar serviço e avançar mostra o tipo REST API e o passo de modo', async ({ page }) => {
+    await page.route('**/api/v1/catalog/services**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(SERVICES_FIXTURE),
+      }),
+    );
     await page.goto('/contracts/new');
-    // Click the REST API card button
+
+    // Passo 1: escolher o serviço.
+    await page.getByRole('button', { name: /Payments Service/i }).click();
+    // Avançar para o passo typeMode.
+    await page.getByRole('button', { name: /next/i }).click();
+
+    // Passo 2: o tipo REST API está disponível (label i18n "REST API").
     const restOption = page.getByRole('button', { name: /rest api/i }).first();
     await expect(restOption).toBeVisible({ timeout: 5_000 });
     await restOption.click();
-    // Click Next to advance to the creation mode step
-    const nextBtn = page.getByRole('button', { name: /next/i });
-    if (await nextBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await nextBtn.click();
-      // On step 2, creation modes should be visible (Visual Builder, Import, AI)
-      await expect(page.getByRole('heading', { name: /import/i })).toBeVisible({ timeout: 3_000 });
-    }
+
+    // Selecionar o tipo revela a secção de modo de criação (mesmo passo).
+    await expect(page.getByText(/how do you want to create it/i)).toBeVisible({ timeout: 3_000 });
   });
 });
 
