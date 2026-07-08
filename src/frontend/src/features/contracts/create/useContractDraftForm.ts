@@ -20,6 +20,8 @@ interface UseContractDraftFormArgs {
   prefilledServiceId?: string;
   initialType?: ContractTypeValue | null;
   initialMode?: CreationMode | null;
+  /** Se fornecido, intercepta a criação do draft (ex.: wizard de onboarding) em vez de navegar para o studio. */
+  onCreated?: (draftId: string) => void;
 }
 
 /**
@@ -213,6 +215,10 @@ export function useContractDraftForm(args: UseContractDraftFormArgs) {
       return createdDraft;
     },
     onSuccess: (data) => {
+      if (args.onCreated) {
+        args.onCreated(data.draftId);
+        return;
+      }
       navigate(`/contracts/studio/${data.draftId}`);
     },
   });
