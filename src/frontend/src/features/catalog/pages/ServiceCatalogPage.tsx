@@ -149,6 +149,7 @@ export function ServiceCatalogPage() {
             variant="ghost"
             size="sm"
             icon={<PlusCircle size={15} />}
+            onClick={() => navigate('/services/onboard')}
           >
             {t('serviceCatalog.registerService')}
           </Button>
@@ -178,6 +179,7 @@ export function ServiceCatalogPage() {
             onOpenService={handleOpenService}
             onOpenApi={handleOpenApi}
             onViewContract={handleViewContract}
+            onRegisterService={() => navigate('/services/onboard')}
           />
         )}
       </TabPanel>

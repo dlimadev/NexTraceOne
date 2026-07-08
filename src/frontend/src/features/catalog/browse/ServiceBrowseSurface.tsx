@@ -50,6 +50,8 @@ export interface ServiceBrowseSurfaceProps {
   onOpenService:  (id: string) => void;
   onOpenApi:      (id: string) => void;
   onViewContract: (apiId: string) => void;
+  /** CTA de registo de serviço no estado-vazio de onboarding (grafo sem serviços). */
+  onRegisterService?: () => void;
 }
 
 /* ─── Componente ─────────────────────────────────────────────────────────────── */
@@ -60,6 +62,7 @@ export function ServiceBrowseSurface({
   onOpenService,
   onOpenApi,
   onViewContract,
+  onRegisterService,
 }: ServiceBrowseSurfaceProps) {
   const { t } = useTranslation();
 
@@ -120,6 +123,13 @@ export function ServiceBrowseSurface({
           title={t('serviceCatalog.browse.empty.title')}
           description={t('serviceCatalog.browse.empty.desc')}
           variant="onboarding"
+          action={
+            onRegisterService ? (
+              <Button variant="primary" size="sm" onClick={onRegisterService}>
+                {t('serviceCatalog.registerService')}
+              </Button>
+            ) : undefined
+          }
         />
       </div>
     );

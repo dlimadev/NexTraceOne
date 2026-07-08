@@ -166,7 +166,7 @@ export function ServiceCatalogListPage() {
             variant="primary"
             size="sm"
             icon={<Plus size={14} />}
-            onClick={() => navigate('/services/new')}
+            onClick={() => navigate('/services/onboard')}
           >
             {t('serviceCatalog.registerService')}
           </Button>

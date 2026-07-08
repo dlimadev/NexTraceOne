@@ -9,6 +9,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 const ServiceCatalogPage = lazy(() => import('../features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
 const ServiceCatalogListPage = lazy(() => import('../features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
 const ServiceDetailPage = lazy(() => import('../features/catalog/pages/ServiceDetailPage').then(m => ({ default: m.ServiceDetailPage })));
+const OnboardWizardPage = lazy(() => import('../features/catalog/onboard/OnboardWizardPage').then(m => ({ default: m.OnboardWizardPage })));
 const CreateServiceInterfacePage = lazy(() => import('../features/catalog/pages/CreateServiceInterfacePage').then(m => ({ default: m.CreateServiceInterfacePage })));
 const SourceOfTruthExplorerPage = lazy(() => import('../features/catalog/pages/SourceOfTruthExplorerPage').then(m => ({ default: m.SourceOfTruthExplorerPage })));
 const ServiceSourceOfTruthPage = lazy(() => import('../features/catalog/pages/ServiceSourceOfTruthPage').then(m => ({ default: m.ServiceSourceOfTruthPage })));
@@ -83,15 +84,17 @@ export function CatalogRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* Rota para criar novo serviço — workspace em modo create */}
+      {/* Jornada guiada de onboarding de serviço (registar + interface + contrato) */}
       <Route
-        path="/services/new"
+        path="/services/onboard"
         element={
           <ProtectedRoute permission="catalog:assets:write" redirectTo="/unauthorized">
-            <ServiceDetailPage />
+            <OnboardWizardPage />
           </ProtectedRoute>
         }
       />
+      {/* Rota legada de criação — redireciona para a jornada de onboarding */}
+      <Route path="/services/new" element={<Navigate to="/services/onboard" replace />} />
       <Route
         path="/services/:serviceId"
         element={
