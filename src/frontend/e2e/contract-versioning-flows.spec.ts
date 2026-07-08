@@ -1,14 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { mockAuthSession } from './helpers/auth';
 
 /**
- * FUTURE-ROADMAP 6.2 — E2E tests para fluxos de versionamento de contratos.
- * Cobre: criar nova versão a partir de versão existente, ciclo draft → published.
+ * E2E dos fluxos de versionamento de contratos (v5).
+ * Cobre: badges de estado na listagem, semver/lifecycle no workspace de detalhe,
+ * e entrada no wizard de criação (service-first).
+ *
+ * Endpoints v5: GET /contracts/summary + /contracts/list (catálogo),
+ * GET /contracts/:id/detail (workspace), GET /catalog/services (wizard).
  */
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const CONTRACT_V1_FIXTURE = {
+const CONTRACT_V1_DETAIL = {
   id: 'cv-pay-001',
   apiAssetId: 'api-pay-001',
   name: 'Payments API',
@@ -31,217 +35,192 @@ const CONTRACT_V1_FIXTURE = {
   ownerEmail: 'payments@acme.com',
 };
 
-const CONTRACT_V2_DRAFT_FIXTURE = {
-  ...CONTRACT_V1_FIXTURE,
-  id: 'cv-pay-002',
-  semVer: '2.0.0',
-  lifecycleState: 'Draft',
-  createdAt: '2025-06-01T10:00:00Z',
-  updatedAt: '2025-06-01T10:00:00Z',
-  fingerprint: 'sha256:v2fingerprint',
-};
+function listItem(id: string, name: string, semVer: string, lifecycleState: string) {
+  return {
+    id,
+    versionId: id,
+    apiAssetId: `api-${id}`,
+    name,
+    semVer,
+    protocol: 'OpenApi',
+    lifecycleState,
+    origin: 'HumanCreated',
+    domain: 'Finance',
+    teamName: 'Payments Team',
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z',
+  };
+}
 
-const CONTRACTS_LIST_FIXTURE = {
-  items: [CONTRACT_V1_FIXTURE, CONTRACT_V2_DRAFT_FIXTURE],
+const SUMMARY = {
   totalCount: 2,
-  page: 1,
-  pageSize: 20,
+  totalVersions: 2,
+  byProtocol: { OpenApi: 2 },
+  approvedCount: 1,
+  lockedCount: 0,
+  draftCount: 1,
+  inReviewCount: 0,
+  deprecatedCount: 0,
 };
 
-// ─── Versioning — History & Summary ──────────────────────────────────────────
+async function mockSummary(page: Page, summary: unknown = SUMMARY) {
+  await page.route('**/api/v1/contracts/summary**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(summary) }),
+  );
+}
 
-test.describe('Contract Versioning — version summary & history', () => {
+async function mockList(page: Page, items: unknown[]) {
+  await page.route('**/api/v1/contracts/list**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ items, totalCount: items.length, page: 1, pageSize: 20 }),
+    }),
+  );
+}
+
+// ─── Versionamento — badges de estado na listagem ────────────────────────────
+
+test.describe('Contract Versioning — badges de estado na listagem', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-
-    await page.route('**/api/v1/contracts/summary', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          totalCount: 2,
-          totalVersions: 2,
-          byProtocol: { OpenApi: 2 },
-          approvedCount: 1,
-          lockedCount: 0,
-          draftCount: 1,
-          inReviewCount: 0,
-          deprecatedCount: 0,
-        }),
-      }),
-    );
-
-    await page.route('**/api/v1/contracts*', (route) => {
-      if (route.request().url().includes('/api/v1/contracts/') && !route.request().url().endsWith('/contracts/')) {
-        return route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(CONTRACT_V1_FIXTURE),
-        });
-      }
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(CONTRACTS_LIST_FIXTURE),
-      });
-    });
+    await mockSummary(page);
+    await mockList(page, [
+      listItem('cv-pay-001', 'Payments API', '1.0.0', 'Approved'),
+      listItem('cv-pay-002', 'Payments API', '2.0.0', 'Draft'),
+    ]);
   });
 
-  test('contract list shows draft badge for v2 and approved badge for v1', async ({ page }) => {
+  test('a listagem mostra badge Approved (v1) e Draft (v2)', async ({ page }) => {
     await page.goto('/contracts');
-    await expect(page.getByText('1.0.0')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('2.0.0')).toBeVisible({ timeout: 5_000 });
-  });
-
-  test('contract detail shows version semver', async ({ page }) => {
-    await page.goto('/contracts/cv-pay-001');
-    await expect(page.getByText(/1\.0\.0/)).toBeVisible({ timeout: 5_000 });
-  });
-
-  test('contract detail shows lifecycle state', async ({ page }) => {
-    await page.goto('/contracts/cv-pay-001');
-    await expect(page.getByText(/approved/i)).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/approved/i).first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/draft/i).first()).toBeVisible();
   });
 });
 
-// ─── Versioning — Draft creation from new contract ───────────────────────────
+// ─── Versionamento — semver + lifecycle no workspace de detalhe ───────────────
 
-test.describe('Contract Versioning — creating new draft via wizard', () => {
+test.describe('Contract Versioning — detalhe (workspace)', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-
-    await page.route('**/api/v1/contracts/summary', (route) =>
+    await page.route('**/api/v1/contracts/cv-pay-001/detail**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CONTRACT_V1_DETAIL) }),
+    );
+    await page.route('**/api/v1/contracts/history/api-pay-001**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          totalCount: 1,
-          totalVersions: 1,
-          byProtocol: { OpenApi: 1 },
-          approvedCount: 0,
-          lockedCount: 0,
-          draftCount: 1,
-          inReviewCount: 0,
-          deprecatedCount: 0,
-        }),
+        body: JSON.stringify({ apiAssetId: 'api-pay-001', versions: [CONTRACT_V1_DETAIL] }),
       }),
     );
-
-    await page.route('**/api/v1/contracts', (route) => {
-      if (route.request().method() === 'POST') {
-        return route.fulfill({
-          status: 201,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            id: 'cv-new-001',
-            apiAssetId: 'api-new-001',
-            name: 'New API',
-            semVer: '1.0.0',
-            lifecycleState: 'Draft',
-          }),
-        });
-      }
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }),
-      });
-    });
   });
 
-  test('navigates to contract creation page from New Contract button', async ({ page }) => {
-    await page.goto('/contracts');
-    const newContractBtn = page.getByRole('button', { name: /new contract/i });
-    if (await newContractBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await newContractBtn.click();
-      await expect(page).toHaveURL(/\/contracts\/new/, { timeout: 5_000 });
-    }
+  test('o detalhe mostra o semver da versão', async ({ page }) => {
+    await page.goto('/contracts/cv-pay-001');
+    await expect(page.getByText(/1\.0\.0/).first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('wizard step 1 shows REST API type selection', async ({ page }) => {
-    await page.goto('/contracts/new');
-    await expect(page.getByRole('heading', { name: /rest api/i })).toBeVisible({ timeout: 5_000 });
-  });
-
-  test('selecting REST API and clicking Next advances to mode selection', async ({ page }) => {
-    await page.goto('/contracts/new');
-    const restBtn = page.getByRole('button', { name: /rest api/i }).first();
-    if (await restBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await restBtn.click();
-      const nextBtn = page.getByRole('button', { name: /next/i });
-      await expect(nextBtn).toBeEnabled({ timeout: 3_000 });
-      await nextBtn.click();
-      // Mode selection step should appear
-      await expect(page.getByText(/visual builder|import|ai/i).first()).toBeVisible({ timeout: 5_000 });
-    }
+  test('o detalhe mostra o estado de ciclo de vida', async ({ page }) => {
+    await page.goto('/contracts/cv-pay-001');
+    await expect(page.getByText(/approved/i).first()).toBeVisible({ timeout: 5_000 });
   });
 });
 
-// ─── Versioning — lifecycle state badges ─────────────────────────────────────
+// ─── Versionamento — entrada no wizard de criação ────────────────────────────
 
-test.describe('Contract Versioning — lifecycle state visibility', () => {
+test.describe('Contract Versioning — wizard de criação (service-first)', () => {
+  const WIZARD_SERVICE = {
+    items: [
+      {
+        serviceId: 'svc-pay-001',
+        name: 'payments-service',
+        displayName: 'Payments Service',
+        serviceType: 'RestApi',
+        domain: 'Finance',
+        teamName: 'Payments Team',
+        criticality: 'High',
+        lifecycleStatus: 'Active',
+        exposureType: 'External',
+      },
+    ],
+    totalCount: 1,
+    page: 1,
+    pageSize: 20,
+  };
+
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
   });
 
-  test.beforeEach(async ({ page }) => {
-    const states = ['Draft', 'InReview', 'Approved', 'Deprecated'];
-    const items = states.map((state, i) => ({
-      id: `cv-${i}`,
-      apiAssetId: `api-${i}`,
-      name: `API ${state}`,
-      semVer: '1.0.0',
-      protocol: 'OpenApi',
-      lifecycleState: state,
-      origin: 'HumanCreated',
-      domain: 'Test',
-      teamName: 'Test Team',
-      createdAt: '2025-01-01T00:00:00Z',
-      updatedAt: '2025-01-01T00:00:00Z',
-    }));
-
-    await page.route('**/api/v1/contracts/summary', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          totalCount: 4,
-          totalVersions: 4,
-          byProtocol: { OpenApi: 4 },
-          approvedCount: 1,
-          lockedCount: 0,
-          draftCount: 1,
-          inReviewCount: 1,
-          deprecatedCount: 1,
-        }),
-      }),
-    );
-
-    await page.route('**/api/v1/contracts*', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items, totalCount: 4, page: 1, pageSize: 20 }),
-      }),
-    );
+  test('navega para /contracts/new a partir do botão New Contract', async ({ page }) => {
+    await mockSummary(page);
+    await mockList(page, [listItem('cv-pay-001', 'Payments API', '1.0.0', 'Approved')]);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: /new contract/i }).click();
+    await expect(page).toHaveURL(/\/contracts\/new/, { timeout: 5_000 });
   });
 
-  test('shows Draft state in contract list', async ({ page }) => {
+  test('passo 1 do wizard lista serviços e o passo 2 mostra o tipo REST API', async ({ page }) => {
+    await page.route('**/api/v1/catalog/services**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(WIZARD_SERVICE) }),
+    );
+    await page.goto('/contracts/new');
+    await page.getByRole('button', { name: /Payments Service/i }).click();
+    await page.getByRole('button', { name: /next/i }).click();
+    await expect(page.getByRole('button', { name: /rest api/i }).first()).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('selecionar REST API revela a secção de modo de criação', async ({ page }) => {
+    await page.route('**/api/v1/catalog/services**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(WIZARD_SERVICE) }),
+    );
+    await page.goto('/contracts/new');
+    await page.getByRole('button', { name: /Payments Service/i }).click();
+    await page.getByRole('button', { name: /next/i }).click();
+    await page.getByRole('button', { name: /rest api/i }).first().click();
+    await expect(page.getByText(/how do you want to create it/i)).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ─── Versionamento — visibilidade dos estados na listagem ────────────────────
+
+test.describe('Contract Versioning — visibilidade dos estados', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAuthSession(page);
+    await mockSummary(page, {
+      totalCount: 4,
+      totalVersions: 4,
+      byProtocol: { OpenApi: 4 },
+      approvedCount: 1,
+      lockedCount: 0,
+      draftCount: 1,
+      inReviewCount: 1,
+      deprecatedCount: 1,
+    });
+    await mockList(page, [
+      listItem('cv-0', 'API Draft', '1.0.0', 'Draft'),
+      listItem('cv-1', 'API InReview', '1.0.0', 'InReview'),
+      listItem('cv-2', 'API Approved', '1.0.0', 'Approved'),
+      listItem('cv-3', 'API Deprecated', '1.0.0', 'Deprecated'),
+    ]);
+  });
+
+  test('mostra o estado Draft na listagem', async ({ page }) => {
     await page.goto('/contracts');
     await expect(page.getByText(/draft/i).first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('shows InReview state in contract list', async ({ page }) => {
+  test('mostra o estado In Review na listagem', async ({ page }) => {
     await page.goto('/contracts');
     await expect(page.getByText(/review/i).first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('shows Approved state in contract list', async ({ page }) => {
+  test('mostra o estado Approved na listagem', async ({ page }) => {
     await page.goto('/contracts');
     await expect(page.getByText(/approved/i).first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('shows Deprecated state in contract list', async ({ page }) => {
+  test('mostra o estado Deprecated na listagem', async ({ page }) => {
     await page.goto('/contracts');
     await expect(page.getByText(/deprecated/i).first()).toBeVisible({ timeout: 5_000 });
   });
