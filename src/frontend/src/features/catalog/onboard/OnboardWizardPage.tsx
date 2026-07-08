@@ -74,7 +74,8 @@ export function OnboardWizardPage() {
           identity={w.identity}
           interfaceValues={w.savedInterface}
           contractSummary={
-            w.contractForm.selectedType
+            // Honest-null: só mostra contrato se um draft foi realmente criado.
+            w.createdDraftId && w.contractForm.selectedType
               ? { title: w.contractForm.title, type: w.contractForm.selectedType }
               : null
           }

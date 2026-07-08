@@ -24,12 +24,20 @@ export function OnboardIdentityPreview({ values }: { values: ServiceIdentityValu
             </p>
             <p className="text-xs text-muted truncate mt-0.5">{values.domain || '—'}</p>
           </div>
-          <Badge variant="warning" size="sm" className="shrink-0 ml-auto">Planning</Badge>
+          <Badge variant="warning" size="sm" className="shrink-0 ml-auto">
+            {t('catalog.badges.lifecycle.Planning', 'Planning')}
+          </Badge>
         </div>
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {values.serviceType && <Badge variant="primary" size="sm">{values.serviceType}</Badge>}
-          {values.criticality && <Badge variant="default" size="sm">{values.criticality}</Badge>}
-          {values.exposureType && <Badge variant="default" size="sm">{values.exposureType}</Badge>}
+          {values.serviceType && (
+            <Badge variant="primary" size="sm">{t(`catalog.badges.type.${values.serviceType}`, values.serviceType)}</Badge>
+          )}
+          {values.criticality && (
+            <Badge variant="default" size="sm">{t(`catalog.badges.criticality.${values.criticality}`, values.criticality)}</Badge>
+          )}
+          {values.exposureType && (
+            <Badge variant="default" size="sm">{t(`catalog.badges.exposure.${values.exposureType}`, values.exposureType)}</Badge>
+          )}
         </div>
       </div>
       <div className="px-4 py-2 divide-y divide-edge/60">

@@ -21,7 +21,7 @@ export function OnboardReviewStep({ identity, interfaceValues, contractSummary }
         <Row label={t('onboard.identity.name')} value={identity.name || '—'} />
         <Row label={t('onboard.identity.domain')} value={identity.domain || '—'} />
         <Row label={t('onboard.identity.team')} value={identity.teamName || '—'} />
-        <Row label={t('onboard.identity.serviceType')} value={identity.serviceType || '—'} />
+        <Row label={t('onboard.identity.serviceType')} value={identity.serviceType ? t(`catalog.badges.type.${identity.serviceType}`, identity.serviceType) : '—'} />
       </Section>
 
       <Section title={t('onboard.review.interface', 'Interface')}>

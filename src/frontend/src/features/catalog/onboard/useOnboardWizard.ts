@@ -56,6 +56,7 @@ export function useOnboardWizard() {
     }),
     onSuccess: (res) => {
       const id = res?.id ?? '';
+      if (!id) { setError(t('onboard.error.create', 'Could not create the service.')); return; }
       setServiceId(id);
       contractForm.setLinkedServiceId(id);
       contractForm.setSelectedServiceType(identity.serviceType as ServiceType);
@@ -100,17 +101,25 @@ export function useOnboardWizard() {
 
   const onNext = useCallback(() => {
     setError(null);
-    if (activeStep === 'identity') { registerMutation.mutate(); return; }
+    if (activeStep === 'identity') {
+      // Idempotente: o serviço é criado uma só vez. Voltar e avançar não duplica.
+      if (serviceId) { setActiveStep('interface'); return; }
+      registerMutation.mutate(); return;
+    }
     if (activeStep === 'interface') {
+      // Interface já persistida → não recria (evita duplicados ao voltar/avançar).
+      if (savedInterface) { setActiveStep('contract'); return; }
       if (interfaceTouched && iface.name.trim()) { interfaceMutation.mutate(); return; }
       setActiveStep('contract'); return;
     }
     if (activeStep === 'contract') {
+      // Draft já criado → não recria.
+      if (createdDraftId) { setActiveStep('review'); return; }
       if (contractForm.selectedType && contractForm.selectedMode) { contractForm.createMutation.mutate(); return; }
       setActiveStep('review'); return;
     }
     navigate(`/services/${serviceId}`); // review → finish
-  }, [activeStep, interfaceTouched, iface.name, contractForm, registerMutation, interfaceMutation, navigate, serviceId]);
+  }, [activeStep, serviceId, savedInterface, createdDraftId, interfaceTouched, iface.name, contractForm, registerMutation, interfaceMutation, navigate]);
 
   const onBack = useCallback(() => {
     const prev = STEP_ORDER[Math.max(stepIndex - 1, 0)];

@@ -83,4 +83,23 @@ describe('useOnboardWizard', () => {
     act(() => { result.current.onNext(); });            // finish
     expect(navigate).toHaveBeenCalledWith('/services/svc-9');
   });
+
+  it('does not re-create the service when going Back to step 1 and Next again', async () => {
+    registerService.mockResolvedValue({ id: 'svc-1' });
+    const { result } = renderHook(() => useOnboardWizard(), { wrapper });
+    act(() => {
+      result.current.setIdentityField('name', 'orders');
+      result.current.setIdentityField('domain', 'Commerce');
+      result.current.setIdentityField('teamName', 'Orders');
+    });
+    act(() => { result.current.onNext(); });               // create → interface
+    await waitFor(() => expect(result.current.serviceId).toBe('svc-1'));
+    expect(registerService).toHaveBeenCalledTimes(1);
+
+    act(() => { result.current.onBack(); });                // back to identity
+    expect(result.current.activeStep).toBe('identity');
+    act(() => { result.current.onNext(); });                // must NOT re-register
+    expect(registerService).toHaveBeenCalledTimes(1);
+    expect(result.current.activeStep).toBe('interface');
+  });
 });
