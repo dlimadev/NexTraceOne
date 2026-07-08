@@ -54,9 +54,10 @@ const CONTRACT_ACTIVE_FIXTURE = {
   ownerEmail: 'payments@acme.com',
 };
 
+// Endpoints v5: /contracts/summary + /contracts/list (catálogo), /contracts/:id/detail (workspace).
 function setupContractsMocks(page: import('@playwright/test').Page) {
   return Promise.all([
-    page.route('**/api/v1/contracts/summary', (route) =>
+    page.route('**/api/v1/contracts/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -72,22 +73,8 @@ function setupContractsMocks(page: import('@playwright/test').Page) {
         }),
       }),
     ),
-    page.route('**/api/v1/contracts*', (route) => {
-      if (route.request().url().match(/\/api\/v1\/contracts\/cv-dep-001/)) {
-        return route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(CONTRACT_DEPRECATED_FIXTURE),
-        });
-      }
-      if (route.request().url().match(/\/api\/v1\/contracts\/cv-active-001/)) {
-        return route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(CONTRACT_ACTIVE_FIXTURE),
-        });
-      }
-      return route.fulfill({
+    page.route('**/api/v1/contracts/list**', (route) =>
+      route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
@@ -96,8 +83,22 @@ function setupContractsMocks(page: import('@playwright/test').Page) {
           page: 1,
           pageSize: 20,
         }),
-      });
-    }),
+      }),
+    ),
+    page.route('**/api/v1/contracts/cv-dep-001/detail**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(CONTRACT_DEPRECATED_FIXTURE),
+      }),
+    ),
+    page.route('**/api/v1/contracts/history/api-dep-001**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ apiAssetId: 'api-dep-001', versions: [CONTRACT_DEPRECATED_FIXTURE] }),
+      }),
+    ),
   ]);
 }
 
@@ -138,14 +139,15 @@ test.describe('Contract Deprecation — detail page', () => {
     await expect(page.getByText(/deprecated/i).first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('deprecated contract detail shows contract name', async ({ page }) => {
+  test('deprecated contract detail shows contract identity (apiAssetId)', async ({ page }) => {
     await page.goto('/contracts/cv-dep-001');
-    await expect(page.getByText(/legacy payments api/i)).toBeVisible({ timeout: 5_000 });
+    // v5: o workspace usa o apiAssetId como identidade primária do contrato.
+    await expect(page.getByText(/api-dep-001/i).first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('deprecated contract detail shows semver', async ({ page }) => {
     await page.goto('/contracts/cv-dep-001');
-    await expect(page.getByText(/1\.0\.0/)).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/1\.0\.0/).first()).toBeVisible({ timeout: 5_000 });
   });
 });
 
