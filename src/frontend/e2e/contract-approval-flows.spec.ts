@@ -63,17 +63,25 @@ test.describe('Contract Approval — lifecycle state display', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
 
-    await page.route('**/api/v1/contracts/summary', (route) =>
+    await page.route('**/api/v1/contracts/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(CONTRACTS_SUMMARY_FIXTURE),
       }),
     );
+    // v5: /contracts/:id é o ContractWorkspacePage → GET /contracts/:id/detail.
+    await page.route('**/api/v1/contracts/history/api-draft-001**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ apiAssetId: 'api-draft-001', versions: [CONTRACT_DRAFT_FIXTURE] }),
+      }),
+    );
   });
 
   test('shows Draft state on contract detail page', async ({ page }) => {
-    await page.route('**/api/v1/contracts/cv-draft-001*', (route) =>
+    await page.route('**/api/v1/contracts/cv-draft-001/detail**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -85,7 +93,7 @@ test.describe('Contract Approval — lifecycle state display', () => {
   });
 
   test('shows InReview state on contract detail page', async ({ page }) => {
-    await page.route('**/api/v1/contracts/cv-draft-001*', (route) =>
+    await page.route('**/api/v1/contracts/cv-draft-001/detail**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -97,7 +105,7 @@ test.describe('Contract Approval — lifecycle state display', () => {
   });
 
   test('shows Approved state on contract detail page', async ({ page }) => {
-    await page.route('**/api/v1/contracts/cv-draft-001*', (route) =>
+    await page.route('**/api/v1/contracts/cv-draft-001/detail**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -115,7 +123,7 @@ test.describe('Contract Approval — contract governance overview', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
 
-    await page.route('**/api/v1/contracts/summary', (route) =>
+    await page.route('**/api/v1/contracts/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -132,7 +140,7 @@ test.describe('Contract Approval — contract governance overview', () => {
       }),
     );
 
-    await page.route('**/api/v1/contracts*', (route) =>
+    await page.route('**/api/v1/contracts/list**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
