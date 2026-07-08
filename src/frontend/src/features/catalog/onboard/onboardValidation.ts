@@ -56,11 +56,15 @@ export const serviceInterfaceSchema = z.object({
   interfaceType: nonEmpty,
 });
 
+/** Resultado estrutural de safeParse — evita depender do tipo interno do Zod. */
+type SafeParseLike = {
+  success: boolean;
+  error?: { issues: ReadonlyArray<{ path: ReadonlyArray<PropertyKey>; message: string }> };
+};
+
 /** Converte issues do Zod num mapa campo→primeira-mensagem. */
-function issuesToMap<T extends Record<string, unknown>>(
-  result: z.SafeParseReturnType<T, unknown>,
-): Partial<Record<keyof T, string>> {
-  if (result.success) return {};
+function issuesToMap<T>(result: SafeParseLike): Partial<Record<keyof T, string>> {
+  if (result.success || !result.error) return {};
   const map: Partial<Record<keyof T, string>> = {};
   for (const issue of result.error.issues) {
     const key = issue.path[0] as keyof T;
@@ -72,13 +76,13 @@ function issuesToMap<T extends Record<string, unknown>>(
 export function validateIdentity(
   values: ServiceIdentityValues,
 ): Partial<Record<keyof ServiceIdentityValues, string>> {
-  return issuesToMap(serviceIdentitySchema.safeParse(values));
+  return issuesToMap<ServiceIdentityValues>(serviceIdentitySchema.safeParse(values));
 }
 
 export function validateInterface(
   values: ServiceInterfaceValues,
 ): Partial<Record<keyof ServiceInterfaceValues, string>> {
-  return issuesToMap(serviceInterfaceSchema.safeParse(values));
+  return issuesToMap<ServiceInterfaceValues>(serviceInterfaceSchema.safeParse(values));
 }
 
 /** Opções de select — labelKey é uma chave i18n resolvida pelo componente. */
