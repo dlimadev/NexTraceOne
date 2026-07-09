@@ -4,6 +4,7 @@
  * entidades canónicas linkadas, contratos deprecated e top violações.
  * Pilar: Contract Governance + Source of Truth.
  */
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +12,8 @@ import { contractsApi } from '../api/contracts';
 import { ShieldCheck, AlertTriangle, CheckCircle2, XCircle, BarChart2, TrendingUp } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { TextField, Select } from '../../../shared/ui';
+import { CONTRACT_TYPES } from '../shared/constants';
 
 type HealthDashboardData = {
   totalContractVersions: number;
@@ -64,9 +67,17 @@ function MetricCard({ label, value, icon: Icon, variant = 'default' }: {
 export function ContractHealthDashboardPage() {
   const { t } = useTranslation();
 
+  const [domain, setDomain] = useState('');
+  const [contractType, setContractType] = useState('');
+
   const { data, isLoading, error } = useQuery<HealthDashboardData>({
-    queryKey: ['contract-health-dashboard'],
-    queryFn: () => contractsApi.getHealthDashboard({ page: 1, pageSize: 50 }) as Promise<HealthDashboardData>,
+    queryKey: ['contract-health-dashboard', domain.trim(), contractType],
+    queryFn: () => contractsApi.getHealthDashboard({
+      page: 1,
+      pageSize: 50,
+      ...(domain.trim() ? { domain: domain.trim() } : {}),
+      ...(contractType ? { contractType } : {}),
+    }) as Promise<HealthDashboardData>,
     staleTime: 30_000,
   });
 
@@ -86,6 +97,30 @@ export function ContractHealthDashboardPage() {
           </Link>
         }
       />
+
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="min-w-[220px]">
+          <TextField
+            label={t('contracts.healthDashboard.filterDomain', 'Domain')}
+            size="sm"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder={t('contracts.healthDashboard.filterDomain', 'Domain')}
+          />
+        </div>
+        <div className="w-52">
+          <Select
+            label={t('contracts.healthDashboard.filterType', 'Type')}
+            size="sm"
+            value={contractType}
+            onChange={(e) => setContractType(e.target.value)}
+            options={[
+              { value: '', label: t('contracts.healthDashboard.allTypes', 'All types') },
+              ...CONTRACT_TYPES.map((ct) => ({ value: ct.value, label: t(ct.labelKey, ct.value) })),
+            ]}
+          />
+        </div>
+      </div>
 
       {isLoading && (
         <div className="flex items-center justify-center h-48 text-muted">
