@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import {
   Database,
   Plus,
@@ -9,6 +10,7 @@ import {
   ExternalLink,
   ArrowUpRight,
   BookOpen,
+  GitBranch,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Card, CardBody } from '../../../components/Card';
@@ -221,6 +223,16 @@ function CanonicalEntityCard({
                 <p className="text-muted mb-1">{t('contracts.canonical.catalog.updated', 'Updated')}</p>
                 <p className="text-heading">{new Date(entity.updatedAt).toLocaleDateString()}</p>
               </div>
+            </div>
+
+            <div>
+              <Link
+                to={`/contracts/canonical/impact-cascade?entityId=${entity.id}`}
+                className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+              >
+                <GitBranch size={12} />
+                {t('contracts.canonical.catalog.impactCascade', 'Impact cascade')}
+              </Link>
             </div>
 
             {/* Tags & Aliases */}

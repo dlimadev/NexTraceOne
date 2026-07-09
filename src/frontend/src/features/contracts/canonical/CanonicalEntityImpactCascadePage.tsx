@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import { contractsApi } from '../api/contracts';
@@ -89,9 +90,11 @@ function CascadeNodeTree({ node, depth = 0 }: { node: CascadeNode; depth?: numbe
  */
 export function CanonicalEntityImpactCascadePage() {
   const { t } = useTranslation();
-  const [entityId, setEntityId] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialEntityId = searchParams.get('entityId') ?? '';
+  const [entityId, setEntityId] = useState(initialEntityId);
   const [maxDepth, setMaxDepth] = useState(2);
-  const [submittedId, setSubmittedId] = useState('');
+  const [submittedId, setSubmittedId] = useState(initialEntityId);
   const [submittedDepth, setSubmittedDepth] = useState(2);
 
   const { data, isLoading, isError, refetch } = useQuery<CascadeResponse>({
