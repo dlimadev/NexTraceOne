@@ -27,6 +27,12 @@ describe('ServiceSetupChecklist', () => {
     expect(onAddContract).toHaveBeenCalled();
   });
 
+  it('renders a collapsed summary (no item CTAs) when the service is Active', () => {
+    render(<ServiceSetupChecklist {...base} lifecycleStatus="Active" />);
+    expect(screen.queryByTestId('setup-cta-contract')).not.toBeInTheDocument();
+    expect(screen.getByText('serviceSetup.title')).toBeInTheDocument();
+  });
+
   it('shows a completion note when all applicable items are done and not Active', () => {
     render(
       <ServiceSetupChecklist

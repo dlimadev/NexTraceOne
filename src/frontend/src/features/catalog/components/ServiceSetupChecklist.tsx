@@ -27,6 +27,23 @@ export function ServiceSetupChecklist({
 
   const { done, total, allDone } = setupProgress(items);
   const isActive = lifecycleStatus === 'Active';
+
+  // Serviço Active: setup já não é a jornada primária — resumo recolhido e não intrusivo (spec §4.4).
+  if (isActive) {
+    return (
+      <div className="rounded-xl border border-edge bg-card px-4 py-2.5 mb-5 flex items-center gap-3">
+        <span className={cn('flex items-center justify-center w-5 h-5 rounded-full shrink-0',
+          allDone ? 'bg-success text-white' : 'bg-elevated text-muted')}>
+          {allDone ? <Check size={12} /> : <Circle size={10} />}
+        </span>
+        <span className="text-sm font-medium text-heading">{t('serviceSetup.title')}</span>
+        <span className="ml-auto shrink-0 text-xs font-medium text-muted">
+          {allDone ? t('serviceSetup.complete') : t('serviceSetup.progress', { done, total })}
+        </span>
+      </div>
+    );
+  }
+
   const labelKey: Record<SetupItemId, string> = {
     ownership: 'serviceSetup.items.ownership',
     repository: 'serviceSetup.items.repository',
