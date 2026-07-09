@@ -43,6 +43,7 @@ import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
 import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
+import { ServiceSetupChecklist } from '../components/ServiceSetupChecklist';
 import { ServiceObservabilityTab } from '../components/ServiceObservabilityTab';
 import { ServiceReliabilityTab } from '../components/ServiceReliabilityTab';
 import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
@@ -331,6 +332,12 @@ export function ServiceDetailPage() {
     setMode('edit');
   }, [service]);
 
+  /** Entra em modo edição posicionado na tab que preenche a lacuna do checklist. */
+  const handleEditField = useCallback((tab: FormTab) => {
+    enterEditMode();
+    setActiveFormTab(tab);
+  }, [enterEditMode]);
+
   /** Cancela edição e volta para view (ou navega de volta em criação). */
   const cancelEdit = useCallback(() => {
     setSaveError(null);
@@ -580,6 +587,7 @@ export function ServiceDetailPage() {
               protocolBadgeVariant={protocolBadgeVariant}
               contractLifecycleBadgeVariant={contractLifecycleBadgeVariant}
               navigate={navigate}
+              onEditField={handleEditField}
               t={t}
             />
           )}
@@ -842,6 +850,7 @@ interface ViewContentProps {
   protocolBadgeVariant: (p: string) => 'success' | 'info' | 'warning' | 'default';
   contractLifecycleBadgeVariant: (s: string) => 'success' | 'info' | 'warning' | 'danger' | 'default';
   navigate: (path: string) => void;
+  onEditField: (tab: FormTab) => void;
   t: TFunction;
 }
 
@@ -864,6 +873,7 @@ function ViewContent({
   protocolBadgeVariant,
   contractLifecycleBadgeVariant,
   navigate,
+  onEditField,
   t,
 }: ViewContentProps) {
   return (
@@ -874,6 +884,17 @@ function ViewContent({
         <StatStrip label={t('catalog.detail.apis', 'APIs')} value={String(service.apiCount ?? 0)} />
         <StatStrip label={t('catalog.detail.contracts', 'Contratos')} value={String(serviceContracts?.totalCount ?? contracts.length)} />
       </div>
+
+      {/* Checklist de setup guiado — do Planning ao Active */}
+      <ServiceSetupChecklist
+        service={service}
+        contractCount={serviceContracts?.totalCount ?? contracts.length}
+        lifecycleStatus={service.lifecycleStatus}
+        onEditOwnership={() => onEditField('ownership')}
+        onEditReferences={() => onEditField('references')}
+        onAddInterface={() => navigate(`/services/${serviceId}/interfaces/new`)}
+        onAddContract={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+      />
 
       {/* Seção: Identidade & Classificação */}
       <SectionBlock title={t('catalog.detail.identityAndClassification', 'Identidade & Classificação')}>
