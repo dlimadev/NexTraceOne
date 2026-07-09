@@ -23,9 +23,11 @@ import {
   AlertTriangle,
   Wand2,
   FileQuestion,
+  ArrowRight,
 } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { ServicesNeedingSetupSection } from '../components/ServicesNeedingSetupSection';
 
 interface ActionItem {
   icon: React.ReactNode;
@@ -49,7 +51,7 @@ const ACTION_GROUPS: ActionGroup[] = [
         icon: <Plus size={20} />,
         titleKey: 'selfServicePortal.actions.createService',
         descKey: 'selfServicePortal.actions.createService_desc',
-        href: '/catalog/services/create',
+        href: '/services/onboard',
       },
       {
         icon: <Plug size={20} />,
@@ -73,19 +75,19 @@ const ACTION_GROUPS: ActionGroup[] = [
         icon: <FileCode size={20} />,
         titleKey: 'selfServicePortal.actions.publishRestContract',
         descKey: 'selfServicePortal.actions.publishRestContract_desc',
-        href: '/contracts/new?type=rest',
+        href: '/contracts/new?type=RestApi',
       },
       {
         icon: <Zap size={20} />,
         titleKey: 'selfServicePortal.actions.publishEventContract',
         descKey: 'selfServicePortal.actions.publishEventContract_desc',
-        href: '/contracts/new?type=event',
+        href: '/contracts/new?type=Event',
       },
       {
         icon: <Activity size={20} />,
         titleKey: 'selfServicePortal.actions.viewContractHealth',
         descKey: 'selfServicePortal.actions.viewContractHealth_desc',
-        href: '/contracts/governance/health',
+        href: '/contracts/health',
       },
     ],
   },
@@ -175,13 +177,13 @@ const ACTION_GROUPS: ActionGroup[] = [
         icon: <Wand2 size={20} />,
         titleKey: 'selfServicePortal.actions.createAiScaffold',
         descKey: 'selfServicePortal.actions.createAiScaffold_desc',
-        href: '/catalog/scaffold',
+        href: '/catalog/templates',
       },
       {
         icon: <FileQuestion size={20} />,
         titleKey: 'selfServicePortal.actions.generateAdr',
         descKey: 'selfServicePortal.actions.generateAdr_desc',
-        href: '/catalog/scaffold',
+        href: '/catalog/templates',
       },
     ],
   },
@@ -197,6 +199,40 @@ export function SelfServicePortalPage() {
         subtitle={t('selfServicePortal.subtitle')}
         icon={<Wand2 size={24} />}
       />
+
+      {/* ── Golden paths: arranque da jornada do produtor ── */}
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold text-heading mb-3">{t('selfServicePortal.goldenPaths.title')}</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Link
+            to="/services/onboard"
+            className="group flex items-start gap-3 rounded-lg border border-accent/30 bg-accent/5 p-4 shadow-sm transition-all hover:border-accent/60"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
+              <Plus size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-heading group-hover:text-accent">{t('selfServicePortal.goldenPaths.onboard')}</p>
+              <p className="mt-0.5 text-xs text-muted leading-snug">{t('selfServicePortal.goldenPaths.onboard_desc')}</p>
+            </div>
+            <ArrowRight size={16} className="ml-auto shrink-0 text-accent" />
+          </Link>
+          <Link
+            to="/catalog/templates"
+            className="group flex items-start gap-3 rounded-lg border border-edge bg-card p-4 shadow-sm transition-all hover:border-accent/40"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+              <Wand2 size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-heading group-hover:text-accent">{t('selfServicePortal.goldenPaths.template')}</p>
+              <p className="mt-0.5 text-xs text-muted leading-snug">{t('selfServicePortal.goldenPaths.template_desc')}</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      <ServicesNeedingSetupSection />
 
       {ACTION_GROUPS.map((group) => (
         <PageSection

@@ -60,7 +60,7 @@ describe('SelfServicePortalPage', () => {
   it('all action tiles are rendered as links', () => {
     renderWithProviders(<SelfServicePortalPage />);
     const links = screen.getAllByRole('link');
-    // 6 groups × 3 actions = 18 links
-    expect(links.length).toBe(18);
+    // 6 groups × 3 actions = 18 action links + 2 golden-path links = 20
+    expect(links.length).toBe(20);
   });
 });
