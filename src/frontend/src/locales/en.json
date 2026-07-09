@@ -3735,7 +3735,9 @@
         "subtitle": "Manage linting rulesets for contract validation and governance.",
         "title": "Spectral Rulesets",
         "total": "Total",
-        "updatedAt": "Updated"
+        "updatedAt": "Updated",
+        "deleteTitle": "Delete ruleset",
+        "deleteConfirm": "Delete ruleset \"{{name}}\"? This cannot be undone."
       }
     },
     "status": "Status",

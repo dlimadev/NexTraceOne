@@ -5033,7 +5033,9 @@
         "subtitle": "Gerir conjuntos de regras de linting para validação e governança de contratos.",
         "title": "Conjuntos de Regras Spectral",
         "total": "Total",
-        "updatedAt": "Atualizado"
+        "updatedAt": "Atualizado",
+        "deleteTitle": "Eliminar ruleset",
+        "deleteConfirm": "Eliminar o ruleset \"{{name}}\"? Esta ação não pode ser anulada."
       }
     },
     "status": "Status",
