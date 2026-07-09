@@ -5,6 +5,7 @@
  * Pilar: Contract Governance + Source of Truth.
  */
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
 import { ShieldCheck, AlertTriangle, CheckCircle2, XCircle, BarChart2, TrendingUp } from 'lucide-react';
@@ -75,6 +76,15 @@ export function ContractHealthDashboardPage() {
         title={t('contracts.healthDashboard.title', 'Contract Health Dashboard')}
         subtitle={t('contracts.healthDashboard.subtitle', 'Aggregated quality and governance metrics across all contracts')}
         icon={<ShieldCheck />}
+        actions={
+          <Link
+            to="/contracts/health/timeline"
+            className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+          >
+            <TrendingUp size={14} />
+            {t('contracts.healthDashboard.viewTimeline', 'View timeline')}
+          </Link>
+        }
       />
 
       {isLoading && (
@@ -136,9 +146,10 @@ export function ContractHealthDashboardPage() {
               </h2>
               <div className="space-y-2">
                 {data.topViolations.map((v) => (
-                  <div
+                  <Link
                     key={v.contractVersionId}
-                    className="flex items-center justify-between py-2 px-3 rounded bg-elevated text-sm"
+                    to={`/contracts/portal/${v.contractVersionId}`}
+                    className="flex items-center justify-between py-2 px-3 rounded bg-elevated text-sm hover:bg-hover transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-body font-mono text-xs">{v.semVer}</span>
@@ -149,7 +160,7 @@ export function ContractHealthDashboardPage() {
                     <span className="text-critical font-semibold tabular-nums">
                       {v.violationCount} {t('contracts.healthDashboard.violations', 'violations')}
                     </span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
