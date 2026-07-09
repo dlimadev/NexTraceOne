@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { TrendingUp, AlertTriangle, Zap, Loader2 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
@@ -13,6 +14,7 @@ import { contractsApi } from '../api/contracts';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button, TextField } from '../../../shared/ui';
+import { HealthTrendSparkline } from './HealthTrendSparkline';
 
 type HealthTimelinePoint = {
   semVer: string;
@@ -47,8 +49,10 @@ function ScoreBar({ score }: { score: number }) {
  */
 export function ContractHealthTimelinePage() {
   const { t } = useTranslation();
-  const [apiAssetId, setApiAssetId] = useState('');
-  const [submittedId, setSubmittedId] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialAssetId = searchParams.get('apiAssetId') ?? '';
+  const [apiAssetId, setApiAssetId] = useState(initialAssetId);
+  const [submittedId, setSubmittedId] = useState(initialAssetId);
   const [validationError, setValidationError] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery<HealthTimelineResponse>({
@@ -133,7 +137,9 @@ export function ContractHealthTimelinePage() {
 
       {/* Results */}
       {data && (
-        <div className="bg-elevated rounded-lg border border-edge overflow-hidden">
+        <div className="space-y-4">
+          {points.length >= 2 && <HealthTrendSparkline points={points} />}
+          <div className="bg-elevated rounded-lg border border-edge overflow-hidden">
           {points.length === 0 ? (
             <div className="p-8 text-center text-muted text-sm">
               {t('phase4.healthTimeline.noData', 'No versions found for this contract')}
@@ -178,6 +184,7 @@ export function ContractHealthTimelinePage() {
               ))}
             </div>
           )}
+          </div>
         </div>
       )}
     </PageContainer>
