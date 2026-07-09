@@ -9093,7 +9093,18 @@
       "services": "Servicios"
     },
     "subtitle": "Acciones rápidas con gobernanza para desarrolladores",
-    "title": "Portal de Autoservicio"
+    "title": "Portal de Autoservicio",
+    "goldenPaths": {
+      "title": "Empieza aquí",
+      "onboard": "Incorporar un servicio",
+      "onboard_desc": "Registra un servicio y su interfaz y contrato en un flujo guiado.",
+      "template": "Empezar desde una plantilla",
+      "template_desc": "Genera desde una plantilla golden-path."
+    },
+    "needingSetup": {
+      "title": "Servicios por configurar",
+      "item": "{{name}} · {{status}}"
+    }
   },
   "serviceCatalog": {
     "apiAsset": "Activo de API",
@@ -17915,6 +17926,21 @@
       "errorRate": "Tasa de Error",
       "throughput": "Throughput",
       "timestamp": "Marca de tiempo"
+    }
+  },
+  "serviceSetup": {
+    "title": "Lista de configuración",
+    "subtitle": "Complétalos para dejar el servicio listo.",
+    "progress": "{{done}} de {{total}} completos",
+    "complete": "Configuración completa — puedes avanzar el ciclo de vida abajo.",
+    "na": "No aplicable",
+    "action": "Completar",
+    "items": {
+      "ownership": "Asignar responsable técnico",
+      "repository": "Enlazar el repositorio",
+      "documentation": "Añadir documentación",
+      "interface": "Registrar una interfaz",
+      "contract": "Publicar un contrato"
     }
   }
 }

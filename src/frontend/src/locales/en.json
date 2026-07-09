@@ -7792,7 +7792,18 @@
       "services": "Services"
     },
     "subtitle": "Governance-backed quick actions for developers",
-    "title": "Self-Service Portal"
+    "title": "Self-Service Portal",
+    "goldenPaths": {
+      "title": "Start here",
+      "onboard": "Onboard a service",
+      "onboard_desc": "Register a service and its interface & contract in one guided flow.",
+      "template": "Start from a template",
+      "template_desc": "Scaffold from a golden-path template."
+    },
+    "needingSetup": {
+      "title": "Services needing setup",
+      "item": "{{name}} · {{status}}"
+    }
   },
   "serviceCatalog": {
     "apiAsset": "API Asset",
@@ -16600,6 +16611,21 @@
       "errorRate": "Error Rate",
       "throughput": "Throughput",
       "timestamp": "Timestamp"
+    }
+  },
+  "serviceSetup": {
+    "title": "Setup checklist",
+    "subtitle": "Complete these to make the service production-ready.",
+    "progress": "{{done}} of {{total}} complete",
+    "complete": "Setup complete — you can advance the lifecycle below.",
+    "na": "Not applicable",
+    "action": "Complete",
+    "items": {
+      "ownership": "Assign a technical owner",
+      "repository": "Link the source repository",
+      "documentation": "Add documentation",
+      "interface": "Register an interface",
+      "contract": "Publish a contract"
     }
   }
 }

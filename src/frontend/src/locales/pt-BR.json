@@ -9108,7 +9108,18 @@
       "services": "Serviços"
     },
     "subtitle": "Ações rápidas com governança para desenvolvedores",
-    "title": "Portal de Autoatendimento"
+    "title": "Portal de Autoatendimento",
+    "goldenPaths": {
+      "title": "Comece aqui",
+      "onboard": "Registrar um serviço",
+      "onboard_desc": "Registre um serviço e sua interface e contrato num fluxo guiado.",
+      "template": "Começar de um template",
+      "template_desc": "Gere a partir de um template golden-path."
+    },
+    "needingSetup": {
+      "title": "Serviços a configurar",
+      "item": "{{name}} · {{status}}"
+    }
   },
   "serviceCatalog": {
     "apiAsset": "Ativo de API",
@@ -17915,6 +17926,21 @@
       "errorRate": "Error Rate",
       "throughput": "Throughput",
       "timestamp": "Timestamp"
+    }
+  },
+  "serviceSetup": {
+    "title": "Checklist de setup",
+    "subtitle": "Complete para deixar o serviço pronto.",
+    "progress": "{{done}} de {{total}} concluídos",
+    "complete": "Setup completo — pode avançar o ciclo de vida abaixo.",
+    "na": "Não aplicável",
+    "action": "Completar",
+    "items": {
+      "ownership": "Definir owner técnico",
+      "repository": "Ligar o repositório",
+      "documentation": "Adicionar documentação",
+      "interface": "Registar uma interface",
+      "contract": "Publicar um contrato"
     }
   }
 }
