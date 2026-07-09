@@ -7,6 +7,7 @@ import {
   Code, Shield, GitCompare, Users, Clock,
   FileText, Target, MessageSquare, History,
   Zap, Cog, Globe, AlertTriangle, ChevronRight,
+  Play,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -104,10 +105,18 @@ export function ContractPortalPage() {
         title={studio.friendlyName || detail.apiName || detail.apiAssetId}
         subtitle={studio.functionalDescription || detail.routePattern || t('contracts.portal.noDescription', 'No description available.')}
         actions={
-          <Button
-            variant="outline"
-            size="sm"
-            icon={<ExternalLink size={14} />}
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/contracts/playground?contractVersionId=${contractVersionId}`}
+              className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+            >
+              <Play size={14} />
+              {t('contracts.portal.tryInPlayground', 'Try in playground')}
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<ExternalLink size={14} />}
             onClick={async () => {
               try {
                 const result = await contractsApi.exportVersion(contractVersionId!);
@@ -122,7 +131,8 @@ export function ContractPortalPage() {
             }}
           >
             {t('contracts.portal.download', 'Download')}
-          </Button>
+            </Button>
+          </div>
         }
       />
 
