@@ -4704,7 +4704,10 @@
       "violations": "violações",
       "withCanonical": "Com Entidades Canónicas",
       "withExamples": "Com Exemplos",
-      "viewTimeline": "Ver linha do tempo"
+      "viewTimeline": "Ver linha do tempo",
+      "filterDomain": "Domínio",
+      "filterType": "Tipo",
+      "allTypes": "Todos os tipos"
     },
     "humanCreated": "Criado por Humano",
     "import": "Importar",
@@ -5472,7 +5475,8 @@
       "scorecard": "Scorecard",
       "consumers": "Consumidores",
       "dependencies": "Dependências",
-      "deployments": "Implantações"
+      "deployments": "Implantações",
+      "healthTimeline": "Linha do tempo de saúde"
     },
     "playground": {
       "placeholder": {
@@ -5507,7 +5511,10 @@
     "migrationSideConsumer": "Apenas Consumidor",
     "migrationCodeHint": "Dica de Código",
     "migrationCopyHint": "Copiar dica de código",
-    "migrationApplyHint": "Aplicar no editor"
+    "migrationApplyHint": "Aplicar no editor",
+    "healthTimeline": {
+      "trend": "Tendência do índice de saúde"
+    }
   },
   "dashboard": {
     "activeNow": "ativos agora",

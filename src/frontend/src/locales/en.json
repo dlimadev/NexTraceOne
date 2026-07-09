@@ -3391,7 +3391,10 @@
       "violations": "violations",
       "withCanonical": "With Canonical Entities",
       "withExamples": "With Examples",
-      "viewTimeline": "View timeline"
+      "viewTimeline": "View timeline",
+      "filterDomain": "Domain",
+      "filterType": "Type",
+      "allTypes": "All types"
     },
     "humanCreated": "Human Created",
     "import": "Import",
@@ -4159,7 +4162,8 @@
       "scorecard": "Scorecard",
       "consumers": "Consumers",
       "dependencies": "Dependencies",
-      "deployments": "Deployments"
+      "deployments": "Deployments",
+      "healthTimeline": "Health timeline"
     },
     "playground": {
       "placeholder": {
@@ -4194,7 +4198,10 @@
     "migrationSideConsumer": "Consumer only",
     "migrationCodeHint": "Code Hint",
     "migrationCopyHint": "Copy code hint",
-    "migrationApplyHint": "Apply in editor"
+    "migrationApplyHint": "Apply in editor",
+    "healthTimeline": {
+      "trend": "Health score trend"
+    }
   },
   "dashboard": {
     "activeNow": "active now",
