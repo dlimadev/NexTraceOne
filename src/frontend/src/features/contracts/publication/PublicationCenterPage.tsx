@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   EyeOff, AlertTriangle, Clock,
@@ -11,7 +11,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { LoadingState } from '../shared/components/StateIndicators';
 import { PageHeader } from '../../../components/PageHeader';
-import { Button, TextField } from '../../../shared/ui';
+import { Button, TextField, Modal } from '../../../shared/ui';
 import {
   usePublicationCenterEntries,
   useWithdrawContractFromPortal,
@@ -129,7 +129,15 @@ export function PublicationCenterPage() {
               <tbody>
                 {entriesQuery.data.items.map((entry) => (
                   <tr key={entry.publicationEntryId} className="border-b border-edge last:border-0 hover:bg-card/50">
-                    <td className="px-4 py-3 font-medium text-accent">{entry.contractTitle}</td>
+                    <td className="px-4 py-3 font-medium">
+                      {entry.contractVersionId ? (
+                        <Link to={`/contracts/${entry.contractVersionId}`} className="text-accent hover:underline">
+                          {entry.contractTitle}
+                        </Link>
+                      ) : (
+                        <span className="text-accent">{entry.contractTitle}</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-muted font-mono">{entry.semVer}</td>
                     <td className="px-4 py-3">
                       <PublicationStatusBadge status={entry.status} />
@@ -155,15 +163,34 @@ export function PublicationCenterPage() {
           </CardBody>
         </Card>
       )}
-      {withdrawTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg border border-edge p-6 w-full max-w-md">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle size={16} className="text-warning" />
-              <h2 className="text-sm font-semibold text-accent">
-                {t('contracts.publication.withdrawModal.title', 'Withdraw Publication')}
-              </h2>
-            </div>
+      <Modal
+        open={!!withdrawTarget}
+        onClose={() => { setWithdrawTarget(null); setWithdrawReason(''); }}
+        title={t('contracts.publication.withdrawModal.title', 'Withdraw Publication')}
+        size="sm"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setWithdrawTarget(null); setWithdrawReason(''); }}
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              loading={withdrawMutation.isPending}
+              disabled={withdrawMutation.isPending}
+              onClick={() => { if (withdrawTarget) handleWithdraw(withdrawTarget); }}
+            >
+              {t('contracts.publication.withdrawModal.confirm', 'Withdraw')}
+            </Button>
+          </>
+        }
+      >
+        {withdrawTarget && (
+          <>
             <p className="text-xs text-muted mb-4">
               {t(
                 'contracts.publication.withdrawModal.description',
@@ -174,36 +201,16 @@ export function PublicationCenterPage() {
                 },
               )}
             </p>
-            <div className="mb-4">
-              <TextField
-                label={t('contracts.publication.withdrawModal.reason', 'Reason (optional)')}
-                value={withdrawReason}
-                onChange={(e) => setWithdrawReason(e.target.value)}
-                placeholder={t('contracts.publication.withdrawModal.reasonPlaceholder', 'e.g. Replaced by v2.0.0')}
-                size="sm"
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => { setWithdrawTarget(null); setWithdrawReason(''); }}
-              >
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                loading={withdrawMutation.isPending}
-                disabled={withdrawMutation.isPending}
-                onClick={() => handleWithdraw(withdrawTarget)}
-              >
-                {t('contracts.publication.withdrawModal.confirm', 'Withdraw')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            <TextField
+              label={t('contracts.publication.withdrawModal.reason', 'Reason (optional)')}
+              value={withdrawReason}
+              onChange={(e) => setWithdrawReason(e.target.value)}
+              placeholder={t('contracts.publication.withdrawModal.reasonPlaceholder', 'e.g. Replaced by v2.0.0')}
+              size="sm"
+            />
+          </>
+        )}
+      </Modal>
     </PageContainer>
   );
 }
