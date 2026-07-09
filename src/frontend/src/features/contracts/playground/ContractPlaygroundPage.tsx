@@ -6,6 +6,7 @@
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
 import {
@@ -19,6 +20,7 @@ import {
   Send,
   FileJson,
   Clock,
+  ArrowLeft,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -42,7 +44,8 @@ type PlaygroundResponse = {
 
 export function ContractPlaygroundPage() {
   const { t } = useTranslation();
-  const [contractVersionId, setContractVersionId] = useState('');
+  const [searchParams] = useSearchParams();
+  const [contractVersionId, setContractVersionId] = useState(searchParams.get('contractVersionId') ?? '');
   const [request, setRequest] = useState<PlaygroundRequest>({
     method: 'GET',
     path: '/',
@@ -112,6 +115,16 @@ export function ContractPlaygroundPage() {
         )}
         icon={<Code2 size={20} />}
       />
+
+      {contractVersionId && (
+        <Link
+          to={`/contracts/portal/${contractVersionId}`}
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors mb-3"
+        >
+          <ArrowLeft size={12} />
+          {t('contracts.playground.backToPortal', 'Back to portal')}
+        </Link>
+      )}
 
       {/* ─── Contract Selector ─── */}
       <div className="bg-panel border border-edge rounded-lg p-4 mb-4">
