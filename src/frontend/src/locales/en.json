@@ -2871,7 +2871,8 @@
         "title": "Canonical Entities",
         "updated": "Updated",
         "usages": "Known Usages",
-        "usedBy": "Used by"
+        "usedBy": "Used by",
+        "impactCascade": "Impact cascade"
       },
       "placeholder": {
         "entityId": "e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -3323,6 +3324,54 @@
         "retired": "Retired",
         "sunset": "Sunset",
         "title": "Lifecycle Workflow"
+      },
+      "tools": {
+        "title": "Governance tools",
+        "groups": {
+          "assess": "Assess",
+          "enforce": "Enforce",
+          "model": "Model",
+          "publish": "Publish",
+          "test": "Test"
+        },
+        "items": {
+          "healthDashboard": {
+            "title": "Health dashboard",
+            "subtitle": "Aggregated quality score and violations"
+          },
+          "healthTimeline": {
+            "title": "Health timeline",
+            "subtitle": "Quality trend across versions"
+          },
+          "spectral": {
+            "title": "Spectral rulesets",
+            "subtitle": "Lint rules applied to contracts"
+          },
+          "cdct": {
+            "title": "Consumer-driven contracts",
+            "subtitle": "Consumer expectations and verification"
+          },
+          "canonical": {
+            "title": "Canonical entities",
+            "subtitle": "Reusable standardized schemas"
+          },
+          "impactCascade": {
+            "title": "Impact cascade",
+            "subtitle": "Blast radius of an entity change"
+          },
+          "publication": {
+            "title": "Publication center",
+            "subtitle": "Publish and promote contract versions"
+          },
+          "migration": {
+            "title": "Migration",
+            "subtitle": "Generate migration patches between versions"
+          },
+          "playground": {
+            "title": "Playground",
+            "subtitle": "Try requests against a contract"
+          }
+        }
       }
     },
     "health": {
@@ -3341,7 +3390,8 @@
       "totalContracts": "Total Contracts",
       "violations": "violations",
       "withCanonical": "With Canonical Entities",
-      "withExamples": "With Examples"
+      "withExamples": "With Examples",
+      "viewTimeline": "View timeline"
     },
     "humanCreated": "Human Created",
     "import": "Import",
@@ -8464,7 +8514,8 @@
     "subGroupDashboards": "Dashboards",
     "subGroupCostSustainability": "Cost & Sustainability",
     "subGroupIdentityAccess": "Identity & Access",
-    "subGroupPlatformConfig": "Configuration"
+    "subGroupPlatformConfig": "Configuration",
+    "contractGovernanceHub": "Contract Governance"
   },
   "sourceOfTruth": {
     "assetTypes": {

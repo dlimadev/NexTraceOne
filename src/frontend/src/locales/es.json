@@ -4169,7 +4169,8 @@
         "title": "Entidades Canónicas",
         "updated": "Actualizado",
         "usages": "Known Usages",
-        "usedBy": "Usado por"
+        "usedBy": "Usado por",
+        "impactCascade": "Cascada de impacto"
       },
       "placeholder": {
         "entityId": "ej. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -4621,6 +4622,54 @@
         "retired": "Retirado",
         "sunset": "Desactivación",
         "title": "Flujo del Ciclo de Vida"
+      },
+      "tools": {
+        "title": "Herramientas de gobernanza",
+        "groups": {
+          "assess": "Evaluar",
+          "enforce": "Aplicar",
+          "model": "Modelar",
+          "publish": "Publicar",
+          "test": "Probar"
+        },
+        "items": {
+          "healthDashboard": {
+            "title": "Panel de salud",
+            "subtitle": "Puntuación de calidad y violaciones agregadas"
+          },
+          "healthTimeline": {
+            "title": "Cronología de salud",
+            "subtitle": "Tendencia de calidad entre versiones"
+          },
+          "spectral": {
+            "title": "Conjuntos de reglas Spectral",
+            "subtitle": "Reglas de lint aplicadas a los contratos"
+          },
+          "cdct": {
+            "title": "Contratos dirigidos por el consumidor",
+            "subtitle": "Expectativas del consumidor y verificación"
+          },
+          "canonical": {
+            "title": "Entidades canónicas",
+            "subtitle": "Esquemas estandarizados reutilizables"
+          },
+          "impactCascade": {
+            "title": "Cascada de impacto",
+            "subtitle": "Radio de impacto de un cambio de entidad"
+          },
+          "publication": {
+            "title": "Centro de publicación",
+            "subtitle": "Publicar y promover versiones de contrato"
+          },
+          "migration": {
+            "title": "Migración",
+            "subtitle": "Generar parches de migración entre versiones"
+          },
+          "playground": {
+            "title": "Playground",
+            "subtitle": "Prueba solicitudes contra un contrato"
+          }
+        }
       }
     },
     "health": {
@@ -4639,7 +4688,8 @@
       "totalContracts": "Total de Contratos",
       "violations": "violaciones",
       "withCanonical": "Con Entidades Canónicas",
-      "withExamples": "Con Ejemplos"
+      "withExamples": "Con Ejemplos",
+      "viewTimeline": "Ver cronología"
     },
     "humanCreated": "Creado por Humano",
     "import": "Importar",
@@ -9765,7 +9815,8 @@
     "subGroupDashboards": "Dashboards",
     "subGroupCostSustainability": "Costo & Sostenibilidad",
     "subGroupIdentityAccess": "Identidad & Acceso",
-    "subGroupPlatformConfig": "Configuración"
+    "subGroupPlatformConfig": "Configuración",
+    "contractGovernanceHub": "Gobernanza de contratos"
   },
   "sourceOfTruth": {
     "assetTypes": {
