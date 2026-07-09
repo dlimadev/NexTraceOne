@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { TrendingUp } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader';
 import { WorkspaceLayout } from './WorkspaceLayout';
 import { WorkspaceTabs } from './components/WorkspaceTabs';
@@ -41,6 +43,7 @@ import type { WorkspaceSectionId, ContractLifecycleState } from '../types';
  * Usa StudioContract (enriched view-model) para alimentar secções com dados completos.
  */
 export function ContractWorkspacePage() {
+  const { t } = useTranslation();
   const { contractVersionId } = useParams<{ contractVersionId: string }>();
 
   const detailQuery = useContractDetail(contractVersionId);
@@ -199,12 +202,23 @@ export function ContractWorkspacePage() {
           title={studioContract.technicalName}
           subtitle={`${detail.protocol} · v${detail.semVer}${studioContract.domain ? ` · ${studioContract.domain}` : ''}`}
           actions={
-            <ContractLifecycleActions
-              lifecycleState={detail.lifecycleState as ContractLifecycleState}
-              isLocked={detail.isLocked}
-              onTransition={handleTransition}
-              onExport={handleExport}
-            />
+            <div className="flex items-center gap-3">
+              {detail.apiAssetId && (
+                <Link
+                  to={`/contracts/health/timeline?apiAssetId=${detail.apiAssetId}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+                >
+                  <TrendingUp size={14} />
+                  {t('contracts.workspace.healthTimeline', 'Health timeline')}
+                </Link>
+              )}
+              <ContractLifecycleActions
+                lifecycleState={detail.lifecycleState as ContractLifecycleState}
+                isLocked={detail.isLocked}
+                onTransition={handleTransition}
+                onExport={handleExport}
+              />
+            </div>
           }
         />
       }
