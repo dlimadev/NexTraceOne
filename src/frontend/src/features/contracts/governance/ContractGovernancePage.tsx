@@ -11,6 +11,7 @@ import { contractsApi } from '../api/contracts';
 import { Button, Tabs } from '../../../shared/ui';
 import { computeGovernanceInsights, computePolicyChecks } from './ContractGovernanceHelpers';
 import { OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView } from './ContractGovernanceViews';
+import { GovernanceToolsSection } from './GovernanceToolsSection';
 import type { GovernanceView } from './ContractGovernanceHelpers';
 
 /**
@@ -106,6 +107,8 @@ export function ContractGovernancePage() {
       {view === 'audit' && (
         <AuditView contracts={contracts} />
       )}
+
+      <GovernanceToolsSection />
     </PageContainer>
   );
 }
