@@ -1,8 +1,6 @@
 // ── Pages ─────────────────────────────────────────────────────────────────────
 export { ContractCatalogPage } from './catalog/ContractCatalogPage';
 export { CreateContractPage } from './create/CreateContractPage';
-/** @deprecated Use CreateContractPage instead. */
-export { CreateContractPage as CreateServicePage } from './create/CreateContractPage';
 export { ContractWorkspacePage } from './workspace/ContractWorkspacePage';
 export { ContractGovernancePage } from './governance/ContractGovernancePage';
 export { ContractPortalPage } from './portal/ContractPortalPage';

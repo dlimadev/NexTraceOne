@@ -1,5 +1,4 @@
 /** Barrel export — bounded context Catalog (catálogo de APIs, contratos, portal, Source of Truth). */
-export { ContractsPage } from './pages/ContractsPage';
 export { ServiceCatalogPage } from './pages/ServiceCatalogPage';
 export { ServiceCatalogListPage } from './pages/ServiceCatalogListPage';
 export { ServiceDetailPage } from './pages/ServiceDetailPage';
@@ -7,8 +6,6 @@ export { default as ServiceDiscoveryPage } from './pages/ServiceDiscoveryPage';
 export { ServiceMaturityPage } from './pages/ServiceMaturityPage';
 export { CatalogContractsConfigurationPage } from './pages/CatalogContractsConfigurationPage';
 export { DeveloperPortalPage } from './pages/DeveloperPortalPage';
-export { ContractListPage } from './pages/ContractListPage';
-export { ContractDetailPage } from './pages/ContractDetailPage';
 export { SourceOfTruthExplorerPage } from './pages/SourceOfTruthExplorerPage';
 export { ServiceSourceOfTruthPage } from './pages/ServiceSourceOfTruthPage';
 export { ContractSourceOfTruthPage } from './pages/ContractSourceOfTruthPage';
