@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, BookOpen } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader';
 import { WorkspaceLayout } from './WorkspaceLayout';
 import { WorkspaceTabs } from './components/WorkspaceTabs';
@@ -210,6 +210,15 @@ export function ContractWorkspacePage() {
                 >
                   <TrendingUp size={14} />
                   {t('contracts.workspace.healthTimeline', 'Health timeline')}
+                </Link>
+              )}
+              {contractVersionId && (
+                <Link
+                  to={`/contracts/portal/${contractVersionId}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+                >
+                  <BookOpen size={14} />
+                  {t('contracts.workspace.consumerPortal', 'Consumer portal')}
                 </Link>
               )}
               <ContractLifecycleActions
