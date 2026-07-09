@@ -63,6 +63,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   // Governança de Contratos
+  { labelKey: 'sidebar.contractGovernanceHub', to: '/contracts/governance', icon: <ShieldCheck size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
   { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <GitBranch size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
   { labelKey: 'sidebar.contractsHealth', to: '/contracts/health', icon: <Stethoscope size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
   { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <FlaskConical size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
