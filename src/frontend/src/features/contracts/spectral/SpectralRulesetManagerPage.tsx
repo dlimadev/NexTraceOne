@@ -14,7 +14,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
-import { Button, IconButton } from '../../../shared/ui';
+import { Button, IconButton, Modal } from '../../../shared/ui';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset, useCreateSpectralRuleset } from '../hooks';
 import { CreateRulesetModal } from './CreateRulesetModal';
@@ -29,6 +29,7 @@ export function SpectralRulesetManagerPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SpectralRuleset | null>(null);
 
   const rulesetsQuery = useSpectralRulesets();
   const toggleMutation = useToggleSpectralRuleset();
@@ -42,10 +43,6 @@ export function SpectralRulesetManagerPage() {
 
   const handleToggle = (ruleset: SpectralRuleset) => {
     toggleMutation.mutate({ rulesetId: ruleset.id, isActive: !ruleset.isActive });
-  };
-
-  const handleDelete = (rulesetId: string) => {
-    deleteMutation.mutate(rulesetId);
   };
 
   return (
@@ -135,7 +132,7 @@ export function SpectralRulesetManagerPage() {
                     icon={<Trash2 size={14} />}
                     label={t('common.delete', 'Delete')}
                     title={t('common.delete', 'Delete')}
-                    onClick={() => handleDelete(ruleset.id)}
+                    onClick={() => setDeleteTarget(ruleset)}
                     disabled={deleteMutation.isPending}
                     className="hover:text-danger"
                   />
@@ -178,6 +175,38 @@ export function SpectralRulesetManagerPage() {
           );
         })}
       </div>
+
+      {/* Delete confirmation */}
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title={t('contracts.spectral.manager.deleteTitle', 'Delete ruleset')}
+        size="sm"
+        footer={
+          <>
+            <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              loading={deleteMutation.isPending}
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                if (deleteTarget) {
+                  deleteMutation.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
+                }
+              }}
+            >
+              {t('common.delete', 'Delete')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-xs text-muted">
+          {t('contracts.spectral.manager.deleteConfirm', 'Delete ruleset "{{name}}"? This cannot be undone.', { name: deleteTarget?.name ?? '' })}
+        </p>
+      </Modal>
 
       {/* Create Modal */}
       <CreateRulesetModal
