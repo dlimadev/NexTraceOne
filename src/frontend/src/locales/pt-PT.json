@@ -4824,7 +4824,8 @@
       "version": "Versão",
       "violationCount": "{{count}} violação(ões) detectada(s).",
       "violations": "Violações",
-      "visibility": "Visibilidade"
+      "visibility": "Visibilidade",
+      "tryInPlayground": "Testar no playground"
     },
     "protocol": "Protocolo",
     "protocols": {
@@ -5461,13 +5462,15 @@
       "consumers": "Consumidores",
       "dependencies": "Dependências",
       "deployments": "Implantações",
-      "healthTimeline": "Cronologia de saúde"
+      "healthTimeline": "Cronologia de saúde",
+      "consumerPortal": "Portal do consumidor"
     },
     "playground": {
       "placeholder": {
         "path": "/api/v1/resource",
         "body": "{}"
-      }
+      },
+      "backToPortal": "Voltar ao portal"
     },
     "migrate": "Migrar Contrato",
     "migrationPatch": "Patch de Migração",

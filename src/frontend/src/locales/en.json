@@ -3526,7 +3526,8 @@
       "version": "Version",
       "violationCount": "{{count}} violation(s) detected.",
       "violations": "Violations",
-      "visibility": "Visibility"
+      "visibility": "Visibility",
+      "tryInPlayground": "Try in playground"
     },
     "protocol": "Protocol",
     "protocols": {
@@ -4163,13 +4164,15 @@
       "consumers": "Consumers",
       "dependencies": "Dependencies",
       "deployments": "Deployments",
-      "healthTimeline": "Health timeline"
+      "healthTimeline": "Health timeline",
+      "consumerPortal": "Consumer portal"
     },
     "playground": {
       "placeholder": {
         "path": "/api/v1/resource",
         "body": "{}"
-      }
+      },
+      "backToPortal": "Back to portal"
     },
     "migrate": "Migrate Contract",
     "migrationPatch": "Migration Patch",
