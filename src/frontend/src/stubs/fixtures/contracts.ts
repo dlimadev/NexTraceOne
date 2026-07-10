@@ -18,6 +18,7 @@ import type {
 } from '../../types';
 import type { CanonicalEntity, ValidationSummary, ContractScorecard } from '../../features/contracts/types/domain';
 import type { ParsePreviewResponse } from '../../features/contracts/hooks/useSpecPreview';
+import yaml from 'js-yaml';
 
 /** Versões de contrato do catálogo. */
 export const stubContractList: ContractListResponse = {
@@ -69,7 +70,77 @@ const specByProtocol: Record<string, { format: string; content: (name: string, v
   OpenApi: {
     format: 'yaml',
     content: (name, ver) =>
-      `openapi: 3.0.3\ninfo:\n  title: ${name}\n  version: ${ver}\npaths:\n  /payments:\n    post:\n      summary: Create payment\n      responses:\n        '201':\n          description: Created\n`,
+      `openapi: 3.0.3
+info:
+  title: ${name}
+  version: ${ver}
+  description: Serviço central de processamento de pagamentos e reconciliação.
+servers:
+  - url: https://api.nextraceone.dev/v2
+security:
+  - bearerAuth: []
+paths:
+  /payments:
+    post:
+      operationId: createPayment
+      summary: Create payment
+      description: Cria um novo pagamento.
+      tags: [payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Get payment
+      description: Obtém um pagamento por id.
+      tags: [payments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Payment:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+`,
   },
   GraphQl: {
     format: 'graphql',
@@ -286,92 +357,160 @@ export function buildContractSubscribers(apiAssetId: string): ContractSubscriber
   };
 }
 
+// ── OpenAPI mínimo (formas parciais para parsing do preview) ────────────────────
+
+interface RawSchema {
+  type?: string;
+  format?: string;
+  required?: string[];
+  properties?: Record<string, RawSchema>;
+  $ref?: string;
+}
+interface RawOperation {
+  operationId?: string;
+  summary?: string;
+  description?: string;
+  deprecated?: boolean;
+  tags?: string[];
+  parameters?: Array<{ name: string; required?: boolean; schema?: RawSchema }>;
+  requestBody?: { required?: boolean; content?: Record<string, { schema?: RawSchema }> };
+  responses?: Record<string, { description?: string; content?: Record<string, { schema?: RawSchema }> }>;
+}
+interface RawSpec {
+  info?: { title?: string; version?: string | number; description?: string };
+  servers?: Array<{ url?: string }>;
+  paths?: Record<string, Record<string, RawOperation>>;
+  components?: { securitySchemes?: Record<string, unknown>; schemas?: Record<string, RawSchema> };
+  tags?: Array<string | { name?: string }>;
+}
+
+/** Extrai o nome do schema a partir de um `$ref` (`#/components/schemas/X` → `X`). */
+function schemaRefName(schema?: RawSchema): string | null {
+  const ref = schema?.$ref;
+  return ref ? ref.split('/').pop() ?? null : null;
+}
+
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
+
 /**
  * Live preview parseado de um spec (POST /contracts/parse-preview).
- * O catch-all `[]` faz o preview mostrar "Erro ao analisar"; esta forma
- * devolve um PreviewModel válido para renderizar operações e schemas.
+ *
+ * Parseia o `specContent` real (via js-yaml) para que o preview reflita
+ * exatamente o YAML do editor e a vista Visual — sem divergências.
  */
-export function buildParsePreview(protocol: string): ParsePreviewResponse {
+export function buildParsePreview(specContent: string, protocol: string): ParsePreviewResponse {
+  let doc: RawSpec | null = null;
+  try {
+    const parsed = yaml.load(specContent);
+    if (parsed && typeof parsed === 'object') doc = parsed as RawSpec;
+  } catch {
+    doc = null;
+  }
+
+  // Protocolos não-YAML (GraphQL, WSDL) ou parse falhado → preview mínimo válido.
+  if (!doc || !doc.paths) {
+    return {
+      isValid: true,
+      errorMessage: null,
+      preview: {
+        protocol,
+        title: doc?.info?.title ?? protocol,
+        specVersion: String(doc?.info?.version ?? ''),
+        description: doc?.info?.description ?? null,
+        servers: (doc?.servers ?? []).map((s) => s.url ?? '').filter(Boolean),
+        tags: [],
+        securitySchemes: Object.keys(doc?.components?.securitySchemes ?? {}),
+        operations: [],
+        schemas: [],
+        operationCount: 0,
+        schemaCount: 0,
+        hasSecurityDefinitions: Object.keys(doc?.components?.securitySchemes ?? {}).length > 0,
+        hasExamples: false,
+        hasDescriptions: !!doc?.info?.description,
+      },
+    };
+  }
+
+  const info = doc.info ?? {};
+  const securitySchemes = Object.keys(doc.components?.securitySchemes ?? {});
+
+  const operations = Object.entries(doc.paths).flatMap(([path, methods]) =>
+    Object.entries(methods)
+      .filter(([method]) => HTTP_METHODS.includes(method.toLowerCase()))
+      .map(([method, op]) => {
+        const reqSchema = op.requestBody?.content?.['application/json']?.schema;
+        const firstResponse = Object.entries(op.responses ?? {})[0];
+        return {
+          operationId: op.operationId ?? `${method}${path}`,
+          name: op.summary ?? `${method.toUpperCase()} ${path}`,
+          description: op.description ?? null,
+          method: method.toUpperCase(),
+          path,
+          isDeprecated: !!op.deprecated,
+          tags: op.tags ?? [],
+          inputParameters: (op.parameters ?? []).map((p) => ({
+            name: p.name,
+            dataType: p.schema?.type ?? 'string',
+            isRequired: !!p.required,
+            format: p.schema?.format ?? null,
+            isDeprecated: false,
+          })),
+          outputFields: [],
+          requestBody: op.requestBody
+            ? {
+                contentType: 'application/json',
+                isRequired: !!op.requestBody.required,
+                properties: [],
+                schemaRef: schemaRefName(reqSchema),
+              }
+            : null,
+          responses: firstResponse
+            ? [
+                {
+                  statusCode: firstResponse[0],
+                  description: firstResponse[1].description ?? null,
+                  contentType: 'application/json',
+                  properties: [],
+                  schemaRef: schemaRefName(firstResponse[1].content?.['application/json']?.schema),
+                },
+              ]
+            : [],
+        };
+      }),
+  );
+
+  const schemas = Object.entries(doc.components?.schemas ?? {}).map(([name, schema]) => ({
+    name,
+    dataType: schema.type ?? 'object',
+    isRequired: false,
+    isDeprecated: false,
+    children: Object.entries(schema.properties ?? {}).map(([propName, prop]) => ({
+      name: propName,
+      dataType: prop.type ?? 'string',
+      isRequired: (schema.required ?? []).includes(propName),
+      format: prop.format ?? null,
+      isDeprecated: false,
+    })),
+  }));
+
   return {
     isValid: true,
     errorMessage: null,
     preview: {
       protocol,
-      title: 'Payments API v2',
-      specVersion: '2.3.0',
-      description: 'Serviço central de processamento de pagamentos e reconciliação.',
-      servers: ['https://api.nextraceone.dev/v2'],
-      tags: ['payments', 'billing'],
-      securitySchemes: ['bearerAuth'],
-      operations: [
-        {
-          operationId: 'createPayment',
-          name: 'Create payment',
-          description: 'Cria um novo pagamento.',
-          method: 'POST',
-          path: '/payments',
-          isDeprecated: false,
-          tags: ['payments'],
-          inputParameters: [],
-          outputFields: [
-            { name: 'id', dataType: 'string', isRequired: true, format: 'uuid', isDeprecated: false },
-            { name: 'status', dataType: 'string', isRequired: true, isDeprecated: false },
-          ],
-          requestBody: {
-            contentType: 'application/json',
-            isRequired: true,
-            properties: [
-              { name: 'amount', dataType: 'number', isRequired: true, isDeprecated: false },
-              { name: 'currency', dataType: 'string', isRequired: true, isDeprecated: false },
-            ],
-            schemaRef: 'Payment',
-          },
-          responses: [
-            { statusCode: '201', description: 'Created', contentType: 'application/json', properties: [], schemaRef: 'Payment' },
-          ],
-        },
-        {
-          operationId: 'getPayment',
-          name: 'Get payment',
-          description: 'Obtém um pagamento por id.',
-          method: 'GET',
-          path: '/payments/{id}',
-          isDeprecated: false,
-          tags: ['payments'],
-          inputParameters: [
-            { name: 'id', dataType: 'string', isRequired: true, format: 'uuid', isDeprecated: false },
-          ],
-          outputFields: [],
-          requestBody: null,
-          responses: [
-            { statusCode: '200', description: 'OK', contentType: 'application/json', properties: [], schemaRef: 'Payment' },
-          ],
-        },
-      ],
-      schemas: [
-        {
-          name: 'Payment',
-          dataType: 'object',
-          isRequired: true,
-          isDeprecated: false,
-          children: [
-            { name: 'amount', dataType: 'number', isRequired: true, isDeprecated: false },
-            { name: 'currency', dataType: 'string', isRequired: true, isDeprecated: false },
-          ],
-        },
-        {
-          name: 'Money',
-          dataType: 'object',
-          isRequired: false,
-          isDeprecated: false,
-          children: [],
-        },
-      ],
-      operationCount: 2,
-      schemaCount: 2,
-      hasSecurityDefinitions: true,
-      hasExamples: true,
-      hasDescriptions: true,
+      title: info.title ?? 'Contract',
+      specVersion: String(info.version ?? ''),
+      description: info.description ?? null,
+      servers: (doc.servers ?? []).map((s) => s.url ?? '').filter(Boolean),
+      tags: (doc.tags ?? []).map((t) => (typeof t === 'string' ? t : t.name ?? '')).filter(Boolean),
+      securitySchemes,
+      operations,
+      schemas,
+      operationCount: operations.length,
+      schemaCount: schemas.length,
+      hasSecurityDefinitions: securitySchemes.length > 0,
+      hasExamples: false,
+      hasDescriptions: operations.some((o) => !!o.description),
     },
   };
 }

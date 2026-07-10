@@ -111,7 +111,7 @@ export const contractsHandlers = [
 
   // Live preview do spec (Contrato → Pré-visualização). POST com { specContent, protocol }.
   http.post(`${API}/contracts/parse-preview`, async ({ request }) => {
-    const body = (await request.json().catch(() => ({}))) as { protocol?: string };
-    return HttpResponse.json(buildParsePreview(body.protocol ?? 'OpenApi'));
+    const body = (await request.json().catch(() => ({}))) as { specContent?: string; protocol?: string };
+    return HttpResponse.json(buildParsePreview(body.specContent ?? '', body.protocol ?? 'OpenApi'));
   }),
 ];
