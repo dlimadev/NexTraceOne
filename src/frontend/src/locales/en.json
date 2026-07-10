@@ -1826,7 +1826,8 @@
       "scopeServices": "Services",
       "searchPlaceholder": "Search services, contracts, runbooks...",
       "subtitle": "Search across all services, contracts, runbooks, and documentation",
-      "title": "Global Search"
+      "title": "Global Search",
+      "sourceOfTruthLink": "Source of truth"
     },
     "governance": "Governance",
     "knowledge": "Knowledge",

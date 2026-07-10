@@ -1841,7 +1841,8 @@
       "scopeServices": "Servicios",
       "searchPlaceholder": "Buscar servicios, contratos, runbooks...",
       "subtitle": "Busque en todos los servicios, contratos, runbooks y documentación",
-      "title": "Búsqueda Global"
+      "title": "Búsqueda Global",
+      "sourceOfTruthLink": "Fuente de verdad"
     },
     "governance": "Gobernanza",
     "knowledge": "Conocimiento",

@@ -8,7 +8,6 @@ import {
   FileText,
   FileCode,
   BookOpen,
-  ChevronRight,
   Loader2,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
@@ -202,45 +201,52 @@ function SearchResultCard({
   item: SearchResultItem;
 }) {
   const { t } = useTranslation();
+  const isService = item.entityType.toLowerCase() === 'service';
 
   return (
-    <Link
-      to={item.route}
-      className="bg-panel border border-edge rounded-lg hover:bg-hover transition-colors p-4 flex items-center gap-4 group"
-    >
-      {/* Ícone por tipo */}
-      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-elevated text-muted shrink-0">
-        {entityTypeIcons[item.entityType] ?? <Search size={16} />}
-      </div>
+    <div className="bg-panel border border-edge rounded-lg hover:bg-hover transition-colors flex items-center gap-2 group">
+      <Link
+        to={item.route}
+        className="flex-1 min-w-0 flex items-center gap-4 p-4"
+      >
+        {/* Ícone por tipo */}
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-elevated text-muted shrink-0">
+          {entityTypeIcons[item.entityType.toLowerCase()] ?? <Search size={16} />}
+        </div>
 
-      {/* Texto principal */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-heading truncate">{item.title}</p>
-        <p className="text-xs text-muted truncate mt-0.5">
-          {item.subtitle ?? t(`commandPalette.entity${capitalize(item.entityType)}`, item.entityType)}
-          {item.owner && (
-            <span className="text-faded"> · {item.owner}</span>
-          )}
-        </p>
-      </div>
+        {/* Texto principal */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-heading truncate">{item.title}</p>
+          <p className="text-xs text-muted truncate mt-0.5">
+            {item.subtitle ?? t(`commandPalette.entity${capitalize(item.entityType)}`, item.entityType)}
+            {item.owner && (
+              <span className="text-faded"> · {item.owner}</span>
+            )}
+          </p>
+        </div>
 
-      {/* Status badge */}
-      {item.status && (
-        <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-            statusColors[item.status] ?? STATUS_COLOR_DEFAULT
-          }`}
+        {/* Status badge */}
+        {item.status && (
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              statusColors[item.status] ?? STATUS_COLOR_DEFAULT
+            }`}
+          >
+            {item.status}
+          </span>
+        )}
+      </Link>
+
+      {/* Ponte para a vista Source of Truth — apenas serviços (entityId===serviceId) */}
+      {isService && (
+        <Link
+          to={`/source-of-truth/services/${item.entityId}`}
+          className="shrink-0 pr-4 text-xs text-accent hover:underline whitespace-nowrap"
         >
-          {item.status}
-        </span>
+          {t('commandPalette.globalSearch.sourceOfTruthLink', 'Source of truth')}
+        </Link>
       )}
-
-      {/* Go link */}
-      <span className="shrink-0 text-xs text-accent opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-        {t('commandPalette.globalSearch.goToEntity')}
-        <ChevronRight size={12} />
-      </span>
-    </Link>
+    </div>
   );
 }
 
