@@ -5466,7 +5466,8 @@
       "dependencies": "Dependencias",
       "deployments": "Despliegues",
       "healthTimeline": "Cronología de salud",
-      "consumerPortal": "Portal del consumidor"
+      "consumerPortal": "Portal del consumidor",
+      "viewSourceOfTruth": "Ver fuente de verdad"
     },
     "playground": {
       "placeholder": {

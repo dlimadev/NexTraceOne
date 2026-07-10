@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { TrendingUp, BookOpen } from 'lucide-react';
+import { TrendingUp, BookOpen, Globe } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader';
 import { WorkspaceLayout } from './WorkspaceLayout';
 import { WorkspaceTabs } from './components/WorkspaceTabs';
@@ -219,6 +219,15 @@ export function ContractWorkspacePage() {
                 >
                   <BookOpen size={14} />
                   {t('contracts.workspace.consumerPortal', 'Consumer portal')}
+                </Link>
+              )}
+              {contractVersionId && (
+                <Link
+                  to={`/source-of-truth/contracts/${contractVersionId}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+                >
+                  <Globe size={14} />
+                  {t('contracts.workspace.viewSourceOfTruth', 'View source of truth')}
                 </Link>
               )}
               <ContractLifecycleActions

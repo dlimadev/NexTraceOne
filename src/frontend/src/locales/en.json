@@ -4168,7 +4168,8 @@
       "dependencies": "Dependencies",
       "deployments": "Deployments",
       "healthTimeline": "Health timeline",
-      "consumerPortal": "Consumer portal"
+      "consumerPortal": "Consumer portal",
+      "viewSourceOfTruth": "View source of truth"
     },
     "playground": {
       "placeholder": {
