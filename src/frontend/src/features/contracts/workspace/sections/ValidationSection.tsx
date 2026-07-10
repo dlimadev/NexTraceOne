@@ -221,7 +221,7 @@ export function ValidationSection({ contractVersionId, className = '' }: Validat
       {/* Empty state */}
       {!hasResults && !summaryQuery.isLoading && !executeMutation.isPending && (
         <EmptyState
-          icon="ScanSearch"
+          icon={<ScanSearch size={24} aria-hidden="true" />}
           title={t('contracts.validation.emptyTitle', 'No validation results')}
           description={t('contracts.validation.emptyDescription', 'Run validation to check this contract against Spectral rules and internal governance checks.')}
         />

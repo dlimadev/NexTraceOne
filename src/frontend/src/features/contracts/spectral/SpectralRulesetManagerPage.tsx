@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Star,
   FileCode,
+  ScanSearch,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -70,7 +71,7 @@ export function SpectralRulesetManagerPage() {
       </StatsGrid>
       {rulesets.length === 0 && !rulesetsQuery.isLoading && (
         <EmptyState
-          icon="ScanSearch"
+          icon={<ScanSearch size={24} aria-hidden="true" />}
           title={t('contracts.spectral.manager.emptyTitle', 'No rulesets found')}
           description={t('contracts.spectral.manager.emptyDescription', 'Create or import Spectral rulesets to start validating contracts.')}
         />

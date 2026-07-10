@@ -118,7 +118,7 @@ export function CanonicalEntityCatalogPage() {
       {/* Entity list */}
       {entities.length === 0 && !entitiesQuery.isLoading && (
         <EmptyState
-          icon="Database"
+          icon={<Database size={24} aria-hidden="true" />}
           title={t('contracts.canonical.catalog.emptyTitle', 'No canonical entities')}
           description={t('contracts.canonical.catalog.emptyDescription', 'Create canonical entities to standardize schemas across contracts.')}
         />

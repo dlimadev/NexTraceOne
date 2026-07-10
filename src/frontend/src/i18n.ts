@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import i18n, { type ResourceLanguage } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
 import ptBR from './locales/pt-BR.json';
@@ -40,12 +40,32 @@ function detectLanguage(): string {
   return 'en';
 }
 
+/**
+ * Constrói os recursos de um idioma.
+ *
+ * O ficheiro de tradução é flat (um único objeto por idioma). A app usa-o de
+ * duas formas: a maioria das páginas via namespace por omissão `translation`
+ * com chaves pontilhadas (`t('catalog.x')`), mas ~30 páginas usam
+ * `useTranslation('<secção>')` esperando a secção de topo como namespace
+ * (`t('x')`). Para suportar ambas sem duplicar traduções, exponho cada objeto
+ * de topo TAMBÉM como namespace, além do namespace `translation` completo.
+ */
+function buildResources(flat: Record<string, unknown>): ResourceLanguage {
+  const namespaces: ResourceLanguage = { translation: flat as ResourceLanguage['translation'] };
+  for (const [key, value] of Object.entries(flat)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      namespaces[key] = value as ResourceLanguage[string];
+    }
+  }
+  return namespaces;
+}
+
 i18n.use(initReactI18next).init({
   resources: {
-    en: { translation: en },
-    'pt-BR': { translation: ptBR },
-    'pt-PT': { translation: ptPT },
-    es: { translation: es },
+    en: buildResources(en),
+    'pt-BR': buildResources(ptBR),
+    'pt-PT': buildResources(ptPT),
+    es: buildResources(es),
   },
   lng: detectLanguage(),
   fallbackLng: 'en',
