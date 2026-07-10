@@ -17,6 +17,7 @@ import type {
   ContractSubscribersResponse,
 } from '../../types';
 import type { CanonicalEntity, ValidationSummary, ContractScorecard } from '../../features/contracts/types/domain';
+import type { ParsePreviewResponse } from '../../features/contracts/hooks/useSpecPreview';
 
 /** Versões de contrato do catálogo. */
 export const stubContractList: ContractListResponse = {
@@ -282,6 +283,96 @@ export function buildContractSubscribers(apiAssetId: string): ContractSubscriber
       { subscriberId: 'sub-2', subscriberEmail: 'team-inventory@nextraceone.dev', consumerServiceName: 'Inventory GraphQL', consumerServiceVersion: '1.0.0', subscriptionLevel: 'All', notificationChannel: 'Slack', isActive: true, subscribedAt: '2026-04-01T00:00:00.000Z' },
     ],
     totalCount: 2,
+  };
+}
+
+/**
+ * Live preview parseado de um spec (POST /contracts/parse-preview).
+ * O catch-all `[]` faz o preview mostrar "Erro ao analisar"; esta forma
+ * devolve um PreviewModel válido para renderizar operações e schemas.
+ */
+export function buildParsePreview(protocol: string): ParsePreviewResponse {
+  return {
+    isValid: true,
+    errorMessage: null,
+    preview: {
+      protocol,
+      title: 'Payments API v2',
+      specVersion: '2.3.0',
+      description: 'Serviço central de processamento de pagamentos e reconciliação.',
+      servers: ['https://api.nextraceone.dev/v2'],
+      tags: ['payments', 'billing'],
+      securitySchemes: ['bearerAuth'],
+      operations: [
+        {
+          operationId: 'createPayment',
+          name: 'Create payment',
+          description: 'Cria um novo pagamento.',
+          method: 'POST',
+          path: '/payments',
+          isDeprecated: false,
+          tags: ['payments'],
+          inputParameters: [],
+          outputFields: [
+            { name: 'id', dataType: 'string', isRequired: true, format: 'uuid', isDeprecated: false },
+            { name: 'status', dataType: 'string', isRequired: true, isDeprecated: false },
+          ],
+          requestBody: {
+            contentType: 'application/json',
+            isRequired: true,
+            properties: [
+              { name: 'amount', dataType: 'number', isRequired: true, isDeprecated: false },
+              { name: 'currency', dataType: 'string', isRequired: true, isDeprecated: false },
+            ],
+            schemaRef: 'Payment',
+          },
+          responses: [
+            { statusCode: '201', description: 'Created', contentType: 'application/json', properties: [], schemaRef: 'Payment' },
+          ],
+        },
+        {
+          operationId: 'getPayment',
+          name: 'Get payment',
+          description: 'Obtém um pagamento por id.',
+          method: 'GET',
+          path: '/payments/{id}',
+          isDeprecated: false,
+          tags: ['payments'],
+          inputParameters: [
+            { name: 'id', dataType: 'string', isRequired: true, format: 'uuid', isDeprecated: false },
+          ],
+          outputFields: [],
+          requestBody: null,
+          responses: [
+            { statusCode: '200', description: 'OK', contentType: 'application/json', properties: [], schemaRef: 'Payment' },
+          ],
+        },
+      ],
+      schemas: [
+        {
+          name: 'Payment',
+          dataType: 'object',
+          isRequired: true,
+          isDeprecated: false,
+          children: [
+            { name: 'amount', dataType: 'number', isRequired: true, isDeprecated: false },
+            { name: 'currency', dataType: 'string', isRequired: true, isDeprecated: false },
+          ],
+        },
+        {
+          name: 'Money',
+          dataType: 'object',
+          isRequired: false,
+          isDeprecated: false,
+          children: [],
+        },
+      ],
+      operationCount: 2,
+      schemaCount: 2,
+      hasSecurityDefinitions: true,
+      hasExamples: true,
+      hasDescriptions: true,
+    },
   };
 }
 

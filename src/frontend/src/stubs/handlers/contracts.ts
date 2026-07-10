@@ -23,6 +23,7 @@ import {
   buildContractIntegrity,
   buildContractDeployments,
   buildContractSubscribers,
+  buildParsePreview,
 } from '../fixtures/contracts';
 
 const API = '/api/v1';
@@ -107,4 +108,10 @@ export const contractsHandlers = [
   http.get(`${API}/developerportal/catalog/:apiAssetId/consumers`, ({ params }) =>
     HttpResponse.json(buildContractSubscribers(String(params.apiAssetId))),
   ),
+
+  // Live preview do spec (Contrato → Pré-visualização). POST com { specContent, protocol }.
+  http.post(`${API}/contracts/parse-preview`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { protocol?: string };
+    return HttpResponse.json(buildParsePreview(body.protocol ?? 'OpenApi'));
+  }),
 ];
