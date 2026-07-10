@@ -8797,7 +8797,9 @@
         "files": "files generated",
         "regenerate": "Regenerate",
         "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
-        "successTitle": "{{count}} files generated successfully"
+        "successTitle": "{{count}} files generated successfully",
+        "createService": "Create service in catalog",
+        "createServiceError": "Could not create the service in the catalog."
       },
       "steps": {
         "generate": "Generating",

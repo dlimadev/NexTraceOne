@@ -10113,7 +10113,9 @@
         "files": "arquivos gerados",
         "regenerate": "Regenerar",
         "successHint": "Serviço \"{{service}}\" gerado com {{language}}. Revise os arquivos abaixo.",
-        "successTitle": "{{count}} arquivos gerados com sucesso"
+        "successTitle": "{{count}} arquivos gerados com sucesso",
+        "createService": "Criar serviço no catálogo",
+        "createServiceError": "Não foi possível criar o serviço no catálogo."
       },
       "steps": {
         "generate": "Gerando",

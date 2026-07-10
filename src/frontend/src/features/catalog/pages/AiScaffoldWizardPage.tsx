@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import JSZip from 'jszip';
 import { templatesApi, type AiScaffoldResult, type ScaffoldedFile } from '../api/templates';
+import { serviceCatalogApi } from '../api/serviceCatalog';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button, TextField, TextArea, Select } from '../../../shared/ui';
@@ -123,6 +124,20 @@ export function AiScaffoldWizardPage() {
     onSuccess: () => {
       setStep('review');
       setSelectedFile(0);
+    },
+  });
+
+  const createServiceMutation = useMutation({
+    mutationFn: () =>
+      serviceCatalogApi.registerService({
+        name: serviceName,
+        domain: domain || template!.defaultDomain,
+        team: teamName || template!.defaultTeam,
+        description: serviceDescription,
+        serviceType: template!.serviceType,
+      }),
+    onSuccess: (res) => {
+      if (res?.id) navigate(`/services/${res.id}`);
     },
   });
 
@@ -507,24 +522,39 @@ export function AiScaffoldWizardPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Button
-              variant="outline"
-              icon={<ArrowLeft className="h-4 w-4" />}
-              onClick={() => setStep('intent')}
-            >
-              {t('templates.scaffold.review.regenerate')}
-            </Button>
-
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
+            {createServiceMutation.isError && (
+              <p className="text-xs text-critical">
+                {t('templates.scaffold.review.createServiceError', 'Could not create the service in the catalog.')}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <Button
-                variant="primary"
-                className="bg-success hover:bg-success/90"
-                icon={<Download className="h-4 w-4" />}
-                onClick={handleDownloadZip}
+                variant="outline"
+                icon={<ArrowLeft className="h-4 w-4" />}
+                onClick={() => setStep('intent')}
               >
-                {t('templates.scaffold.review.downloadZip')}
+                {t('templates.scaffold.review.regenerate')}
               </Button>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  icon={<Download className="h-4 w-4" />}
+                  onClick={handleDownloadZip}
+                >
+                  {t('templates.scaffold.review.downloadZip')}
+                </Button>
+                <Button
+                  variant="primary"
+                  icon={<Server className="h-4 w-4" />}
+                  loading={createServiceMutation.isPending}
+                  disabled={createServiceMutation.isPending || !serviceName}
+                  onClick={() => createServiceMutation.mutate()}
+                >
+                  {t('templates.scaffold.review.createService', 'Create service in catalog')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

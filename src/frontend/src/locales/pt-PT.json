@@ -10095,7 +10095,9 @@
         "files": "ficheiros gerados",
         "regenerate": "Regenerar",
         "successHint": "Serviço \"{{service}}\" gerado com {{language}}.",
-        "successTitle": "{{count}} ficheiros gerados com sucesso"
+        "successTitle": "{{count}} ficheiros gerados com sucesso",
+        "createService": "Criar serviço no catálogo",
+        "createServiceError": "Não foi possível criar o serviço no catálogo."
       },
       "steps": {
         "generate": "A Gerar",
