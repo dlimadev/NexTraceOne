@@ -15,6 +15,14 @@ import {
   stubHealthDashboard,
   stubPublicationCenter,
   buildContractSot,
+  buildContractDetail,
+  buildContractViolations,
+  buildValidationSummary,
+  buildContractScorecard,
+  buildContractHistory,
+  buildContractIntegrity,
+  buildContractDeployments,
+  buildContractSubscribers,
 } from '../fixtures/contracts';
 
 const API = '/api/v1';
@@ -57,5 +65,46 @@ export const contractsHandlers = [
   // Vista Source of Truth de um contrato (governance deep-acedido)
   http.get(`${API}/source-of-truth/contracts/:contractVersionId`, ({ params }) =>
     HttpResponse.json(buildContractSot(String(params.contractVersionId))),
+  ),
+
+  // Detalhe de uma versão de contrato (workspace `/contracts/:id`).
+  // Fornece specContent para evitar crash em useSpecPreview.
+  http.get(`${API}/contracts/:contractVersionId/detail`, ({ params }) =>
+    HttpResponse.json(buildContractDetail(String(params.contractVersionId))),
+  ),
+
+  // Violações — o cliente lê `r.data.violations` (envelope obrigatório).
+  http.get(`${API}/contracts/:contractVersionId/violations`, ({ params }) =>
+    HttpResponse.json(buildContractViolations(String(params.contractVersionId))),
+  ),
+
+  // Resumo de validação (Governança → ValidationSection, `sources` deep-acedido).
+  http.get(`${API}/contracts/:contractVersionId/validation-summary`, ({ params }) =>
+    HttpResponse.json(buildValidationSummary(String(params.contractVersionId))),
+  ),
+
+  // Scorecard técnico (Governança → Scorecard; NaN sem forma dedicada).
+  http.get(`${API}/contracts/:contractVersionId/scorecard`, ({ params }) =>
+    HttpResponse.json(buildContractScorecard(String(params.contractVersionId))),
+  ),
+
+  // Histórico de versões por apiAssetId (Versionamento/Changelog; lê `.data.versions`).
+  http.get(`${API}/contracts/history/:apiAssetId`, ({ params }) =>
+    HttpResponse.json(buildContractHistory(String(params.apiAssetId))),
+  ),
+
+  // Integridade estrutural (Conformidade → validateIntegrity).
+  http.get(`${API}/contracts/:contractVersionId/validate`, ({ params }) =>
+    HttpResponse.json(buildContractIntegrity(String(params.contractVersionId))),
+  ),
+
+  // Deployments de uma versão de contrato.
+  http.get(`${API}/contracts/:contractVersionId/deployments`, ({ params }) =>
+    HttpResponse.json(buildContractDeployments(String(params.contractVersionId))),
+  ),
+
+  // Subscritores formais via Developer Portal (ConsumersSection).
+  http.get(`${API}/developerportal/catalog/:apiAssetId/consumers`, ({ params }) =>
+    HttpResponse.json(buildContractSubscribers(String(params.apiAssetId))),
   ),
 ];
