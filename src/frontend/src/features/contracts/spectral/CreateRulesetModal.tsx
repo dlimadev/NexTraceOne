@@ -323,7 +323,6 @@ export function CreateRulesetModal({ isOpen, onClose, onSubmit, isSubmitting, er
           <Button
             variant="primary"
             loading={isSubmitting}
-            disabled={isSubmitting}
             onClick={handleSubmit}
           >
             {t('contracts.spectral.form.submit', 'Create Ruleset')}

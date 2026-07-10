@@ -44,6 +44,7 @@ export function CanonicalEntityPicker({ onSelect, onClose }: CanonicalEntityPick
         {/* Search */}
         <SearchInput
           size="sm"
+          autoFocus
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('contracts.builder.canonical.picker.search', 'Search entities...')}
