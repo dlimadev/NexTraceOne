@@ -1432,7 +1432,8 @@
       "actions": {
         "ignore": "Ignore",
         "match": "Match",
-        "register": "Register"
+        "register": "Register",
+        "viewInCatalog": "View in catalog"
       },
       "filters": {
         "allStatuses": "All statuses",

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -17,7 +18,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Button, IconButton, TextField, TextArea, Select, SearchInput } from '../../../shared/ui';
+import { Button, IconButton, TextField, TextArea, Select, SearchInput, Modal } from '../../../shared/ui';
 
 /**
  * Página de Service Discovery Automático.
@@ -274,6 +275,14 @@ export default function ServiceDiscoveryPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
+                    {svc.matchedServiceAssetId && (
+                      <Link
+                        to={`/services/${svc.matchedServiceAssetId}`}
+                        className="text-xs text-accent hover:underline mr-2 whitespace-nowrap"
+                      >
+                        {t('catalog.discovery.actions.viewInCatalog', 'View in catalog')}
+                      </Link>
+                    )}
                     {svc.status === 'Pending' && (
                       <div className="flex items-center justify-end gap-1">
                         <Button
@@ -405,62 +414,19 @@ function ActionModal({
   const [teamName, setTeamName] = useState('');
   const [reason, setReason] = useState('');
 
+  const title =
+    actionType === 'match' ? t('catalog.discovery.modal.matchTitle', 'Match to Existing Service')
+    : actionType === 'register' ? t('catalog.discovery.modal.registerTitle', 'Register as New Service')
+    : t('catalog.discovery.modal.ignoreTitle', 'Ignore Discovered Service');
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-panel border border-edge rounded-md shadow-lg w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-base font-semibold text-heading mb-1">
-          {actionType === 'match' && t('catalog.discovery.modal.matchTitle', 'Match to Existing Service')}
-          {actionType === 'register' && t('catalog.discovery.modal.registerTitle', 'Register as New Service')}
-          {actionType === 'ignore' && t('catalog.discovery.modal.ignoreTitle', 'Ignore Discovered Service')}
-        </h3>
-        <p className="text-xs text-muted mb-4">
-          {t('catalog.discovery.modal.service', 'Service')}: <strong>{service.serviceName}</strong> ({service.environment})
-        </p>
-
-        {actionType === 'match' && (
-          <div className="space-y-3">
-            <TextField
-              size="sm"
-              label={t('catalog.discovery.modal.serviceAssetId', 'Service Asset ID')}
-              value={serviceAssetId}
-              onChange={(e) => setServiceAssetId(e.target.value)}
-              placeholder={t('catalog.discovery.modal.serviceAssetIdPlaceholder', 'Select or enter service ID...')}
-            />
-          </div>
-        )}
-
-        {actionType === 'register' && (
-          <div className="space-y-3">
-            <TextField
-              size="sm"
-              label={t('catalog.discovery.modal.domain', 'Domain')}
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder={t('catalog.discovery.modal.domainPlaceholder', 'e.g. Payments')}
-            />
-            <TextField
-              size="sm"
-              label={t('catalog.discovery.modal.teamName', 'Team')}
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              placeholder={t('catalog.discovery.modal.teamNamePlaceholder', 'e.g. Platform Engineering')}
-            />
-          </div>
-        )}
-
-        {actionType === 'ignore' && (
-          <div className="space-y-3">
-            <TextArea
-              label={t('catalog.discovery.modal.reason', 'Reason')}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t('catalog.discovery.modal.reasonPlaceholder', 'e.g. Internal tooling, not a business service')}
-              textareaClassName="resize-none h-20 min-h-0"
-            />
-          </div>
-        )}
-
-        <div className="flex justify-end gap-2 mt-5">
+    <Modal
+      open
+      onClose={onClose}
+      title={title}
+      size="md"
+      footer={
+        <>
           <Button variant="outline" onClick={onClose}>
             {t('common.cancel', 'Cancel')}
           </Button>
@@ -475,8 +441,51 @@ function ActionModal({
           >
             {isLoading ? t('common.loading', 'Loading...') : t('common.confirm', 'Confirm')}
           </Button>
+        </>
+      }
+    >
+      <p className="text-xs text-muted mb-4">
+        {t('catalog.discovery.modal.service', 'Service')}: <strong>{service.serviceName}</strong> ({service.environment})
+      </p>
+
+      {actionType === 'match' && (
+        <TextField
+          size="sm"
+          label={t('catalog.discovery.modal.serviceAssetId', 'Service Asset ID')}
+          value={serviceAssetId}
+          onChange={(e) => setServiceAssetId(e.target.value)}
+          placeholder={t('catalog.discovery.modal.serviceAssetIdPlaceholder', 'Select or enter service ID...')}
+        />
+      )}
+
+      {actionType === 'register' && (
+        <div className="space-y-3">
+          <TextField
+            size="sm"
+            label={t('catalog.discovery.modal.domain', 'Domain')}
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder={t('catalog.discovery.modal.domainPlaceholder', 'e.g. Payments')}
+          />
+          <TextField
+            size="sm"
+            label={t('catalog.discovery.modal.teamName', 'Team')}
+            value={teamName}
+            onChange={(e) => setTeamName(e.target.value)}
+            placeholder={t('catalog.discovery.modal.teamNamePlaceholder', 'e.g. Platform Engineering')}
+          />
         </div>
-      </div>
-    </div>
+      )}
+
+      {actionType === 'ignore' && (
+        <TextArea
+          label={t('catalog.discovery.modal.reason', 'Reason')}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t('catalog.discovery.modal.reasonPlaceholder', 'e.g. Internal tooling, not a business service')}
+          textareaClassName="resize-none h-20 min-h-0"
+        />
+      )}
+    </Modal>
   );
 }

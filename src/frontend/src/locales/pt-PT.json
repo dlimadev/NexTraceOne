@@ -1447,7 +1447,8 @@
       "actions": {
         "ignore": "Ignorar",
         "match": "Associar",
-        "register": "Registar"
+        "register": "Registar",
+        "viewInCatalog": "Ver no catálogo"
       },
       "filters": {
         "allStatuses": "Todos os estados",
