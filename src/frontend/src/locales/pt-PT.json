@@ -5226,7 +5226,9 @@
       "livePreview": {
         "parameters": "Parâmetros",
         "response": "Resposta"
-      }
+      },
+      "resume": "Retomar",
+      "openBuilder": "Abrir construtor"
     },
     "draftValidation": {
       "title": "Validação de Draft",
@@ -11777,7 +11779,10 @@
       "slo": "SLO"
     },
     "viewScorecard": "Ver scorecard",
-    "viewSourceOfTruth": "Ver fonte da verdade"
+    "viewSourceOfTruth": "Ver fonte da verdade",
+    "draftBadge": "Rascunho",
+    "sloActive": "Ativo",
+    "sloInactive": "Inativo"
   },
   "migrationPreview": {
     "title": "Pré-visualização de Migrações",

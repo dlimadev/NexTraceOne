@@ -733,7 +733,7 @@ function ServiceIdentityCard({ mode, summaryData, t, criticalityBadgeVariant, li
           </div>
           {/* Badge de status */}
           {isDraft && mode === 'create' ? (
-            <Badge variant="warning" size="sm" className="shrink-0 ml-auto">Draft</Badge>
+            <Badge variant="warning" size="sm" className="shrink-0 ml-auto">{t('serviceDetail.draftBadge', 'Draft')}</Badge>
           ) : (
             <Badge variant={lsVariant} size="sm" className="shrink-0 ml-auto">
               {summaryData.lifecycleStatus}

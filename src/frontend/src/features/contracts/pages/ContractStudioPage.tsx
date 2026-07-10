@@ -128,6 +128,7 @@ function StatCard({ testId, label, value, loading }: StatCardProps) {
 // ── Draft Resume Card ─────────────────────────────────────────────────────────
 
 function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () => void }) {
+  const { t } = useTranslation();
   return (
     <Button
       variant="ghost"
@@ -144,7 +145,7 @@ function DraftCard({ item, onResume }: { item: ContractListItem; onResume: () =>
       </p>
       <p className="text-[11px] text-faded font-mono">{item.protocol}</p>
       <div className="flex items-center gap-1 text-[11px] font-medium text-accent mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <span>Resume</span>
+        <span>{t('contracts.studio.resume', 'Resume')}</span>
         <ArrowRight size={10} />
       </div>
     </Button>
@@ -213,7 +214,7 @@ function ContractTypeCard({ type, onSelect, onDesign, onImport }: ContractTypeCa
 
         {/* CTA row */}
         <div className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
-          <span>Open builder</span>
+          <span>{t('contracts.studio.openBuilder', 'Open builder')}</span>
           <ArrowRight size={11} />
         </div>
       </div>

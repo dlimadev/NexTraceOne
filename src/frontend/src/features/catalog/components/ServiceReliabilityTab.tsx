@@ -18,10 +18,10 @@ interface Props {
   serviceId: string;
 }
 
-function sloActiveBadge(isActive: boolean) {
+function sloActiveBadge(isActive: boolean, activeLabel: string, inactiveLabel: string) {
   return isActive
-    ? <Badge variant="success" size="sm"><CheckCircle2 size={10} className="inline mr-1" />Active</Badge>
-    : <Badge variant="default" size="sm">Inactive</Badge>;
+    ? <Badge variant="success" size="sm"><CheckCircle2 size={10} className="inline mr-1" />{activeLabel}</Badge>
+    : <Badge variant="default" size="sm">{inactiveLabel}</Badge>;
 }
 
 export function ServiceReliabilityTab({ serviceId }: Props) {
@@ -124,7 +124,7 @@ export function ServiceReliabilityTab({ serviceId }: Props) {
                     <td className="px-4 py-3 text-muted tabular-nums">{slo.targetPercent?.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-muted text-xs">{slo.windowDays}d</td>
                     <td className="px-4 py-3">
-                      {sloActiveBadge(slo.isActive)}
+                      {sloActiveBadge(slo.isActive, t('serviceDetail.sloActive', 'Active'), t('serviceDetail.sloInactive', 'Inactive'))}
                     </td>
                   </tr>
                 ))}
