@@ -9505,7 +9505,8 @@
     "withoutContracts": "Sin Contratos",
     "withoutDocs": "Sin Docs",
     "withoutOwnership": "Sin Ownership",
-    "withoutRunbooks": "Sin Runbooks"
+    "withoutRunbooks": "Sin Runbooks",
+    "openService": "Abrir servicio"
   },
   "serviceScorecard": {
     "compute": "Calcular",

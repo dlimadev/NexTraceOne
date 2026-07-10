@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -201,10 +202,11 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
             <div className="divide-y divide-edge">
               {services.map((svc: ServiceMaturityItemDto) => (
                 <div key={svc.serviceId} className="py-3">
+                  <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     onClick={() => setExpandedId(expandedId === svc.serviceId ? null : svc.serviceId)}
-                    className="w-full justify-start h-auto p-0 gap-3 font-normal"
+                    className="flex-1 justify-start h-auto p-0 gap-3 font-normal"
                   >
                     <div className="flex-1 min-w-0 text-left">
                       <div className="flex items-center gap-2">
@@ -229,6 +231,13 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
                       {expandedId === svc.serviceId ? <ChevronUp size={14} className="text-muted" /> : <ChevronDown size={14} className="text-muted" />}
                     </div>
                   </Button>
+                    <Link
+                      to={`/services/${svc.serviceId}`}
+                      className="text-[11px] text-accent hover:underline whitespace-nowrap"
+                    >
+                      {t('serviceMaturity.openService', 'Open service')}
+                    </Link>
+                  </div>
                   {expandedId === svc.serviceId && (
                     <div className="mt-3 grid grid-cols-3 md:grid-cols-6 gap-3 pl-2">
                       <DimensionPill icon={<Users size={12} />} label={t('serviceMaturity.dim.ownership')} ok={svc.hasOwnership} />
@@ -299,6 +308,12 @@ function AuditTab({ teamName, domain }: { teamName?: string; domain?: string }) 
                     <span className="text-sm font-medium text-heading">{f.displayName || f.serviceName}</span>
                     <span className="text-[11px] text-muted">{f.teamName || '—'}</span>
                     <span className="text-[11px] text-muted">{f.domain}</span>
+                    <Link
+                      to={`/services/${f.serviceId}`}
+                      className="ml-auto text-[11px] text-accent hover:underline whitespace-nowrap"
+                    >
+                      {t('serviceMaturity.openService', 'Open service')}
+                    </Link>
                   </div>
                   <div className="flex flex-wrap gap-1.5 pl-1">
                     {f.findings.map((finding, idx) => (

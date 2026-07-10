@@ -8204,7 +8204,8 @@
     "withoutContracts": "No Contracts",
     "withoutDocs": "No Docs",
     "withoutOwnership": "No Ownership",
-    "withoutRunbooks": "No Runbooks"
+    "withoutRunbooks": "No Runbooks",
+    "openService": "Open service"
   },
   "serviceScorecard": {
     "compute": "Compute",

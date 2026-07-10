@@ -9520,7 +9520,8 @@
     "withoutContracts": "Sem Contratos",
     "withoutDocs": "Sem Docs",
     "withoutOwnership": "Sem Ownership",
-    "withoutRunbooks": "Sem Runbooks"
+    "withoutRunbooks": "Sem Runbooks",
+    "openService": "Abrir serviço"
   },
   "serviceScorecard": {
     "compute": "Calcular",
