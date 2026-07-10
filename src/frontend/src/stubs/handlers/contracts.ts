@@ -14,6 +14,7 @@ import {
   stubRulesetsRaw,
   stubHealthDashboard,
   stubPublicationCenter,
+  buildContractSot,
 } from '../fixtures/contracts';
 
 const API = '/api/v1';
@@ -51,5 +52,10 @@ export const contractsHandlers = [
   // Central de publicação
   http.get(`${API}/publication-center`, () =>
     HttpResponse.json(stubPublicationCenter),
+  ),
+
+  // Vista Source of Truth de um contrato (governance deep-acedido)
+  http.get(`${API}/source-of-truth/contracts/:contractVersionId`, ({ params }) =>
+    HttpResponse.json(buildContractSot(String(params.contractVersionId))),
   ),
 ];

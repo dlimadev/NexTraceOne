@@ -8,6 +8,7 @@ import type {
   ContractListResponse,
   ContractsSummary,
   ServiceContractsResponse,
+  ContractSourceOfTruth,
 } from '../../types';
 import type { CanonicalEntity } from '../../features/contracts/types/domain';
 
@@ -22,6 +23,39 @@ export const stubContractList: ContractListResponse = {
   ],
   totalCount: 5,
 };
+
+/**
+ * Vista Source of Truth de um contrato, derivada da lista.
+ * A página deep-acede `governance.lifecycleState` e `references` — o
+ * catch-all `[]` não serve, precisa de forma dedicada.
+ */
+export function buildContractSot(contractVersionId: string): ContractSourceOfTruth {
+  const item =
+    stubContractList.items.find(
+      (c) => c.versionId === contractVersionId || c.contractVersionId === contractVersionId,
+    ) ?? stubContractList.items[0];
+
+  return {
+    apiAssetId: item.apiAssetId,
+    semVer: item.semVer ?? item.version ?? '1.0.0',
+    protocol: item.protocol,
+    format: item.protocol === 'OpenApi' ? 'YAML' : item.protocol === 'Wsdl' ? 'XML' : 'JSON',
+    importedFrom: `git://nextraceone/${item.apiAssetId}`,
+    artifactCount: 3,
+    diffCount: 2,
+    violationCount: item.ruleViolationCount ?? 0,
+    governance: {
+      lifecycleState: item.lifecycleState,
+      isLocked: item.isLocked,
+      isSigned: item.isSigned,
+      deprecationDate: item.deprecationDate,
+    },
+    references: [
+      { referenceId: 'ref-spec', title: 'Especificação do contrato', description: 'Definição versionada do contrato.', assetType: 'Specification', referenceType: 'Specification', url: `https://docs.nextraceone.dev/${item.apiAssetId}` },
+      { referenceId: 'ref-changelog', title: 'Changelog', description: 'Histórico de alterações do contrato.', assetType: 'Documentation', referenceType: 'Documentation', url: `https://docs.nextraceone.dev/${item.apiAssetId}/changelog` },
+    ],
+  };
+}
 
 /** Resumo agregado dos contratos. */
 export const stubContractsSummary: ContractsSummary = {
