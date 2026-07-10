@@ -78,4 +78,12 @@ describe('AiScaffoldWizardPage — criar serviço no catálogo', () => {
     }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/services/new-svc-id'));
   });
+
+  it('em caso de erro mostra mensagem honesta e NÃO navega', async () => {
+    registerService.mockRejectedValueOnce(new Error('boom'));
+    const btn = await driveToReview();
+    fireEvent.click(btn);
+    expect(await screen.findByText('Could not create the service in the catalog.')).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+  });
 });
