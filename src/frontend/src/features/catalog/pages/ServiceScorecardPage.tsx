@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -153,8 +154,10 @@ function DimensionCard({
 export function ServiceScorecardPage() {
   const { t } = useTranslation();
   const { activeEnvironmentId } = useEnvironment();
-  const [serviceName, setServiceName] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [searchParams] = useSearchParams();
+  const preloadName = searchParams.get('serviceName')?.trim() ?? '';
+  const [serviceName, setServiceName] = useState(preloadName);
+  const [searchInput, setSearchInput] = useState(preloadName);
   const [environment, setEnvironment] = useState('Production');
 
   const {

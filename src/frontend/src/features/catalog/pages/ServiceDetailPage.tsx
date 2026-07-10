@@ -1058,13 +1058,22 @@ function ViewContent({
             </CardHeader>
             <CardBody>
               <p className="text-xs text-muted mb-3">{t('catalog.detail.recentChangesDescription')}</p>
-              <Link
-                to={`/changes?serviceName=${encodeURIComponent(service.name)}`}
-                className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
-              >
-                <ExternalLink size={12} />
-                {t('catalog.detail.viewChange')}
-              </Link>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link
+                  to={`/changes?serviceName=${encodeURIComponent(service.name)}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+                >
+                  <ExternalLink size={12} />
+                  {t('catalog.detail.viewChange')}
+                </Link>
+                <Link
+                  to={`/services/scorecards?serviceName=${encodeURIComponent(service.name)}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+                >
+                  <ExternalLink size={12} />
+                  {t('serviceDetail.viewScorecard', 'View scorecard')}
+                </Link>
+              </div>
             </CardBody>
           </Card>
         )}

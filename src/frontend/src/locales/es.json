@@ -11772,7 +11772,8 @@
     "health": {
       "maturity": "Madurez",
       "slo": "SLO"
-    }
+    },
+    "viewScorecard": "Ver scorecard"
   },
   "migrationPreview": {
     "title": "Vista Previa de Migraciones",

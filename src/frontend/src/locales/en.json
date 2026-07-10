@@ -10480,7 +10480,8 @@
     "health": {
       "maturity": "Maturity",
       "slo": "SLO"
-    }
+    },
+    "viewScorecard": "View scorecard"
   },
   "migrationPreview": {
     "title": "Migration Preview",
