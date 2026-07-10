@@ -10483,7 +10483,8 @@
       "maturity": "Maturity",
       "slo": "SLO"
     },
-    "viewScorecard": "View scorecard"
+    "viewScorecard": "View scorecard",
+    "viewSourceOfTruth": "View source of truth"
   },
   "migrationPreview": {
     "title": "Migration Preview",

@@ -11775,7 +11775,8 @@
       "maturity": "Madurez",
       "slo": "SLO"
     },
-    "viewScorecard": "Ver scorecard"
+    "viewScorecard": "Ver scorecard",
+    "viewSourceOfTruth": "Ver fuente de verdad"
   },
   "migrationPreview": {
     "title": "Vista Previa de Migraciones",

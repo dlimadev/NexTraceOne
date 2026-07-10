@@ -1073,6 +1073,13 @@ function ViewContent({
                   <ExternalLink size={12} />
                   {t('serviceDetail.viewScorecard', 'View scorecard')}
                 </Link>
+                <Link
+                  to={`/source-of-truth/services/${serviceId}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+                >
+                  <ExternalLink size={12} />
+                  {t('serviceDetail.viewSourceOfTruth', 'View source of truth')}
+                </Link>
               </div>
             </CardBody>
           </Card>

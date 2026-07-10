@@ -11772,7 +11772,8 @@
       "maturity": "Maturidade",
       "slo": "SLO"
     },
-    "viewScorecard": "Ver scorecard"
+    "viewScorecard": "Ver scorecard",
+    "viewSourceOfTruth": "Ver fonte da verdade"
   },
   "migrationPreview": {
     "title": "Pré-visualização de Migrações",
