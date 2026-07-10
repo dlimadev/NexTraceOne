@@ -6,9 +6,21 @@
  * atingível (sem contratos no stub) → cai no catch-all.
  */
 import { http, HttpResponse } from 'msw';
-import { stubServiceDetails, buildFallbackDetail } from '../fixtures/catalog';
+import { stubServiceDetails, buildFallbackDetail, stubServices } from '../fixtures/catalog';
 
 const API = '/api/v1';
+
+/** Itens da busca global (⌘K e /search) derivados dos serviços. */
+const globalSearchItems = stubServices.map((s, i) => ({
+  entityId: s.serviceId,
+  entityType: 'Service',
+  title: s.displayName,
+  subtitle: `${s.domain} · ${s.teamName}`,
+  owner: s.technicalOwner,
+  status: s.lifecycleStatus,
+  route: `/services/${s.serviceId}`,
+  relevanceScore: 1 - i * 0.1,
+}));
 
 export const sourceOfTruthHandlers = [
   http.get(`${API}/source-of-truth/services/:serviceId/coverage`, () =>
@@ -33,27 +45,40 @@ export const sourceOfTruthHandlers = [
       businessOwner: svc.businessOwner,
       documentationUrl: svc.documentationUrl,
       repositoryUrl: svc.repositoryUrl,
-      totalApis: 0,
-      totalContracts: 0,
-      totalReferences: 0,
-      apis: [],
+      totalApis: svc.apis.length,
+      totalContracts: svc.apis.length > 0 ? 1 : 0,
+      totalReferences: 3,
+      apis: svc.apis,
       contracts: [],
-      references: [],
+      references: [
+        { referenceId: 'ref-docs', title: 'Documentação', description: 'Documentação do serviço', assetType: 'Documentation', referenceType: 'Documentation', url: svc.documentationUrl },
+        { referenceId: 'ref-repo', title: 'Repositório', description: 'Código-fonte', assetType: 'Repository', referenceType: 'Repository', url: svc.repositoryUrl },
+        { referenceId: 'ref-ci', title: 'Pipeline CI', description: 'Pipeline de integração contínua', assetType: 'Pipeline', referenceType: 'Pipeline', url: svc.ciPipelineUrl ?? '' },
+      ],
       coverage: {
         hasOwner: true,
-        hasContracts: false,
+        hasContracts: svc.apis.length > 0,
         hasDocumentation: true,
         hasRunbook: false,
-        hasRecentChangeHistory: false,
-        hasDependenciesMapped: false,
-        hasEventTopics: false,
+        hasRecentChangeHistory: true,
+        hasDependenciesMapped: svc.apis.length > 0,
+        hasEventTopics: (svc.interfaces ?? []).some((i) => i.interfaceType.includes('Kafka')),
       },
     });
   }),
   http.get(`${API}/source-of-truth/search`, () =>
-    HttpResponse.json({ services: [], contracts: [], references: [], totalResults: 0 }),
+    HttpResponse.json({
+      services: Object.values(stubServiceDetails),
+      contracts: [],
+      references: [],
+      totalResults: stubServices.length,
+    }),
   ),
   http.get(`${API}/source-of-truth/global-search`, () =>
-    HttpResponse.json({ items: [], facetCounts: {}, totalResults: 0 }),
+    HttpResponse.json({
+      items: globalSearchItems,
+      facetCounts: { Service: stubServices.length },
+      totalResults: stubServices.length,
+    }),
   ),
 ];
