@@ -204,7 +204,7 @@ function SearchResultCard({
   const isService = item.entityType.toLowerCase() === 'service';
 
   return (
-    <div className="bg-panel border border-edge rounded-lg hover:bg-hover transition-colors flex items-center gap-2 group">
+    <div className="bg-panel border border-edge rounded-lg hover:bg-hover transition-colors flex items-center gap-2">
       <Link
         to={item.route}
         className="flex-1 min-w-0 flex items-center gap-4 p-4"
