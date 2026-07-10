@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "stub": "vite --mode stub",
     "dev:e2e:real": "vite --host 127.0.0.1 --port 4173",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -82,5 +83,10 @@
     "typescript-eslint": "^8.48.0",
     "vite": "^7.3.3",
     "vitest": "^4.0.18"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

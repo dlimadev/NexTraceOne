@@ -5,6 +5,8 @@ declare module '@fontsource-variable/instrument-sans';
 // so consumers can read `import.meta.env.VITE_*` without unsafe type assertions.
 interface ImportMetaEnv {
   readonly VITE_DOCS_BASE_URL?: string;
+  /** Ativa o modo stub (MSW) quando 'true'. Definido por .env.stub / npm run stub. */
+  readonly VITE_STUB?: string;
 }
 
 interface ImportMeta {

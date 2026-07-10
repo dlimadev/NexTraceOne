@@ -14,11 +14,25 @@ import { ErrorBoundary } from './components/ErrorBoundary'
  * - StrictMode ativa verificações adicionais em desenvolvimento.
  * - Migração de tokens legados do localStorage é feita pelo AuthProvider internamente.
  */
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </StrictMode>,
-)
+/**
+ * Arranca o modo stub (MSW) apenas quando VITE_STUB === 'true' (npm run stub).
+ * O import é dinâmico e condicionado por uma constante substituída em build,
+ * pelo que o MSW e os stubs nunca entram no bundle de dev/produção normal.
+ */
+async function bootstrap() {
+  if (import.meta.env.VITE_STUB === 'true') {
+    const { startStubs } = await import('./stubs/startStubs')
+    await startStubs()
+  }
+
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </StrictMode>,
+  )
+}
+
+void bootstrap()
 
