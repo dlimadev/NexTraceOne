@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
@@ -161,6 +162,30 @@ public sealed class ServiceCatalogDbContext(
     // ── ProductAnalytics (consolidated from ProductAnalyticsDbContext) ────────
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
     public DbSet<JourneyDefinition> JourneyDefinitions => Set<JourneyDefinition>();
+
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes().ToList())
+        {
+            if (entityType.IsOwned() || entityType.ClrType == typeof(OutboxMessage))
+                continue;
+
+            // Todo método de leitura multi-tenant filtra por TenantId (defesa em
+            // profundidade); sem índice essas consultas degradam para seq scan.
+            var tenantId = entityType.FindProperty("TenantId");
+            if (tenantId is not null && !entityType.GetIndexes().Any(i => i.Properties.Contains(tenantId)))
+                entityType.AddIndex(tenantId);
+
+            // As entidades documentam RowVersion como token xmin, mas sem IsRowVersion
+            // o EF persistia uma coluna bigint inerte sem detecção de concorrência.
+            var rowVersion = entityType.FindProperty("RowVersion");
+            if (rowVersion is not null && rowVersion.ClrType == typeof(uint) && !rowVersion.IsConcurrencyToken)
+                modelBuilder.Entity(entityType.ClrType).Property("RowVersion").IsRowVersion();
+        }
+    }
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
