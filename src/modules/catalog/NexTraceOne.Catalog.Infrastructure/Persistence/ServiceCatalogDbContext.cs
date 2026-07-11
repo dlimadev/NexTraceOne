@@ -340,7 +340,7 @@ public sealed class ServiceCatalogDbContext
                 && property.ClrType == typeof(Guid?)
                 && entry.Property(TenantPropertyName).CurrentValue is null)
             {
-                entry.Property(TenantPropertyName).CurrentValue = tenant.Id;
+                entry.Property(TenantPropertyName).CurrentValue = _tenantContext.Id;
             }
         }
     }
