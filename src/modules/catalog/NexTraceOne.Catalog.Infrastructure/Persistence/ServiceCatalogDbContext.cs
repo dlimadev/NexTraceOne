@@ -168,11 +168,12 @@ public sealed class ServiceCatalogDbContext(
     {
         base.OnModelCreating(modelBuilder);
 
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes().ToList())
-        {
-            if (entityType.IsOwned() || entityType.ClrType == typeof(OutboxMessage))
-                continue;
+        var entityTypes = modelBuilder.Model.GetEntityTypes()
+            .Where(entityType => !entityType.IsOwned() && entityType.ClrType != typeof(OutboxMessage))
+            .ToList();
 
+        foreach (var entityType in entityTypes)
+        {
             // Todo método de leitura multi-tenant filtra por TenantId (defesa em
             // profundidade); sem índice essas consultas degradam para seq scan.
             var tenantId = entityType.FindProperty("TenantId");
