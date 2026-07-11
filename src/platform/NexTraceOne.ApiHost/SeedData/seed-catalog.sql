@@ -8,17 +8,17 @@
 
 -- ═══ SERVICE ASSETS (CatalogGraphDbContext) ═══════════════════════════════════
 
-INSERT INTO "ServiceAssets" (
+INSERT INTO cat_service_assets (
   "Id", "Name", "DisplayName", "Description",
   "ServiceType", "Domain", "SystemArea",
   "TeamName", "TechnicalOwner", "BusinessOwner",
   "Criticality", "LifecycleStatus", "ExposureType",
   "DocumentationUrl", "RepositoryUrl",
-  "TenantId", "SearchVector",
+  "TenantId",
   "GitRepository", "CiPipelineUrl", "InfrastructureProvider", "HostingPlatform",
   "RuntimeLanguage", "RuntimeVersion", "SloTarget", "DataClassification",
   "RegulatoryScope", "ChangeFrequency", "ProductOwner", "ContactChannel",
-  "OnCallRotationId", "Tier", "RowVersion",
+  "OnCallRotationId", "Tier",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
@@ -30,11 +30,10 @@ INSERT INTO "ServiceAssets" (
   3, 3, 0,
   '', '',
   'a0000000-0000-0000-0000-000000000001',
-  to_tsvector('english', 'payment-service Payment Service core-platform payments'),
   '', '', '', '',
   '', '', '', '',
   '', '', '', '',
-  '', 0, 1,
+  '', 0,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
@@ -46,11 +45,10 @@ INSERT INTO "ServiceAssets" (
   2, 3, 0,
   '', '',
   'a0000000-0000-0000-0000-000000000001',
-  to_tsvector('english', 'catalog-service Catalog Service core-platform platform'),
   '', '', '', '',
   '', '', '', '',
   '', '', '', '',
-  '', 0, 1,
+  '', 0,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
@@ -62,11 +60,10 @@ INSERT INTO "ServiceAssets" (
   1, 3, 0,
   '', '',
   'a0000000-0000-0000-0000-000000000001',
-  to_tsvector('english', 'notification-service Notification Service core-platform platform'),
   '', '', '', '',
   '', '', '', '',
   '', '', '', '',
-  '', 0, 1,
+  '', 0,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
@@ -78,11 +75,10 @@ INSERT INTO "ServiceAssets" (
   3, 3, 0,
   '', '',
   'a0000000-0000-0000-0000-000000000001',
-  to_tsvector('english', 'identity-service Identity Service core-platform security'),
   '', '', '', '',
   '', '', '', '',
   '', '', '', '',
-  '', 0, 1,
+  '', 0,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
@@ -94,18 +90,17 @@ INSERT INTO "ServiceAssets" (
   1, 3, 0,
   '', '',
   'a0000000-0000-0000-0000-000000000001',
-  to_tsvector('english', 'analytics-gateway Analytics Gateway data-platform analytics'),
   '', '', '', '',
   '', '', '', '',
   '', '', '', '',
-  '', 0, 1,
+  '', 0,
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ API ASSETS (CatalogGraphDbContext) ═══════════════════════════════════════
 
-INSERT INTO "ApiAssets" (
+INSERT INTO cat_api_assets (
   "Id", "Name", "RoutePattern", "Version",
   "Visibility", "OwnerServiceId", "IsDecommissioned"
 ) VALUES
@@ -113,28 +108,28 @@ INSERT INTO "ApiAssets" (
   'ca010001-0001-0000-0000-000000000001',
   'payment-service-v1', '/api/v1/payments', 'v1',
   0,
-  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'payment-service'),
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'payment-service'),
   false
 ),
 (
   'ca010002-0001-0000-0000-000000000001',
   'catalog-service-v1', '/api/v1', 'v1',
   0,
-  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'catalog-service'),
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'catalog-service'),
   false
 ),
 (
   'ca010003-0001-0000-0000-000000000001',
   'identity-service-v1', '/api/v1/identity', 'v1',
   0,
-  (SELECT "Id" FROM "ServiceAssets" WHERE "Name" = 'identity-service'),
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'identity-service'),
   false
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ SPECTRAL RULESETS (ContractsDbContext) ═══════════════════════════════════
 
-INSERT INTO "ContractLintRulesets" (
+INSERT INTO ctr_contract_lint_rulesets (
   "Id", "Name", "Description", "Version",
   "Content", "Origin", "DefaultExecutionMode", "EnforcementBehavior",
   "OrganizationId", "Owner", "Domain", "ApplicableServiceType", "ApplicableProtocols",
@@ -155,7 +150,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ CANONICAL ENTITIES (ContractsDbContext) ══════════════════════════════════
 
-INSERT INTO "CanonicalEntities" (
+INSERT INTO ctr_canonical_entities (
   "Id", "Name", "Description",
   "Domain", "Category", "Owner", "Version",
   "State", "SchemaContent", "SchemaFormat",
@@ -189,7 +184,7 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ CONTRACT DRAFTS (ContractsDbContext) ════════════════════════════════════
 
-INSERT INTO "Drafts" (
+INSERT INTO ctr_contract_drafts (
   "Id", "Title", "Description",
   "ServiceId", "ContractType", "Protocol",
   "SpecContent", "Format",

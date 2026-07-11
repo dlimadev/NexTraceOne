@@ -234,7 +234,8 @@
       "Read(//c/Users/dlima/AppData/Local/Temp/claude/C--Users-dlima-Documents-GitHub-NexTraceOne/89f4b0bc-e496-4217-9737-fc0d3e8c0e14/scratchpad/**)",
       "Bash(git --no-pager show 28a5e9c7 --stat)",
       "Bash(echo \"### FULL DIFF \\(code + i18n\\) ###\")",
-      "Bash(git --no-pager show 28a5e9c7 -U12 --format=\"\")"
+      "Bash(git --no-pager show 28a5e9c7 -U12 --format=\"\")",
+      "mcp__bf7c680d-5fdc-5ef4-b4a0-abadb619bf0a__send_later"
     ]
   }
 }

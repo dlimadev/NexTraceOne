@@ -312,37 +312,12 @@ CREATE POLICY tenant_isolation ON ops_automation_workflows
 
 -- ── Service Catalog module (cat_ prefix) ──────────────────────────────────────
 
--- cat_discovered_services — discovered services per tenant
-ALTER TABLE cat_discovered_services ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_discovered_services;
-CREATE POLICY tenant_isolation ON cat_discovered_services
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
 
 -- ── Contracts module (ctr_ prefix) ────────────────────────────────────────────
 
--- ctr_contract_versions — contract versions per tenant (was ctr_api_contracts — phantom corrected rev.7)
-ALTER TABLE ctr_contract_versions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_versions;
-CREATE POLICY tenant_isolation ON ctr_contract_versions
-    USING (true)
-    WITH CHECK (true);
 
 -- ── Knowledge module (knw_ prefix) ────────────────────────────────────────────
 
--- knw_documents — knowledge documents per tenant
-ALTER TABLE knw_documents ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON knw_documents;
-CREATE POLICY tenant_isolation ON knw_documents
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
-
--- knw_operational_notes — operational notes per tenant
-ALTER TABLE knw_operational_notes ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON knw_operational_notes;
-CREATE POLICY tenant_isolation ON knw_operational_notes
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
 
 -- ── Notifications module (ntf_ prefix) ────────────────────────────────────────
 
@@ -554,12 +529,6 @@ CREATE POLICY tenant_isolation ON ops_chaos_experiments
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
--- cat_contract_health_scores — contract health scores per tenant
-ALTER TABLE cat_contract_health_scores ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_health_scores;
-CREATE POLICY tenant_isolation ON cat_contract_health_scores
-    USING (true)
-    WITH CHECK (true);
 
 -- chg_change_confidence_events — change confidence timeline events per tenant
 ALTER TABLE chg_change_confidence_events ENABLE ROW LEVEL SECURITY;
@@ -612,26 +581,6 @@ CREATE POLICY tenant_isolation ON ops_reliability_incident_prediction_patterns
 
 -- ── Wave D: Developer Experience (cat_ and ai_ prefixes) ─────────────────────
 
--- cat_pipeline_executions — Contract-to-code pipeline executions per tenant
-ALTER TABLE cat_pipeline_executions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_pipeline_executions;
-CREATE POLICY tenant_isolation ON cat_pipeline_executions
-    USING (true)
-    WITH CHECK (true);
-
--- cat_contract_negotiations — Cross-team contract negotiations per tenant
-ALTER TABLE cat_contract_negotiations ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_negotiations;
-CREATE POLICY tenant_isolation ON cat_contract_negotiations
-    USING (true)
-    WITH CHECK (true);
-
--- cat_negotiation_comments — Negotiation comments per tenant
-ALTER TABLE cat_negotiation_comments ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_negotiation_comments;
-CREATE POLICY tenant_isolation ON cat_negotiation_comments
-    USING (true)
-    WITH CHECK (true);
 
 -- ai_onboarding_sessions — AI-powered onboarding sessions per tenant
 ALTER TABLE ai_onboarding_sessions ENABLE ROW LEVEL SECURITY;
@@ -656,12 +605,6 @@ CREATE POLICY tenant_isolation ON ops_reliability_healing_recommendations
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
 
--- cat_schema_evolution_advices — Schema evolution advisor reports per tenant
-ALTER TABLE cat_schema_evolution_advices ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_schema_evolution_advices;
-CREATE POLICY tenant_isolation ON cat_schema_evolution_advices
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
 
 -- ops_operational_playbooks — Operational playbook definitions per tenant
 ALTER TABLE ops_operational_playbooks ENABLE ROW LEVEL SECURITY;
@@ -716,26 +659,6 @@ CREATE POLICY tenant_isolation ON gov_cost_attributions
 
 -- ── Wave G: Visualization & Marketplace (Ideas 4, 5, 9, 11, 21, 22, 23) ─────
 
--- cat_semantic_diff_results — Semantic diff results per tenant (Idea 5)
-ALTER TABLE cat_semantic_diff_results ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_semantic_diff_results;
-CREATE POLICY tenant_isolation ON cat_semantic_diff_results
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
-
--- cat_contract_compliance_gates — Contract compliance gates per tenant (Idea 22)
-ALTER TABLE cat_contract_compliance_gates ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_compliance_gates;
-CREATE POLICY tenant_isolation ON cat_contract_compliance_gates
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
-
--- cat_contract_compliance_results — Compliance evaluation results per tenant (Idea 22)
-ALTER TABLE cat_contract_compliance_results ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_compliance_results;
-CREATE POLICY tenant_isolation ON cat_contract_compliance_results
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
 -- chg_blast_radius_reports — Blast radius visualization reports per tenant (Idea 4)
 ALTER TABLE chg_blast_radius_reports ENABLE ROW LEVEL SECURITY;
@@ -758,26 +681,6 @@ CREATE POLICY tenant_isolation ON chg_promotion_gate_evaluations
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
--- cat_contract_listings — Contract marketplace listings per tenant (Idea 11)
-ALTER TABLE cat_contract_listings ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_listings;
-CREATE POLICY tenant_isolation ON cat_contract_listings
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
-
--- cat_contract_reviews — Contract marketplace reviews per tenant (Idea 11)
-ALTER TABLE cat_contract_reviews ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_contract_reviews;
-CREATE POLICY tenant_isolation ON cat_contract_reviews
-    USING (true)
-    WITH CHECK (true);
-
--- cat_impact_simulations — Dependency impact simulations per tenant (Idea 21)
-ALTER TABLE cat_impact_simulations ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cat_impact_simulations;
-CREATE POLICY tenant_isolation ON cat_impact_simulations
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
 -- gov_license_compliance_reports — License compliance reports per tenant (Idea 23)
 ALTER TABLE gov_license_compliance_reports ENABLE ROW LEVEL SECURITY;
@@ -1073,152 +976,6 @@ CREATE POLICY tenant_isolation ON chg_rollback_assessments
 
 -- ── Contracts sub-module — additional ctr_ tables ────────────────────────────
 
--- ctr_background_service_contract_details — background service contract details per tenant
-ALTER TABLE ctr_background_service_contract_details ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_background_service_contract_details;
-CREATE POLICY tenant_isolation ON ctr_background_service_contract_details
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_background_service_draft_metadata — background service draft metadata per tenant
-ALTER TABLE ctr_background_service_draft_metadata ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_background_service_draft_metadata;
-CREATE POLICY tenant_isolation ON ctr_background_service_draft_metadata
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_canonical_entities — canonical entities per tenant
-ALTER TABLE ctr_canonical_entities ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_canonical_entities;
-CREATE POLICY tenant_isolation ON ctr_canonical_entities
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_canonical_entity_versions — canonical entity versions per tenant
-ALTER TABLE ctr_canonical_entity_versions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_canonical_entity_versions;
-CREATE POLICY tenant_isolation ON ctr_canonical_entity_versions
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_consumer_expectations — consumer expectations per tenant
-ALTER TABLE ctr_consumer_expectations ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_consumer_expectations;
-CREATE POLICY tenant_isolation ON ctr_consumer_expectations
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_artifacts — contract artifacts per tenant
-ALTER TABLE ctr_contract_artifacts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_artifacts;
-CREATE POLICY tenant_isolation ON ctr_contract_artifacts
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_deployments — contract deployments per tenant
-ALTER TABLE ctr_contract_deployments ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_deployments;
-CREATE POLICY tenant_isolation ON ctr_contract_deployments
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_diffs — contract diffs per tenant
-ALTER TABLE ctr_contract_diffs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_diffs;
-CREATE POLICY tenant_isolation ON ctr_contract_diffs
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_drafts — contract drafts per tenant
-ALTER TABLE ctr_contract_drafts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_drafts;
-CREATE POLICY tenant_isolation ON ctr_contract_drafts
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_evidence_packs — contract evidence packs per tenant
-ALTER TABLE ctr_contract_evidence_packs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_evidence_packs;
-CREATE POLICY tenant_isolation ON ctr_contract_evidence_packs
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_examples — contract examples per tenant
-ALTER TABLE ctr_contract_examples ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_examples;
-CREATE POLICY tenant_isolation ON ctr_contract_examples
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_reviews — contract reviews per tenant
-ALTER TABLE ctr_contract_reviews ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_reviews;
-CREATE POLICY tenant_isolation ON ctr_contract_reviews
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_rule_violations — contract rule violations per tenant
-ALTER TABLE ctr_contract_rule_violations ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_rule_violations;
-CREATE POLICY tenant_isolation ON ctr_contract_rule_violations
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_scorecards — contract scorecards per tenant
-ALTER TABLE ctr_contract_scorecards ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_scorecards;
-CREATE POLICY tenant_isolation ON ctr_contract_scorecards
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_event_contract_details — event contract details per tenant
-ALTER TABLE ctr_event_contract_details ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_event_contract_details;
-CREATE POLICY tenant_isolation ON ctr_event_contract_details
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_event_draft_metadata — event draft metadata per tenant
-ALTER TABLE ctr_event_draft_metadata ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_event_draft_metadata;
-CREATE POLICY tenant_isolation ON ctr_event_draft_metadata
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_soap_contract_details — soap contract details per tenant
-ALTER TABLE ctr_soap_contract_details ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_soap_contract_details;
-CREATE POLICY tenant_isolation ON ctr_soap_contract_details
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_soap_draft_metadata — soap draft metadata per tenant
-ALTER TABLE ctr_soap_draft_metadata ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_soap_draft_metadata;
-CREATE POLICY tenant_isolation ON ctr_soap_draft_metadata
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_spectral_rulesets — spectral rulesets per tenant
-ALTER TABLE ctr_spectral_rulesets ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_spectral_rulesets;
-CREATE POLICY tenant_isolation ON ctr_spectral_rulesets
-    USING (true)
-    WITH CHECK (true);
-
--- ctr_contract_verifications — contract verifications per tenant
-ALTER TABLE ctr_contract_verifications ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_verifications;
-CREATE POLICY tenant_isolation ON ctr_contract_verifications
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
-
--- ctr_contract_changelogs — contract changelogs per tenant
-ALTER TABLE ctr_contract_changelogs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_changelogs;
-CREATE POLICY tenant_isolation ON ctr_contract_changelogs
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
 -- cfg_contract_compliance_policies — contract compliance policies per tenant
 ALTER TABLE cfg_contract_compliance_policies ENABLE ROW LEVEL SECURITY;
@@ -1298,13 +1055,6 @@ CREATE POLICY tenant_isolation ON int_ingestion_executions
 
 
 -- ── Knowledge module — additional knw_ tables ────────────────────────────
-
--- knw_relations — relations per tenant
-ALTER TABLE knw_relations ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON knw_relations;
-CREATE POLICY tenant_isolation ON knw_relations
-    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
 
 
 -- ── Notifications module — additional ntf_ tables ────────────────────────────
@@ -1469,3 +1219,581 @@ CREATE POLICY tenant_isolation ON tpl_service_templates
 --              USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
 --              WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 -- ════════════════════════════════════════════════════════════════════════════════
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- Service Catalog & Contracts — políticas regeneradas a partir do modelo EF real
+-- (nomes ctr_/cat_/dx_ conforme convenção; colunas "TenantId" reais ou shadow).
+-- Tabelas com coluna shadow (uuid NULL) permitem linhas com tenant nulo durante a
+-- transição (dados pré-backfill e escritas de sistema). Apertar após o backfill.
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+ALTER TABLE cat_api_assets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_api_assets;
+CREATE POLICY tenant_isolation ON cat_api_assets
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_api_keys ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_api_keys;
+CREATE POLICY tenant_isolation ON cat_api_keys
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_asset_deployment_states ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_asset_deployment_states;
+CREATE POLICY tenant_isolation ON cat_asset_deployment_states
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_cics_transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_cics_transactions;
+CREATE POLICY tenant_isolation ON cat_cics_transactions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_cobol_programs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_cobol_programs;
+CREATE POLICY tenant_isolation ON cat_cobol_programs
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_code_generation_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_code_generation_records;
+CREATE POLICY tenant_isolation ON cat_code_generation_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_consumer_assets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_consumer_assets;
+CREATE POLICY tenant_isolation ON cat_consumer_assets
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_consumer_relationships ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_consumer_relationships;
+CREATE POLICY tenant_isolation ON cat_consumer_relationships
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_contract_bindings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_bindings;
+CREATE POLICY tenant_isolation ON cat_contract_bindings
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_contract_publication_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_publication_entries;
+CREATE POLICY tenant_isolation ON cat_contract_publication_entries
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybook_contract_mappings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybook_contract_mappings;
+CREATE POLICY tenant_isolation ON cat_copybook_contract_mappings
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybook_diff_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybook_diff_records;
+CREATE POLICY tenant_isolation ON cat_copybook_diff_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybook_fields ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybook_fields;
+CREATE POLICY tenant_isolation ON cat_copybook_fields
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybook_program_usages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybook_program_usages;
+CREATE POLICY tenant_isolation ON cat_copybook_program_usages
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybook_versions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybook_versions;
+CREATE POLICY tenant_isolation ON cat_copybook_versions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_copybooks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_copybooks;
+CREATE POLICY tenant_isolation ON cat_copybooks
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_db2_artifacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_db2_artifacts;
+CREATE POLICY tenant_isolation ON cat_db2_artifacts
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_discovered_services ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_discovered_services;
+CREATE POLICY tenant_isolation ON cat_discovered_services
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_discovery_match_rules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_discovery_match_rules;
+CREATE POLICY tenant_isolation ON cat_discovery_match_rules
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_discovery_runs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_discovery_runs;
+CREATE POLICY tenant_isolation ON cat_discovery_runs
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_discovery_sources ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_discovery_sources;
+CREATE POLICY tenant_isolation ON cat_discovery_sources
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_framework_asset_details ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_framework_asset_details;
+CREATE POLICY tenant_isolation ON cat_framework_asset_details
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_graph_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_graph_snapshots;
+CREATE POLICY tenant_isolation ON cat_graph_snapshots
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_hub_outbox_messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_hub_outbox_messages;
+CREATE POLICY tenant_isolation ON cat_hub_outbox_messages
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_ims_transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_ims_transactions;
+CREATE POLICY tenant_isolation ON cat_ims_transactions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_legacy_dependencies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_legacy_dependencies;
+CREATE POLICY tenant_isolation ON cat_legacy_dependencies
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_linked_references ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_linked_references;
+CREATE POLICY tenant_isolation ON cat_linked_references
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_mainframe_systems ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_mainframe_systems;
+CREATE POLICY tenant_isolation ON cat_mainframe_systems
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_mq_message_contracts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_mq_message_contracts;
+CREATE POLICY tenant_isolation ON cat_mq_message_contracts
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_node_health_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_node_health_records;
+CREATE POLICY tenant_isolation ON cat_node_health_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_package_dependencies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_package_dependencies;
+CREATE POLICY tenant_isolation ON cat_package_dependencies
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_playground_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_playground_sessions;
+CREATE POLICY tenant_isolation ON cat_playground_sessions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_portal_analytics_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_portal_analytics_events;
+CREATE POLICY tenant_isolation ON cat_portal_analytics_events
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_rate_limit_policies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_rate_limit_policies;
+CREATE POLICY tenant_isolation ON cat_rate_limit_policies
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_saved_graph_views ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_saved_graph_views;
+CREATE POLICY tenant_isolation ON cat_saved_graph_views
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_saved_searches ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_saved_searches;
+CREATE POLICY tenant_isolation ON cat_saved_searches
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_service_assets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_service_assets;
+CREATE POLICY tenant_isolation ON cat_service_assets
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_service_dependency_profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_service_dependency_profiles;
+CREATE POLICY tenant_isolation ON cat_service_dependency_profiles
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_service_interfaces ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_service_interfaces;
+CREATE POLICY tenant_isolation ON cat_service_interfaces
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_service_links ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_service_links;
+CREATE POLICY tenant_isolation ON cat_service_links
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_service_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_service_templates;
+CREATE POLICY tenant_isolation ON cat_service_templates
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_subscriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_subscriptions;
+CREATE POLICY tenant_isolation ON cat_subscriptions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_vulnerability_advisory_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_vulnerability_advisory_records;
+CREATE POLICY tenant_isolation ON cat_vulnerability_advisory_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE cat_zos_connect_bindings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_zos_connect_bindings;
+CREATE POLICY tenant_isolation ON cat_zos_connect_bindings
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_background_service_contract_details ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_background_service_contract_details;
+CREATE POLICY tenant_isolation ON ctr_background_service_contract_details
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_background_service_draft_metadata ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_background_service_draft_metadata;
+CREATE POLICY tenant_isolation ON ctr_background_service_draft_metadata
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_breaking_change_proposals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_breaking_change_proposals;
+CREATE POLICY tenant_isolation ON ctr_breaking_change_proposals
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_canonical_entities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_canonical_entities;
+CREATE POLICY tenant_isolation ON ctr_canonical_entities
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_canonical_entity_versions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_canonical_entity_versions;
+CREATE POLICY tenant_isolation ON ctr_canonical_entity_versions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_code_quality_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_code_quality_records;
+CREATE POLICY tenant_isolation ON ctr_code_quality_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_consumer_expectations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_consumer_expectations;
+CREATE POLICY tenant_isolation ON ctr_consumer_expectations
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_artifacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_artifacts;
+CREATE POLICY tenant_isolation ON ctr_contract_artifacts
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_changelogs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_changelogs;
+CREATE POLICY tenant_isolation ON ctr_contract_changelogs
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_compliance_gates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_compliance_gates;
+CREATE POLICY tenant_isolation ON ctr_contract_compliance_gates
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_compliance_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_compliance_results;
+CREATE POLICY tenant_isolation ON ctr_contract_compliance_results
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_consumer_inventories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_consumer_inventories;
+CREATE POLICY tenant_isolation ON ctr_contract_consumer_inventories
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_deployments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_deployments;
+CREATE POLICY tenant_isolation ON ctr_contract_deployments
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_diffs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_diffs;
+CREATE POLICY tenant_isolation ON ctr_contract_diffs
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_drafts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_drafts;
+CREATE POLICY tenant_isolation ON ctr_contract_drafts
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_evidence_packs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_evidence_packs;
+CREATE POLICY tenant_isolation ON ctr_contract_evidence_packs
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_examples ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_examples;
+CREATE POLICY tenant_isolation ON ctr_contract_examples
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_health_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_health_scores;
+CREATE POLICY tenant_isolation ON ctr_contract_health_scores
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_lint_rulesets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_lint_rulesets;
+CREATE POLICY tenant_isolation ON ctr_contract_lint_rulesets
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_listings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_listings;
+CREATE POLICY tenant_isolation ON ctr_contract_listings
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_negotiations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_negotiations;
+CREATE POLICY tenant_isolation ON ctr_contract_negotiations
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_reviews;
+CREATE POLICY tenant_isolation ON ctr_contract_reviews
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_rule_violations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_rule_violations;
+CREATE POLICY tenant_isolation ON ctr_contract_rule_violations
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_scorecards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_scorecards;
+CREATE POLICY tenant_isolation ON ctr_contract_scorecards
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_contract_verifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_verifications;
+CREATE POLICY tenant_isolation ON ctr_contract_verifications
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_contract_versions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_versions;
+CREATE POLICY tenant_isolation ON ctr_contract_versions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_data_contract_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_data_contract_records;
+CREATE POLICY tenant_isolation ON ctr_data_contract_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_data_contract_schemas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_data_contract_schemas;
+CREATE POLICY tenant_isolation ON ctr_data_contract_schemas
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_deprecation_schedules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_deprecation_schedules;
+CREATE POLICY tenant_isolation ON ctr_deprecation_schedules
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_event_contract_details ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_event_contract_details;
+CREATE POLICY tenant_isolation ON ctr_event_contract_details
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_event_draft_metadata ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_event_draft_metadata;
+CREATE POLICY tenant_isolation ON ctr_event_draft_metadata
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_feature_flag_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_feature_flag_records;
+CREATE POLICY tenant_isolation ON ctr_feature_flag_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_graph_ql_schema_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_graph_ql_schema_snapshots;
+CREATE POLICY tenant_isolation ON ctr_graph_ql_schema_snapshots
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_impact_simulations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_impact_simulations;
+CREATE POLICY tenant_isolation ON ctr_impact_simulations
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_marketplace_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_marketplace_reviews;
+CREATE POLICY tenant_isolation ON ctr_marketplace_reviews
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_negotiation_comments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_negotiation_comments;
+CREATE POLICY tenant_isolation ON ctr_negotiation_comments
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_pipeline_executions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_pipeline_executions;
+CREATE POLICY tenant_isolation ON ctr_pipeline_executions
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_protobuf_schema_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_protobuf_schema_snapshots;
+CREATE POLICY tenant_isolation ON ctr_protobuf_schema_snapshots
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_sbom_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_sbom_records;
+CREATE POLICY tenant_isolation ON ctr_sbom_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_schema_evolution_advices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_schema_evolution_advices;
+CREATE POLICY tenant_isolation ON ctr_schema_evolution_advices
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_semantic_diff_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_semantic_diff_results;
+CREATE POLICY tenant_isolation ON ctr_semantic_diff_results
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE ctr_soap_contract_details ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_soap_contract_details;
+CREATE POLICY tenant_isolation ON ctr_soap_contract_details
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE ctr_soap_draft_metadata ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_soap_draft_metadata;
+CREATE POLICY tenant_isolation ON ctr_soap_draft_metadata
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE dx_developer_surveys ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON dx_developer_surveys;
+CREATE POLICY tenant_isolation ON dx_developer_surveys
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE dx_ide_usage_records ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON dx_ide_usage_records;
+CREATE POLICY tenant_isolation ON dx_ide_usage_records
+    USING (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+ALTER TABLE dx_productivity_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON dx_productivity_snapshots;
+CREATE POLICY tenant_isolation ON dx_productivity_snapshots
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE dx_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON dx_scores;
+CREATE POLICY tenant_isolation ON dx_scores
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE knw_documents ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_documents;
+CREATE POLICY tenant_isolation ON knw_documents
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE knw_operational_notes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_operational_notes;
+CREATE POLICY tenant_isolation ON knw_operational_notes
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE knw_proposed_runbooks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_proposed_runbooks;
+CREATE POLICY tenant_isolation ON knw_proposed_runbooks
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
+ALTER TABLE knw_relations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_relations;
+CREATE POLICY tenant_isolation ON knw_relations
+    USING (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" IS NULL OR "TenantId" = get_current_tenant_id());
+
