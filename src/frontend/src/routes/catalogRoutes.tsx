@@ -5,6 +5,7 @@
 import { lazy } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+import { ServicesAreaLayout } from '../features/catalog/layouts/ServicesAreaLayout';
 
 const ServiceCatalogPage = lazy(() => import('../features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
 const ServiceCatalogListPage = lazy(() => import('../features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
@@ -25,7 +26,6 @@ const TemplateLibraryPage = lazy(() => import('../features/catalog/pages/Templat
 const TemplateDetailPage = lazy(() => import('../features/catalog/pages/TemplateDetailPage').then(m => ({ default: m.TemplateDetailPage })));
 const TemplateEditorPage = lazy(() => import('../features/catalog/pages/TemplateEditorPage').then(m => ({ default: m.TemplateEditorPage })));
 const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
-const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
 const SecurityGateDashboardPage = lazy(() => import('../features/catalog/pages/SecurityGateDashboardPage').then(m => ({ default: m.SecurityGateDashboardPage })));
 const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfServicePortalPage').then(m => ({ default: m.SelfServicePortalPage })));
 const DeveloperExperienceScorePage = lazy(() => import('../features/catalog/pages/DeveloperExperienceScorePage').then(m => ({ default: m.DeveloperExperienceScorePage })));
@@ -68,22 +68,65 @@ export function CatalogRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/services"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <ServiceCatalogListPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/services/graph"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <ServiceCatalogPage />
-          </ProtectedRoute>
-        }
-      />
+      {/* Área de serviços — sub-nav persistente no topo (Outlet) */}
+      <Route element={<ServicesAreaLayout />}>
+        <Route
+          path="/services"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <ServiceCatalogListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/graph"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <ServiceCatalogPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/discovery"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <ServiceDiscoveryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/maturity"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <ServiceMaturityPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/experience"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <DeveloperExperienceScorePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/feature-flags"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <ServiceFeatureFlagsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/legacy"
+          element={
+            <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+              <LegacyAssetCatalogPage />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
       {/* Jornada guiada de onboarding de serviço (registar + interface + contrato) */}
       <Route
         path="/services/onboard"
@@ -113,34 +156,10 @@ export function CatalogRoutes() {
       />
       <Route path="/graph" element={<Navigate to="/services/graph" replace />} />
       <Route
-        path="/services/legacy"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <LegacyAssetCatalogPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/services/legacy/:assetType/:assetId"
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <MainframeSystemDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/services/discovery"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <ServiceDiscoveryPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/services/maturity"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <ServiceMaturityPage />
           </ProtectedRoute>
         }
       />
@@ -201,15 +220,10 @@ export function CatalogRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* ── Phase 5: Contract Pipeline & Security Gate ── */}
-      <Route
-        path="/catalog/contracts/pipeline"
-        element={
-          <ProtectedRoute permission="catalog:contracts:pipeline:read" redirectTo="/unauthorized">
-            <ContractPipelinePage />
-          </ProtectedRoute>
-        }
-      />
+      {/* Rotas renomeadas — redirects de compatibilidade */}
+      <Route path="/catalog/contracts/pipeline" element={<Navigate to="/contracts/pipeline" replace />} />
+      <Route path="/catalog/developer-experience-score" element={<Navigate to="/services/experience" replace />} />
+      {/* ── Phase 5: Security Gate ── */}
       <Route
         path="/catalog/security-gate"
         element={
@@ -227,14 +241,6 @@ export function CatalogRoutes() {
         }
       />
       <Route
-        path="/catalog/developer-experience-score"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <DeveloperExperienceScorePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/catalog/dependency-dashboard"
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
@@ -247,15 +253,6 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <LicenseCompliancePage />
-          </ProtectedRoute>
-        }
-      />
-      {/* ── Feature Flags por Serviço ── */}
-      <Route
-        path="/services/feature-flags"
-        element={
-          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
-            <ServiceFeatureFlagsPage />
           </ProtectedRoute>
         }
       />
