@@ -37,12 +37,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Persistence;
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
-public sealed class ServiceCatalogDbContext(
-    DbContextOptions<ServiceCatalogDbContext> options,
-    ICurrentTenant tenant,
-    ICurrentUser user,
-    IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock),
+public sealed class ServiceCatalogDbContext
+    : NexTraceDbContextBase,
       IUnitOfWork,
       ICatalogGraphUnitOfWork,
       IContractsUnitOfWork,
@@ -52,6 +48,19 @@ public sealed class ServiceCatalogDbContext(
       ITemplatesUnitOfWork,
       IPortalUnitOfWork
 {
+    private readonly ICurrentTenant _tenantContext;
+
+    /// <summary>Cria o DbContext consolidado do módulo ServiceCatalog.</summary>
+    public ServiceCatalogDbContext(
+        DbContextOptions<ServiceCatalogDbContext> options,
+        ICurrentTenant tenant,
+        ICurrentUser user,
+        IDateTimeProvider clock)
+        : base(options, tenant, user, clock)
+    {
+        _tenantContext = tenant;
+    }
+
     // ── Catalog Graph ─────────────────────────────────────────────────────────
     public DbSet<ApiAsset> ApiAssets => Set<ApiAsset>();
     public DbSet<ServiceAsset> ServiceAssets => Set<ServiceAsset>();
@@ -169,9 +178,6 @@ public sealed class ServiceCatalogDbContext(
     public DbSet<JourneyDefinition> JourneyDefinitions => Set<JourneyDefinition>();
 
     private const string TenantPropertyName = "TenantId";
-
-    // Captura explícita evita CS9107 (parâmetro primário usado em membros e passado ao base).
-    private readonly ICurrentTenant _tenantContext = tenant;
 
     private static readonly MethodInfo EfPropertyMethod =
         typeof(EF).GetMethod(nameof(EF.Property))!.MakeGenericMethod(typeof(Guid?));
