@@ -1,4 +1,9 @@
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -163,6 +168,40 @@ public sealed class ServiceCatalogDbContext(
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
     public DbSet<JourneyDefinition> JourneyDefinitions => Set<JourneyDefinition>();
 
+    private const string TenantPropertyName = "TenantId";
+
+    // Captura explícita evita CS9107 (parâmetro primário usado em membros e passado ao base).
+    private readonly ICurrentTenant _tenantContext = tenant;
+
+    private static readonly MethodInfo EfPropertyMethod =
+        typeof(EF).GetMethod(nameof(EF.Property))!.MakeGenericMethod(typeof(Guid?));
+
+    private static readonly PropertyInfo QueryFilterTenantIdProperty =
+        typeof(ServiceCatalogDbContext).GetProperty(nameof(QueryFilterTenantId))!;
+
+    /// <summary>
+    /// Nomes de tabela que fogem da derivação automática (nomes documentados na plataforma).
+    /// </summary>
+    private static readonly Dictionary<string, string> TableNameOverrides = new()
+    {
+        ["DeprecationScheduleRecord"] = "ctr_deprecation_schedules",
+        ["DxScore"] = "dx_scores",
+    };
+
+    /// <summary>
+    /// Tenant corrente usado pelos filtros globais de consulta.
+    /// Null quando não há contexto de tenant (background workers / seeding) — nesse
+    /// caso os filtros ficam abertos, espelhando a semântica das políticas de RLS.
+    /// </summary>
+    public Guid? QueryFilterTenantId => _tenantContext.Id == Guid.Empty ? null : _tenantContext.Id;
+
+    /// <inheritdoc />
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        StampTenantOnAddedEntries();
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -174,18 +213,167 @@ public sealed class ServiceCatalogDbContext(
 
         foreach (var entityType in entityTypes)
         {
-            // Todo método de leitura multi-tenant filtra por TenantId (defesa em
-            // profundidade); sem índice essas consultas degradam para seq scan.
-            var tenantId = entityType.FindProperty("TenantId");
-            if (tenantId is not null && !entityType.GetIndexes().Any(i => i.Properties.Contains(tenantId)))
-                entityType.AddIndex(tenantId);
-
-            // As entidades documentam RowVersion como token xmin, mas sem IsRowVersion
-            // o EF persistia uma coluna bigint inerte sem detecção de concorrência.
-            var rowVersion = entityType.FindProperty("RowVersion");
-            if (rowVersion is not null && rowVersion.ClrType == typeof(uint) && !rowVersion.IsConcurrencyToken)
-                modelBuilder.Entity(entityType.ClrType).Property("RowVersion").IsRowVersion();
+            ApplyTablePrefixConvention(entityType);
+            EnsureTenantColumn(entityType);
+            EnsureTenantIndex(entityType);
+            ConfigureXminRowVersion(modelBuilder, entityType);
+            ApplyTenantQueryFilter(modelBuilder, entityType);
         }
+    }
+
+    /// <summary>
+    /// Aplica a convenção de prefixo de módulo (ctr_/cat_/dx_) + snake_case plural às
+    /// tabelas sem ToTable explícito. Configurações explícitas (knw_, pan_, outbox) prevalecem.
+    /// </summary>
+    private static void ApplyTablePrefixConvention(IMutableEntityType entityType)
+    {
+        if (entityType.FindAnnotation("Relational:TableName") is not null)
+            return;
+
+        var clrType = entityType.ClrType;
+        if (TableNameOverrides.TryGetValue(clrType.Name, out var overridden))
+        {
+            entityType.SetTableName(overridden);
+            return;
+        }
+
+        var ns = clrType.FullName ?? string.Empty;
+        var prefix = ns.Contains(".Domain.Contracts.", StringComparison.Ordinal)
+                     || ns.Contains(".Application.Contracts.", StringComparison.Ordinal)
+                     || ns.Contains(".Catalog.Domain.Entities.", StringComparison.Ordinal)
+            ? "ctr_"
+            : ns.Contains(".DeveloperExperience.", StringComparison.Ordinal)
+                ? "dx_"
+                : "cat_";
+
+        entityType.SetTableName(prefix + Pluralize(ToSnakeCase(clrType.Name)));
+    }
+
+    /// <summary>
+    /// Garante coluna de tenant em toda entidade do módulo: quando a entidade não declara
+    /// TenantId no domínio, adiciona shadow property Guid? preenchida no SaveChanges.
+    /// Pré-requisito para as políticas de RLS por tabela.
+    /// </summary>
+    private static void EnsureTenantColumn(IMutableEntityType entityType)
+    {
+        if (entityType.FindProperty(TenantPropertyName) is null)
+            entityType.AddProperty(TenantPropertyName, typeof(Guid?));
+    }
+
+    /// <summary>
+    /// Todo método de leitura multi-tenant filtra por TenantId (defesa em profundidade);
+    /// sem índice essas consultas degradam para seq scan.
+    /// </summary>
+    private static void EnsureTenantIndex(IMutableEntityType entityType)
+    {
+        var tenantId = entityType.FindProperty(TenantPropertyName);
+        if (tenantId is not null && !entityType.GetIndexes().Any(i => i.Properties.Contains(tenantId)))
+            entityType.AddIndex(tenantId);
+    }
+
+    /// <summary>
+    /// As entidades documentam RowVersion como token xmin, mas sem IsRowVersion
+    /// o EF persistia uma coluna bigint inerte sem detecção de concorrência.
+    /// </summary>
+    private static void ConfigureXminRowVersion(ModelBuilder modelBuilder, IMutableEntityType entityType)
+    {
+        var rowVersion = entityType.FindProperty("RowVersion");
+        if (rowVersion is not null && rowVersion.ClrType == typeof(uint) && !rowVersion.IsConcurrencyToken)
+            modelBuilder.Entity(entityType.ClrType).Property("RowVersion").IsRowVersion();
+    }
+
+    /// <summary>
+    /// Filtro global de tenant para entidades com TenantId shadow (as que não declaram
+    /// tenant no domínio). Linhas com tenant nulo permanecem visíveis (escritas de sistema
+    /// e dados anteriores ao backfill). Combina com o filtro de soft-delete da base,
+    /// pois HasQueryFilter substitui o filtro anterior.
+    /// </summary>
+    private void ApplyTenantQueryFilter(ModelBuilder modelBuilder, IMutableEntityType entityType)
+    {
+        var tenantProperty = entityType.FindProperty(TenantPropertyName);
+        if (tenantProperty is null || !tenantProperty.IsShadowProperty())
+            return;
+
+        var parameter = Expression.Parameter(entityType.ClrType, "entity");
+        var rowTenant = Expression.Call(EfPropertyMethod, parameter, Expression.Constant(TenantPropertyName));
+        var currentTenant = Expression.Property(Expression.Constant(this), QueryFilterTenantIdProperty);
+        var nullGuid = Expression.Constant(null, typeof(Guid?));
+
+        var tenantCondition = Expression.OrElse(
+            Expression.Equal(currentTenant, nullGuid),
+            Expression.OrElse(
+                Expression.Equal(rowTenant, nullGuid),
+                Expression.Equal(rowTenant, currentTenant)));
+
+        Expression body = tenantCondition;
+        var isDeleted = entityType.ClrType.GetProperty("IsDeleted");
+        if (isDeleted is not null)
+        {
+            body = Expression.AndAlso(
+                Expression.Equal(Expression.Property(parameter, isDeleted), Expression.Constant(false)),
+                tenantCondition);
+        }
+
+        modelBuilder.Entity(entityType.ClrType).HasQueryFilter(Expression.Lambda(body, parameter));
+    }
+
+    /// <summary>
+    /// Carimba o tenant corrente nas shadow properties TenantId de entidades recém-adicionadas.
+    /// Sem contexto de tenant (background workers) o valor permanece nulo intencionalmente.
+    /// </summary>
+    private void StampTenantOnAddedEntries()
+    {
+        if (_tenantContext.Id == Guid.Empty)
+            return;
+
+        foreach (var entry in ChangeTracker.Entries().Where(e => e.State == EntityState.Added))
+        {
+            var property = entry.Metadata.FindProperty(TenantPropertyName);
+            if (property is not null
+                && property.IsShadowProperty()
+                && property.ClrType == typeof(Guid?)
+                && entry.Property(TenantPropertyName).CurrentValue is null)
+            {
+                entry.Property(TenantPropertyName).CurrentValue = tenant.Id;
+            }
+        }
+    }
+
+    /// <summary>Converte PascalCase em snake_case preservando dígitos e siglas.</summary>
+    private static string ToSnakeCase(string name)
+    {
+        var builder = new StringBuilder(name.Length + 8);
+        for (var i = 0; i < name.Length; i++)
+        {
+            var current = name[i];
+            if (char.IsUpper(current))
+            {
+                var previousIsLowerOrDigit = i > 0 && (char.IsLower(name[i - 1]) || char.IsDigit(name[i - 1]));
+                var nextIsLower = i + 1 < name.Length && char.IsLower(name[i + 1]);
+                if (i > 0 && (previousIsLowerOrDigit || nextIsLower))
+                    builder.Append('_');
+                builder.Append(char.ToLowerInvariant(current));
+            }
+            else
+            {
+                builder.Append(current);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>Pluralização mínima para nomes de tabela (metadata invariável, y→ies, s/x/z/ch/sh→es).</summary>
+    private static string Pluralize(string snake)
+    {
+        if (snake.EndsWith("metadata", StringComparison.Ordinal))
+            return snake;
+        if (snake.Length > 1 && snake[^1] == 'y' && !"aeiou".Contains(snake[^2], StringComparison.Ordinal))
+            return snake[..^1] + "ies";
+        if (snake.EndsWith('s') || snake.EndsWith('x') || snake.EndsWith('z')
+            || snake.EndsWith("ch", StringComparison.Ordinal) || snake.EndsWith("sh", StringComparison.Ordinal))
+            return snake + "es";
+        return snake + "s";
     }
 
     /// <inheritdoc />

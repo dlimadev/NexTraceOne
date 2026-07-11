@@ -20,8 +20,8 @@ tenant, integridade, concorrência e performance.
 
 | # | Severidade | Achado | Estado |
 |---|-----------|--------|--------|
-| 1 | **P0** | RLS inoperante no módulo: `infra/postgres/apply-rls.sql` referencia tabelas `ctr_*`/`cat_*` que não existem (EF gerou `ContractVersions`, `Drafts`, …) | Documentado (plano §5) |
-| 2 | **P0** | 71 entidades sem `TenantId` (incl. `ContractVersion`, `ContractDraft`, `ApiAsset`) e repositórios de Contracts sem filtro de tenant | Documentado (plano §5) |
+| 1 | **P0** | RLS inoperante no módulo: `infra/postgres/apply-rls.sql` referencia tabelas `ctr_*`/`cat_*` que não existem (EF gerou `ContractVersions`, `Drafts`, …) | **Corrigido neste PR** — convenção de nomes `ctr_`/`cat_`/`dx_` no DbContext, seções catalog do `apply-rls.sql` regeneradas a partir do modelo real, `seed-catalog.sql` atualizado |
+| 2 | **P0** | 71 entidades sem `TenantId` (incl. `ContractVersion`, `ContractDraft`, `ApiAsset`) e repositórios de Contracts sem filtro de tenant | **Corrigido neste PR** — shadow property `TenantId` (Guid?) em toda entidade sem tenant, carimbada no `SaveChanges` a partir de `ICurrentTenant`, com filtro global de consulta combinado ao soft-delete; políticas RLS por tabela geradas |
 | 3 | **P0** | `ServiceAsset.SearchVector` é `tsvector NOT NULL` sem coluna gerada/trigger e nunca preenchido — INSERT de serviço falha contra PostgreSQL real | **Corrigido neste PR** |
 | 4 | **P0** | `ContractVersion.Sla`, `.Signature`, `.Provenance` eram ignorados pela convenção de VOs e **nunca persistidos** (perda silenciosa de SLA, assinatura digital e proveniência) | **Corrigido neste PR** |
 | 5 | **P1** | `RowVersion` (xmin) declarado em 36 entidades mas mapeado como token de concorrência em apenas 2 — nas demais era coluna `bigint` inerte | **Corrigido neste PR** (convenção no DbContext) |
@@ -41,10 +41,21 @@ dotnet ef migrations add CatalogDataModelHardening \
   --context ServiceCatalogDbContext
 ```
 
-A migration resultante deve: criar as colunas jsonb (`sla_json`, `signature_json`,
-`provenance_json`), converter `SearchVector` em coluna gerada + índice GIN, remover as
-colunas `RowVersion` bigint inertes, e criar os índices/uniques. Constraints únicas exigem
-dados sem duplicatas — validar antes em ambientes com dados.
+A migration resultante deve: renomear ~90 tabelas para os nomes `ctr_`/`cat_`/`dx_`,
+criar as colunas jsonb (`sla_json`, `signature_json`, `provenance_json`), adicionar as
+colunas `TenantId uuid NULL` (shadow) nas entidades sem tenant, converter `SearchVector`
+em coluna gerada + índice GIN, remover as colunas `RowVersion` bigint inertes e criar os
+índices/uniques. Constraints únicas exigem dados sem duplicatas — validar antes em
+ambientes com dados.
+
+**Pós-migração:**
+1. Reaplicar `infra/postgres/apply-rls.sql` (seções catalog regeneradas neste PR).
+2. **Backfill de tenant** nas tabelas de Contracts a partir da cadeia
+   `ApiAsset → ServiceAsset.TenantId` (linhas antigas ficam com `TenantId NULL` e
+   permanecem visíveis durante a transição — tanto o filtro EF quanto as políticas RLS
+   das colunas shadow permitem `TenantId IS NULL` intencionalmente).
+3. Após o backfill, endurecer: remover a cláusula `"TenantId" IS NULL` das políticas e
+   do filtro global, e opcionalmente tornar a coluna NOT NULL.
 
 ---
 
@@ -155,7 +166,13 @@ O contrato arquitetural do projeto é RLS + filtro de repositório. No módulo c
    `Where(TenantId == …)` — diferentemente de `ServiceAssetRepository`, que aplica.
 
 Consequência: um tenant que obtenha o Guid de uma versão de contrato de outro tenant pode
-lê-la. A mitigação exige a fase §5 (não há correção pontual segura).
+lê-la.
+
+**Resolução aplicada neste PR:** as duas camadas foram restauradas sem alterar domínio ou
+handlers — (a) shadow property `TenantId Guid?` + filtro global de consulta no
+`ServiceCatalogDbContext` (camada de aplicação) e (b) políticas RLS regeneradas para os
+nomes reais de tabela (camada de banco). Linhas com tenant nulo (legado/sistema)
+permanecem visíveis até o backfill — ver instruções pós-migração no topo do documento.
 
 ---
 
@@ -169,22 +186,27 @@ documentação (CLAUDE.md "Feature Status", XML docs) afirma nomes `ctr_*` que n
 
 ---
 
-## 5. Plano de remediação recomendado (fases)
+## 5. Plano de remediação (fases)
 
-1. **Fase A — este PR:** persistência dos VOs de `ContractVersion`, tsvector gerado + GIN,
-   convenções xmin e índice de tenant, uniques de invariantes core + migration
-   `CatalogDataModelHardening` (gerar localmente).
-2. **Fase B — renomeação de tabelas:** configurações `ToTable("ctr_…"/"cat_…")` para todas
-   as entidades + migration de `RenameTable` + atualização do `apply-rls.sql` e dos XML
-   docs. Mecânico (não há SQL cru sobre essas tabelas fora do provider ClickHouse), mas
-   deve ser uma migration única e coordenada.
-3. **Fase C — tenant em Contracts:** adicionar `TenantId Guid` às entidades de Contracts
-   (preenchido nos factory methods a partir de `ICurrentTenant`), backfill via join com
-   `ApiAsset`/`ServiceAsset`, filtros nos repositórios e políticas RLS.
-4. **Fase D — qualidade de dados:** enums para os campos livres de `ServiceAsset`,
+1. **Fase A — ✅ aplicada neste PR:** persistência dos VOs de `ContractVersion`, tsvector
+   gerado + GIN, convenções xmin e índice de tenant, uniques de invariantes core.
+2. **Fase B — ✅ aplicada neste PR:** convenção de nomes `ctr_`/`cat_`/`dx_` no
+   `ServiceCatalogDbContext` (configurações explícitas `knw_`/`pan_`/outbox prevalecem),
+   regeneração das seções catalog do `apply-rls.sql` a partir do modelo real (37 blocos
+   obsoletos removidos, 95 tabelas cobertas) e atualização do `seed-catalog.sql`.
+3. **Fase C — ✅ aplicada neste PR (variante shadow):** em vez de alterar domínio e
+   handlers, toda entidade sem `TenantId` ganhou shadow property `Guid?` carimbada no
+   `SaveChanges` via `ICurrentTenant` + filtro global de consulta (combinado ao
+   soft-delete). Pendências pós-migração: backfill e endurecimento (ver topo do doc).
+   Evolução futura opcional: promover o tenant a conceito de domínio nos agregados core.
+4. **Fase D — pendente (PR próprio):** enums para os campos livres de `ServiceAsset`,
    consolidação `RepositoryUrl`/`GitRepository`, `Format` como enum, FKs internas ao
-   DbContext, `TenantId` `string→Guid` em `FeatureFlagRecord`/`SbomRecord`.
-5. **Fase E — mercado:** comando `nex contract validate|diff|can-i-deploy` para CI
+   DbContext, `TenantId` `string→Guid` em `FeatureFlagRecord`/`SbomRecord` — mudam o
+   contrato da API (frontend/ingestão precisam acompanhar).
+5. **Fase E — pendente:** comando `nex contract validate|diff|can-i-deploy` para CI
    (APIOps shift-left) e query de decisão de deploy combinando `ContractDeployment` +
    `ContractVerification` + `ConsumerExpectation` (equivalente ao can-i-deploy do Pact
    Broker); import/export ODCS para data contracts.
+
+> Observação fora do escopo do módulo: restaram 35 políticas `USING (true)` (no-op) em
+> seções de outros módulos do `apply-rls.sql` — merecem a mesma revisão.
