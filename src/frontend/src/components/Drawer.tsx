@@ -15,7 +15,7 @@ interface DrawerProps {
   /** Lado de abertura. */
   side?: 'right' | 'left';
   /** Largura. */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** Conteúdo principal. */
   children: ReactNode;
   /** Ações do rodapé. */
@@ -27,6 +27,7 @@ const sizeClasses = {
   sm: 'w-80',
   md: 'w-[480px]',
   lg: 'w-[640px]',
+  xl: 'w-[min(1100px,92vw)]',
 };
 
 const FOCUSABLE_SELECTOR =
