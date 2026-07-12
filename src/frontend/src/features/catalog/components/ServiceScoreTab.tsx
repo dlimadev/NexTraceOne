@@ -207,7 +207,7 @@ export function ServiceScoreTab({ serviceId }: Props) {
               {t('serviceDetail.score.maturityScorecard', 'Maturity Scorecard')}
             </Link>
             <Link
-              to={`/services/experience?serviceId=${serviceId}`}
+              to={`/catalog/developer-experience-score?serviceId=${serviceId}`}
               className="flex items-center gap-1.5 text-xs text-accent border border-accent/30 rounded px-3 py-1.5 hover:bg-accent/5 transition-colors"
             >
               <BookMarked size={12} />

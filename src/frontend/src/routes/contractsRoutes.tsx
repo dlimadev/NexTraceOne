@@ -5,7 +5,6 @@
 import { lazy } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
-import { ContractsAreaLayout } from '../features/catalog/layouts/ContractsAreaLayout';
 
 const ContractCatalogPage = lazy(() => import('../features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
 const CreateContractPage = lazy(() => import('../features/contracts/create/CreateContractPage').then(m => ({ default: m.CreateContractPage })));
@@ -24,79 +23,18 @@ const ConsumerDrivenContractPage = lazy(() => import('../features/contracts/cdct
 const ContractMigrationPage = lazy(() => import('../features/contracts/governance/ContractMigrationPage').then(m => ({ default: m.ContractMigrationPage })));
 // Wave V3.12 — Contract Studio hub (entrada "do zero")
 const ContractStudioPage = lazy(() => import('../features/contracts/pages/ContractStudioPage').then(m => ({ default: m.ContractStudioPage })));
-// Pipeline de contratos — movido de /catalog/contracts/pipeline para a área /contracts
-const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
 
 export function ContractsRoutes() {
   return (
     <>
-      {/* Área de contratos — sub-nav persistente no topo (Outlet) */}
-      <Route element={<ContractsAreaLayout />}>
-        <Route
-          path="/contracts"
-          element={
-            <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-              <ContractCatalogPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/governance"
-          element={
-            <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-              <ContractGovernancePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/health"
-          element={
-            <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-              <ContractHealthDashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/spectral"
-          element={
-            <ProtectedRoute permission="rulesets:read" redirectTo="/unauthorized">
-              <SpectralRulesetManagerPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/canonical"
-          element={
-            <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-              <CanonicalEntityCatalogPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/publication"
-          element={
-            <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-              <PublicationCenterPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/pipeline"
-          element={
-            <ProtectedRoute permission="catalog:contracts:pipeline:read" redirectTo="/unauthorized">
-              <ContractPipelinePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/cdct"
-          element={
-            <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-              <ConsumerDrivenContractPage />
-            </ProtectedRoute>
-          }
-        />
-      </Route>
+      <Route
+        path="/contracts"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractCatalogPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/contracts/new"
         element={
@@ -124,6 +62,38 @@ export function ContractsRoutes() {
       />
       <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
       <Route
+        path="/contracts/governance"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractGovernancePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/spectral"
+        element={
+          <ProtectedRoute permission="rulesets:read" redirectTo="/unauthorized">
+            <SpectralRulesetManagerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/canonical"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <CanonicalEntityCatalogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/health"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractHealthDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/contracts/health/timeline"
         element={
           <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
@@ -140,10 +110,26 @@ export function ContractsRoutes() {
         }
       />
       <Route
+        path="/contracts/publication"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <PublicationCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/contracts/playground"
         element={
           <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
             <ContractPlaygroundPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/cdct"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ConsumerDrivenContractPage />
           </ProtectedRoute>
         }
       />

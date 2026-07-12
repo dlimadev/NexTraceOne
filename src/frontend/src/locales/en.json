@@ -1,25 +1,4 @@
 {
-  "catalogAreaNav": {
-    "ariaLabel": "Service catalog sub-navigation",
-    "catalog": "Catalog",
-    "graph": "Graph",
-    "discovery": "Discovery",
-    "maturity": "Maturity",
-    "experience": "Experience",
-    "featureFlags": "Feature Flags",
-    "legacy": "Legacy"
-  },
-  "contractsAreaNav": {
-    "ariaLabel": "Contract catalog sub-navigation",
-    "catalog": "Catalog",
-    "governance": "Governance",
-    "health": "Health",
-    "rulesets": "Rulesets",
-    "canonical": "Canonical",
-    "publication": "Publication",
-    "pipeline": "Pipeline",
-    "cdct": "CDCT"
-  },
   "activation": {
     "activating": "Activating...",
     "confirmPasswordLabel": "Confirm password",

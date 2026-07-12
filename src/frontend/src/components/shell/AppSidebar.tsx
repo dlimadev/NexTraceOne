@@ -12,22 +12,22 @@ import {
   LayoutDashboard, FileText, Zap, Users, Users2, CheckSquare, ArrowUpCircle,
   AlertTriangle, Clock, UserCheck,
   ClipboardCheck, Monitor, Bot,
-  Server,
+  Share2, Server,
   Settings, SlidersHorizontal,
   PanelLeftClose, PanelLeftOpen,
   Cable, TrendingUp, BookOpen, Briefcase,
-  Workflow, BookMarked,
+  Workflow, StickyNote, BookMarked, Radar,
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
   Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
-  Train, GitCommit, Target, Download, Sliders, BookText,
+  Train, MapPin, GitCommit, Target, Download, Sliders, MessageSquare, Eye, BookText,
   PackageCheck, GitMerge, History, Building2,
   Bug, Flame, TrendingDown, Store, FileSearch, Lightbulb,
-  HeartPulse, ArrowRightLeft, FlaskConical, MonitorDot,
-  Waypoints, LineChart, PieChart, Diff,
-  FileLock2, KeyRound, ShieldAlert, BookOpenCheck,
-  Layers, ScanEye, Scale, DoorOpen, Tag, PhoneCall,
+  HeartPulse, ArrowRightLeft, FlaskConical, Star, MonitorDot,
+  Waypoints, LineChart, Stethoscope, PieChart, Diff,
+  ListChecks, FileLock2, KeyRound, ShieldAlert, BookOpenCheck,
+  Layers, ScanEye, Scale, DoorOpen, Tag, PhoneCall, Send,
   // Wave 1 — icon revision
-  Sparkles, Globe, LayoutGrid, ScrollText, Activity,
+  Boxes, Sparkles, Globe, LayoutGrid, ScrollText, GitBranch, Activity,
   // Wave 2 — new nav items (confirmed available in lucide-react ^0.577)
   FileCode, BarChart3, BarChart2, Database, Brain,
   ShieldCheck, Package, Edit3, Coins, Code2, Map,
@@ -51,14 +51,28 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
 
   // ── CATÁLOGO ──────────────────────────────────────────────────────────────
-  // Cinco roots ancorados — os drill-downs vivem na sub-nav de cada área
-  // (ServicesAreaLayout / ContractsAreaLayout), pelo que apenas um item da
-  // sidebar fica ativo em qualquer caminho do catálogo.
   { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
+  { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
   { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'catalog' },
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'catalog' },
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <BookOpenCheck size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
-  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
+  // Descoberta & Maturidade
+  { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.scoreMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Star size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
+  // Governança de Contratos
+  { labelKey: 'sidebar.contractGovernanceHub', to: '/contracts/governance', icon: <ShieldCheck size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <GitBranch size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.contractsHealth', to: '/contracts/health', icon: <Stethoscope size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <FlaskConical size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ListChecks size={18} />, permission: 'rulesets:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Boxes size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <Send size={18} />, permission: 'contracts:write', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
+  // Habilitação de Desenvolvedores
+  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDeveloperEnablement' },
+  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDeveloperEnablement' },
 
   // ── MUDANÇAS ──────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.changes', to: '/changes', icon: <Diff size={18} />, permission: 'change-intelligence:read', section: 'changes' },
