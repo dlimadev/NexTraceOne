@@ -10493,7 +10493,8 @@
     "viewSourceOfTruth": "View source of truth",
     "draftBadge": "Draft",
     "sloActive": "Active",
-    "sloInactive": "Inactive"
+    "sloInactive": "Inactive",
+    "openSourceOfTruth": "Open source of truth"
   },
   "migrationPreview": {
     "title": "Migration Preview",

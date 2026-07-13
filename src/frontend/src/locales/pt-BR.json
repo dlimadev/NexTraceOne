@@ -11800,7 +11800,8 @@
     "viewSourceOfTruth": "Ver fonte da verdade",
     "draftBadge": "Rascunho",
     "sloActive": "Ativo",
-    "sloInactive": "Inativo"
+    "sloInactive": "Inativo",
+    "openSourceOfTruth": "Abrir fonte de verdade"
   },
   "migrationPreview": {
     "title": "Pré-visualização de Migrações",
