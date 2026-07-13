@@ -18019,5 +18019,10 @@
       "interface": "Registar uma interface",
       "contract": "Publicar um contrato"
     }
+  },
+  "serviceContractDrawer": {
+    "viewTitle": "Ver contrato",
+    "createTitle": "Novo contrato",
+    "editTitle": "Editar rascunho"
   }
 }

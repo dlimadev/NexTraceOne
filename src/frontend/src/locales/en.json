@@ -16704,5 +16704,10 @@
       "interface": "Register an interface",
       "contract": "Publish a contract"
     }
+  },
+  "serviceContractDrawer": {
+    "viewTitle": "View contract",
+    "createTitle": "New contract",
+    "editTitle": "Edit draft"
   }
 }
