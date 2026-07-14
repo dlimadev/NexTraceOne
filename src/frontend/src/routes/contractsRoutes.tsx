@@ -7,7 +7,6 @@ import { Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 const ContractCatalogPage = lazy(() => import('../features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
-const CreateContractPage = lazy(() => import('../features/contracts/create/CreateContractPage').then(m => ({ default: m.CreateContractPage })));
 const DraftStudioPage = lazy(() => import('../features/contracts/studio/DraftStudioPage').then(m => ({ default: m.DraftStudioPage })));
 const ContractWorkspacePage = lazy(() => import('../features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
 const SpectralRulesetManagerPage = lazy(() => import('../features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
@@ -21,8 +20,6 @@ const ContractHealthTimelinePage = lazy(() => import('../features/contracts/gove
 const ContractPlaygroundPage = lazy(() => import('../features/contracts/playground/ContractPlaygroundPage').then(m => ({ default: m.ContractPlaygroundPage })));
 const ConsumerDrivenContractPage = lazy(() => import('../features/contracts/cdct/ConsumerDrivenContractPage').then(m => ({ default: m.ConsumerDrivenContractPage })));
 const ContractMigrationPage = lazy(() => import('../features/contracts/governance/ContractMigrationPage').then(m => ({ default: m.ContractMigrationPage })));
-// Wave V3.12 — Contract Studio hub (entrada "do zero")
-const ContractStudioPage = lazy(() => import('../features/contracts/pages/ContractStudioPage').then(m => ({ default: m.ContractStudioPage })));
 
 export function ContractsRoutes() {
   return (
@@ -35,14 +32,7 @@ export function ContractsRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/contracts/new"
-        element={
-          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-            <CreateContractPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/contracts/new" element={<Navigate to="/contracts" replace />} />
       <Route
         path="/contracts/studio/:draftId"
         element={
@@ -51,15 +41,8 @@ export function ContractsRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* Wave V3.12 — Contract Studio type-specific builders (must come before :draftId catch-all) */}
-      <Route
-        path="/contracts/studio/new"
-        element={
-          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-            <ContractStudioPage />
-          </ProtectedRoute>
-        }
-      />
+      {/* Wave V3.12 — hub "do zero" desativado: contrato nasce do serviço/onboarding */}
+      <Route path="/contracts/studio/new" element={<Navigate to="/contracts" replace />} />
       <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
       <Route
         path="/contracts/governance"
