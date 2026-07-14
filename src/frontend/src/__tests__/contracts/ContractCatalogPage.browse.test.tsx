@@ -1,10 +1,10 @@
 /**
- * Testes do reshell "browse-first" da ContractCatalogPage (Task 6).
+ * Testes do reshell "browse-first" da ContractCatalogPage (Task 6 + Task 2).
  *
  * Cobrem o comportamento novo:
  *  - A barra de pesquisa do ContractBrowseSurface (searchbox) está visível.
  *  - Existe um controlo de vista Tabela|Cartões (tab "Cards").
- *  - A CTA "New contract" mantém-se presente.
+ *  - A CTA "New contract" NÃO está presente — criação de contrato nasce do serviço.
  */
 import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -79,8 +79,8 @@ describe('ContractCatalogPage — reshell browse-first (Tabela|Cartões)', () =>
     expect(screen.getByRole('tab', { name: /cards/i })).toBeInTheDocument();
   });
 
-  it('keeps the "New contract" CTA present', () => {
+  it('não mostra o botão de criação de contrato (contrato nasce do serviço)', () => {
     render(<ContractCatalogPage />);
-    expect(screen.getByRole('button', { name: /new contract/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /new contract/i })).not.toBeInTheDocument();
   });
 });

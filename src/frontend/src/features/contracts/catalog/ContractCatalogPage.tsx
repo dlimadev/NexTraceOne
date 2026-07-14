@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree, Plus } from 'lucide-react';
+import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../../components/PageHeader';
-import { Button } from '../../../components/Button';
 import { FilterChip } from '../../../components/FilterChip';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer } from '../../../components/shell';
-import { usePermissions } from '../../../hooks/usePermissions';
 import { useContractList, useContractsSummary } from '../hooks';
 import { CatalogTable } from './components';
 import { ContractBrowseSurface } from './browse/ContractBrowseSurface';
@@ -24,7 +22,6 @@ import { toCatalogItem } from './types';
 export function ContractCatalogPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { can } = usePermissions();
 
   // ── State ───────────────────────────────────────────────────────────────────
   // O sort próprio da tabela mantém-se; filtros/pesquisa vivem no URL (browse surface).
@@ -64,22 +61,10 @@ export function ContractCatalogPage() {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <PageContainer>
-      {/* Cabeçalho com CTA primário no topo — padrão Betterstack */}
+      {/* Cabeçalho — catálogo de descoberta sem CTA de criação (contratos nascem do serviço) */}
       <PageHeader
         title={t('contracts.catalog.title', 'Contract Catalog')}
         subtitle={t('contracts.catalog.subtitle', 'Governed catalog of all contracts, APIs, and service definitions.')}
-        actions={
-          can('contracts:write') ? (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<Plus size={14} />}
-              onClick={() => navigate('/contracts/new')}
-            >
-              {t('contracts.catalog.actions.newContract', 'New contract')}
-            </Button>
-          ) : undefined
-        }
       />
 
       {/* Summary chips — sincronizados com o param `lifecycle` do URL */}
