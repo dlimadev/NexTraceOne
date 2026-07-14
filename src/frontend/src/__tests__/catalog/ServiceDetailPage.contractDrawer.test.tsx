@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { renderWithProviders } from '../test-utils';
 import { ServiceDetailPage } from '../../features/catalog/pages/ServiceDetailPage';
 
@@ -24,7 +24,6 @@ vi.mock('../../features/catalog/api/serviceCatalog', () => ({
 vi.mock('../../features/contracts/api/contracts', () => ({
   contractsApi: { listContractsByService: vi.fn().mockResolvedValue({ contracts: [], items: [], totalCount: 0 }) },
 }));
-// Drawer mockado para asserir o modo sem montar o editor pesado
 vi.mock('../../contexts/EnvironmentContext', () => ({
   useEnvironment: () => ({ activeEnvironment: null }),
 }));
