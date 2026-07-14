@@ -50,6 +50,7 @@ import { ServiceIncidentsTab } from '../components/ServiceIncidentsTab';
 import { ServiceScoreTab } from '../components/ServiceScoreTab';
 import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import { cn } from '../../../lib/cn';
+import { ServiceContractDrawer, type ContractDrawerState } from '../components/ServiceContractDrawer';
 
 // ── Helpers de variante de badge ─────────────────────────────────────────────
 
@@ -262,6 +263,12 @@ export function ServiceDetailPage() {
   const [activeViewTab, setActiveViewTab] = useState<ServiceTab>('overview');
   const [editForm, setEditForm] = useState<EditFormState>(EMPTY_FORM);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [contractDrawer, setContractDrawer] = useState<ContractDrawerState>({ mode: 'closed' });
+
+  const closeContractDrawer = useCallback(() => {
+    setContractDrawer({ mode: 'closed' });
+    queryClient.invalidateQueries({ queryKey: ['catalog-service-contracts', serviceId] });
+  }, [queryClient, serviceId]);
 
   // ── Carregamento de dados (apenas em view/edit de serviço existente) ─────────
   const { data: service, isLoading, isError } = useQuery({
@@ -588,6 +595,8 @@ export function ServiceDetailPage() {
               contractLifecycleBadgeVariant={contractLifecycleBadgeVariant}
               navigate={navigate}
               onEditField={handleEditField}
+              onCreateContract={() => setContractDrawer({ mode: 'create' })}
+              onViewContract={(contractVersionId) => setContractDrawer({ mode: 'view', contractVersionId })}
               t={t}
             />
           )}
@@ -660,6 +669,15 @@ export function ServiceDetailPage() {
             isNonProductionEnvironment={activeEnvironment ? !activeEnvironment.isProductionLike : false}
           />
         </div>
+      )}
+
+      {!isCreateRoute && serviceId && (
+        <ServiceContractDrawer
+          state={contractDrawer}
+          onClose={closeContractDrawer}
+          onModeChange={setContractDrawer}
+          serviceId={serviceId}
+        />
       )}
     </PageContainer>
   );
@@ -851,6 +869,8 @@ interface ViewContentProps {
   contractLifecycleBadgeVariant: (s: string) => 'success' | 'info' | 'warning' | 'danger' | 'default';
   navigate: (path: string) => void;
   onEditField: (tab: FormTab) => void;
+  onCreateContract: () => void;
+  onViewContract: (contractVersionId: string) => void;
   t: TFunction;
 }
 
@@ -874,6 +894,8 @@ function ViewContent({
   contractLifecycleBadgeVariant,
   navigate,
   onEditField,
+  onCreateContract,
+  onViewContract,
   t,
 }: ViewContentProps) {
   return (
@@ -893,7 +915,7 @@ function ViewContent({
         onEditOwnership={() => onEditField('ownership')}
         onEditReferences={() => onEditField('references')}
         onAddInterface={() => navigate(`/services/${serviceId}/interfaces/new`)}
-        onAddContract={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+        onAddContract={onCreateContract}
       />
 
       {/* Seção: Identidade & Classificação */}
@@ -1151,7 +1173,7 @@ function ViewContent({
                   <Button
                     variant="ghost"
                     size="xs"
-                    onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+                    onClick={onCreateContract}
                     icon={<Plus size={13} />}
                     className="text-accent border border-accent/30 hover:text-accent/80 hover:bg-transparent"
                   >
@@ -1207,12 +1229,13 @@ function ViewContent({
                               : <span className="text-xs text-muted">—</span>}
                           </td>
                           <td className="px-4 py-3">
-                            <Link
-                              to={`/source-of-truth/contracts/${contract.versionId ?? contract.contractVersionId}`}
+                            <button
+                              type="button"
+                              onClick={() => onViewContract(contract.versionId ?? contract.contractVersionId)}
                               className="text-xs text-accent hover:underline"
                             >
                               {t('catalog.detail.viewContract')}
-                            </Link>
+                            </button>
                           </td>
                         </tr>
                       ))}

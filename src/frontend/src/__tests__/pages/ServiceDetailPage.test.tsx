@@ -41,6 +41,7 @@ vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
 vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn(), patch: vi.fn() },
 }));
+vi.mock('../../features/catalog/components/ServiceContractDrawer', () => ({ ServiceContractDrawer: () => null }));
 
 vi.mock('../../features/catalog/api', () => ({
   serviceCatalogApi: {
