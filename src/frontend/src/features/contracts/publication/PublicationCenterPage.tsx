@@ -61,7 +61,7 @@ export function PublicationCenterPage() {
           'Manage which contract versions are visible in the Developer Portal. Only Approved or Locked contracts can be published.',
         )}
         actions={
-          <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => navigate('/contracts/studio/new')}>
+          <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => navigate('/services/onboard')}>
             {t('contracts.publication.newContract', 'New Contract')}
           </Button>
         }

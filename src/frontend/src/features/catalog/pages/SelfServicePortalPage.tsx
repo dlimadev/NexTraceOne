@@ -75,13 +75,13 @@ const ACTION_GROUPS: ActionGroup[] = [
         icon: <FileCode size={20} />,
         titleKey: 'selfServicePortal.actions.publishRestContract',
         descKey: 'selfServicePortal.actions.publishRestContract_desc',
-        href: '/contracts/new?type=RestApi',
+        href: '/services/onboard',
       },
       {
         icon: <Zap size={20} />,
         titleKey: 'selfServicePortal.actions.publishEventContract',
         descKey: 'selfServicePortal.actions.publishEventContract_desc',
-        href: '/contracts/new?type=Event',
+        href: '/services/onboard',
       },
       {
         icon: <Activity size={20} />,
