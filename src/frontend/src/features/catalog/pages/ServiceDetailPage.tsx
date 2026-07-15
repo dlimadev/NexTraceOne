@@ -5,10 +5,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Shield,
   Users,
-  Globe,
   FileText,
   ExternalLink,
-  Eye,
   Lock,
   GitCommit,
   AlertTriangle,
@@ -43,6 +41,7 @@ import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
 import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
+import { ServiceApisSection } from '../components/ServiceApisSection';
 import { ServiceSetupChecklist } from '../components/ServiceSetupChecklist';
 import { ServiceObservabilityTab } from '../components/ServiceObservabilityTab';
 import { ServiceReliabilityTab } from '../components/ServiceReliabilityTab';
@@ -233,7 +232,7 @@ const REGULATORY_OPTIONS = [
 
 // ── Tabs de conteúdo para modo view ──────────────────────────────────────────
 
-type ServiceTab = 'overview' | 'apis' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score';
+type ServiceTab = 'overview' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -477,16 +476,11 @@ export function ServiceDetailPage() {
   const viewTabItems = [
     { id: 'overview', label: t('catalog.detail.overview'), icon: <FileText size={14} /> },
     {
-      id: 'apis',
-      label: `${t('catalog.detail.apis')} (${service?.apiCount ?? service?.apis?.length ?? 0})`,
-      icon: <Globe size={14} />,
-    },
-    {
       id: 'contracts',
       label: `${t('catalog.detail.contracts')} (${serviceContracts?.totalCount ?? contracts.length})`,
       icon: <FileText size={14} />,
     },
-    { id: 'interfaces', label: t('serviceDetail.tabInterfaces', 'Interfaces'), icon: <Server size={14} /> },
+    { id: 'interfaces', label: t('serviceDetail.tabInterfacesApis', 'Interfaces & APIs'), icon: <Server size={14} /> },
     { id: 'observability', label: t('serviceDetail.tabObservability', 'Observability'), icon: <Activity size={14} /> },
     { id: 'reliability', label: t('serviceDetail.tabReliability', 'Reliability & SLOs'), icon: <Shield size={14} /> },
     { id: 'incidents', label: t('serviceDetail.tabIncidents', 'Incidents'), icon: <AlertTriangle size={14} /> },
@@ -1107,60 +1101,6 @@ function ViewContent({
           </Card>
         )}
 
-        {activeViewTab === 'apis' && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Globe size={16} className="text-accent" />
-                <h2 className="text-base font-semibold text-heading">{t('catalog.detail.apis')}</h2>
-              </div>
-            </CardHeader>
-            <CardBody className="p-0">
-              {service.apis.length === 0 ? (
-                <div className="py-10 text-center">
-                  <p className="text-sm text-muted">{t('catalog.detail.noApis')}</p>
-                </div>
-              ) : (
-                <TableWrapper>
-                  <table className="w-full text-sm">
-                    <thead className="sticky top-0 z-10 bg-panel">
-                      <tr className="border-b border-edge text-left">
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.columns.name')}</th>
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.detail.routePattern')}</th>
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.detail.version')}</th>
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.detail.visibility')}</th>
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.detail.consumers')}</th>
-                        <th scope="col" className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">{t('catalog.detail.status')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-edge">
-                      {service.apis.map((api: ServiceApiSummary) => (
-                        <tr key={api.apiId} className="hover:bg-elevated/50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-heading">{api.name}</td>
-                          <td className="px-4 py-3 text-muted font-mono text-xs">{api.routePattern}</td>
-                          <td className="px-4 py-3 text-muted">{api.version}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1 text-xs text-muted">
-                              <Eye size={12} />
-                              {api.visibility}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-muted">{api.consumerCount}</td>
-                          <td className="px-4 py-3">
-                            {api.isDecommissioned
-                              ? <Badge variant="danger" size="sm">{t('catalog.detail.decommissioned')}</Badge>
-                              : <Badge variant="success" size="sm">{t('catalog.detail.active')}</Badge>}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </TableWrapper>
-              )}
-            </CardBody>
-          </Card>
-        )}
-
         {activeViewTab === 'contracts' && (
           <Card>
             <CardHeader>
@@ -1247,7 +1187,17 @@ function ViewContent({
           </Card>
         )}
 
-        {activeViewTab === 'interfaces' && <ServiceInterfacesTab serviceId={serviceId} />}
+        {activeViewTab === 'interfaces' && (
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-xs font-medium uppercase tracking-wider text-muted mb-2">
+                {t('serviceDetail.publishedApis', 'Published APIs')}
+              </h3>
+              <ServiceApisSection apis={service.apis} />
+            </div>
+            <ServiceInterfacesTab serviceId={serviceId} />
+          </div>
+        )}
         {activeViewTab === 'observability' && <ServiceObservabilityTab serviceId={serviceId} serviceName={service.name} />}
         {activeViewTab === 'reliability' && <ServiceReliabilityTab serviceId={serviceId} />}
         {activeViewTab === 'incidents' && <ServiceIncidentsTab serviceId={serviceId} />}
