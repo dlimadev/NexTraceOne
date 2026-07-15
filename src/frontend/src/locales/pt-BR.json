@@ -11763,6 +11763,7 @@
     "statusDeprecated": "Depreciado",
     "statusSunset": "Sunset",
     "statusRetired": "Inativo",
+    "apiBadge": "API",
     "createTitle": "Nova Interface",
     "createSubtitle": "Registre uma nova interface para este serviço",
     "fieldName": "Nome da Interface",

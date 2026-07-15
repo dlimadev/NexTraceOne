@@ -11748,6 +11748,7 @@
     "statusDeprecated": "Obsoleto",
     "statusSunset": "Sunset",
     "statusRetired": "Retirado",
+    "apiBadge": "API",
     "createTitle": "Nueva Interfaz",
     "createSubtitle": "Registre una nueva interfaz para este servicio",
     "fieldName": "Nombre de la Interfaz",

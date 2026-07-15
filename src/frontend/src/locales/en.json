@@ -10456,6 +10456,7 @@
     "statusDeprecated": "Deprecated",
     "statusSunset": "Sunset",
     "statusRetired": "Retired",
+    "apiBadge": "API",
     "createTitle": "New Interface",
     "createSubtitle": "Register a new interface for this service",
     "fieldName": "Interface Name",

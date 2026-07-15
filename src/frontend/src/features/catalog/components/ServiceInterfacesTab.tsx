@@ -69,6 +69,11 @@ const exposureBadgeVariant = (scope: string): 'info' | 'warning' | 'default' => 
   }
 };
 
+/** Tipos de interface que expõem uma API consumível externamente. */
+const API_INTERFACE_TYPES: ReadonlySet<InterfaceType> = new Set([
+  'RestApi', 'GraphqlApi', 'GrpcService', 'SoapService',
+]);
+
 /** Campo contextual principal da interface (basePath, topicName, etc.) */
 function interfacePrimaryField(iface: ServiceInterface): string {
   if (iface.basePath) return iface.basePath;
@@ -188,6 +193,9 @@ export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
                         <Badge variant="info" size="sm">
                           {t(`serviceInterfaces.type${iface.interfaceType}`, iface.interfaceType)}
                         </Badge>
+                        {API_INTERFACE_TYPES.has(iface.interfaceType) && (
+                          <Badge variant="success" size="sm" className="ml-1">{t('serviceInterfaces.apiBadge', 'API')}</Badge>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={exposureBadgeVariant(iface.exposureScope)} size="sm">
