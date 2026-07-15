@@ -10481,7 +10481,6 @@
     "cancel": "Cancel"
   },
   "serviceDetail": {
-    "tabInterfaces": "Interfaces",
     "tabInterfacesApis": "Interfaces & APIs",
     "publishedApis": "Published APIs",
     "tabObservability": "Observability",

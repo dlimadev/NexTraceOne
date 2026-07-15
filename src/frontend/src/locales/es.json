@@ -11773,7 +11773,6 @@
     "cancel": "Cancelar"
   },
   "serviceDetail": {
-    "tabInterfaces": "Interfaces",
     "tabInterfacesApis": "Interfaces y APIs",
     "publishedApis": "APIs publicadas",
     "tabObservability": "Observabilidad",
