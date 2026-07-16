@@ -11804,6 +11804,7 @@
     "tabReliability": "Fiabilidad & SLOs",
     "tabIncidents": "Incidentes",
     "tabScore": "Puntuación",
+    "tabFeatureFlags": "Feature Flags",
     "health": {
       "maturity": "Madurez",
       "slo": "SLO"

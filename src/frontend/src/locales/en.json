@@ -10512,6 +10512,7 @@
     "tabReliability": "Reliability & SLOs",
     "tabIncidents": "Incidents",
     "tabScore": "Score",
+    "tabFeatureFlags": "Feature Flags",
     "health": {
       "maturity": "Maturity",
       "slo": "SLO"

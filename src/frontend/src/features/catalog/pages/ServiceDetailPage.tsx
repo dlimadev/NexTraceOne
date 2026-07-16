@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight,
   GitBranch,
+  Sliders,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -50,6 +51,7 @@ import { ServiceScoreTab } from '../components/ServiceScoreTab';
 import { Button, TextField, TextArea, Select } from '../../../shared/ui';
 import { cn } from '../../../lib/cn';
 import { ServiceContractDrawer, type ContractDrawerState } from '../components/ServiceContractDrawer';
+import { ServiceFeatureFlagsTab } from '../components/ServiceFeatureFlagsTab';
 
 // ── Helpers de variante de badge ─────────────────────────────────────────────
 
@@ -232,7 +234,7 @@ const REGULATORY_OPTIONS = [
 
 // ── Tabs de conteúdo para modo view ──────────────────────────────────────────
 
-type ServiceTab = 'overview' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score';
+type ServiceTab = 'overview' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score' | 'featureFlags';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -485,6 +487,7 @@ export function ServiceDetailPage() {
     { id: 'reliability', label: t('serviceDetail.tabReliability', 'Reliability & SLOs'), icon: <Shield size={14} /> },
     { id: 'incidents', label: t('serviceDetail.tabIncidents', 'Incidents'), icon: <AlertTriangle size={14} /> },
     { id: 'score', label: t('serviceDetail.tabScore', 'Score'), icon: <Award size={14} /> },
+    { id: 'featureFlags', label: t('serviceDetail.tabFeatureFlags', 'Feature Flags'), icon: <Sliders size={14} /> },
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────────
@@ -1198,6 +1201,7 @@ function ViewContent({
         {activeViewTab === 'reliability' && <ServiceReliabilityTab serviceId={serviceId} />}
         {activeViewTab === 'incidents' && <ServiceIncidentsTab serviceId={serviceId} />}
         {activeViewTab === 'score' && <ServiceScoreTab serviceId={serviceId} />}
+        {activeViewTab === 'featureFlags' && <ServiceFeatureFlagsTab serviceId={serviceId} />}
       </div>
 
       {/* Panels laterais adicionais — lifecycle e links */}
