@@ -6025,6 +6025,32 @@
     "unknownError": "Ocorreu um erro desconhecido.",
     "validation": "Verifique os dados informados e tente novamente."
   },
+  "featureFlags": {
+    "viewPortfolio": "Ver todas as flags do portfólio",
+    "serviceEmpty": "Este serviço não tem feature flags registradas.",
+    "colFlag": "Flag",
+    "colEnvironment": "Ambiente",
+    "colUpdated": "Atualizado",
+    "colStatus": "Status",
+    "colService": "Serviço",
+    "errorTitle": "Erro ao carregar feature flags",
+    "errorDesc": "Verifique a conectividade e tente novamente.",
+    "enable": "Habilitar",
+    "disable": "Desabilitar",
+    "allServices": "Todos os Serviços",
+    "statusAll": "Todas",
+    "statusEnabled": "Ativas",
+    "statusDisabled": "Inativas",
+    "title": "Feature Flags",
+    "subtitle": "Gerencie feature flags escopadas por serviço",
+    "totalFlags": "Total de Flags",
+    "enabled": "Habilitadas",
+    "disabled": "Desabilitadas",
+    "affectedServices": "Serviços Afetados",
+    "searchPlaceholder": "Buscar por flag ou serviço...",
+    "empty": "Nenhuma feature flag encontrada",
+    "emptyDesc": "Ajuste os filtros ou registre feature flags nos serviços."
+  },
   "footer": {
     "default": "Powered by {{name}} — Plataforma de Confiança Operacional",
     "poweredBy": "Powered by NexTraceOne"
