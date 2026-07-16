@@ -20,7 +20,6 @@ import {
   Bot,
   ShieldCheck,
   Share2,
-  Layers,
   Globe,
   Activity,
   Loader2,
@@ -51,7 +50,7 @@ interface PaletteItem {
  * Itens navegáveis da command palette — espelha a sidebar para manter consistência.
  * Agrupados por seção oficial do produto (MODULES-AND-PAGES.md).
  */
-const paletteItems: PaletteItem[] = [
+export const paletteItems: PaletteItem[] = [
   // ── Home ──
   { id: 'dashboard', labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={16} />, group: 'commandPalette.navigation' },
   // ── Services ──
@@ -62,7 +61,6 @@ const paletteItems: PaletteItem[] = [
   { id: 'developer-portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.knowledge', permission: 'developer-portal:read' },
   // ── Contracts ──
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
-  { id: 'contract-studio', labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
   // ── Changes ──
   { id: 'change-confidence', labelKey: 'sidebar.changes', to: '/changes', icon: <ShieldCheck size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
   { id: 'releases', labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
