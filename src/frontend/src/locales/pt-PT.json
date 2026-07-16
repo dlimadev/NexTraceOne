@@ -11771,7 +11771,6 @@
   },
   "serviceDetail": {
     "tabInterfacesApis": "Interfaces e APIs",
-    "publishedApis": "APIs publicadas",
     "tabObservability": "Observabilidade",
     "tabReliability": "Fiabilidade & SLOs",
     "tabIncidents": "Incidentes",

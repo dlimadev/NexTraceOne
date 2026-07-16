@@ -1189,12 +1189,8 @@ function ViewContent({
 
         {activeViewTab === 'interfaces' && (
           <div className="space-y-4">
-            <div>
-              <h3 className="text-xs font-medium uppercase tracking-wider text-muted mb-2">
-                {t('serviceDetail.publishedApis', 'Published APIs')}
-              </h3>
-              <ServiceApisSection apis={service.apis} />
-            </div>
+            {/* APIs publicadas (subconjunto consumível) empilhadas sobre todas as interfaces */}
+            <ServiceApisSection apis={service.apis} />
             <ServiceInterfacesTab serviceId={serviceId} />
           </div>
         )}

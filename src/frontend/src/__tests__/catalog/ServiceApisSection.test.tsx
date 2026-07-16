@@ -14,14 +14,18 @@ const api: ServiceApiSummary = {
 };
 
 describe('ServiceApisSection', () => {
-  it('renderiza uma linha por API', () => {
+  it('renderiza uma tabela com uma linha por API', () => {
     render(<ServiceApisSection apis={[api]} />);
+    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText('payments-api')).toBeInTheDocument();
     expect(screen.getByText('/v1/payments')).toBeInTheDocument();
   });
 
-  it('mostra estado vazio quando não há APIs', () => {
+  it('mostra estado vazio (sem tabela) quando não há APIs', () => {
     render(<ServiceApisSection apis={[]} />);
-    expect(screen.getByText(/no.*api/i)).toBeInTheDocument();
+    // Sem APIs não há tabela; o estado vazio usa a chave catalog.detail.noApis
+    // (o mock de t devolve a chave quando não recebe fallback).
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText('catalog.detail.noApis')).toBeInTheDocument();
   });
 });
