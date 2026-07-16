@@ -46,7 +46,7 @@ interface NavItem {
   preview?: boolean;
 }
 
-const navItems: NavItem[] = [
+export const navItems: NavItem[] = [
   // ── HOME ──────────────────────────────────────────────────────────────────
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
 
@@ -60,7 +60,6 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.scoreMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Star size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
-  { labelKey: 'sidebar.featureFlags', to: '/services/feature-flags', icon: <Sliders size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   // Governança de Contratos
   { labelKey: 'sidebar.contractGovernanceHub', to: '/contracts/governance', icon: <ShieldCheck size={18} />, permission: 'contracts:read', section: 'catalog', subGroup: 'sidebar.subGroupContractGovernance' },
