@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import client from '../../../api/client';
+import { serviceFeatureFlagsApi, type ServiceFeatureFlag } from '../api/featureFlags';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -20,37 +20,6 @@ import { Button, SearchInput, Select, Toggle, Tabs } from '../../../shared/ui';
  * Exibe e permite gerenciar feature flags escopadas por serviço
  * (tabela ctr_feature_flag_records com TenantId + ServiceId + FlagKey).
  */
-
-export interface ServiceFeatureFlag {
-  id: string;
-  serviceId: string;
-  serviceName: string;
-  flagKey: string;
-  displayName: string;
-  description?: string;
-  enabled: boolean;
-  environment: string;
-  updatedAt: string;
-  updatedBy?: string;
-}
-
-export interface ServiceFeatureFlagDashboard {
-  totalFlags: number;
-  enabledFlags: number;
-  disabledFlags: number;
-  affectedServices: number;
-  flags: ServiceFeatureFlag[];
-}
-
-const serviceFeatureFlagsApi = {
-  getDashboard: async (): Promise<ServiceFeatureFlagDashboard> => {
-    const res = await client.get<ServiceFeatureFlagDashboard>('/catalog/feature-flags');
-    return res.data;
-  },
-  toggle: async (flagId: string, enabled: boolean): Promise<void> => {
-    await client.patch(`/catalog/feature-flags/${flagId}`, { enabled });
-  },
-};
 
 export function ServiceFeatureFlagsPage() {
   const { t } = useTranslation();
