@@ -1311,6 +1311,7 @@
       "domain": "Dominio",
       "exposure": "Exposición",
       "lifecycle": "Ciclo de Vida",
+      "maturity": "Madurez",
       "name": "Nombre",
       "serviceType": "Tipo",
       "team": "Equipo"
@@ -1598,6 +1599,9 @@
     "aiScaffold": {
       "serviceNamePlaceholder": "api-pagos",
       "entitiesPlaceholder": "Pago, Reembolso, Extracto"
+    },
+    "maturity": {
+      "viewDashboard": "Ver panel de madurez"
     }
   },
   "catalogContractsConfig": {

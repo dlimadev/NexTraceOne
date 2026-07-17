@@ -1311,6 +1311,7 @@
       "domain": "Domain",
       "exposure": "Exposure",
       "lifecycle": "Lifecycle",
+      "maturity": "Maturity",
       "name": "Name",
       "serviceType": "Type",
       "team": "Team"
@@ -1583,6 +1584,9 @@
     "aiScaffold": {
       "serviceNamePlaceholder": "payment-api",
       "entitiesPlaceholder": "Payment, Refund, Statement"
+    },
+    "maturity": {
+      "viewDashboard": "View maturity dashboard"
     }
   },
   "catalogContractsConfig": {

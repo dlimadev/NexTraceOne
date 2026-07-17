@@ -14,6 +14,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '../../../components/Badge';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { EmptyState } from '../../../components/EmptyState';
@@ -35,6 +36,18 @@ const criticalityColors: Record<Criticality, string> = {
   Medium: 'bg-warning/15 text-warning border border-warning/25',
   Low: 'bg-elevated text-muted border border-edge',
 };
+
+/** Variante de badge por nível de maturidade. */
+function maturityBadgeVariant(level: string): 'success' | 'warning' | 'danger' | 'info' | 'default' {
+  switch (level) {
+    case 'Optimizing':
+    case 'Managed': return 'success';
+    case 'Defined': return 'info';
+    case 'Developing': return 'warning';
+    case 'Initial': return 'danger';
+    default: return 'default';
+  }
+}
 
 /** Variantes visuais para badges de ciclo de vida. */
 const lifecycleColors: Record<LifecycleStatus, string> = {
@@ -144,6 +157,18 @@ export function ServiceCatalogListPage() {
     queryKey: ['catalog-services-summary', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getServicesSummary(),
   });
+
+  // Query independente — loading/erro não bloqueiam a lista principal
+  const { data: maturityDash } = useQuery({
+    queryKey: ['catalog-maturity-dashboard'],
+    queryFn: () => serviceCatalogApi.getMaturityDashboard(),
+  });
+
+  /** Mapa serviceId → entrada de maturidade para lookup O(1) por linha. */
+  const maturityById = useMemo(
+    () => new Map((maturityDash?.services ?? []).map((s) => [s.serviceId, s])),
+    [maturityDash],
+  );
 
   const summary = summaryQuery.data;
   const services: ServiceListItem[] = data?.items ?? [];
@@ -299,13 +324,21 @@ export function ServiceCatalogListPage() {
                 </span>
               )}
             </div>
-            <Link
-              to="/services/graph"
-              className="text-xs text-accent hover:underline flex items-center gap-1"
-            >
-              <Globe size={14} />
-              {t('catalog.actions.viewGraph')}
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/services/maturity"
+                className="text-xs text-accent hover:underline"
+              >
+                {t('catalog.maturity.viewDashboard', 'View maturity dashboard')} →
+              </Link>
+              <Link
+                to="/services/graph"
+                className="text-xs text-accent hover:underline flex items-center gap-1"
+              >
+                <Globe size={14} />
+                {t('catalog.actions.viewGraph')}
+              </Link>
+            </div>
           </div>
         </CardHeader>
         <CardBody className="p-0">
@@ -346,6 +379,9 @@ export function ServiceCatalogListPage() {
                     </th>
                     <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
                       {t('catalog.columns.exposure')}
+                    </th>
+                    <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                      {t('catalog.columns.maturity', 'Maturity')}
                     </th>
                     <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
                       {t('common.actions')}
@@ -400,6 +436,17 @@ export function ServiceCatalogListPage() {
                         <span className="text-xs text-muted">
                           {t(`catalog.badges.exposure.${svc.exposureType}`)}
                         </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {(() => {
+                          const m = maturityById.get(svc.serviceId);
+                          return m ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <Badge variant={maturityBadgeVariant(m.level)} size="sm">{t(`serviceMaturity.level.${m.level}`)}</Badge>
+                              <span className="text-xs text-muted">{Math.round(m.overallScore * 100)}</span>
+                            </span>
+                          ) : <span className="text-xs text-muted">—</span>;
+                        })()}
                       </td>
                       <td className="px-4 py-3">
                         <Link
