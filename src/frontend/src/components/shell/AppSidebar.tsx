@@ -58,7 +58,6 @@ export const navItems: NavItem[] = [
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <BookOpenCheck size={18} />, permission: 'catalog:assets:read', section: 'catalog' },
   // Descoberta & Maturidade
   { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
-  { labelKey: 'sidebar.scoreMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Star size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   { labelKey: 'sidebar.legacyAssets', to: '/services/legacy', icon: <Archive size={18} />, permission: 'catalog:assets:read', section: 'catalog', subGroup: 'sidebar.subGroupDiscovery' },
   // Governança de Contratos

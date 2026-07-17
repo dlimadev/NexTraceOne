@@ -6,6 +6,10 @@ describe('navItems — catálogo', () => {
     expect(navItems.find((i) => i.to === '/services/feature-flags')).toBeUndefined();
   });
 
+  it('não contém o item Score & Maturidade (agora na lista do catálogo)', () => {
+    expect(navItems.find((i) => i.to === '/services/maturity')).toBeUndefined();
+  });
+
   it('mantém o Catálogo de Serviços', () => {
     expect(navItems.find((i) => i.to === '/services')).toBeDefined();
   });
