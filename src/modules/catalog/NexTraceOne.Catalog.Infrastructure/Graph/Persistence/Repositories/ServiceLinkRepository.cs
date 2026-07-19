@@ -22,6 +22,22 @@ internal sealed class ServiceLinkRepository(ServiceCatalogDbContext context) : I
             .ThenBy(l => l.Title)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ServiceLink>> ListByServiceIdsAsync(
+        IReadOnlyCollection<ServiceAssetId> serviceAssetIds,
+        CancellationToken cancellationToken)
+    {
+        if (serviceAssetIds.Count == 0)
+            return [];
+
+        var guids = serviceAssetIds.Select(id => id.Value).ToList();
+        return await _context.ServiceLinks
+            .Where(l => guids.Contains(l.ServiceAssetId.Value))
+            .OrderBy(l => l.Category)
+            .ThenBy(l => l.SortOrder)
+            .ThenBy(l => l.Title)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(ServiceLink link)
         => _context.ServiceLinks.Add(link);
 

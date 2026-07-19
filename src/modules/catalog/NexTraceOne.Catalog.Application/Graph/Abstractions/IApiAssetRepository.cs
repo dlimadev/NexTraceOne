@@ -19,6 +19,9 @@ public interface IApiAssetRepository
     /// <summary>Lista ativos de API pertencentes a um serviço específico.</summary>
     Task<IReadOnlyList<ApiAsset>> ListByServiceIdAsync(ServiceAssetId serviceId, CancellationToken cancellationToken);
 
+    /// <summary>Lista ativos de API pertencentes a um conjunto de serviços numa única query batch.</summary>
+    Task<IReadOnlyList<ApiAsset>> ListByServiceIdsAsync(IReadOnlyCollection<ServiceAssetId> serviceIds, CancellationToken cancellationToken);
+
     /// <summary>Pesquisa ativos de API pelo nome ou rota.</summary>
     Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken);
 

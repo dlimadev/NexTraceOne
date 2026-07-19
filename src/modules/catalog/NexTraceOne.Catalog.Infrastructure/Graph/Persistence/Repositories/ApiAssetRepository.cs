@@ -29,6 +29,19 @@ internal sealed class ApiAssetRepository(ServiceCatalogDbContext context)
             .Where(asset => asset.OwnerService.Id == serviceId)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ApiAsset>> ListByServiceIdsAsync(
+        IReadOnlyCollection<ServiceAssetId> serviceIds,
+        CancellationToken cancellationToken)
+    {
+        if (serviceIds.Count == 0)
+            return [];
+
+        var guids = serviceIds.Select(id => id.Value).ToList();
+        return await IncludeGraph(_context.ApiAssets)
+            .Where(a => guids.Contains(EF.Property<Guid>(a, "OwnerServiceId")))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)
         => await IncludeGraph(_context.ApiAssets)
             .Where(asset =>

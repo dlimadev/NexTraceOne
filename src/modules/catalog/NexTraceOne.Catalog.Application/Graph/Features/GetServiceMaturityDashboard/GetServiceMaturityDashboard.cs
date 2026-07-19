@@ -2,10 +2,8 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Catalog.Domain.Graph.Entities;
-using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Application.Graph.Maturity;
 
 namespace NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityDashboard;
 
@@ -34,9 +32,7 @@ public static class GetServiceMaturityDashboard
     /// <summary>Handler que computa maturidade de todos os serviços filtrados.</summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
-        IServiceLinkRepository serviceLinkRepository,
-        IApiAssetRepository apiAssetRepository,
-        IContractVersionRepository contractVersionRepository) : IQueryHandler<Query, Response>
+        IServiceMaturityCalculator calculator) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -54,45 +50,13 @@ public static class GetServiceMaturityDashboard
                 pageSize: 10_000,
                 cancellationToken);
 
-            var scorecards = new List<ServiceMaturityItemDto>();
+            // Batch — elimina o N+1 do loop anterior
+            var maturityByService = await calculator.ComputeForServicesAsync(services, cancellationToken);
 
-            foreach (var service in services)
+            var scorecards = services.Select(service =>
             {
-                var links = await serviceLinkRepository.ListByServiceAsync(service.Id, cancellationToken);
-                var apis = await apiAssetRepository.ListByServiceIdAsync(service.Id, cancellationToken);
-
-                var contractCount = 0;
-                if (apis.Count > 0)
-                {
-                    var apiIds = apis.Select(a => a.Id.Value).ToList();
-                    var contracts = await contractVersionRepository.ListByApiAssetIdsAsync(apiIds, cancellationToken);
-                    contractCount = contracts.Count;
-                }
-
-                var hasOwnership = !string.IsNullOrWhiteSpace(service.TeamName)
-                    && !string.IsNullOrWhiteSpace(service.TechnicalOwner);
-                var hasContracts = contractCount > 0;
-                var hasDocumentation = !string.IsNullOrWhiteSpace(service.DocumentationUrl)
-                    || links.Any(l => l.Category is LinkCategory.Documentation or LinkCategory.Wiki);
-                var hasRunbook = links.Any(l => l.Category == LinkCategory.Runbook);
-                var hasMonitoring = links.Any(l =>
-                    l.Category is LinkCategory.Monitoring or LinkCategory.Dashboard);
-                var hasRepository = !string.IsNullOrWhiteSpace(service.RepositoryUrl)
-                    || links.Any(l => l.Category == LinkCategory.Repository);
-
-                var dimensionScores = new List<decimal>();
-                if (hasOwnership) dimensionScores.Add(1m); else dimensionScores.Add(string.IsNullOrWhiteSpace(service.TeamName) ? 0m : 0.4m);
-                dimensionScores.Add(hasContracts ? 1m : (apis.Count == 0 ? 0.5m : 0m));
-                dimensionScores.Add(hasDocumentation ? 1m : 0m);
-                dimensionScores.Add(hasRepository ? 1m : 0m);
-                dimensionScores.Add(hasMonitoring && hasRunbook ? 1m : (hasMonitoring || hasRunbook ? 0.5m : 0m));
-
-                var overallScore = dimensionScores.Count > 0
-                    ? Math.Round(dimensionScores.Average(), 2)
-                    : 0m;
-                var level = ScoreToLevel(overallScore);
-
-                scorecards.Add(new ServiceMaturityItemDto(
+                var m = maturityByService[service.Id.Value];
+                return new ServiceMaturityItemDto(
                     ServiceId: service.Id.Value,
                     ServiceName: service.Name,
                     DisplayName: service.DisplayName,
@@ -100,18 +64,18 @@ public static class GetServiceMaturityDashboard
                     Domain: service.Domain,
                     Criticality: service.Criticality.ToString(),
                     LifecycleStatus: service.LifecycleStatus.ToString(),
-                    Level: level.ToString(),
-                    OverallScore: overallScore,
-                    HasOwnership: hasOwnership,
-                    HasContracts: hasContracts,
-                    HasDocumentation: hasDocumentation,
-                    HasRunbook: hasRunbook,
-                    HasMonitoring: hasMonitoring,
-                    HasRepository: hasRepository,
-                    ApiCount: apis.Count,
-                    ContractCount: contractCount,
-                    LinkCount: links.Count));
-            }
+                    Level: m.Level,
+                    OverallScore: m.OverallScore,
+                    HasOwnership: m.HasOwnership,
+                    HasContracts: m.HasContracts,
+                    HasDocumentation: m.HasDocumentation,
+                    HasRunbook: m.HasRunbook,
+                    HasMonitoring: m.HasMonitoring,
+                    HasRepository: m.HasRepository,
+                    ApiCount: m.ApiCount,
+                    ContractCount: m.ContractCount,
+                    LinkCount: m.LinkCount);
+            }).ToList();
 
             var ordered = scorecards.OrderBy(s => s.OverallScore).ToList();
 
@@ -148,12 +112,6 @@ public static class GetServiceMaturityDashboard
                 ComputedAt: DateTimeOffset.UtcNow);
         }
 
-        private static string ScoreToLevel(decimal score) =>
-            score >= 0.9m ? "Optimizing"
-            : score >= 0.7m ? "Managed"
-            : score >= 0.5m ? "Defined"
-            : score >= 0.25m ? "Developing"
-            : "Initial";
     }
 
     /// <summary>Resposta do dashboard de maturidade.</summary>

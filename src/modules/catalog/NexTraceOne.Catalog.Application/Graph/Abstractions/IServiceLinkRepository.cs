@@ -14,6 +14,9 @@ public interface IServiceLinkRepository
     /// <summary>Lista todos os links de um serviço, ordenados por categoria e sort order.</summary>
     Task<IReadOnlyList<ServiceLink>> ListByServiceAsync(ServiceAssetId serviceAssetId, CancellationToken cancellationToken);
 
+    /// <summary>Lista todos os links de um conjunto de serviços numa única query batch.</summary>
+    Task<IReadOnlyList<ServiceLink>> ListByServiceIdsAsync(IReadOnlyCollection<ServiceAssetId> serviceAssetIds, CancellationToken cancellationToken);
+
     /// <summary>Adiciona um novo link para persistência.</summary>
     void Add(ServiceLink link);
 

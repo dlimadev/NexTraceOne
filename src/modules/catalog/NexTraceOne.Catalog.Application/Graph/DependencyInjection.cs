@@ -40,6 +40,7 @@ using NexTraceOne.Catalog.Application.Services.Features.GetCatalogHealthMaintena
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractDriftFromRealityReport;
 using NexTraceOne.Catalog.Application.Graph.Features.GetCatalogCompletenessScore;
 using NexTraceOne.Catalog.Application.Graph.Features.GetPortfolioCompletenessReport;
+using NexTraceOne.Catalog.Application.Graph.Maturity;
 
 namespace NexTraceOne.Catalog.Application.Graph;
 
@@ -56,6 +57,9 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        // ── Serviços partilhados ─────────────────────────────────────────────
+        services.AddScoped<IServiceMaturityCalculator, ServiceMaturityCalculator>();
 
         // ── Features existentes ──────────────────────────────────────────
         services.AddTransient<IValidator<RegisterServiceAsset.Command>, RegisterServiceAsset.Validator>();
