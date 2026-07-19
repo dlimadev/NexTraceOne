@@ -182,6 +182,9 @@ export const serviceCatalogApi = {
     lifecycleStatus?: string;
     exposureType?: string;
     search?: string;
+    maturityLevel?: string;
+    sortBy?: string;
+    sortDescending?: boolean;
     page?: number;
     pageSize?: number;
   }) =>

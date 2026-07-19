@@ -12,6 +12,8 @@ import {
   Globe,
   Archive,
   Plus,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '../../../components/Badge';
@@ -89,6 +91,9 @@ const LIFECYCLE_VALUES = [
 /** Valores disponíveis nos filtros de tipo de exposição. */
 const EXPOSURE_VALUES = ['Internal', 'External', 'Partner'] as const;
 
+/** Níveis de maturidade disponíveis como filtro. */
+const MATURITY_LEVELS = ['Initial', 'Developing', 'Defined', 'Managed', 'Optimizing'] as const;
+
 /** Interface dos filtros ativos na listagem. */
 interface ServiceFilters {
   search: string;
@@ -98,6 +103,7 @@ interface ServiceFilters {
   exposureType: string;
   domain: string;
   teamName: string;
+  maturityFilter: string;
 }
 
 const emptyFilters: ServiceFilters = {
@@ -108,6 +114,7 @@ const emptyFilters: ServiceFilters = {
   exposureType: '',
   domain: '',
   teamName: '',
+  maturityFilter: '',
 };
 
 /** Intervalo de debounce para pesquisa (ms). */
@@ -121,6 +128,9 @@ export function ServiceCatalogListPage() {
   const [filters, setFilters] = useState<ServiceFilters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  // Estado de ordenação por maturidade — estado único para evitar closures stale
+  type MaturitySortState = { by: '' } | { by: 'maturity'; desc: boolean };
+  const [maturitySortState, setMaturitySortState] = useState<MaturitySortState>({ by: '' });
   const PAGE_SIZE = 50;
 
   /** Debounce da pesquisa para evitar chamadas excessivas à API. */
@@ -130,8 +140,11 @@ export function ServiceCatalogListPage() {
   }, [filters.search]);
 
   /** Parâmetros enviados à API — omite chaves vazias. */
-  const queryParams = useMemo(() => {
-    const p: Record<string, string> = {};
+  const queryParams = useMemo((): NonNullable<Parameters<typeof serviceCatalogApi.listServices>[0]> => {
+    const p: NonNullable<Parameters<typeof serviceCatalogApi.listServices>[0]> = {
+      page: currentPage,
+      pageSize: PAGE_SIZE,
+    };
     if (debouncedSearch) p.search = debouncedSearch;
     if (filters.serviceType) p.serviceType = filters.serviceType;
     if (filters.criticality) p.criticality = filters.criticality;
@@ -139,10 +152,13 @@ export function ServiceCatalogListPage() {
     if (filters.exposureType) p.exposureType = filters.exposureType;
     if (filters.domain) p.domain = filters.domain;
     if (filters.teamName) p.teamName = filters.teamName;
-    p.page = currentPage.toString();
-    p.pageSize = PAGE_SIZE.toString();
+    if (filters.maturityFilter) p.maturityLevel = filters.maturityFilter;
+    if (maturitySortState.by === 'maturity') {
+      p.sortBy = 'maturity';
+      p.sortDescending = maturitySortState.desc;
+    }
     return p;
-  }, [debouncedSearch, filters.serviceType, filters.criticality, filters.lifecycleStatus, filters.exposureType, filters.domain, filters.teamName, currentPage]);
+  }, [debouncedSearch, filters.serviceType, filters.criticality, filters.lifecycleStatus, filters.exposureType, filters.domain, filters.teamName, filters.maturityFilter, maturitySortState, currentPage]);
 
   const {
     data,
@@ -176,6 +192,17 @@ export function ServiceCatalogListPage() {
   /** Atualiza um campo de filtro individual. */
   const setFilter = (key: keyof ServiceFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  /** Alterna a ordenação por maturidade (asc → desc → asc…). Usa update funcional
+   *  para garantir que prev reflecte sempre o estado mais recente, evitando closures stale. */
+  const handleMaturitySortClick = () => {
+    setMaturitySortState((prev) =>
+      prev.by !== 'maturity'
+        ? { by: 'maturity', desc: false }
+        : { by: 'maturity', desc: !prev.desc },
+    );
     setCurrentPage(1);
   };
 
@@ -257,7 +284,7 @@ export function ServiceCatalogListPage() {
             />
 
             {/* Filtros dropdown — DS Select + TextField */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <Select
                 label={t('catalog.filters.serviceType')}
                 size="sm"
@@ -305,6 +332,17 @@ export function ServiceCatalogListPage() {
                 placeholder={t('catalog.filters.team')}
                 value={filters.teamName}
                 onChange={(e) => setFilter('teamName', e.target.value)}
+              />
+              {/* Filtro por nível de maturidade */}
+              <Select
+                label={t('catalog.filters.maturity')}
+                size="sm"
+                value={filters.maturityFilter}
+                onChange={(e) => setFilter('maturityFilter', e.target.value)}
+                options={[
+                  { value: '', label: t('catalog.filters.all') },
+                  ...MATURITY_LEVELS.map((v) => ({ value: v, label: t(`serviceMaturity.level.${v}`) })),
+                ]}
               />
             </div>
           </div>
@@ -381,7 +419,19 @@ export function ServiceCatalogListPage() {
                       {t('catalog.columns.exposure')}
                     </th>
                     <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                      {t('catalog.columns.maturity', 'Maturity')}
+                      <button
+                        type="button"
+                        aria-label={t('catalog.columns.sortByMaturity')}
+                        onClick={handleMaturitySortClick}
+                        className="inline-flex items-center gap-1 hover:text-heading transition-colors cursor-pointer"
+                      >
+                        {t('catalog.columns.maturity', 'Maturity')}
+                        {maturitySortState.by === 'maturity' && (
+                          maturitySortState.desc
+                            ? <ArrowDown size={12} />
+                            : <ArrowUp size={12} />
+                        )}
+                      </button>
                     </th>
                     <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
                       {t('common.actions')}

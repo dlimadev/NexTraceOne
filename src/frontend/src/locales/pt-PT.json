@@ -1314,6 +1314,7 @@
       "maturity": "Maturidade",
       "name": "Nome",
       "serviceType": "Tipo",
+      "sortByMaturity": "Ordenar por maturidade",
       "team": "Equipa"
     },
     "dependencyGraph": {
@@ -1509,6 +1510,7 @@
       "domain": "Domínio",
       "exposureType": "Tipo de Exposição",
       "lifecycleStatus": "Estado do Ciclo de Vida",
+      "maturity": "Maturidade",
       "serviceType": "Tipo de Serviço",
       "team": "Equipa"
     },
