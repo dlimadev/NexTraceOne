@@ -162,6 +162,9 @@ public sealed class ServiceCatalogEndpointModule
             string? search,
             int? page,
             int? pageSize,
+            string? maturityLevel,
+            string? sortBy,
+            bool? sortDescending,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
@@ -169,7 +172,10 @@ public sealed class ServiceCatalogEndpointModule
             var query = new ListServicesFeature.Query(
                 teamName, domain, serviceType, criticality,
                 lifecycleStatus, exposureType, search,
-                page ?? 1, pageSize ?? 50);
+                page ?? 1, pageSize ?? 50,
+                MaturityLevel: maturityLevel,
+                SortBy: sortBy,
+                SortDescending: sortDescending ?? false);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");

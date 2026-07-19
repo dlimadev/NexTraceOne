@@ -2,6 +2,7 @@ using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Maturity;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Configuration.Application.Abstractions;
@@ -27,7 +28,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task ListServices_Should_ReturnAllServices_When_NoFilters()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var sut = new ListServicesFeature.Handler(repository);
+        var sut = new ListServicesFeature.Handler(repository, Substitute.For<IServiceMaturityCalculator>());
 
         var services = new List<ServiceAsset>
         {
@@ -50,7 +51,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task ListServices_Should_PassFilters_To_Repository()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var sut = new ListServicesFeature.Handler(repository);
+        var sut = new ListServicesFeature.Handler(repository, Substitute.For<IServiceMaturityCalculator>());
 
         repository.ListFilteredAsync("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns((new List<ServiceAsset>(), 0));
