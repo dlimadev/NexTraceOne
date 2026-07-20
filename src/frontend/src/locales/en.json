@@ -8038,6 +8038,7 @@
     "registerApi": "Register API",
     "registerApiTitle": "Register API Asset",
     "registerService": "Register Service",
+    "createFromTemplate": "Create from template",
     "registerServiceTitle": "Register Service",
     "repositoryUrl": "Repository URL",
     "searchPlaceholder": "Search services, APIs, domains…",

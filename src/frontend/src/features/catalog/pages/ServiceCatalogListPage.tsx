@@ -14,6 +14,7 @@ import {
   Plus,
   ArrowUp,
   ArrowDown,
+  LayoutTemplate,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '../../../components/Badge';
@@ -214,14 +215,24 @@ export function ServiceCatalogListPage() {
         subtitle={t('catalog.subtitle')}
         icon={<Server size={24} />}
         actions={
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Plus size={14} />}
-            onClick={() => navigate('/services/onboard')}
-          >
-            {t('serviceCatalog.registerService')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<LayoutTemplate size={14} />}
+              onClick={() => navigate('/catalog/templates')}
+            >
+              {t('serviceCatalog.createFromTemplate', 'Create from template')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Plus size={14} />}
+              onClick={() => navigate('/services/onboard')}
+            >
+              {t('serviceCatalog.registerService')}
+            </Button>
+          </div>
         }
       />
 

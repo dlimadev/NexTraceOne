@@ -9339,6 +9339,7 @@
     "registerApi": "Registrar API",
     "registerApiTitle": "Registrar Activo de API",
     "registerService": "Registrar Servicio",
+    "createFromTemplate": "Crear desde plantilla",
     "registerServiceTitle": "Registrar Servicio",
     "repositoryUrl": "URL del Repositorio",
     "searchPlaceholder": "Buscar servicios, APIs, dominios…",
