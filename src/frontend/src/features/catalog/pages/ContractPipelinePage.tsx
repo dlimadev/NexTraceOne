@@ -17,7 +17,7 @@ import {
   FileJson,
   RefreshCw,
 } from 'lucide-react';
-import axios from 'axios';
+import client from '../../../api/client';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button, TextField, Select, TextArea } from '../../../shared/ui';
@@ -59,7 +59,7 @@ const pipelineApi = {
     generateTests: boolean;
     generateClientSdk: boolean;
   }): Promise<PipelineResult> =>
-    axios.post('/api/v1/catalog/contracts/pipeline/orchestrate', body).then(r => r.data),
+    client.post('/catalog/contracts/pipeline/orchestrate', body).then(r => r.data),
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────

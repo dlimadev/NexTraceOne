@@ -1,4 +1,4 @@
-import axios from 'axios';
+import client from '../../../api/client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -147,37 +147,37 @@ export interface ListTemplatesParams {
 
 // ── API client ────────────────────────────────────────────────────────────────
 
-const BASE = '/api/v1/catalog/templates';
-const AI_BASE = '/api/v1/aiorchestration/generate';
+const BASE = '/catalog/templates';
+const AI_BASE = '/aiorchestration/generate';
 
 export const templatesApi = {
   list: (params?: ListTemplatesParams): Promise<TemplateSummary[]> =>
-    axios.get(BASE, { params }).then(r => r.data),
+    client.get(BASE, { params }).then(r => r.data),
 
   getById: (id: string): Promise<TemplateDetail> =>
-    axios.get(`${BASE}/${id}`).then(r => r.data),
+    client.get(`${BASE}/${id}`).then(r => r.data),
 
   getBySlug: (slug: string): Promise<TemplateDetail> =>
-    axios.get(`${BASE}/slug/${slug}`).then(r => r.data),
+    client.get(`${BASE}/slug/${slug}`).then(r => r.data),
 
   create: (body: CreateTemplateRequest): Promise<{ templateId: string; slug: string; displayName: string }> =>
-    axios.post(BASE, body).then(r => r.data),
+    client.post(BASE, body).then(r => r.data),
 
   update: (id: string, body: UpdateTemplateRequest): Promise<{ templateId: string; slug: string; displayName: string }> =>
-    axios.put(`${BASE}/${id}`, body).then(r => r.data),
+    client.put(`${BASE}/${id}`, body).then(r => r.data),
 
   activate: (id: string): Promise<{ templateId: string; slug: string; isActive: boolean }> =>
-    axios.post(`${BASE}/${id}/activate`).then(r => r.data),
+    client.post(`${BASE}/${id}/activate`).then(r => r.data),
 
   deactivate: (id: string): Promise<{ templateId: string; slug: string; isActive: boolean }> =>
-    axios.post(`${BASE}/${id}/deactivate`).then(r => r.data),
+    client.post(`${BASE}/${id}/deactivate`).then(r => r.data),
 
   scaffold: (id: string, body: ScaffoldRequest): Promise<ScaffoldResult> =>
-    axios.post(`${BASE}/${id}/scaffold`, body).then(r => r.data),
+    client.post(`${BASE}/${id}/scaffold`, body).then(r => r.data),
 
   scaffoldBySlug: (slug: string, body: ScaffoldRequest): Promise<ScaffoldResult> =>
-    axios.post(`${BASE}/slug/${slug}/scaffold`, body).then(r => r.data),
+    client.post(`${BASE}/slug/${slug}/scaffold`, body).then(r => r.data),
 
   generateWithAi: (body: AiScaffoldRequest): Promise<AiScaffoldResult> =>
-    axios.post(`${AI_BASE}/scaffold`, body).then(r => r.data),
+    client.post(`${AI_BASE}/scaffold`, body).then(r => r.data),
 };
