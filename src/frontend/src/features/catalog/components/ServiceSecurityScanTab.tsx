@@ -245,21 +245,21 @@ export function ServiceSecurityScanTab({ serviceId }: { serviceId: string }) {
                 </p>
                 <p className="text-xs text-muted">
                   {t('riskLevel')}:{' '}
-                  <span className={RISK_CONFIG[scanMutation.data.overallRisk].color}>
+                  <span className={(RISK_CONFIG[scanMutation.data.overallRisk] ?? RISK_CONFIG.Clean).color}>
                     {scanMutation.data.overallRisk}
                   </span>
                 </p>
               </div>
               <div className="ml-auto flex gap-2">
-                {RISK_CONFIG[scanMutation.data.overallRisk].icon}
+                {(RISK_CONFIG[scanMutation.data.overallRisk] ?? RISK_CONFIG.Clean).icon}
               </div>
             </div>
 
             {/* Severity summary */}
             <div className="grid grid-cols-3 gap-2">
-              <SummaryCard label={t('critical')} value={scanMutation.data.summary.criticalCount} color="text-critical" />
-              <SummaryCard label={t('high')} value={scanMutation.data.summary.highCount} color="text-orange-500" />
-              <SummaryCard label={t('medium')} value={scanMutation.data.summary.mediumCount} color="text-warning" />
+              <SummaryCard label={t('critical')} value={scanMutation.data.summary?.criticalCount ?? 0} color="text-critical" />
+              <SummaryCard label={t('high')} value={scanMutation.data.summary?.highCount ?? 0} color="text-orange-500" />
+              <SummaryCard label={t('medium')} value={scanMutation.data.summary?.mediumCount ?? 0} color="text-warning" />
             </div>
 
             {/* Filters */}

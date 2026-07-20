@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import client from '../../api/client';
 import { ServiceLicenseComplianceTab } from '../../features/catalog/components/ServiceLicenseComplianceTab';
 
 vi.mock('../../api/client', () => ({
@@ -75,5 +76,14 @@ describe('ServiceLicenseComplianceTab', () => {
   it('shows generate SBOM button', () => {
     renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
     expect(screen.getByText('licenseCompliance.generateSbom')).toBeDefined();
+  });
+
+  // Regressão: uma resposta sem o array `conflicts` (ex.: resposta parcial ou
+  // fallback HTML no stub) não deve rebentar o render — antes crashava o shell
+  // inteiro via ErrorBoundary (TypeError: reading 'length' of undefined).
+  it('renders empty state when the response is missing the conflicts array', async () => {
+    (client.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: {} });
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
+    expect(await screen.findByText('licenseCompliance.noConflicts')).toBeDefined();
   });
 });

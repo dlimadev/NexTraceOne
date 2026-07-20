@@ -176,13 +176,13 @@ export function ServiceDependencyTab({ serviceId }: { serviceId: string }) {
               </div>
 
               {/* License risk */}
-              {Object.keys(serviceHealth.licenseRiskCounts).length > 0 && (
+              {Object.keys(serviceHealth.licenseRiskCounts ?? {}).length > 0 && (
                 <div>
                   <p className="text-xs font-medium text-muted mb-2">
                     {t('dependencyDashboard.licenseRiskCounts')}
                   </p>
                   <ul className="space-y-1">
-                    {Object.entries(serviceHealth.licenseRiskCounts).map(([risk, count]) => (
+                    {Object.entries(serviceHealth.licenseRiskCounts ?? {}).map(([risk, count]) => (
                       <li key={risk} className="flex justify-between text-sm">
                         <span className="text-body">{risk}</span>
                         <span className="font-semibold text-heading">{count}</span>

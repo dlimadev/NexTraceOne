@@ -186,13 +186,13 @@ export function ServiceLicenseComplianceTab({ serviceId }: { serviceId: string }
             )}
             {licenseData && (
               <>
-                {licenseData.conflicts.length === 0 ? (
+                {(licenseData.conflicts ?? []).length === 0 ? (
                   <p className="text-sm text-muted py-4 text-center">
                     {t('licenseCompliance.noConflicts')}
                   </p>
                 ) : (
                   <ul className="space-y-3">
-                    {licenseData.conflicts.map((conflict, idx) => (
+                    {(licenseData.conflicts ?? []).map((conflict, idx) => (
                       <li
                         key={idx}
                         className="flex items-start justify-between gap-3 rounded-lg border border-edge p-3"
@@ -236,13 +236,13 @@ export function ServiceLicenseComplianceTab({ serviceId }: { serviceId: string }
             )}
             {upgradesData && (
               <>
-                {upgradesData.suggestions.length === 0 ? (
+                {(upgradesData.suggestions ?? []).length === 0 ? (
                   <p className="text-sm text-muted py-4 text-center">
                     {t('licenseCompliance.noUpgrades')}
                   </p>
                 ) : (
                   <ul className="space-y-3">
-                    {upgradesData.suggestions.map((suggestion, idx) => (
+                    {(upgradesData.suggestions ?? []).map((suggestion, idx) => (
                       <li
                         key={idx}
                         className="flex items-center justify-between gap-3 rounded-lg border border-edge p-3"
