@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { LicenseCompliancePage } from '../../features/catalog/pages/LicenseCompliancePage';
+import { ServiceLicenseComplianceTab } from '../../features/catalog/components/ServiceLicenseComplianceTab';
 
 vi.mock('../../api/client', () => ({
   default: {
@@ -31,15 +31,6 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={qc}>
-      <MemoryRouter>{ui}</MemoryRouter>
-    </QueryClientProvider>
-  );
-};
-
 vi.mock('../../contexts/EnvironmentContext', () => ({
   useEnvironment: vi.fn().mockReturnValue({
     activeEnvironmentId: 'env-prod-001',
@@ -51,24 +42,38 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
   }),
 }));
 
-describe('LicenseCompliancePage', () => {
+const renderWithProviders = (ui: React.ReactElement) => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </QueryClientProvider>
+  );
+};
+
+describe('ServiceLicenseComplianceTab', () => {
   it('renders title from i18n', () => {
-    renderWithProviders(<LicenseCompliancePage />);
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
     expect(screen.getByText('licenseCompliance.title')).toBeDefined();
   });
 
-  it('shows serviceId input', () => {
-    renderWithProviders(<LicenseCompliancePage />);
-    expect(screen.getByText('licenseCompliance.serviceId')).toBeDefined();
+  it('does not render a service id input (service is known from context)', () => {
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
+    expect(screen.queryByText('licenseCompliance.serviceId')).toBeNull();
   });
 
   it('shows check licenses button', () => {
-    renderWithProviders(<LicenseCompliancePage />);
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
     expect(screen.getByText('licenseCompliance.checkLicenses')).toBeDefined();
   });
 
+  it('shows get upgrades button', () => {
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
+    expect(screen.getByText('licenseCompliance.getUpgrades')).toBeDefined();
+  });
+
   it('shows generate SBOM button', () => {
-    renderWithProviders(<LicenseCompliancePage />);
+    renderWithProviders(<ServiceLicenseComplianceTab serviceId="service-001" />);
     expect(screen.getByText('licenseCompliance.generateSbom')).toBeDefined();
   });
 });

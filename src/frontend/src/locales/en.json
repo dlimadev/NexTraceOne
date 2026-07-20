@@ -10517,6 +10517,7 @@
     "tabIncidents": "Incidents",
     "tabScore": "Score",
     "tabFeatureFlags": "Feature Flags",
+    "tabLicense": "Licenses & SBOM",
     "health": {
       "maturity": "Maturity",
       "slo": "SLO"

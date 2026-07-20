@@ -11809,6 +11809,7 @@
     "tabIncidents": "Incidentes",
     "tabScore": "Puntuación",
     "tabFeatureFlags": "Feature Flags",
+    "tabLicense": "Licencias y SBOM",
     "health": {
       "maturity": "Madurez",
       "slo": "SLO"
