@@ -11825,6 +11825,7 @@
     "tabScore": "Score",
     "tabFeatureFlags": "Feature Flags",
     "tabLicense": "Licenças & SBOM",
+    "tabDependencies": "Dependências",
     "health": {
       "maturity": "Maturidade",
       "slo": "SLO"
