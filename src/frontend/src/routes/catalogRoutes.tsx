@@ -26,7 +26,6 @@ const TemplateDetailPage = lazy(() => import('../features/catalog/pages/Template
 const TemplateEditorPage = lazy(() => import('../features/catalog/pages/TemplateEditorPage').then(m => ({ default: m.TemplateEditorPage })));
 const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
 const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
-const SecurityGateDashboardPage = lazy(() => import('../features/catalog/pages/SecurityGateDashboardPage').then(m => ({ default: m.SecurityGateDashboardPage })));
 const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfServicePortalPage').then(m => ({ default: m.SelfServicePortalPage })));
 const DeveloperExperienceScorePage = lazy(() => import('../features/catalog/pages/DeveloperExperienceScorePage').then(m => ({ default: m.DeveloperExperienceScorePage })));
 const ServiceFeatureFlagsPage = lazy(() => import('../features/catalog/pages/ServiceFeatureFlagsPage').then(m => ({ default: m.ServiceFeatureFlagsPage })));
@@ -205,14 +204,6 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:contracts:pipeline:read" redirectTo="/unauthorized">
             <ContractPipelinePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/catalog/security-gate"
-        element={
-          <ProtectedRoute permission="governance:security:scan" redirectTo="/unauthorized">
-            <SecurityGateDashboardPage />
           </ProtectedRoute>
         }
       />

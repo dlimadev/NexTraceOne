@@ -25,6 +25,7 @@ import {
   Sliders,
   FileCheck,
   Network,
+  ShieldAlert,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -56,6 +57,7 @@ import { ServiceContractDrawer, type ContractDrawerState } from '../components/S
 import { ServiceFeatureFlagsTab } from '../components/ServiceFeatureFlagsTab';
 import { ServiceLicenseComplianceTab } from '../components/ServiceLicenseComplianceTab';
 import { ServiceDependencyTab } from '../components/ServiceDependencyTab';
+import { ServiceSecurityScanTab } from '../components/ServiceSecurityScanTab';
 
 // ── Helpers de variante de badge ─────────────────────────────────────────────
 
@@ -238,7 +240,7 @@ const REGULATORY_OPTIONS = [
 
 // ── Tabs de conteúdo para modo view ──────────────────────────────────────────
 
-type ServiceTab = 'overview' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score' | 'featureFlags' | 'license' | 'dependencies';
+type ServiceTab = 'overview' | 'contracts' | 'interfaces' | 'observability' | 'reliability' | 'incidents' | 'score' | 'featureFlags' | 'license' | 'dependencies' | 'security';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -494,6 +496,7 @@ export function ServiceDetailPage() {
     { id: 'featureFlags', label: t('serviceDetail.tabFeatureFlags', 'Feature Flags'), icon: <Sliders size={14} /> },
     { id: 'license', label: t('serviceDetail.tabLicense', 'Licenses & SBOM'), icon: <FileCheck size={14} /> },
     { id: 'dependencies', label: t('serviceDetail.tabDependencies', 'Dependencies'), icon: <Network size={14} /> },
+    { id: 'security', label: t('serviceDetail.tabSecurity', 'Security'), icon: <ShieldAlert size={14} /> },
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────────
@@ -1210,6 +1213,7 @@ function ViewContent({
         {activeViewTab === 'featureFlags' && <ServiceFeatureFlagsTab serviceId={serviceId} />}
         {activeViewTab === 'license' && <ServiceLicenseComplianceTab serviceId={serviceId} />}
         {activeViewTab === 'dependencies' && <ServiceDependencyTab serviceId={serviceId} />}
+        {activeViewTab === 'security' && <ServiceSecurityScanTab serviceId={serviceId} />}
       </div>
 
       {/* Panels laterais adicionais — lifecycle e links */}

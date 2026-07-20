@@ -11811,6 +11811,7 @@
     "tabFeatureFlags": "Feature Flags",
     "tabLicense": "Licencias y SBOM",
     "tabDependencies": "Dependencias",
+    "tabSecurity": "Seguridad",
     "health": {
       "maturity": "Madurez",
       "slo": "SLO"
