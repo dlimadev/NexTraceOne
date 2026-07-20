@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.Catalog.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using NpgsqlTypes;
 namespace NexTraceOne.Catalog.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ServiceCatalogDbContext))]
-    partial class ServiceCatalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720080352_MapContractScorecardContractVersionId")]
+    partial class MapContractScorecardContractVersionId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
