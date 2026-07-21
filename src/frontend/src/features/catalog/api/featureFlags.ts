@@ -26,10 +26,10 @@ export interface ServiceFeatureFlagDashboard {
 /** Cliente de feature flags do catálogo. */
 export const serviceFeatureFlagsApi = {
   getDashboard: async (): Promise<ServiceFeatureFlagDashboard> => {
-    const res = await client.get<ServiceFeatureFlagDashboard>('/catalog/feature-flags');
+    const res = await client.get<ServiceFeatureFlagDashboard>('/contracts/feature-flags');
     return res.data;
   },
   toggle: async (flagId: string, enabled: boolean): Promise<void> => {
-    await client.patch(`/catalog/feature-flags/${flagId}`, { enabled });
+    await client.patch(`/contracts/feature-flags/${flagId}`, { enabled });
   },
 };

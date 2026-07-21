@@ -12,6 +12,9 @@ public interface IFeatureFlagRepository
 {
     Task UpsertAsync(FeatureFlagRecord record, CancellationToken ct);
 
+    /// <summary>Obtém uma flag por identificador dentro do tenant (rastreada para edição).</summary>
+    Task<FeatureFlagRecord?> FindByIdAsync(Guid id, string tenantId, CancellationToken ct);
+
     Task<IReadOnlyList<FeatureFlagRecord>> ListByTenantAsync(string tenantId, CancellationToken ct);
 
     Task<IReadOnlyList<FeatureFlagRecord>> ListByServiceAsync(string serviceId, string tenantId, CancellationToken ct);

@@ -36,6 +36,10 @@ internal sealed class EfFeatureFlagRepository(ServiceCatalogDbContext context) :
         }
     }
 
+    public async Task<FeatureFlagRecord?> FindByIdAsync(Guid id, string tenantId, CancellationToken ct)
+        => await context.FeatureFlagRecords
+            .FirstOrDefaultAsync(f => f.Id == id && f.TenantId == tenantId, ct);
+
     public async Task<IReadOnlyList<FeatureFlagRecord>> ListByTenantAsync(
         string tenantId, CancellationToken ct)
         => await context.FeatureFlagRecords

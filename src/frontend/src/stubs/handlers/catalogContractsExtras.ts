@@ -70,8 +70,8 @@ paths:
 
 export const catalogContractsExtrasHandlers = [
   // ── Feature Flags ───────────────────────────────────────────────────
-  http.get(`${API}/catalog/feature-flags`, () => HttpResponse.json(featureFlagDashboard)),
-  http.patch(`${API}/catalog/feature-flags/:flagId`, () => new HttpResponse(null, { status: 204 })),
+  http.get(`${API}/contracts/feature-flags`, () => HttpResponse.json(featureFlagDashboard)),
+  http.patch(`${API}/contracts/feature-flags/:flagId`, () => HttpResponse.json({ id: 'ff-1', enabled: false })),
 
   // ── Developer Portal — catálogo ─────────────────────────────────────
   http.get(`${API}/developerportal/catalog/search`, () => HttpResponse.json(pagedCatalog(catalogItems))),
