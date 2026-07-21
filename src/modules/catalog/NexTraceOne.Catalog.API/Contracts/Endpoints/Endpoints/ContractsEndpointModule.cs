@@ -2,6 +2,7 @@ using MediatR;
 
 using Microsoft.AspNetCore.Builder;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Core.Enums;
@@ -56,6 +57,7 @@ using GetDeprecationProgressFeature = NexTraceOne.Catalog.Application.Contracts.
 using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.DetectContractDrift.DetectContractDrift;
 using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
 using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
+using PromoteSchemaToCanonicalEntityFeature = NexTraceOne.Catalog.Application.Contracts.Features.PromoteSchemaToCanonicalEntity.PromoteSchemaToCanonicalEntity;
 using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
 using ValidateDraftSpecFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateDraftSpec.ValidateDraftSpec;
 using GetContractEnvironmentVersionDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractEnvironmentVersionDrift.GetContractEnvironmentVersionDrift;
@@ -529,6 +531,23 @@ public sealed class ContractsEndpointModule
             var updated = command with { CanonicalEntityId = entityId };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:write");
+
+        // Promove um schema de uma versão de contrato a entidade canónica reutilizável.
+        canonicalGroup.MapPost("/promote", async (
+            PromoteSchemaToCanonicalEntityFeature.PromoteBody body,
+            ICurrentUser currentUser,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var owner = string.IsNullOrWhiteSpace(currentUser.Name) ? currentUser.Email : currentUser.Name;
+            var result = await sender.Send(
+                new PromoteSchemaToCanonicalEntityFeature.Command(
+                    body.SourceContractVersionId, body.SchemaName, body.Name,
+                    body.Domain, body.Category, owner),
+                cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/canonical-entities/{r.Id}", localizer);
         }).RequirePermission("contracts:write");
 
         // ── Mock, Design Guidelines, Multi-Format Export ─────────────────

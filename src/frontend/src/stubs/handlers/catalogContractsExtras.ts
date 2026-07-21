@@ -135,6 +135,11 @@ export const catalogContractsExtrasHandlers = [
     HttpResponse.json({ items: [], contracts: [], totalCount: 0 }),
   ),
 
+  // ── Promover schema a entidade canónica ─────────────────────────────
+  http.post(`${API}/contracts/canonical-entities/promote`, () =>
+    HttpResponse.json({ id: 'ce-promoted-1' }, { status: 201 }),
+  ),
+
   // ── Entidades canónicas — detalhe / usos ────────────────────────────
   http.get(`${API}/contracts/canonical-entities/:entityId/usages`, () =>
     HttpResponse.json({
