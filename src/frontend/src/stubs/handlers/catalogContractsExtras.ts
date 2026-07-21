@@ -130,6 +130,20 @@ export const catalogContractsExtrasHandlers = [
     });
   }),
 
+  // ── Linting nativo do contrato (validate/spectral) ──────────────────
+  http.post(`${API}/contracts/:contractVersionId/validate/spectral`, () =>
+    HttpResponse.json({
+      issues: [
+        { ruleId: 'info-description', ruleName: 'API has a description', severity: 'Info', message: 'Recomenda-se info.description.', path: '$.info.description', source: 'internal' },
+      ],
+      summary: {
+        totalIssues: 1, errorCount: 0, warningCount: 0, infoCount: 1, hintCount: 0, blockedCount: 0,
+        isPublishReady: true, isReviewReady: true, sources: ['internal'],
+        validatedAt: nowIso(), overallStatus: 'Valid',
+      },
+    }),
+  ),
+
   // ── Pesquisa de contratos ───────────────────────────────────────────
   http.get(`${API}/contracts/search`, () =>
     HttpResponse.json({ items: [], contracts: [], totalCount: 0 }),

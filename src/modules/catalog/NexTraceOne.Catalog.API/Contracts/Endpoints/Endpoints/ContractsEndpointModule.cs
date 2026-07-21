@@ -58,6 +58,8 @@ using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Fea
 using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
 using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
 using PromoteSchemaToCanonicalEntityFeature = NexTraceOne.Catalog.Application.Contracts.Features.PromoteSchemaToCanonicalEntity.PromoteSchemaToCanonicalEntity;
+using ValidateContractSpectralFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractSpectral.ValidateContractSpectral;
+using GetContractValidationSummaryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractValidationSummary.GetContractValidationSummary;
 using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
 using ValidateDraftSpecFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateDraftSpec.ValidateDraftSpec;
 using GetContractEnvironmentVersionDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractEnvironmentVersionDrift.GetContractEnvironmentVersionDrift;
@@ -311,6 +313,28 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new ValidateContractIntegrityFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // Linting nativo do contrato (regras estruturais) → issues + resumo.
+        group.MapPost("/{contractVersionId:guid}/validate/spectral", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ValidateContractSpectralFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // Resumo consolidado de validação (contadores por severidade, prontidão, fingerprint).
+        group.MapGet("/{contractVersionId:guid}/validation-summary", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetContractValidationSummaryFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 
