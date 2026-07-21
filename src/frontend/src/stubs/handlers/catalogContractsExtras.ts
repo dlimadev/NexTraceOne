@@ -179,24 +179,39 @@ export const catalogContractsExtrasHandlers = [
   ),
 
   // ── Impacto em cascata de uma entidade canónica ─────────────────────
-  http.get(`${API}/contracts/canonical-entities/:entityId/impact/cascade`, ({ params }) =>
-    HttpResponse.json({
-      entityId: String(params.entityId),
-      totalImpactedContracts: 4,
-      totalImpactedServices: 3,
-      maxDepth: 2,
-      nodes: [
-        { nodeId: 'ct-pay-v2', label: 'Payments API v2', nodeType: 'Contract', depth: 1, impactSeverity: 'High' },
-        { nodeId: 'svc-payments-api', label: 'Payments API', nodeType: 'Service', depth: 1, impactSeverity: 'High' },
-        { nodeId: 'svc-orders-api', label: 'Orders API', nodeType: 'Service', depth: 2, impactSeverity: 'Medium' },
+  // Forma alinhada ao backend GetCanonicalEntityImpactCascade.Response:
+  // { rootEntityId, rootEntityName, totalContractsAffected, totalUniqueEntitiesInCascade,
+  //   cascadeNodes: [{ entityName, depth, affectedContractIds[], children[] }],
+  //   maxDepthReached, riskLevel }
+  http.get(`${API}/contracts/canonical-entities/:entityId/impact/cascade`, ({ params }) => {
+    const rootName = String(params.entityId);
+    return HttpResponse.json({
+      rootEntityId: rootName,
+      rootEntityName: rootName,
+      totalContractsAffected: 4,
+      totalUniqueEntitiesInCascade: 3,
+      maxDepthReached: 2,
+      riskLevel: 'Medium',
+      cascadeNodes: [
+        {
+          entityName: rootName,
+          depth: 0,
+          affectedContractIds: ['ct-pay-v2', 'ct-pay-v1'],
+          children: [
+            {
+              entityName: 'Money',
+              depth: 1,
+              affectedContractIds: ['ct-pay-v2'],
+              children: [
+                { entityName: 'Currency', depth: 2, affectedContractIds: ['ct-orders-v1'], children: [] },
+              ],
+            },
+            { entityName: 'Address', depth: 1, affectedContractIds: ['ct-cust-v1'], children: [] },
+          ],
+        },
       ],
-      edges: [
-        { source: 'ce-payment', target: 'ct-pay-v2' },
-        { source: 'ct-pay-v2', target: 'svc-payments-api' },
-        { source: 'svc-payments-api', target: 'svc-orders-api' },
-      ],
-    }),
-  ),
+    });
+  }),
 
   // ── Benchmark de maturidade (comparação entre serviços) ─────────────
   http.get(`${API}/catalog/maturity/benchmark`, () =>
