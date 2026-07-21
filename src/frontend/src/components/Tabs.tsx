@@ -148,7 +148,10 @@ export function Tabs({
       role="tablist"
       onKeyDown={handleKeyDown}
       className={cn(
-        'flex items-center border-b border-edge',
+        // flex-wrap: quando há muitas tabs (ex.: detalhe do serviço, 10 tabs),
+        // quebram para uma segunda linha em vez de transbordarem/cortarem —
+        // no-op quando cabem numa linha. Mantém todas descobríveis pelo rato.
+        'flex flex-wrap items-center border-b border-edge',
         className,
       )}
     >
