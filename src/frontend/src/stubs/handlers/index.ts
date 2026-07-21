@@ -6,6 +6,7 @@
  */
 import { authHandlers } from './auth';
 import { catalogHandlers } from './catalog';
+import { serviceTabsHandlers } from './serviceTabs';
 import { contractsHandlers } from './contracts';
 import { sourceOfTruthHandlers } from './sourceOfTruth';
 import { runtimeHandlers } from './runtime';
@@ -14,6 +15,7 @@ import { catchAllHandlers } from './catchAll';
 export const handlers = [
   ...authHandlers,
   ...catalogHandlers,
+  ...serviceTabsHandlers,
   ...contractsHandlers,
   ...sourceOfTruthHandlers,
   ...runtimeHandlers,
