@@ -8,6 +8,7 @@ import { authHandlers } from './auth';
 import { catalogHandlers } from './catalog';
 import { serviceTabsHandlers } from './serviceTabs';
 import { contractsHandlers } from './contracts';
+import { catalogContractsExtrasHandlers } from './catalogContractsExtras';
 import { sourceOfTruthHandlers } from './sourceOfTruth';
 import { runtimeHandlers } from './runtime';
 import { catchAllHandlers } from './catchAll';
@@ -17,6 +18,7 @@ export const handlers = [
   ...catalogHandlers,
   ...serviceTabsHandlers,
   ...contractsHandlers,
+  ...catalogContractsExtrasHandlers,
   ...sourceOfTruthHandlers,
   ...runtimeHandlers,
   ...catchAllHandlers,
