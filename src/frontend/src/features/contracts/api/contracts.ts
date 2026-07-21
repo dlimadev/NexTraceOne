@@ -402,15 +402,15 @@ export const contractsApi = {
 
   /** Gera configuração de mock a partir do spec de uma versão de contrato. */
   getMockConfig: (contractVersionId: string) =>
-    client.get(`/contracts/versions/${contractVersionId}/mock-config`).then((r) => r.data),
+    client.get(`/contracts/${contractVersionId}/mock-config`).then((r) => r.data),
 
   /** Avalia directrizes de design API (score 0-100 + violações). */
   evaluateDesignGuidelines: (contractVersionId: string) =>
-    client.get(`/contracts/versions/${contractVersionId}/design-guidelines`).then((r) => r.data),
+    client.get(`/contracts/${contractVersionId}/design-guidelines`).then((r) => r.data),
 
   /** Exporta contrato em formato específico (openapi-yaml, postman-v21, curl, etc.). */
   exportMultiFormat: (contractVersionId: string, format: string) =>
-    client.get(`/contracts/versions/${contractVersionId}/export-format`, { params: { format } }).then((r) => r.data),
+    client.get(`/contracts/${contractVersionId}/export-format`, { params: { format } }).then((r) => r.data),
 
   /** Regista expectativa de consumidor para CDCT. */
   registerConsumerExpectation: (apiAssetId: string, data: { consumerServiceName: string; consumerDomain: string; expectedSubsetJson: string; notes?: string }) =>
@@ -448,7 +448,7 @@ export const contractsApi = {
 
   /** Propaga impacto de mudança de entidade canónica para contratos referenciados. */
   propagateCanonicalChange: (entityId: string, newVersion: string) =>
-    client.post(`/contracts/canonical/${entityId}/propagate`, { newVersion }).then((r) => r.data),
+    client.post(`/contracts/canonical-entities/${entityId}/propagate`, { newVersion }).then((r) => r.data),
 
   // ── Phase 4 — Innovation ───────────────────────────────────────────
 
@@ -462,7 +462,7 @@ export const contractsApi = {
 
   /** Benchmark de maturidade entre equipas e domínios. */
   getServiceMaturityBenchmark: (params?: { domain?: string; teamName?: string; topN?: number }) =>
-    client.get(`/services/maturity/benchmark`, { params }).then((r) => r.data),
+    client.get(`/catalog/maturity/benchmark`, { params }).then((r) => r.data),
 
   /** Revisão de contrato assistida por IA. */
   reviewContractDraft: (data: { tenantId: string; draftId: string; contractContent: string; contractType: string; serviceName: string; preferredProvider?: string }) =>
@@ -470,7 +470,7 @@ export const contractsApi = {
 
   /** Análise em cascata de impacto de entidade canónica (multi-nível). */
   getCanonicalEntityImpactCascade: (entityId: string, maxDepth?: number) =>
-    client.get(`/catalog/canonical-entities/${entityId}/impact/cascade`, { params: { maxDepth } }).then((r) => r.data),
+    client.get(`/contracts/canonical-entities/${entityId}/impact/cascade`, { params: { maxDepth } }).then((r) => r.data),
 
   // ── Contract Migration Patch ───────────────────────────────────────
 

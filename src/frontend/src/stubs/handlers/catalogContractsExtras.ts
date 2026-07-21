@@ -157,7 +157,7 @@ export const catalogContractsExtrasHandlers = [
   }),
 
   // ── Impacto em cascata de uma entidade canónica ─────────────────────
-  http.get(`${API}/catalog/canonical-entities/:entityId/impact/cascade`, ({ params }) =>
+  http.get(`${API}/contracts/canonical-entities/:entityId/impact/cascade`, ({ params }) =>
     HttpResponse.json({
       entityId: String(params.entityId),
       totalImpactedContracts: 4,
@@ -177,7 +177,7 @@ export const catalogContractsExtrasHandlers = [
   ),
 
   // ── Benchmark de maturidade (comparação entre serviços) ─────────────
-  http.get(`${API}/services/maturity/benchmark`, () =>
+  http.get(`${API}/catalog/maturity/benchmark`, () =>
     HttpResponse.json({
       averageScore: 0.72,
       p50: 0.74,
