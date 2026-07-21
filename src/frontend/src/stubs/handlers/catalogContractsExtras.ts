@@ -154,12 +154,15 @@ export const catalogContractsExtrasHandlers = [
     return HttpResponse.json({ ...found });
   }),
 
-  // ── Ruleset Spectral — detalhe ──────────────────────────────────────
+  // ── Ruleset Spectral — detalhe / actualização ──────────────────────
   http.get(`${API}/contracts/spectral/rulesets/:rulesetId`, ({ params }) => {
     const id = String(params.rulesetId);
     const found = stubRulesetsRaw.rulesets.find((r) => r.rulesetId === id) ?? stubRulesetsRaw.rulesets[0];
     return HttpResponse.json({ ...found });
   }),
+  http.put(`${API}/contracts/spectral/rulesets/:rulesetId`, ({ params }) =>
+    HttpResponse.json({ rulesetId: String(params.rulesetId) }),
+  ),
 
   // ── Impacto em cascata de uma entidade canónica ─────────────────────
   http.get(`${API}/contracts/canonical-entities/:entityId/impact/cascade`, ({ params }) =>

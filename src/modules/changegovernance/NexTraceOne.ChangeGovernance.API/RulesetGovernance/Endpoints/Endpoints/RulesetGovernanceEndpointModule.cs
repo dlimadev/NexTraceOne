@@ -10,6 +10,8 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using UploadRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UploadRuleset.UploadRuleset;
 using ListRulesetsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ListRulesets.ListRulesets;
+using GetRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRuleset.GetRuleset;
+using UpdateRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UpdateRuleset.UpdateRuleset;
 using ArchiveRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ArchiveRuleset.ArchiveRuleset;
 using ActivateRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ActivateRuleset.ActivateRuleset;
 using DeleteRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.DeleteRuleset.DeleteRuleset;
@@ -57,6 +59,30 @@ public sealed class RulesetGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("rulesets:read");
+
+        group.MapGet("/{rulesetId:guid}", async (
+            Guid rulesetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetRulesetFeature.Query(rulesetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:read");
+
+        group.MapPut("/{rulesetId:guid}", async (
+            Guid rulesetId,
+            UpdateRulesetFeature.UpdateBody body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new UpdateRulesetFeature.Command(rulesetId, body.Content), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:write");
 
         group.MapPut("/{rulesetId:guid}/archive", async (
             Guid rulesetId,
