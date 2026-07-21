@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.ChangeGovernance.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ChangeGovernanceDbContext))]
-    partial class ChangeGovernanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721093414_SyncReleasePromotionColumns")]
+    partial class SyncReleasePromotionColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,9 +98,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<long>("RowVersion")
                         .HasColumnType("bigint");
 
@@ -116,8 +116,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("BlastRadiusReports");
                 });
@@ -139,9 +137,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("RecordedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("RolloutPercentage")
                         .HasColumnType("numeric");
 
@@ -153,8 +148,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("CanaryRollouts");
                 });
@@ -223,16 +216,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ChangeConfidenceEvents");
                 });
@@ -263,9 +251,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("OccurredAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("text");
@@ -278,8 +263,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ChangeEvents");
                 });
@@ -311,9 +294,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<long>("RowVersion")
                         .HasColumnType("bigint");
 
@@ -332,8 +312,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ChangeScores");
                 });
@@ -480,9 +458,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("ReceivedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("SourceSystem")
                         .IsRequired()
                         .HasColumnType("text");
@@ -495,8 +470,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ExternalMarkers");
                 });
@@ -580,9 +553,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<int>("Phase")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal?>("RequestsPerMinute")
                         .HasColumnType("numeric");
 
@@ -600,8 +570,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ObservationWindows");
                 });
@@ -626,9 +594,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<int>("Outcome")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -637,8 +602,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("PostReleaseReviews");
                 });
@@ -704,9 +667,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<string>("EvaluatedBy")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("GateId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Result")
                         .HasColumnType("integer");
 
@@ -720,8 +680,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GateId");
 
                     b.ToTable("PromotionGateEvaluations");
                 });
@@ -947,9 +905,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<string>("OutboundWebhookUrl")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("RequestedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -970,8 +925,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ApprovalRequests");
                 });
@@ -1012,9 +965,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("P99LatencyMs")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("RequestsPerMinute")
                         .HasColumnType("numeric");
 
@@ -1029,8 +979,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("ReleaseBaselines");
                 });
@@ -1121,12 +1069,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("RecordedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("FeatureFlagStates");
                 });
@@ -1242,9 +1185,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("TotalConsumersImpacted")
                         .HasColumnType("integer");
 
@@ -1256,8 +1196,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("RollbackAssessments");
                 });
@@ -1290,9 +1228,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset?>("RemovedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1311,8 +1246,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
 
                     b.ToTable("WorkItemAssociations");
                 });
@@ -1555,12 +1488,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("Passed")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("PromotionGateId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("PromotionRequestId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1569,10 +1496,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PromotionGateId");
-
-                    b.HasIndex("PromotionRequestId");
 
                     b.ToTable("GateEvaluations");
                 });
@@ -1588,9 +1511,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("DeploymentEnvironmentId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("GateName")
                         .IsRequired()
@@ -1617,8 +1537,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DeploymentEnvironmentId");
 
                     b.ToTable("PromotionGates");
                 });
@@ -1653,23 +1571,13 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<long>("RowVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("SourceEnvironmentId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
-
-                    b.Property<Guid>("TargetEnvironmentId")
-                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SourceEnvironmentId");
-
-                    b.HasIndex("TargetEnvironmentId");
 
                     b.ToTable("PromotionRequests");
                 });
@@ -1698,9 +1606,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RulesetId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("Score")
                         .HasColumnType("numeric");
 
@@ -1715,8 +1620,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RulesetId");
 
                     b.ToTable("LintResults");
                 });
@@ -1794,9 +1697,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("RulesetId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1805,8 +1705,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RulesetId");
 
                     b.ToTable("RulesetBindings");
                 });
@@ -1947,12 +1845,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("WorkflowTemplateId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WorkflowTemplateId");
 
                     b.ToTable("SlaPolicies");
                 });
@@ -1984,12 +1877,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("WorkflowTemplateId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WorkflowTemplateId");
 
                     b.ToTable("WorkflowInstances");
                 });
@@ -2044,12 +1932,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("WorkflowInstanceId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WorkflowInstanceId");
 
                     b.ToTable("WorkflowStages");
                 });

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(IncidentResponseDbContext))]
-    partial class IncidentResponseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721094659_SyncIncidentsAndMapTypedIdFks")]
+    partial class SyncIncidentsAndMapTypedIdFks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
