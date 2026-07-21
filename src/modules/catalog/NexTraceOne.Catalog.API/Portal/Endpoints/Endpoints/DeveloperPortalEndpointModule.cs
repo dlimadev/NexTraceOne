@@ -19,6 +19,7 @@ using GetApiUsageAnalyticsFeature = NexTraceOne.Catalog.Application.Portal.Featu
 using GetApisIConsumeFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume.GetApisIConsume;
 using GetAssetTimelineFeature = NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline.GetAssetTimeline;
 using GetMyApisFeature = NexTraceOne.Catalog.Application.Portal.Features.GetMyApis.GetMyApis;
+using ExecutePlaygroundFeature = NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground.ExecutePlayground;
 using GetPlaygroundHistoryFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory.GetPlaygroundHistory;
 using GetPortalAnalyticsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics.GetPortalAnalytics;
 using GetRateLimitPolicyFeature = NexTraceOne.Catalog.Application.Portal.Features.GetRateLimitPolicy.GetRateLimitPolicy;
@@ -212,7 +213,24 @@ public sealed class DeveloperPortalEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("developer-portal:write");
 
-        // ── Histórico de playground ──
+        // ── Playground ──
+
+        // POST /api/v1/developerportal/playground/execute — Executar pedido de teste (sandbox)
+        group.MapPost("/playground/execute", async (
+            ExecutePlaygroundFeature.ExecuteBody body,
+            ICurrentUser currentUser,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = Guid.Parse(currentUser.Id);
+            var result = await sender.Send(
+                new ExecutePlaygroundFeature.Command(
+                    body.ApiAssetId, body.ApiName, userId, body.HttpMethod,
+                    body.RequestPath, body.RequestBody, body.RequestHeaders, body.Environment),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:write");
 
         // GET /api/v1/developerportal/playground/history — Histórico de sessões do playground
         group.MapGet("/playground/history", async (
