@@ -66,7 +66,7 @@ export function LicensingAdminPage() {
       <PageSection>
         {isLoading ? (
           <PageLoadingState />
-        ) : data ? (
+        ) : data && 'entitlements' in data ? (
           <>
             {/* License header card */}
             <Card className="mb-6">

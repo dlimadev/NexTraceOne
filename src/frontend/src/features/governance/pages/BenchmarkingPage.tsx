@@ -61,7 +61,7 @@ export function BenchmarkingPage() {
   const dimensionOptions: BenchmarkDimension[] = ['teams', 'domains'];
 
   if (isLoading) return <PageLoadingState />;
-  if (isError || !d) return <PageErrorState action={<button onClick={() => refetch()} className="btn btn-sm btn-primary">{t('common.retry')}</button>} />;
+  if (isError || !d?.comparisons) return <PageErrorState action={<button onClick={() => refetch()} className="btn btn-sm btn-primary">{t('common.retry')}</button>} />;
 
   return (
     <PageContainer>

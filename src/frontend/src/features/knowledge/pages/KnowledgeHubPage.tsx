@@ -89,7 +89,7 @@ export function KnowledgeHubPage() {
   if (isError) return <PageErrorState />;
 
   const displayItems = debouncedSearch.trim().length >= 2 && searchResults
-    ? searchResults.items.filter(i => i.entityType === 'KnowledgeDocument')
+    ? (searchResults.items ?? []).filter(i => i.entityType === 'KnowledgeDocument')
     : (documents?.items ?? []);
 
   const totalDocs = documents?.totalCount ?? 0;
@@ -241,7 +241,7 @@ export function KnowledgeHubPage() {
       </PageSection>
 
       {/* Recent open operational notes panel */}
-      {recentNotes && recentNotes.items.length > 0 && (
+      {recentNotes && (recentNotes.items?.length ?? 0) > 0 && (
         <PageSection title={t('knowledgeHub.recentNotesTitle')}>
           <div className="space-y-2">
             {recentNotes.items.map(note => (

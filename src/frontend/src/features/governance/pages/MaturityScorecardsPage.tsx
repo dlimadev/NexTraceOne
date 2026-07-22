@@ -85,13 +85,13 @@ export function MaturityScorecardsPage() {
       {/* Scorecards */}
       {!isLoading && data && (
         <div className="space-y-6">
-          {data.scorecards.length === 0 && (
+          {(data?.scorecards?.length ?? 0) === 0 && (
             <div className="text-center py-12 text-muted">
               <Award size={32} className="mx-auto mb-2 opacity-50" />
               <p className="text-sm">{t('governance.executive.noScorecards')}</p>
             </div>
           )}
-          {data.scorecards.map(sc => (
+          {(data?.scorecards ?? []).map(sc => (
             <Card key={sc.groupId}>
               <CardHeader>
                 <div className="flex items-center gap-3">

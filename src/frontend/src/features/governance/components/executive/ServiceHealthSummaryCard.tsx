@@ -52,14 +52,14 @@ export function ServiceHealthSummaryCard({ data }: Props) {
       </CardHeader>
       <CardBody>
         <div className={`text-3xl font-bold mb-2 ${scoreColor(data.overallScore)}`}>
-          {data.overallScore.toFixed(0)}
+          {(data.overallScore ?? 0).toFixed(0)}
           <span className="text-sm font-normal text-muted">/100</span>
         </div>
         <div className="grid grid-cols-2 gap-2 mt-3">
           {dimensions.map((dim) => (
             <div key={dim.label} className="flex justify-between items-center text-xs">
               <span className="text-muted">{dim.label}</span>
-              <span className={`font-medium ${scoreColor(dim.value)}`}>{dim.value.toFixed(0)}%</span>
+              <span className={`font-medium ${scoreColor(dim.value ?? 0)}`}>{(dim.value ?? 0).toFixed(0)}%</span>
             </div>
           ))}
         </div>

@@ -89,7 +89,7 @@ export function NotificationAnalyticsPage() {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !data?.platform) {
     return (
       <PageContainer>
         <PageErrorState

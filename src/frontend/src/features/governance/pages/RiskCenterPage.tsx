@@ -62,7 +62,7 @@ export function RiskCenterPage() {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (riskQuery.isError || !riskQuery.data) {
+  if (riskQuery.isError || !riskQuery.data?.indicators) {
     return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 

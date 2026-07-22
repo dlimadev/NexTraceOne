@@ -97,7 +97,7 @@ function OverviewTab() {
           </CardHeader>
           <CardBody className="p-0">
             <div className="divide-y divide-border">
-              {preflight.checks.slice(0, 6).map((check) => (
+              {(preflight?.checks ?? []).slice(0, 6).map((check) => (
                 <div key={check.name} className="flex items-center justify-between px-4 py-2.5">
                   <div className="flex items-center gap-2 min-w-0">
                     {configStatusIcon(check.status === 'Ok' ? 'ok' : check.status === 'Warning' ? 'warning' : 'degraded')}
@@ -124,7 +124,7 @@ function OverviewTab() {
           </CardHeader>
           <CardBody className="p-0">
             <div className="divide-y divide-border">
-              {health.subsystems.map((sub: { name: string; status: string; description: string }) => (
+              {(health?.subsystems ?? []).map((sub: { name: string; status: string; description: string }) => (
                 <div key={sub.name} className="flex items-center justify-between px-4 py-2.5">
                   <span className="text-sm text-heading">{sub.name}</span>
                   <div className="flex items-center gap-2">

@@ -155,7 +155,7 @@ export function TechnicalDebtPage() {
   };
 
   if (isLoading) return <PageLoadingState message={t('governance.technicalDebt.loading')} />;
-  if (isError)
+  if (isError || !data?.byType)
     return <PageErrorState message={t('governance.technicalDebt.error')} onRetry={() => refetch()} />;
 
   return (

@@ -50,7 +50,7 @@ export function CompliancePage() {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (complianceQuery.isError || !complianceQuery.data) {
+  if (complianceQuery.isError || !complianceQuery.data?.packs) {
     return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 

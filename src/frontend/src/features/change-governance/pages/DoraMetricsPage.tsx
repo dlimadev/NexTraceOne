@@ -114,7 +114,7 @@ export function DoraMetricsPage() {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !data?.deploymentFrequency) {
     return (
       <PageContainer>
         <PageHeader title={t('doraMetrics.title')} subtitle={t('doraMetrics.subtitle')} />

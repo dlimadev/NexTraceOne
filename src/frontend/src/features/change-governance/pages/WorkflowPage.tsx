@@ -218,7 +218,7 @@ export function WorkflowPage() {
                     <div>
                       <p className="text-sm font-medium text-body">{tmpl.name}</p>
                       <p className="text-xs text-muted">
-                        {t('workflow.stageCount', { count: tmpl.stages.length })}
+                        {t('workflow.stageCount', { count: tmpl.stages?.length ?? 0 })}
                       </p>
                     </div>
                     <Badge variant={TEMPLATE_LEVEL_VARIANTS[tmpl.changeLevel] ?? 'default'}>
@@ -248,7 +248,7 @@ export function WorkflowPage() {
       </div>
 
       {/* All Instances Table */}
-      {instances && instances.items.length > 0 && (
+      {instances && (instances.items?.length ?? 0) > 0 && (
         <Card className="mt-6">
           <CardHeader>
             <h2 className="font-semibold text-heading">{t('workflow.allInstances')}</h2>

@@ -91,16 +91,16 @@ export function ExecutiveIntelligenceDashboardPage() {
       <PageSection>
         {/* Top row: Health + Confidence + FinOps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          {healthQ.data && <ServiceHealthSummaryCard data={healthQ.data} />}
-          {confidenceQ.data && <ChangeConfidenceGauge data={confidenceQ.data} />}
-          {finopsQ.data && <FinOpsBudgetBurnWidget data={finopsQ.data} />}
+          {healthQ.data && !Array.isArray(healthQ.data) && <ServiceHealthSummaryCard data={healthQ.data} />}
+          {confidenceQ.data && !Array.isArray(confidenceQ.data) && <ChangeConfidenceGauge data={confidenceQ.data} />}
+          {finopsQ.data && !Array.isArray(finopsQ.data) && <FinOpsBudgetBurnWidget data={finopsQ.data} />}
         </div>
 
         {/* Bottom row: Compliance + Top Risky Services + MTTR */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {complianceQ.data && <ComplianceCoverageWidget data={complianceQ.data} />}
-          {riskyQ.data && <TopRiskyServicesTable data={riskyQ.data} />}
-          {mttrQ.data && <MttrTrendMiniChart data={mttrQ.data} />}
+          {complianceQ.data && !Array.isArray(complianceQ.data) && <ComplianceCoverageWidget data={complianceQ.data} />}
+          {riskyQ.data && !Array.isArray(riskyQ.data) && <TopRiskyServicesTable data={riskyQ.data} />}
+          {mttrQ.data && !Array.isArray(mttrQ.data) && <MttrTrendMiniChart data={mttrQ.data} />}
         </div>
       </PageSection>
     </PageContainer>

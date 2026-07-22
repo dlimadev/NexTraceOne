@@ -43,7 +43,7 @@ const CONTEXT_TABS: { key: ContextFilter; label: string }[] = [
 ];
 
 function formatCost(v: number) {
-  return `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  return `$${(v ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 }
 
 export function FinOpsContextViewsPage() {

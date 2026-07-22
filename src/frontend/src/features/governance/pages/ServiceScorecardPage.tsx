@@ -189,7 +189,7 @@ export function ServiceScorecardPage() {
             <>
               {/* Distribution */}
               <div className="mb-4 flex flex-wrap gap-2">
-                {Object.entries(listQuery.data.distributionByLevel).map(([level, count]) => (
+                {Object.entries(listQuery.data?.distributionByLevel ?? {}).map(([level, count]) => (
                   <Badge key={level} variant={LEVEL_VARIANT[level] ?? 'secondary'}>
                     {level}: {count}
                   </Badge>
@@ -199,7 +199,7 @@ export function ServiceScorecardPage() {
                 </Badge>
               </div>
 
-              {listQuery.data.items.length === 0 ? (
+              {(listQuery.data?.items?.length ?? 0) === 0 ? (
                 <EmptyState
                   title={t('governance.scorecard.empty', 'No scorecards available')}
                   description={t('governance.scorecard.emptyDescription', 'Service scorecards will appear here once services are assessed.')}

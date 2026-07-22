@@ -187,7 +187,7 @@ export function McpServerPage() {
               <div className="flex justify-between">
                 <span className="text-body">{t('mcpServer.serverInfo.capabilities')}</span>
                 <div className="flex gap-1">
-                  {serverInfo.capabilities.tools && (
+                  {serverInfo.capabilities?.tools && (
                     <Badge variant="info">{t('mcpServer.serverInfo.capTools')}</Badge>
                   )}
                 </div>

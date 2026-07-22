@@ -198,7 +198,7 @@ export function AgentMarketplacePage() {
       )}
 
       {/* Estado vazio */}
-      {!isLoading && !isError && data && data.items.length === 0 && (
+      {!isLoading && !isError && data && (data.items?.length ?? 0) === 0 && (
         <EmptyState
           icon={<Bot className="w-5 h-5" />}
           title={t('agentMarketplace.noAgents', 'No agents available')}
@@ -207,7 +207,7 @@ export function AgentMarketplacePage() {
       )}
 
       {/* Grade de cards dos agentes */}
-      {!isLoading && !isError && data && data.items.length > 0 && (
+      {!isLoading && !isError && data && (data.items?.length ?? 0) > 0 && (
         <ContentGrid columns={3}>
           {data.items.map((agent) => (
             <AgentCard key={agent.agentId} agent={agent} t={t} />

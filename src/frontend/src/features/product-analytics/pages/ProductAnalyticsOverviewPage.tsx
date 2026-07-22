@@ -59,7 +59,7 @@ export function ProductAnalyticsOverviewPage() {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !data || Array.isArray(data)) {
     return (
       <PageContainer>
         <PageErrorState

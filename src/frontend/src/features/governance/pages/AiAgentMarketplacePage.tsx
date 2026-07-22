@@ -60,7 +60,7 @@ export function AiAgentMarketplacePage() {
       />
       <PageSection>
         {/* Token budget overview */}
-        {data && (
+        {data && 'agents' in data && (
           <div className="grid grid-cols-3 gap-3 mb-6">
             <Card>
               <CardBody className="p-3">

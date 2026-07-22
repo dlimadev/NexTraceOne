@@ -74,7 +74,7 @@ export function PolicyCatalogPage() {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (policyQuery.isError || !policyQuery.data) {
+  if (policyQuery.isError || !policyQuery.data?.policies) {
     return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 

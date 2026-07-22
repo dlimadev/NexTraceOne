@@ -88,7 +88,7 @@ export function GreenOpsPage() {
           </div>
         )}
 
-        {data && (
+        {data && 'percentAboveTarget' in data && (
           <>
             {/* ESG Target Banner */}
             {data.percentAboveTarget > 0 ? (

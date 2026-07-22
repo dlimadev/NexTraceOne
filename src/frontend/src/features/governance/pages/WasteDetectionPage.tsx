@@ -62,7 +62,7 @@ export function WasteDetectionPage() {
             <div className="bg-card border border-edge rounded-lg p-4">
               <p className="text-xs text-muted uppercase tracking-wide">{t('byTypeTitle')}</p>
               <div className="mt-2 space-y-1">
-                {data.byType.slice(0, 3).map((bt) => (
+                {(data?.byType ?? []).slice(0, 3).map((bt) => (
                   <div key={bt.type} className="flex items-center justify-between text-xs">
                     <span className="text-body">{bt.type}</span>
                     <span className="font-medium text-heading">{bt.count}</span>

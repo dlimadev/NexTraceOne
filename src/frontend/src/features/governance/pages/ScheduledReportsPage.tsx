@@ -171,7 +171,7 @@ export function ScheduledReportsPage() {
       />
 
       <PageSection>
-        {!data?.items.length ? (
+        {!data?.items?.length ? (
           <EmptyState
             icon={<BarChart3 className="w-8 h-8 text-faded" />}
             title={t('scheduledReports.empty')}

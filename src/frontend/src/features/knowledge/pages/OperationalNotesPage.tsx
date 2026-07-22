@@ -97,7 +97,7 @@ export function OperationalNotesPage() {
       </div>
 
       <PageSection>
-        {data && data.items.length === 0 ? (
+        {data && (data.items?.length ?? 0) === 0 ? (
           <Card>
             <CardBody>
               <div className="text-center py-10 text-body">

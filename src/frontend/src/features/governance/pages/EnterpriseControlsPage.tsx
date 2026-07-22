@@ -108,7 +108,7 @@ export function EnterpriseControlsPage() {
 
       {/* Dimension Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-        {data.dimensions.map(dim => (
+        {(data?.dimensions ?? []).map(dim => (
           <Card key={dim.dimension}>
             <CardBody>
               <div className="flex items-start gap-3">
@@ -173,7 +173,7 @@ export function EnterpriseControlsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
-                {data.dimensions.map(dim => (
+                {(data?.dimensions ?? []).map(dim => (
                   <tr key={dim.dimension} className="hover:bg-hover transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

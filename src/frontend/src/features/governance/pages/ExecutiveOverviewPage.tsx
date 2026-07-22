@@ -66,7 +66,7 @@ export function ExecutiveOverviewPage() {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !data?.maturitySummary) {
     return (
       <PageContainer>
         <PageErrorState message={t('common.errorLoading')} />

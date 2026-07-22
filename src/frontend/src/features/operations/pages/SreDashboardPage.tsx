@@ -420,7 +420,7 @@ export function SreDashboardPage() {
     topQueriesQuery.refetch();
   }, [summaryQuery, timeseriesQuery, topRequestsQuery, topQueriesQuery]);
 
-  const summary: SreSummary = summaryQuery.data ?? {
+  const summary: SreSummary = (Array.isArray(summaryQuery.data) ? undefined : summaryQuery.data) ?? {
     problems: { open: 0, total: 1 },
     slo: { errorCompliancePct: 0, latencyCompliancePct: 0 },
     traffic: { requestCount: 0, queryCount: 0 },
@@ -429,7 +429,7 @@ export function SreDashboardPage() {
   };
 
   // Use real data when available; generate illustrative fallback when API not yet wired
-  const ts: SreTimeSeries = timeseriesQuery.data ?? {
+  const ts: SreTimeSeries = (Array.isArray(timeseriesQuery.data) ? undefined : timeseriesQuery.data) ?? {
     requests: buildMockTimeSeries(from, until, 600),
     requestLatency: buildMockTimeSeries(from, until, 63),
     requestErrors: buildMockTimeSeries(from, until, 2),

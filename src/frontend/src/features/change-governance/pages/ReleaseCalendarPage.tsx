@@ -218,7 +218,7 @@ export function ReleaseCalendarPage() {
   const releaseDays = useMemo(() => {
     if (!calendar) return new Map<string, CalendarReleaseDto[]>();
     const map = new Map<string, CalendarReleaseDto[]>();
-    for (const r of calendar.releases) {
+    for (const r of calendar.releases ?? []) {
       const day = r.createdAt.slice(0, 10);
       const list = map.get(day) ?? [];
       list.push(r);
@@ -357,7 +357,7 @@ function CalendarTab({
   if (isError) return <PageErrorState message={t('common.errorLoading')} />;
   if (!calendar) return null;
 
-  const { releases, freezeWindows, dailySummary } = calendar;
+  const { releases = [], freezeWindows = [], dailySummary = [] } = calendar;
 
   return (
     <div className="space-y-6">

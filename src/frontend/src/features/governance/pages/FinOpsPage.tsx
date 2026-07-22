@@ -52,7 +52,7 @@ export function FinOpsPage() {
   });
 
   if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
-  if (isError || !d) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
+  if (isError || !d?.services) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
 
   const filtered = d.services.filter(svc => {
     if (filter !== 'all' && svc.efficiency !== filter) return false;

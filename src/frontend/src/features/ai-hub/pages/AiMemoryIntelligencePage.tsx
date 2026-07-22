@@ -129,7 +129,7 @@ function MemoryHealthPanel({ tenantId }: { tenantId: string }) {
 
   if (isLoading) return <CardListSkeleton count={4} />;
   if (isError) return <PageErrorState onRetry={refetch} />;
-  if (!report) return null;
+  if (!report || Array.isArray(report)) return null;
 
   return (
     <div className="space-y-6">
@@ -169,7 +169,7 @@ function MemoryHealthPanel({ tenantId }: { tenantId: string }) {
             </div>
             <div className="text-right">
               <p className="text-xs text-muted mb-1">{t('organizationalMemoryHealth.avgRelevance')}</p>
-              <span className="text-lg font-semibold text-heading">{report.averageRelevanceScore.toFixed(2)}</span>
+              <span className="text-lg font-semibold text-heading">{(report.averageRelevanceScore ?? 0).toFixed(2)}</span>
             </div>
           </div>
         </CardBody>
@@ -241,7 +241,7 @@ function AgentBenchmarkPanel({ tenantId }: { tenantId: string }) {
 
   if (isLoading) return <CardListSkeleton count={4} />;
   if (isError) return <PageErrorState onRetry={refetch} />;
-  if (!report) return null;
+  if (!report || Array.isArray(report)) return null;
 
   const tierColors: Record<string, string> = {
     Champion: 'text-success',
@@ -348,7 +348,7 @@ function MaturityPanel({ tenantId }: { tenantId: string }) {
 
   if (isLoading) return <CardListSkeleton count={4} />;
   if (isError) return <PageErrorState onRetry={refetch} />;
-  if (!report) return null;
+  if (!report || Array.isArray(report)) return null;
 
   return (
     <div className="space-y-6">
