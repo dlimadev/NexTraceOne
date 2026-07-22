@@ -10658,7 +10658,15 @@
     "groupBackground": "Background",
     "groupInfrastructure": "Infrastructure",
     "submit": "Create Interface",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "bindings": {
+      "title": "Contract Bindings",
+      "empty": "No contract bindings",
+      "emptyDesc": "This interface has no contracts bound to it yet.",
+      "default": "Default",
+      "environment": "Environment",
+      "activatedBy": "Activated by"
+    }
   },
   "serviceDetail": {
     "tabInterfacesApis": "Interfaces & APIs",

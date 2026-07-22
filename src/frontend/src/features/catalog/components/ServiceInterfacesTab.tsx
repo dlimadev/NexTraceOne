@@ -2,6 +2,7 @@
  * Tab de interfaces de exposição de um serviço no ServiceDetailPage.
  * Exibe a lista de ServiceInterface registadas e permite navegar para criar nova.
  */
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -16,12 +17,15 @@ import {
   Webhook,
   Database,
   Layers,
+  Link2,
+  FileText,
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { Drawer } from '../../../components/Drawer';
 import { TableWrapper } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -88,6 +92,7 @@ function interfacePrimaryField(iface: ServiceInterface): string {
 export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [bindingsFor, setBindingsFor] = useState<ServiceInterface | null>(null);
 
   const { data: interfaces, isLoading, isError } = useQuery({
     queryKey: ['service-interfaces', serviceId],
@@ -110,6 +115,7 @@ export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
   const items = interfaces ?? [];
 
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -221,7 +227,7 @@ export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
                         <button
                           type="button"
                           className="text-xs text-accent hover:underline"
-                          onClick={() => navigate(`/services/${serviceId}/interfaces/${iface.interfaceId}/bindings`)}
+                          onClick={() => setBindingsFor(iface)}
                         >
                           {t('serviceInterfaces.viewBindings', 'View Bindings')}
                         </button>
@@ -235,5 +241,102 @@ export function ServiceInterfacesTab({ serviceId }: ServiceInterfacesTabProps) {
         )}
       </CardBody>
     </Card>
+    <InterfaceBindingsDrawer iface={bindingsFor} onClose={() => setBindingsFor(null)} />
+    </>
+  );
+}
+
+/** Variante de badge por estado de um contract binding. */
+function bindingStatusVariant(status: string): 'success' | 'warning' | 'danger' | 'default' {
+  switch (status) {
+    case 'Active': return 'success';
+    case 'Pending': return 'warning';
+    case 'Deprecated': return 'warning';
+    case 'Revoked': return 'danger';
+    default: return 'default';
+  }
+}
+
+/**
+ * Drawer lateral que lista os contract bindings de uma interface de serviço.
+ * Abre in-place a partir de "Ver Ligações" — não navega para fora do detalhe.
+ */
+function InterfaceBindingsDrawer({
+  iface,
+  onClose,
+}: {
+  iface: ServiceInterface | null;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['interface-bindings', iface?.interfaceId],
+    queryFn: () => serviceCatalogApi.listContractBindings(iface!.interfaceId),
+    enabled: !!iface,
+  });
+
+  const bindings = data ?? [];
+
+  return (
+    <Drawer
+      open={!!iface}
+      onClose={onClose}
+      size="lg"
+      title={t('serviceInterfaces.bindings.title', 'Contract Bindings')}
+      description={iface?.name}
+    >
+      {isLoading ? (
+        <PageLoadingState size="sm" />
+      ) : isError ? (
+        <PageErrorState message={t('common.errorLoading', 'Failed to load bindings.')} />
+      ) : bindings.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+          <Link2 size={28} className="text-muted" aria-hidden="true" />
+          <p className="text-sm font-medium text-heading">
+            {t('serviceInterfaces.bindings.empty', 'No contract bindings')}
+          </p>
+          <p className="text-xs text-muted max-w-xs">
+            {t('serviceInterfaces.bindings.emptyDesc', 'This interface has no contracts bound to it yet.')}
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {bindings.map((b) => (
+            <li key={b.bindingId} className="rounded-lg border border-edge bg-elevated/40 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText size={14} className="text-accent shrink-0" aria-hidden="true" />
+                  <span className="font-mono text-xs text-heading truncate">{b.contractVersionId}</span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {b.isDefaultVersion && (
+                    <Badge variant="info" size="sm">{t('serviceInterfaces.bindings.default', 'Default')}</Badge>
+                  )}
+                  <Badge variant={bindingStatusVariant(b.status)} size="sm">
+                    {t(`serviceInterfaces.bindings.status${b.status}`, b.status)}
+                  </Badge>
+                </div>
+              </div>
+              <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div className="flex justify-between">
+                  <dt className="text-muted">{t('serviceInterfaces.bindings.environment', 'Environment')}</dt>
+                  <dd className="text-body">{b.bindingEnvironment}</dd>
+                </div>
+                {b.activatedBy && (
+                  <div className="flex justify-between">
+                    <dt className="text-muted">{t('serviceInterfaces.bindings.activatedBy', 'Activated by')}</dt>
+                    <dd className="text-body truncate ml-2">{b.activatedBy}</dd>
+                  </div>
+                )}
+              </dl>
+              {b.migrationNotes && (
+                <p className="mt-2 text-xs text-muted border-t border-edge/60 pt-2">{b.migrationNotes}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Drawer>
   );
 }

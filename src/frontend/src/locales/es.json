@@ -11931,7 +11931,15 @@
     "groupBackground": "Background",
     "groupInfrastructure": "Infraestructura",
     "submit": "Crear Interfaz",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "bindings": {
+      "title": "Vínculos de Contrato",
+      "empty": "Sin vínculos de contrato",
+      "emptyDesc": "Esta interfaz aún no tiene contratos vinculados.",
+      "default": "Predeterminado",
+      "environment": "Entorno",
+      "activatedBy": "Activado por"
+    }
   },
   "serviceDetail": {
     "tabInterfacesApis": "Interfaces y APIs",

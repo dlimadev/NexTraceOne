@@ -54,7 +54,23 @@ export const catalogHandlers = [
     const found = Object.values(stubInterfacesByService).flat().find((i) => i.interfaceId === id);
     return HttpResponse.json(found ?? { interfaceId: id, name: '', serviceAssetId: '' });
   }),
-  http.get(`${API}/catalog/interfaces/:id/bindings`, () => HttpResponse.json([])),
+  http.get(`${API}/catalog/interfaces/:id/bindings`, ({ params }) => {
+    const interfaceId = String(params.id);
+    return HttpResponse.json([
+      {
+        bindingId: 'bind-1', serviceInterfaceId: interfaceId, contractVersionId: 'ct-pay-v2',
+        status: 'Active', bindingEnvironment: 'production', isDefaultVersion: true,
+        activatedAt: '2026-03-05T00:00:00.000Z', activatedBy: 'ana.silva@nextraceone.dev',
+        migrationNotes: 'Vinculação ativa da versão 2.3.0 do contrato Payments.',
+      },
+      {
+        bindingId: 'bind-2', serviceInterfaceId: interfaceId, contractVersionId: 'ct-pay-v1',
+        status: 'Deprecated', bindingEnvironment: 'production', isDefaultVersion: false,
+        activatedAt: '2026-01-20T00:00:00.000Z', activatedBy: 'ana.silva@nextraceone.dev',
+        migrationNotes: 'Versão anterior mantida para consumidores em migração.',
+      },
+    ]);
+  }),
   http.get(`${API}/catalog/services/:id/links`, ({ params }) =>
     HttpResponse.json(stubLinksByService[String(params.id)] ?? { items: [], totalCount: 0 }),
   ),
