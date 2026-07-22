@@ -42,7 +42,7 @@ describe('DelegatedAdminPage', () => {
   it('renders page heading', async () => {
     renderWithProviders(<DelegatedAdminPage />);
     await waitFor(() => {
-      expect(screen.getByText('organization.delegatedAdmin.title')).toBeInTheDocument();
+      expect(screen.getByText('Delegated Administration')).toBeInTheDocument();
     });
   });
 

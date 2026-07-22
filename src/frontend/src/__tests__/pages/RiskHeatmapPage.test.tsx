@@ -51,7 +51,7 @@ describe('RiskHeatmapPage', () => {
 
   it('renders page heading', async () => {
     renderWithProviders(<RiskHeatmapPage />);
-    expect(screen.getByText('governance.executive.heatmapTitle')).toBeInTheDocument();
+    expect(screen.getByText('Risk Heatmap')).toBeInTheDocument();
   });
 
   it('renders data after loading', async () => {

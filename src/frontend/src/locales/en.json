@@ -592,7 +592,9 @@
     "relevanceScore": "Relevance",
     "routingRationaleLabel": "Routing rationale",
     "contextTruncated": "Context was truncated to fit the model window",
-    "explainPrompt": "Explain your reasoning for the previous response, indicating which sources you used and why."
+    "explainPrompt": "Explain your reasoning for the previous response, indicating which sources you used and why.",
+    "filterBlocked": "Blocked",
+    "filterDeprecated": "Deprecated"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Recent Changes",
@@ -1666,26 +1668,38 @@
       "score": "Score",
       "createdAt": "Created",
       "noChanges": "No changes found",
-      "noChangesDescription": "Adjust your filters or wait for new deployments"
+      "noChangesDescription": "Adjust your filters or wait for new deployments",
+      "confidence": "Confidence",
+      "date": "Date",
+      "deploymentStatus": "Deployment status"
     },
     "summary": {
       "totalChanges": "Total Changes",
       "validatedChanges": "Validated",
       "changesNeedingAttention": "Needs Attention",
       "suspectedRegressions": "Suspected Regressions",
-      "changesCorrelatedWithIncidents": "Correlated with Incidents"
+      "changesCorrelatedWithIncidents": "Correlated with Incidents",
+      "correlatedWithIncidents": "Correlated with incidents"
     },
     "changeType": {
       "Deployment": "Deployment",
       "ContractChange": "Contract Change",
       "ConfigChange": "Config Change",
-      "SchemaChange": "Schema Change"
+      "SchemaChange": "Schema Change",
+      "ConfigurationChange": "Configuration",
+      "DependencyChange": "Dependency",
+      "OperationalChange": "Operational",
+      "PolicyChange": "Policy"
     },
     "confidenceStatus": {
       "Validated": "Validated",
       "NeedsAttention": "Needs Attention",
       "Investigating": "Investigating",
-      "Pending": "Pending"
+      "Pending": "Pending",
+      "CorrelatedWithIncident": "Correlated with incident",
+      "Mitigated": "Mitigated",
+      "NotAssessed": "Not assessed",
+      "SuspectedRegression": "Suspected regression"
     },
     "detail": {
       "backToCatalog": "Back to Catalog",
@@ -1808,7 +1822,8 @@
     "submit": "Create Experiment",
     "subtitle": "Plan and manage chaos experiments to validate system resilience",
     "targetPercentage": "Target Percentage (%)",
-    "title": "Chaos Engineering"
+    "title": "Chaos Engineering",
+    "noExperimentsHint": "Create an experiment above to get started."
   },
   "commandPalette": {
     "admin": "Administration",
@@ -1862,6 +1877,25 @@
         "partial": "~ Partial",
         "incorrect": "✗ Incorrect"
       }
+    },
+    "featureBindings": {
+      "title": "Vinculações Feature → Modelo",
+      "subtitle": "Defina qual modelo de IA é utilizado para cada funcionalidade da plataforma",
+      "empty": "Nenhuma vinculação configurada",
+      "emptyDesc": "Crie uma vinculação para definir qual modelo é usado para cada funcionalidade."
+    },
+    "userModelPolicies": {
+      "title": "Políticas de Modelos por Utilizador",
+      "subtitle": "Defina quais modelos de IA cada utilizador pode usar",
+      "empty": "Nenhuma política configurada",
+      "emptyDesc": "Crie uma política para controlar quais modelos cada utilizador pode usar."
+    },
+    "userTokenQuotas": {
+      "title": "Quotas de Tokens por Utilizador",
+      "subtitle": "Configure limites de consumo de tokens de IA por utilizador",
+      "empty": "Nenhuma quota configurada",
+      "emptyDesc": "Crie uma quota para controlar o consumo de tokens de IA por utilizador.",
+      "searchPlaceholder": "Filtrar por utilizador..."
     }
   },
   "common": {
@@ -1939,7 +1973,11 @@
     "step_upcoming": "upcoming",
     "days": "days",
     "pass": "Pass",
-    "fail": "Fail"
+    "fail": "Fail",
+    "all": "All",
+    "register": "Register",
+    "daysN_one": "{{count}} day",
+    "daysN_other": "{{count}} days"
   },
   "config": {
     "changegovernance": {
@@ -2074,7 +2112,8 @@
     "category": {
       "bootstrap": "Bootstrap",
       "functional": "Functional",
-      "sensitiveOperational": "Sensitive"
+      "sensitiveOperational": "Sensitive",
+      "sensitiveoperational": "Sensitive Operational"
     },
     "definitions": {
       "title": "Configuration Definitions"
@@ -4895,7 +4934,8 @@
       "sortField": {
         "name": "Name",
         "persona": "Persona",
-        "widgetCount": "Widgets"
+        "widgetCount": "Widgets",
+        "createdAt": "Created date"
       },
       "topServices": {
         "header": "incidents",
@@ -4920,7 +4960,14 @@
       "releaseCalendar": {
         "changes": "changes",
         "noChanges": "No changes scheduled"
-      }
+      },
+      "allPersonas": "All",
+      "builderCtaTitle": "Visual Dashboard Builder",
+      "builderCtaDesc": "Drag and drop widgets, resize panels, and configure your layout interactively — just like Grafana.",
+      "empty": "No dashboards yet",
+      "emptyDescription": "Create a dashboard above to get started.",
+      "favorites": "Favorites",
+      "filterByPersona": "Persona"
     },
     "dashboards": {
       "empty": "No custom dashboards",
@@ -5127,7 +5174,17 @@
       "emptyDomains": "No domain data",
       "emptyDomainsDescription": "No domain performance data available.",
       "emptyFocusAreas": "No focus areas",
-      "emptyFocusAreasDescription": "No focus areas identified at this time."
+      "emptyFocusAreasDescription": "No focus areas identified at this time.",
+      "heatmapTitle": "Risk Heatmap",
+      "heatmapSubtitle": "Risk distribution across the portfolio",
+      "heatmapDimensionTeam": "By team",
+      "heatmapDimensionDomain": "By domain",
+      "heatmapDimensionCategory": "By category",
+      "scorecardsTitle": "Maturity Scorecards",
+      "scorecardsSubtitle": "Service maturity by dimension",
+      "scorecardsDimensionTeam": "By team",
+      "scorecardsDimensionDomain": "By domain",
+      "noScorecards": "No scorecards available"
     },
     "finops": {
       "backToOverview": "Back to overview",
@@ -5376,6 +5433,45 @@
     "deploymentFreq": {
       "chartLabel": "Deployment frequency chart",
       "deploys": "deploys"
+    },
+    "gates": {
+      "title": "Governance Gates",
+      "subtitle": "Evaluate governance gates before critical actions",
+      "evaluate": "Evaluate",
+      "cab": {
+        "title": "Change Advisory Board",
+        "description": "CAB approval gate",
+        "serviceName": "Service name",
+        "environment": "Environment",
+        "criticality": "Criticality",
+        "blastRadius": "Blast Radius"
+      },
+      "errorBudget": {
+        "title": "Error Budget Gate",
+        "description": "Evaluate if error budget allows deployment",
+        "serviceName": "Service name",
+        "environment": "Environment",
+        "remainingPct": "Budget remaining %"
+      },
+      "fourEyes": {
+        "title": "Four-Eyes Approval",
+        "description": "Requires a second approver",
+        "requester": "Requester",
+        "approver": "Approver (optional)",
+        "action": "Action"
+      }
+    },
+    "riskHeatmap": {
+      "empty": "No risk data available",
+      "emptyDescription": "Risk heatmap cells will appear here once governance packs are assessed."
+    },
+    "templates": {
+      "title": "Dashboard Templates",
+      "subtitle": "Start from a pre-built template and customise it for your team.",
+      "empty": "No templates in this category",
+      "emptyDesc": "Try selecting a different category or browse All.",
+      "showAll": "Show All Templates",
+      "count": "templates"
     }
   },
   "governanceConfig": {
@@ -5701,7 +5797,9 @@
       "correlationIndicator": "Correlated",
       "mitigationIndicator": "Mitigation",
       "resolveAction": "Resolve",
-      "title": "Incident List"
+      "title": "Incident List",
+      "countSummary": "Showing {{start}}-{{end}} of {{total}} incidents",
+      "pageSummary": "Page {{page}} of {{totalPages}}"
     },
     "mitigation": {
       "escalationGuidance": "Escalation Guidance",
@@ -5780,7 +5878,22 @@
       "ServiceDegradation": "Service Degradation"
     },
     "withCorrelation": "With Correlated Changes",
-    "withMitigation": "Mitigation Available"
+    "withMitigation": "Mitigation Available",
+    "create": {
+      "title": "Create Incident",
+      "button": "Create Incident",
+      "submit": "Create",
+      "incidentType": "Type",
+      "severity": "Severity",
+      "titlePlaceholder": "Incident title",
+      "descriptionPlaceholder": "Describe what happened",
+      "serviceNamePlaceholder": "Service display name",
+      "serviceIdPlaceholder": "Service ID",
+      "domainPlaceholder": "Impacted domain (optional)",
+      "environmentPlaceholder": "Environment",
+      "ownerTeamPlaceholder": "Owner team"
+    },
+    "empty": "No incidents found"
   },
   "integrations": {
     "acceptable": "Acceptable",
@@ -5910,7 +6023,9 @@
       "subtitle": "Explore relationships between services, contracts, teams, and incidents",
       "title": "Knowledge Graph",
       "totalEdges": "Total Edges",
-      "totalNodes": "Total Nodes"
+      "totalNodes": "Total Nodes",
+      "noNodesHint": "Nodes will appear here once knowledge data is ingested.",
+      "noEdgesHint": "Relationships will appear here once connected knowledge is available."
     },
     "serviceTimeline": {
       "title": "Service Operational Timeline",
@@ -6886,6 +7001,18 @@
       "totalServices": "Total Services",
       "totalTeams": "Total Teams",
       "viewDetails": "View Details"
+    },
+    "delegatedAdmin": {
+      "title": "Delegated Administration",
+      "subtitle": "Scoped admin roles per team and domain",
+      "activeDelegations": "Active delegations",
+      "noDelegations": "No delegations",
+      "teamScoped": "Team-scoped",
+      "domainScoped": "Domain-scoped",
+      "filterAll": "All",
+      "filterTeamAdmin": "Team admin",
+      "filterDomainAdmin": "Domain admin",
+      "filterReadOnly": "Read-only"
     }
   },
   "opsFinOpsConfig": {
@@ -7475,7 +7602,21 @@
     "approvalRequired": "Approval Required",
     "confidence": "Confidence",
     "approve": "Approve",
-    "empty": "No scheduled releases"
+    "empty": "No scheduled releases",
+    "totalReleases": "Total releases",
+    "activeFreezes": "Active freezes",
+    "highRiskReleases": "High-risk releases",
+    "avgScore": "Avg. score",
+    "releaseTimeline": "Release timeline",
+    "noReleases": "No releases in this period",
+    "filters": "Filters",
+    "environment": "Environment",
+    "from": "From",
+    "to": "To",
+    "tabs": {
+      "calendar": "Calendar",
+      "freezeWindows": "Freeze windows"
+    }
   },
   "releaseScope": {
     "excludedDescription": "This area remains in the codebase but is intentionally outside the final production release scope. It is not part of the supported production surface.",
@@ -8564,7 +8705,12 @@
     "subGroupCostSustainability": "Cost & Sustainability",
     "subGroupIdentityAccess": "Identity & Access",
     "subGroupPlatformConfig": "Configuration",
-    "contractGovernanceHub": "Contract Governance"
+    "contractGovernanceHub": "Contract Governance",
+    "aiMemoryIntelligence": "AI Memory Intelligence",
+    "mtlsManager": "mTLS Manager",
+    "policies": "Policies",
+    "samlSso": "SAML SSO",
+    "userPreferences": "User Preferences"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8896,7 +9042,9 @@
     "selectRole": "Select a role",
     "subtitle": "Identity and access management",
     "tenantUsers": "Tenant Users",
-    "title": "Users"
+    "title": "Users",
+    "status": "Status",
+    "totalUsers": "Total Users"
   },
   "validation": {
     "invalidEmail": "Please enter a valid email address.",
@@ -9357,7 +9505,8 @@
       "runbooks": "Runbooks",
       "knowledgeArticles": "Knowledge Articles",
       "operationalNotes": "Operational Notes"
-    }
+    },
+    "mode": "Modo de IA"
   },
   "savedPrompts": {
     "title": "Saved Prompts",
@@ -11908,6 +12057,28 @@
     "errors": {
       "noServices": "No services found for the specified filter.",
       "tenantRequired": "Tenant ID is required."
+    },
+    "loading": "Loading dependency risk…",
+    "stats": {
+      "avgScore": "Avg. score",
+      "critical": "Critical",
+      "high": "High",
+      "totalServices": "Total services"
+    },
+    "table": {
+      "blastRadius": "Blast radius",
+      "dependents": "Dependents",
+      "failureHistory": "Failure history",
+      "riskScore": "Risk score",
+      "service": "Service",
+      "sloHealth": "SLO health",
+      "trend": "Trend"
+    },
+    "timeRange": {
+      "1h": "1h",
+      "6h": "6h",
+      "24h": "24h",
+      "7d": "7d"
     }
   },
   "loadTesting": {
@@ -12273,6 +12444,17 @@
         "description": "Showback makes costs visible per service and team. Chargeback allocates costs to responsible teams.",
         "showbackEnabled": "Showback",
         "chargebackEnabled": "Chargeback"
+      }
+    },
+    "approvals": {
+      "title": "Budget Approvals",
+      "subtitle": "Review and approve budget change requests",
+      "empty": "No pending approvals",
+      "results": "results",
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected"
       }
     }
   },
@@ -16080,7 +16262,18 @@
     "presence": "Participants",
     "status": "Status",
     "incident": "Incident",
-    "simulatedBanner": "Presence and comments are simulated"
+    "simulatedBanner": "Presence and comments are simulated",
+    "live": "Live",
+    "activeContext": "Active context",
+    "contextHint": "Select a context to focus the war room.",
+    "send": "Send",
+    "showResolved": "Show resolved",
+    "noParticipants": "No participants",
+    "noCommentsHint": "No comments yet. Start the discussion.",
+    "openThreads_one": "{{count}} open thread",
+    "openThreads_other": "{{count}} open threads",
+    "participants_one": "{{count}} participant",
+    "participants_other": "{{count}} participants"
   },
   "pluginMarketplace": {
     "title": "Dashboard Marketplace",
@@ -16088,10 +16281,28 @@
     "search": "Search templates...",
     "install": "Install",
     "installed": "Installed",
-    "category": "Category",
-    "persona": "Persona",
+    "category": {
+      "all": "All",
+      "ai": "AI",
+      "compliance": "Compliance",
+      "engineering": "Engineering",
+      "executive": "Executive",
+      "finops": "FinOps",
+      "operations": "Operations"
+    },
+    "persona": {
+      "all": "All",
+      "architect": "Architect",
+      "auditor": "Auditor",
+      "engineer": "Engineer",
+      "executive": "Executive",
+      "platform-admin": "Platform admin",
+      "product": "Product",
+      "tech-lead": "Tech lead"
+    },
     "noTemplates": "No templates found",
-    "simulatedBanner": "Template data is simulated"
+    "simulatedBanner": "Template data is simulated",
+    "searchPlaceholder": "Search plugins…"
   },
   "mobileOnCall": {
     "title": "Mobile On-Call",
@@ -16106,7 +16317,16 @@
     "approve": "Approve",
     "reject": "Reject",
     "quickLinks": "Quick Links",
-    "noIncidents": "No active incidents"
+    "noIncidents": "No active incidents",
+    "active": "Active",
+    "contacts": "Contacts",
+    "myDashboards": "My dashboards",
+    "noApprovals": "No pending approvals",
+    "pwaBanner": "Install the app for a better on-call experience",
+    "refresh": "Refresh",
+    "runbooks": "Runbooks",
+    "sloStatus": "SLO status",
+    "viewAllIncidents": "View all incidents"
   },
   "engineerCockpit": {
     "title": "Engineer Cockpit",
@@ -16135,7 +16355,22 @@
   },
   "auditorConsole": {
     "title": "Auditor Console",
-    "subtitle": "Compliance standards, audit surfaces and evidence"
+    "subtitle": "Compliance standards, audit surfaces and evidence",
+    "accessReviews": "Access Reviews",
+    "auditSurfaces": "Audit Surfaces",
+    "auditTrail": "Audit Trail",
+    "breakGlassHistory": "Break-Glass History",
+    "complianceStandards": "Compliance Standards",
+    "evidenceIntegrity": "Evidence Integrity",
+    "evidencePacks": "Evidence Packs",
+    "exportSigned": "Export Signed",
+    "policyViolations": "Policy Violations",
+    "searchAudit": "Search audit…",
+    "status": {
+      "compliant": "Compliant",
+      "not-assessed": "Not Assessed",
+      "partial": "Partial"
+    }
   },
   "changeConfidenceHub": {
     "title": "Change Confidence Hub",
@@ -16399,7 +16634,8 @@
     "history": "History",
     "active": "Active",
     "noPending": "No pending requests",
-    "expires": "Expires"
+    "expires": "Expires",
+    "rolePlaceholder": "-- selecionar --"
   },
   "licensing": {
     "title": "Licensing & Entitlements",
@@ -16521,7 +16757,8 @@
       "condition": "Condition",
       "firedAt": "Fired At",
       "actions": "Actions"
-    }
+    },
+    "noAlertsDescription": "No active alerts at this time."
   },
   "organizationalMemoryHealth": {
     "pageTitle": "Memory Intelligence",
@@ -16745,5 +16982,51 @@
     "viewTitle": "View contract",
     "createTitle": "New contract",
     "editTitle": "Edit draft"
+  },
+  "architecture": {
+    "topology": "Topology",
+    "topologyDesc": "Service topology and connections",
+    "serviceCoupling": "Service Coupling",
+    "couplingDesc": "Degree of coupling between services",
+    "dependencyRisk": "Dependency Risk",
+    "dependencyRiskDesc": "Risk from external and internal dependencies",
+    "maturityDistribution": "Maturity Distribution",
+    "maturityDesc": "Distribution of service maturity levels",
+    "contractAdoption": "Contract Adoption",
+    "contractAdoptionDesc": "Adoption of API contracts across services",
+    "breakingChanges": "Breaking Changes",
+    "breakingChangesDesc": "Recent breaking changes in contracts"
+  },
+  "personaSuite": {
+    "simulatedBanner": "Simulated data for demonstration",
+    "engineer": {
+      "title": "Engineer Workspace",
+      "subtitle": "Your services, changes and incidents",
+      "role": "Engineer"
+    },
+    "architect": {
+      "title": "Architect Workspace",
+      "subtitle": "Topology, coupling and contract health",
+      "role": "Architect"
+    },
+    "auditor": {
+      "title": "Auditor Console",
+      "subtitle": "Compliance, evidence and audit trail"
+    },
+    "executive": {
+      "title": "Executive Overview",
+      "subtitle": "Portfolio health at a glance",
+      "complianceScore": "Compliance score",
+      "complianceDetails": "Compliance details",
+      "doraTier": "DORA tier",
+      "doraDetails": "DORA details",
+      "finOpsTrend": "FinOps trend",
+      "finOpsDetails": "FinOps details",
+      "riskDetails": "Risk details",
+      "topRisks": "Top risks",
+      "evidenceDetails": "Evidence details",
+      "scheduledReports": "Scheduled reports",
+      "exportPdf": "Export PDF"
+    }
   }
 }

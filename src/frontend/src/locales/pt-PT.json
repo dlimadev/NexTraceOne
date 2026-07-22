@@ -592,7 +592,9 @@
         "title": "Está pronto!",
         "description": "O seu Assistente de IA está configurado e pronto para ajudar. Inicie uma conversa para explorar o seu contexto operacional."
       }
-    }
+    },
+    "filterBlocked": "Bloqueados",
+    "filterDeprecated": "Descontinuados"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Alterações Recentes",
@@ -1681,26 +1683,38 @@
       "score": "Score",
       "createdAt": "Criado em",
       "noChanges": "Nenhuma mudança encontrada",
-      "noChangesDescription": "Ajuste os filtros ou aguarde novas implementações"
+      "noChangesDescription": "Ajuste os filtros ou aguarde novas implementações",
+      "confidence": "Confiança",
+      "date": "Data",
+      "deploymentStatus": "Estado da implementação"
     },
     "summary": {
       "totalChanges": "Total de Mudanças",
       "validatedChanges": "Validadas",
       "changesNeedingAttention": "Requerem Atenção",
       "suspectedRegressions": "Regressões Suspeitas",
-      "changesCorrelatedWithIncidents": "Correlacionadas com Incidentes"
+      "changesCorrelatedWithIncidents": "Correlacionadas com Incidentes",
+      "correlatedWithIncidents": "Correlacionadas com incidentes"
     },
     "changeType": {
       "Deployment": "Implementação",
       "ContractChange": "Alteração de Contrato",
       "ConfigChange": "Alteração de Configuração",
-      "SchemaChange": "Alteração de Schema"
+      "SchemaChange": "Alteração de Schema",
+      "ConfigurationChange": "Configuração",
+      "DependencyChange": "Dependência",
+      "OperationalChange": "Operacional",
+      "PolicyChange": "Política"
     },
     "confidenceStatus": {
       "Validated": "Validado",
       "NeedsAttention": "Requer Atenção",
       "Investigating": "A investigar",
-      "Pending": "Pendente"
+      "Pending": "Pendente",
+      "CorrelatedWithIncident": "Correlacionada com incidente",
+      "Mitigated": "Mitigada",
+      "NotAssessed": "Não avaliada",
+      "SuspectedRegression": "Regressão suspeita"
     },
     "detail": {
       "backToCatalog": "Voltar ao Catálogo",
@@ -1823,7 +1837,8 @@
     "submit": "Criar Experimento",
     "subtitle": "Planeie e gira experimentos de chaos para validar a resiliência do sistema",
     "targetPercentage": "Percentagem Alvo (%)",
-    "title": "Chaos Engineering"
+    "title": "Chaos Engineering",
+    "noExperimentsHint": "Crie a sua primeira experiência de caos para começar."
   },
   "commandPalette": {
     "admin": "Administração",
@@ -1939,7 +1954,11 @@
     "step_upcoming": "pendente",
     "days": "dias",
     "pass": "Aprovado",
-    "fail": "Reprovado"
+    "fail": "Reprovado",
+    "all": "Todos",
+    "register": "Registar",
+    "daysN_one": "{{count}} dia",
+    "daysN_other": "{{count}} dias"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Quando ativado, utilizadores podem criar agentes de IA especializados customizados.",
@@ -3372,7 +3391,8 @@
     "category": {
       "bootstrap": "Bootstrap",
       "functional": "Funcional",
-      "sensitiveOperational": "Sensível"
+      "sensitiveOperational": "Sensível",
+      "sensitiveoperational": "Operacional Sensível"
     },
     "definitions": {
       "title": "Definições de Configuração"
@@ -6193,7 +6213,8 @@
       "sortField": {
         "name": "Nome",
         "persona": "Persona",
-        "widgetCount": "Widgets"
+        "widgetCount": "Widgets",
+        "createdAt": "Data de criação"
       },
       "topServices": {
         "header": "incidentes",
@@ -6218,7 +6239,14 @@
       "releaseCalendar": {
         "changes": "alterações",
         "noChanges": "Nenhuma alteração agendada"
-      }
+      },
+      "allPersonas": "Todas as personas",
+      "builderCtaTitle": "Crie um painel personalizado",
+      "builderCtaDesc": "Componha widgets à medida da sua equipa.",
+      "empty": "Nenhum painel",
+      "emptyDescription": "Crie o seu primeiro painel personalizado.",
+      "favorites": "Favoritos",
+      "filterByPersona": "Filtrar por persona"
     },
     "dashboards": {
       "empty": "Sem dashboards personalizados",
@@ -6425,7 +6453,17 @@
       "emptyDomains": "Sem dados de domínio",
       "emptyDomainsDescription": "Sem dados de desempenho por domínio disponíveis.",
       "emptyFocusAreas": "Sem áreas de foco",
-      "emptyFocusAreasDescription": "Nenhuma área de foco identificada neste momento."
+      "emptyFocusAreasDescription": "Nenhuma área de foco identificada neste momento.",
+      "heatmapTitle": "Mapa de Calor de Risco",
+      "heatmapSubtitle": "Distribuição de risco no portefólio",
+      "heatmapDimensionTeam": "Por equipa",
+      "heatmapDimensionDomain": "Por domínio",
+      "heatmapDimensionCategory": "Por categoria",
+      "scorecardsTitle": "Scorecards de Maturidade",
+      "scorecardsSubtitle": "Maturidade dos serviços por dimensão",
+      "scorecardsDimensionTeam": "Por equipa",
+      "scorecardsDimensionDomain": "Por domínio",
+      "noScorecards": "Nenhum scorecard disponível"
     },
     "finops": {
       "backToOverview": "Voltar à visão geral",
@@ -6674,6 +6712,45 @@
     "deploymentFreq": {
       "chartLabel": "Gráfico de frequência de deploy",
       "deploys": "deploys"
+    },
+    "gates": {
+      "title": "Portões de Promoção",
+      "subtitle": "Avalie os portões de prontidão de release",
+      "evaluate": "Avaliar",
+      "cab": {
+        "title": "Comité de Alterações (CAB)",
+        "description": "Portão de aprovação do CAB",
+        "serviceName": "Nome do serviço",
+        "environment": "Ambiente",
+        "criticality": "Criticidade",
+        "blastRadius": "Raio de impacto"
+      },
+      "errorBudget": {
+        "title": "Orçamento de Erro",
+        "description": "Portão de orçamento de erro",
+        "serviceName": "Nome do serviço",
+        "environment": "Ambiente",
+        "remainingPct": "% restante"
+      },
+      "fourEyes": {
+        "title": "Aprovação de Quatro Olhos",
+        "description": "Requer um segundo aprovador",
+        "requester": "Solicitante",
+        "approver": "Aprovador",
+        "action": "Ação"
+      }
+    },
+    "riskHeatmap": {
+      "empty": "Nenhum dado de risco",
+      "emptyDescription": "Nenhum dado de risco disponível para esta dimensão."
+    },
+    "templates": {
+      "title": "Modelos de Painel",
+      "subtitle": "Comece a partir de um modelo curado",
+      "empty": "Nenhum modelo",
+      "emptyDesc": "Nenhum modelo de painel disponível.",
+      "showAll": "Mostrar todos",
+      "count": "modelos"
     }
   },
   "governanceConfig": {
@@ -6999,7 +7076,9 @@
       "correlationIndicator": "Correlacionado",
       "mitigationIndicator": "Mitigação",
       "resolveAction": "Resolver",
-      "title": "Lista de Incidentes"
+      "title": "Lista de Incidentes",
+      "countSummary": "{{count}} incidentes",
+      "pageSummary": "Página {{page}} de {{total}}"
     },
     "mitigation": {
       "escalationGuidance": "Orientação de Escalonamento",
@@ -7078,7 +7157,22 @@
       "ServiceDegradation": "Degradação de Serviço"
     },
     "withCorrelation": "Com Mudanças Correlacionadas",
-    "withMitigation": "Mitigação Disponível"
+    "withMitigation": "Mitigação Disponível",
+    "create": {
+      "title": "Criar Incidente",
+      "button": "Novo incidente",
+      "submit": "Criar",
+      "incidentType": "Tipo de incidente",
+      "severity": "Severidade",
+      "titlePlaceholder": "Título do incidente",
+      "descriptionPlaceholder": "Descreva o incidente…",
+      "serviceNamePlaceholder": "Nome do serviço",
+      "serviceIdPlaceholder": "ID do serviço",
+      "domainPlaceholder": "Domínio",
+      "environmentPlaceholder": "Ambiente",
+      "ownerTeamPlaceholder": "Equipa responsável"
+    },
+    "empty": "Nenhum incidente"
   },
   "integrations": {
     "acceptable": "Aceitável",
@@ -7208,7 +7302,9 @@
       "subtitle": "Explore relações entre serviços, contratos, equipas e incidentes",
       "title": "Grafo de Conhecimento",
       "totalEdges": "Total de Arestas",
-      "totalNodes": "Total de Nós"
+      "totalNodes": "Total de Nós",
+      "noNodesHint": "Nenhum nó para apresentar no grafo.",
+      "noEdgesHint": "Ainda não há ligações entre nós."
     },
     "serviceTimeline": {
       "title": "Timeline Operacional do Serviço",
@@ -8184,6 +8280,18 @@
       "totalServices": "Total de Serviços",
       "totalTeams": "Total de Equipas",
       "viewDetails": "Ver Detalhes"
+    },
+    "delegatedAdmin": {
+      "title": "Administração Delegada",
+      "subtitle": "Perfis de admin com âmbito por equipa e domínio",
+      "activeDelegations": "Delegações ativas",
+      "noDelegations": "Nenhuma delegação",
+      "teamScoped": "Âmbito de equipa",
+      "domainScoped": "Âmbito de domínio",
+      "filterAll": "Todos",
+      "filterTeamAdmin": "Admin de equipa",
+      "filterDomainAdmin": "Admin de domínio",
+      "filterReadOnly": "Apenas leitura"
     }
   },
   "opsFinOpsConfig": {
@@ -8773,7 +8881,21 @@
     "approvalRequired": "Aprovação Obrigatória",
     "confidence": "Confiança",
     "approve": "Aprovar",
-    "empty": "Nenhuma release agendada"
+    "empty": "Nenhuma release agendada",
+    "totalReleases": "Total de releases",
+    "activeFreezes": "Congelamentos ativos",
+    "highRiskReleases": "Releases de alto risco",
+    "avgScore": "Pontuação média",
+    "releaseTimeline": "Cronologia de releases",
+    "noReleases": "Nenhum release neste período",
+    "filters": "Filtros",
+    "environment": "Ambiente",
+    "from": "De",
+    "to": "Até",
+    "tabs": {
+      "calendar": "Calendário",
+      "freezeWindows": "Janelas de congelamento"
+    }
   },
   "releaseScope": {
     "excludedDescription": "Esta área continua no código, mas foi deliberadamente retirada do escopo do release produtivo final. Não faz parte da superfície suportada em produção.",
@@ -9862,7 +9984,12 @@
     "subGroupCostSustainability": "Custo & Sustentabilidade",
     "subGroupIdentityAccess": "Identidade & Acesso",
     "subGroupPlatformConfig": "Configuração",
-    "contractGovernanceHub": "Governança de contratos"
+    "contractGovernanceHub": "Governança de contratos",
+    "aiMemoryIntelligence": "Inteligência de Memória de IA",
+    "mtlsManager": "Gestor de mTLS",
+    "policies": "Políticas",
+    "samlSso": "SAML SSO",
+    "userPreferences": "Preferências do Utilizador"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -10194,7 +10321,9 @@
     "selectRole": "Selecione uma função",
     "subtitle": "Gestão de identidade e acesso",
     "tenantUsers": "Utilizadores do Tenant",
-    "title": "Utilizadores"
+    "title": "Utilizadores",
+    "status": "Estado",
+    "totalUsers": "Total de utilizadores"
   },
   "validation": {
     "invalidEmail": "Introduza um endereço de email válido.",
@@ -10655,7 +10784,8 @@
       "runbooks": "Runbooks",
       "knowledgeArticles": "Artigos de Conhecimento",
       "operationalNotes": "Notas Operacionais"
-    }
+    },
+    "mode": "Modo"
   },
   "savedPrompts": {
     "title": "Prompts Guardados",
@@ -13205,6 +13335,28 @@
     "errors": {
       "noServices": "Nenhum serviço encontrado para o filtro especificado.",
       "tenantRequired": "O ID de tenant é obrigatório."
+    },
+    "loading": "A carregar risco de dependências…",
+    "stats": {
+      "avgScore": "Pontuação média",
+      "critical": "Crítico",
+      "high": "Alto",
+      "totalServices": "Total de serviços"
+    },
+    "table": {
+      "blastRadius": "Raio de impacto",
+      "dependents": "Dependentes",
+      "failureHistory": "Histórico de falhas",
+      "riskScore": "Pontuação de risco",
+      "service": "Serviço",
+      "sloHealth": "Saúde do SLO",
+      "trend": "Tendência"
+    },
+    "timeRange": {
+      "1h": "1h",
+      "6h": "6h",
+      "24h": "24h",
+      "7d": "7d"
     }
   },
   "loadTesting": {
@@ -13571,6 +13723,17 @@
         "showbackEnabled": "Showback",
         "chargebackEnabled": "Chargeback"
       }
+    },
+    "approvals": {
+      "title": "Aprovações de Orçamento",
+      "subtitle": "Reveja e aprove pedidos de alteração de orçamento",
+      "empty": "Nenhuma aprovação pendente",
+      "results": "resultados",
+      "status": {
+        "approved": "Aprovado",
+        "pending": "Pendente",
+        "rejected": "Rejeitado"
+      }
     }
   },
   "ai": {
@@ -13586,6 +13749,25 @@
         "partial": "~ Parcial",
         "incorrect": "✗ Incorreto"
       }
+    },
+    "featureBindings": {
+      "title": "Associações de Funcionalidades",
+      "subtitle": "Associe capacidades de IA a funcionalidades do produto",
+      "empty": "Nenhuma associação de funcionalidade",
+      "emptyDesc": "Ainda não há associações de funcionalidade de IA configuradas."
+    },
+    "userModelPolicies": {
+      "title": "Políticas de Modelo por Utilizador",
+      "subtitle": "Políticas de acesso a modelos de IA por utilizador",
+      "empty": "Nenhuma política de modelo",
+      "emptyDesc": "Ainda não há políticas de modelo por utilizador definidas."
+    },
+    "userTokenQuotas": {
+      "title": "Cotas de Tokens por Utilizador",
+      "subtitle": "Limites de consumo de tokens de IA por utilizador",
+      "empty": "Nenhuma cota de tokens",
+      "emptyDesc": "Ainda não há cotas de tokens por utilizador definidas.",
+      "searchPlaceholder": "Pesquisar utilizadores…"
     }
   },
   "aiEvaluation": {
@@ -17392,7 +17574,18 @@
     "presence": "Participantes",
     "status": "Estado",
     "incident": "Incidente",
-    "simulatedBanner": "Presença e comentários são simulados"
+    "simulatedBanner": "Presença e comentários são simulados",
+    "live": "Em direto",
+    "activeContext": "Contexto ativo",
+    "contextHint": "Selecione um contexto para focar a war room.",
+    "send": "Enviar",
+    "showResolved": "Mostrar resolvidos",
+    "noParticipants": "Nenhum participante",
+    "noCommentsHint": "Ainda não há comentários. Inicie a discussão.",
+    "openThreads_one": "{{count}} tópico aberto",
+    "openThreads_other": "{{count}} tópicos abertos",
+    "participants_one": "{{count}} participante",
+    "participants_other": "{{count}} participantes"
   },
   "pluginMarketplace": {
     "title": "Marketplace de Dashboards",
@@ -17400,10 +17593,28 @@
     "search": "Pesquisar templates...",
     "install": "Instalar",
     "installed": "Instalado",
-    "category": "Categoria",
-    "persona": "Persona",
+    "category": {
+      "all": "Todos",
+      "ai": "IA",
+      "compliance": "Conformidade",
+      "engineering": "Engenharia",
+      "executive": "Executivo",
+      "finops": "FinOps",
+      "operations": "Operações"
+    },
+    "persona": {
+      "all": "Todos",
+      "architect": "Arquiteto",
+      "auditor": "Auditor",
+      "engineer": "Engenheiro",
+      "executive": "Executivo",
+      "platform-admin": "Admin de plataforma",
+      "product": "Produto",
+      "tech-lead": "Tech lead"
+    },
     "noTemplates": "Nenhum template encontrado",
-    "simulatedBanner": "Dados de templates são simulados"
+    "simulatedBanner": "Dados de templates são simulados",
+    "searchPlaceholder": "Pesquisar plugins…"
   },
   "mobileOnCall": {
     "title": "On-Call Mobile",
@@ -17418,7 +17629,16 @@
     "approve": "Aprovar",
     "reject": "Rejeitar",
     "quickLinks": "Ligações Rápidas",
-    "noIncidents": "Sem incidentes ativos"
+    "noIncidents": "Sem incidentes ativos",
+    "active": "Ativo",
+    "contacts": "Contactos",
+    "myDashboards": "Os meus painéis",
+    "noApprovals": "Nenhuma aprovação pendente",
+    "pwaBanner": "Instale a app para uma melhor experiência de prevenção",
+    "refresh": "Atualizar",
+    "runbooks": "Runbooks",
+    "sloStatus": "Estado do SLO",
+    "viewAllIncidents": "Ver todos os incidentes"
   },
   "engineerCockpit": {
     "title": "Cockpit do Engenheiro",
@@ -17447,7 +17667,22 @@
   },
   "auditorConsole": {
     "title": "Consola do Auditor",
-    "subtitle": "Padrões de compliance, superfícies de auditoria e evidências"
+    "subtitle": "Padrões de compliance, superfícies de auditoria e evidências",
+    "accessReviews": "Revisões de Acesso",
+    "auditSurfaces": "Superfícies de Auditoria",
+    "auditTrail": "Trilho de Auditoria",
+    "breakGlassHistory": "Histórico de Break-Glass",
+    "complianceStandards": "Normas de Conformidade",
+    "evidenceIntegrity": "Integridade de Evidências",
+    "evidencePacks": "Pacotes de Evidências",
+    "exportSigned": "Exportar Assinado",
+    "policyViolations": "Violações de Política",
+    "searchAudit": "Pesquisar auditoria…",
+    "status": {
+      "compliant": "Conforme",
+      "not-assessed": "Não Avaliado",
+      "partial": "Parcial"
+    }
   },
   "changeConfidenceHub": {
     "title": "Hub de Confiança de Mudança",
@@ -17711,7 +17946,8 @@
     "history": "Histórico",
     "active": "Ativo",
     "noPending": "Nenhum pedido pendente",
-    "expires": "Expira"
+    "expires": "Expira",
+    "rolePlaceholder": "Selecione um perfil…"
   },
   "licensing": {
     "title": "Licenciamento & Direitos",
@@ -17833,7 +18069,8 @@
       "condition": "Condição",
       "firedAt": "Disparado em",
       "actions": "Acções"
-    }
+    },
+    "noAlertsDescription": "Nenhum alerta ativo de momento."
   },
   "organizationalMemoryHealth": {
     "pageTitle": "Inteligência de Memória",
@@ -18057,5 +18294,51 @@
     "viewTitle": "Ver contrato",
     "createTitle": "Novo contrato",
     "editTitle": "Editar rascunho"
+  },
+  "architecture": {
+    "topology": "Topologia",
+    "topologyDesc": "Topologia e ligações de serviços",
+    "serviceCoupling": "Acoplamento de Serviços",
+    "couplingDesc": "Grau de acoplamento entre serviços",
+    "dependencyRisk": "Risco de Dependências",
+    "dependencyRiskDesc": "Risco de dependências externas e internas",
+    "maturityDistribution": "Distribuição de Maturidade",
+    "maturityDesc": "Distribuição dos níveis de maturidade dos serviços",
+    "contractAdoption": "Adoção de Contratos",
+    "contractAdoptionDesc": "Adoção de contratos de API entre serviços",
+    "breakingChanges": "Alterações Incompatíveis",
+    "breakingChangesDesc": "Alterações incompatíveis recentes nos contratos"
+  },
+  "personaSuite": {
+    "simulatedBanner": "Dados simulados para demonstração",
+    "engineer": {
+      "title": "Espaço do Engenheiro",
+      "subtitle": "Os seus serviços, alterações e incidentes",
+      "role": "Engenheiro"
+    },
+    "architect": {
+      "title": "Espaço do Arquiteto",
+      "subtitle": "Topologia, acoplamento e saúde de contratos",
+      "role": "Arquiteto"
+    },
+    "auditor": {
+      "title": "Consola do Auditor",
+      "subtitle": "Conformidade, evidências e trilho de auditoria"
+    },
+    "executive": {
+      "title": "Visão Executiva",
+      "subtitle": "Saúde do portefólio num relance",
+      "complianceScore": "Pontuação de conformidade",
+      "complianceDetails": "Detalhes de conformidade",
+      "doraTier": "Nível DORA",
+      "doraDetails": "Detalhes DORA",
+      "finOpsTrend": "Tendência FinOps",
+      "finOpsDetails": "Detalhes FinOps",
+      "riskDetails": "Detalhes de risco",
+      "topRisks": "Principais riscos",
+      "evidenceDetails": "Detalhes de evidências",
+      "scheduledReports": "Relatórios agendados",
+      "exportPdf": "Exportar PDF"
+    }
   }
 }

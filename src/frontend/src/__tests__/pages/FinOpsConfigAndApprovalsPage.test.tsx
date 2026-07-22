@@ -198,16 +198,16 @@ describe('FinOpsBudgetApprovalsPage', () => {
   it('renders page title', async () => {
     renderApprovalsPage();
     await waitFor(() => {
-      expect(screen.getByText('finops.approvals.title')).toBeTruthy();
+      expect(screen.getByText('Budget Approvals')).toBeTruthy();
     });
   });
 
   it('shows all status filters', async () => {
     renderApprovalsPage();
     await waitFor(() => {
-      expect(screen.getAllByText('finops.approvals.status.pending').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText('finops.approvals.status.approved').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText('finops.approvals.status.rejected').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Pending').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Approved').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Rejected').length).toBeGreaterThanOrEqual(1);
     });
   });
 

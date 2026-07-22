@@ -102,7 +102,7 @@ describe('DependencyRiskPage', () => {
   it('renders critical risk badge', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Critical')).toBeTruthy();
+      expect(screen.getAllByText('Critical').length).toBeGreaterThanOrEqual(1);
     });
   });
 

@@ -49,7 +49,7 @@ describe('MaturityScorecardsPage', () => {
   it('renders page heading', async () => {
     renderWithProviders(<MaturityScorecardsPage />);
     await waitFor(() => {
-      expect(screen.getByText('governance.executive.scorecardsTitle')).toBeInTheDocument();
+      expect(screen.getByText('Maturity Scorecards')).toBeInTheDocument();
     });
   });
 
