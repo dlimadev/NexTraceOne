@@ -39,7 +39,7 @@ export function ServiceInterfaceForm({ values, errors, onChange }: ServiceInterf
           onChange={(e) => onChange('name', e.target.value)}
           placeholder={t('serviceInterfaces.fieldNamePlaceholder', 'Orders REST API v1')}
           required
-          error={errors.name}
+          error={errors.name ? t(errors.name) : undefined}
           size="sm"
         />
         <Select

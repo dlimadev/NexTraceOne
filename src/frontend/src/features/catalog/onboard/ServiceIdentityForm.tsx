@@ -31,7 +31,7 @@ export function ServiceIdentityForm({ values, errors, onChange }: ServiceIdentit
           onChange={(e) => onChange('name', e.target.value)}
           required
           autoFocus
-          error={errors.name}
+          error={errors.name ? t(errors.name) : undefined}
           size="sm"
         />
         <TextField
@@ -39,7 +39,7 @@ export function ServiceIdentityForm({ values, errors, onChange }: ServiceIdentit
           value={values.domain}
           onChange={(e) => onChange('domain', e.target.value)}
           required
-          error={errors.domain}
+          error={errors.domain ? t(errors.domain) : undefined}
           size="sm"
         />
       </div>
@@ -50,7 +50,7 @@ export function ServiceIdentityForm({ values, errors, onChange }: ServiceIdentit
           value={values.teamName}
           onChange={(e) => onChange('teamName', e.target.value)}
           required
-          error={errors.teamName}
+          error={errors.teamName ? t(errors.teamName) : undefined}
           size="sm"
         />
         <Select

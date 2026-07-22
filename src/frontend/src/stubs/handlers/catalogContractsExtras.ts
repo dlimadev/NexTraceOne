@@ -15,6 +15,8 @@ import { stubCanonicalEntities, stubRulesetsRaw } from '../fixtures/contracts';
 
 const API = '/api/v1';
 const nowIso = () => new Date().toISOString();
+/** Gera um draftId único que o GET /contracts/drafts/:draftId resolve para um draft de demo. */
+const newDraftId = () => `draft-${Math.random().toString(36).slice(2, 10)}`;
 
 /** APIs consumíveis derivadas dos serviços de catálogo (para o Developer Portal). */
 const apiServices = stubServices.filter((s) =>
@@ -128,6 +130,58 @@ export const catalogContractsExtrasHandlers = [
       author: 'ana.silva@nextraceone.dev', isAiGenerated: false, createdAt: '2026-06-20T00:00:00.000Z',
       lastEditedAt: nowIso(), lastEditedBy: 'ana.silva@nextraceone.dev', examples: [],
     });
+  }),
+
+  // ── Contract Studio — criação de draft ──────────────────────────────
+  // Sem estes handlers, o POST cai no catch-all (`[]`) → draftId indefinido →
+  // o editor in-place mostra "Rascunho não encontrado". Devolvem um draftId
+  // que o GET /contracts/drafts/:draftId acima resolve para um draft de demo.
+  http.post(`${API}/contracts/drafts`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { title?: string };
+    return HttpResponse.json(
+      { draftId: newDraftId(), title: body.title ?? 'Novo contrato', status: 'Editing', createdAt: nowIso() },
+      { status: 201 },
+    );
+  }),
+  http.post(`${API}/contracts/drafts/soap`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { title?: string; serviceName?: string; targetNamespace?: string; soapVersion?: string };
+    return HttpResponse.json(
+      {
+        draftId: newDraftId(), title: body.title ?? 'Novo contrato SOAP', status: 'Editing',
+        serviceName: body.serviceName ?? '', targetNamespace: body.targetNamespace ?? '',
+        soapVersion: body.soapVersion ?? '1.1', createdAt: nowIso(),
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(`${API}/contracts/drafts/event`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { title?: string; asyncApiVersion?: string; defaultContentType?: string };
+    return HttpResponse.json(
+      {
+        draftId: newDraftId(), title: body.title ?? 'Novo contrato Event', status: 'Editing',
+        asyncApiVersion: body.asyncApiVersion ?? '2.6.0', defaultContentType: body.defaultContentType ?? 'application/json',
+        createdAt: nowIso(),
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(`${API}/contracts/drafts/background-service`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { title?: string; serviceName?: string; category?: string; triggerType?: string };
+    return HttpResponse.json(
+      {
+        draftId: newDraftId(), title: body.title ?? 'Novo Background Service', status: 'Editing',
+        serviceName: body.serviceName ?? '', category: body.category ?? 'Job',
+        triggerType: body.triggerType ?? 'OnDemand', createdAt: nowIso(),
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(`${API}/contracts/drafts/ai/generate`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { title?: string };
+    return HttpResponse.json(
+      { draftId: newDraftId(), title: body.title ?? 'Contrato gerado por IA', status: 'Editing', createdAt: nowIso() },
+      { status: 201 },
+    );
   }),
 
   // ── Linting nativo do contrato (validate/spectral) ──────────────────

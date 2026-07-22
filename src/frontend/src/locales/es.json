@@ -4471,7 +4471,9 @@
       "serviceTypeNoContracts": "Este tipo de servicio ({{type}}) no expone contratos de interfaz pública.",
       "noServiceSelected": "Ningún servicio seleccionado",
       "missingRequiredFields": "Faltan campos obligatorios. El servicio y el tipo de contrato son obligatorios.",
-      "stepService": "Servicio"
+      "stepService": "Servicio",
+      "selectTypeHint": "Elija el tipo de contrato que coincide con el estilo de interfaz de este servicio.",
+      "selectModeHint": "Elija cómo desea definir la especificación del contrato."
     },
     "createVersion": "Crear Versión",
     "createVersionDescription": "Crear una nueva versión a partir de un contrato existente",
@@ -8075,6 +8077,9 @@
       "create": "No se pudo crear el servicio.",
       "interface": "No se pudo crear la interfaz.",
       "contract": "No se pudo crear el contrato."
+    },
+    "validation": {
+      "required": "Este campo es obligatorio."
     }
   },
   "onboarding": {

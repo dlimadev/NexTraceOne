@@ -21,7 +21,9 @@ export const EMPTY_IDENTITY: ServiceIdentityValues = {
   technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
 };
 
-const nonEmpty = z.string().trim().min(1);
+// Mensagem = chave i18n resolvida pelos formulários (t(error)); evita o texto
+// default do Zod em inglês ("Too small: expected string to have >=1 characters").
+const nonEmpty = z.string().trim().min(1, 'onboard.validation.required');
 
 export const serviceIdentitySchema = z.object({
   name: nonEmpty,
