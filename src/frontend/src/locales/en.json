@@ -1765,7 +1765,44 @@
         "Reject": "Reject",
         "ApproveConditionally": "Approve Conditionally",
         "NeedsMoreEvidence": "Needs More Evidence"
-      }
+      },
+      "activeFlagCount": "Active flags",
+      "affectedServices": "Affected services",
+      "affectedServicesSubtitle": "Services impacted by this change",
+      "baselineMetrics": "Baseline metrics",
+      "criticalFlagCount": "Critical flags",
+      "failureRate": "Failure rate",
+      "featureFlags": "Feature flags",
+      "featureFlagsSubtitle": "Active flags and associated risk",
+      "featureFlagsUnavailable": "Feature flag data unavailable",
+      "flagProvider": "Flag provider",
+      "flagRiskLevel": "Flag risk level",
+      "historicalPattern": "Historical pattern",
+      "historicalPatternSubtitle": "Risk from similar past releases",
+      "historicalPatternUnavailable": "Historical pattern unavailable",
+      "historicalSamples": "Historical samples",
+      "lookbackWindow": "Lookback window",
+      "newFlagCount": "New flags",
+      "noAffectedServices": "No affected services",
+      "noFeatureFlagData": "No feature flag data",
+      "noHistoricalData": "No historical data",
+      "noTimeline": "No timeline events",
+      "noTraceCorrelations": "No trace correlations",
+      "noValidation": "No validation data",
+      "patternRisk": "Pattern risk",
+      "quickLinks": "Quick links",
+      "reviewStatus": "Review status",
+      "rollbackRate": "Rollback rate",
+      "successRate": "Success rate",
+      "timeline": "Timeline",
+      "traceCorrelations": "Trace correlations",
+      "traceCorrelationsFound": "correlations found",
+      "traceCorrelationsSubtitle": "Traces correlated with this change",
+      "traceCorrelationsUnavailable": "Trace correlations unavailable",
+      "viewIncidents": "View incidents",
+      "viewInReleases": "View in releases",
+      "viewService": "View service",
+      "viewServiceSot": "View source of truth"
     },
     "breakdown": {
       "title": "Change Confidence Breakdown",
@@ -1977,7 +2014,8 @@
     "all": "All",
     "register": "Register",
     "daysN_one": "{{count}} day",
-    "daysN_other": "{{count}} days"
+    "daysN_other": "{{count}} days",
+    "saving": "Saving…"
   },
   "config": {
     "changegovernance": {
@@ -6039,6 +6077,16 @@
       "empty": "No operational notes found for this service.",
       "origin": "Origin",
       "type": "Type"
+    },
+    "relations": {
+      "title": "Knowledge context",
+      "empty": "No linked documents or operational notes were found for this entity.",
+      "documents": "Related knowledge documents",
+      "notes": "Operational notes"
+    },
+    "notes": {
+      "resolved": "Resolved",
+      "open": "Open"
     }
   },
   "knowledgeHub": {
@@ -7621,7 +7669,15 @@
     "tabs": {
       "calendar": "Calendar",
       "freezeWindows": "Freeze windows"
-    }
+    },
+    "activeFreezeWindows": "Active freeze windows",
+    "dailySummary": "Daily summary",
+    "date": "Date",
+    "deactivate": "Deactivate",
+    "editFreezeWindow": "Edit freeze window",
+    "freezeWindowsList": "Freeze windows",
+    "releasesLabel": "Releases",
+    "score": "Score"
   },
   "releaseScope": {
     "excludedDescription": "This area remains in the codebase but is intentionally outside the final production release scope. It is not part of the supported production surface.",
@@ -11163,7 +11219,27 @@
       "invalidTenantId": "Tenant ID is required.",
       "invalidMaxHighRiskServices": "Max high-risk services must be between 1 and 100.",
       "invalidHighRiskThreshold": "High-risk threshold must be between 1 and 100."
-    }
+    },
+    "avgScore": "Avg score",
+    "chartTitle": "Risk score over time",
+    "colChangeLevel": "Change level",
+    "colDate": "Date",
+    "colEnvironment": "Environment",
+    "colScore": "Score",
+    "colTrend": "Trend",
+    "colVersion": "Version",
+    "emptyMessage": "Run a search to see the risk trend.",
+    "emptyTitle": "No risk trend data",
+    "envLabel": "Environment",
+    "envPlaceholder": "All environments",
+    "limitLabel": "Limit",
+    "maxScore": "Max score",
+    "minScore": "Min score",
+    "noData": "No data",
+    "serviceLabel": "Service",
+    "servicePlaceholder": "Service name",
+    "tableTitle": "Release history",
+    "totalReleases": "Total releases"
   },
   "commitPool": {
     "title": "Release Commit Pool",

@@ -11,6 +11,7 @@ import { contractsHandlers } from './contracts';
 import { catalogContractsExtrasHandlers } from './catalogContractsExtras';
 import { sourceOfTruthHandlers } from './sourceOfTruth';
 import { runtimeHandlers } from './runtime';
+import { changeGovernanceHandlers } from './changeGovernance';
 import { catchAllHandlers } from './catchAll';
 
 export const handlers = [
@@ -21,5 +22,6 @@ export const handlers = [
   ...catalogContractsExtrasHandlers,
   ...sourceOfTruthHandlers,
   ...runtimeHandlers,
+  ...changeGovernanceHandlers,
   ...catchAllHandlers,
 ];

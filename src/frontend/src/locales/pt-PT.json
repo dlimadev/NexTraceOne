@@ -1780,7 +1780,44 @@
         "Reject": "Rejeitar",
         "ApproveConditionally": "Aprovar Condicionalmente",
         "NeedsMoreEvidence": "Necessita Mais Evidências"
-      }
+      },
+      "activeFlagCount": "Flags ativas",
+      "affectedServices": "Serviços afetados",
+      "affectedServicesSubtitle": "Serviços impactados por esta alteração",
+      "baselineMetrics": "Métricas de baseline",
+      "criticalFlagCount": "Flags críticas",
+      "failureRate": "Taxa de falha",
+      "featureFlags": "Feature flags",
+      "featureFlagsSubtitle": "Flags ativas e risco associado",
+      "featureFlagsUnavailable": "Dados de feature flags indisponíveis",
+      "flagProvider": "Fornecedor de flags",
+      "flagRiskLevel": "Nível de risco das flags",
+      "historicalPattern": "Padrão histórico",
+      "historicalPatternSubtitle": "Risco de releases semelhantes anteriores",
+      "historicalPatternUnavailable": "Padrão histórico indisponível",
+      "historicalSamples": "Amostras históricas",
+      "lookbackWindow": "Janela de análise",
+      "newFlagCount": "Novas flags",
+      "noAffectedServices": "Sem serviços afetados",
+      "noFeatureFlagData": "Sem dados de feature flags",
+      "noHistoricalData": "Sem dados históricos",
+      "noTimeline": "Sem eventos na cronologia",
+      "noTraceCorrelations": "Sem correlações de traces",
+      "noValidation": "Sem dados de validação",
+      "patternRisk": "Risco do padrão",
+      "quickLinks": "Ligações rápidas",
+      "reviewStatus": "Estado da revisão",
+      "rollbackRate": "Taxa de rollback",
+      "successRate": "Taxa de sucesso",
+      "timeline": "Cronologia",
+      "traceCorrelations": "Correlações de traces",
+      "traceCorrelationsFound": "correlações encontradas",
+      "traceCorrelationsSubtitle": "Traces correlacionados com esta alteração",
+      "traceCorrelationsUnavailable": "Correlações de traces indisponíveis",
+      "viewIncidents": "Ver incidentes",
+      "viewInReleases": "Ver em releases",
+      "viewService": "Ver serviço",
+      "viewServiceSot": "Ver fonte de verdade"
     },
     "breakdown": {
       "title": "Breakdown de Confiança da Mudança",
@@ -1958,7 +1995,8 @@
     "all": "Todos",
     "register": "Registar",
     "daysN_one": "{{count}} dia",
-    "daysN_other": "{{count}} dias"
+    "daysN_other": "{{count}} dias",
+    "saving": "A guardar…"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Quando ativado, utilizadores podem criar agentes de IA especializados customizados.",
@@ -7318,6 +7356,16 @@
       "empty": "Nenhuma nota operacional encontrada para este serviço.",
       "origin": "Origem",
       "type": "Tipo"
+    },
+    "relations": {
+      "title": "Contexto de conhecimento",
+      "empty": "Não foram encontrados documentos ligados nem notas operacionais para esta entidade.",
+      "documents": "Documentos de conhecimento relacionados",
+      "notes": "Notas operacionais"
+    },
+    "notes": {
+      "resolved": "Resolvida",
+      "open": "Aberta"
     }
   },
   "knowledgeHub": {
@@ -8900,7 +8948,15 @@
     "tabs": {
       "calendar": "Calendário",
       "freezeWindows": "Janelas de congelamento"
-    }
+    },
+    "activeFreezeWindows": "Janelas de congelamento ativas",
+    "dailySummary": "Resumo diário",
+    "date": "Data",
+    "deactivate": "Desativar",
+    "editFreezeWindow": "Editar janela de congelamento",
+    "freezeWindowsList": "Janelas de congelamento",
+    "releasesLabel": "Releases",
+    "score": "Score"
   },
   "releaseScope": {
     "excludedDescription": "Esta área continua no código, mas foi deliberadamente retirada do escopo do release produtivo final. Não faz parte da superfície suportada em produção.",
@@ -12433,7 +12489,27 @@
       "invalidTenantId": "O ID do tenant é obrigatório.",
       "invalidMaxHighRiskServices": "O máximo de serviços de alto risco deve estar entre 1 e 100.",
       "invalidHighRiskThreshold": "O limiar de alto risco deve estar entre 1 e 100."
-    }
+    },
+    "avgScore": "Score médio",
+    "chartTitle": "Score de risco ao longo do tempo",
+    "colChangeLevel": "Nível de alteração",
+    "colDate": "Data",
+    "colEnvironment": "Ambiente",
+    "colScore": "Score",
+    "colTrend": "Tendência",
+    "colVersion": "Versão",
+    "emptyMessage": "Faça uma pesquisa para ver a tendência de risco.",
+    "emptyTitle": "Sem dados de tendência de risco",
+    "envLabel": "Ambiente",
+    "envPlaceholder": "Todos os ambientes",
+    "limitLabel": "Limite",
+    "maxScore": "Score máximo",
+    "minScore": "Score mínimo",
+    "noData": "Sem dados",
+    "serviceLabel": "Serviço",
+    "servicePlaceholder": "Nome do serviço",
+    "tableTitle": "Histórico de releases",
+    "totalReleases": "Total de releases"
   },
   "commitPool": {
     "title": "Pool de Commits da Release",
