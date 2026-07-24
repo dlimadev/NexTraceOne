@@ -108,7 +108,11 @@ export function IncidentDetailPage() {
   });
 
   const latestWorkflowId = useMemo(() => {
-    const entries = mitigationHistoryQuery.data?.entries ?? [];
+    // Cuidado: numa resposta em forma de array (ex.: catch-all []), `data.entries`
+    // resolve para o método Array.prototype.entries (truthy) em vez de undefined —
+    // por isso valida-se explicitamente que é um array antes de `.find`.
+    const raw = mitigationHistoryQuery.data?.entries;
+    const entries = Array.isArray(raw) ? raw : [];
     const firstWithWorkflow = entries.find((entry) => !!entry.workflowId);
     return firstWithWorkflow?.workflowId;
   }, [mitigationHistoryQuery.data?.entries]);
@@ -189,7 +193,8 @@ export function IncidentDetailPage() {
 
   const detail: IncidentDetailResponse | undefined = detailQuery.data;
 
-  if (!detail) {
+  // Uma resposta em forma de array ([], ex.: 404/catch-all) não é um detalhe válido.
+  if (!detail || Array.isArray(detail) || !detail.identity) {
     return (
       <PageContainer>
         <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">

@@ -62,7 +62,8 @@ export function AutomationWorkflowDetailPage() {
 
   if (isLoading) return <PageLoadingState />;
   if (isError) return <PageErrorState onRetry={() => refetch()} />;
-  if (!workflow) {
+  // `workflow` deve ser um objeto; uma resposta em forma de array ([]) é "não encontrado".
+  if (!workflow || Array.isArray(workflow)) {
     return (
       <PageContainer>
         <EmptyState

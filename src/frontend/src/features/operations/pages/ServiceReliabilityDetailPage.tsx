@@ -63,7 +63,8 @@ export function ServiceReliabilityDetailPage() {
     );
   }
 
-  if (!data) return null;
+  // Uma resposta em forma de array ([], ex.: 404/catch-all) não é um detalhe válido.
+  if (!data || Array.isArray(data) || !data.identity) return null;
 
   const badge = statusBadge(data.status);
 
