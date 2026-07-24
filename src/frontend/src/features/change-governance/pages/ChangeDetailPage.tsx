@@ -215,7 +215,9 @@ export function ChangeDetailPage() {
     );
   }
 
-  if (changeQuery.isError || !change) {
+  // `change` deve ser um objeto; uma resposta em forma de array (ex.: 404/malformada
+  // devolvida como []) é tratada como "não encontrado" e não renderiza o detalhe.
+  if (changeQuery.isError || !change || Array.isArray(change)) {
     return (
       <PageContainer>
         <PageErrorState
@@ -449,7 +451,7 @@ export function ChangeDetailPage() {
         <CardBody>
           {advisoryQuery.isLoading ? (
             <p className="text-sm text-muted py-4">{t('common.loading')}</p>
-          ) : advisory ? (
+          ) : advisory && !Array.isArray(advisory) ? (
             <div className="space-y-4">
               <div className="flex items-center gap-4 flex-wrap">
                 <div>
@@ -480,7 +482,7 @@ export function ChangeDetailPage() {
               <div>
                 <p className="text-xs text-muted mb-2">{t('changeConfidence.detail.advisoryFactors')}</p>
                 <div className="space-y-2">
-                  {advisory.factors.map((factor: AdvisoryFactorDto) => (
+                  {(advisory.factors ?? []).map((factor: AdvisoryFactorDto) => (
                     <div key={factor.factorName} className="flex items-start gap-2 p-2 rounded-md bg-elevated">
                       <FactorStatusIcon status={factor.status} />
                       <div className="flex-1 min-w-0">
