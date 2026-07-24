@@ -7121,7 +7121,7 @@
       "resolveAction": "Resolver",
       "title": "Lista de Incidentes",
       "countSummary": "{{count}} incidentes",
-      "pageSummary": "Página {{page}} de {{total}}"
+      "pageSummary": "Página {{page}} de {{totalPages}}"
     },
     "mitigation": {
       "escalationGuidance": "Guía de Escalamiento",
