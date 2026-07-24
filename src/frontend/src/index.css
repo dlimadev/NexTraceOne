@@ -243,6 +243,10 @@
   --color-critical: var(--t-critical);
   --color-critical-muted: var(--t-critical-muted);
   --color-danger: var(--t-danger);
+  /* Alias: `destructive` era usado em ~22 ficheiros sem estar definido como cor
+     (as utilidades text-/bg-/border-destructive não geravam nada). Aponta para
+     o mesmo vermelho de `danger` para que essas classes passem a ter efeito. */
+  --color-destructive: var(--t-danger);
   --color-neutral: var(--t-neutral);
 
   /* Data Visualization (Strato 10-color) */
