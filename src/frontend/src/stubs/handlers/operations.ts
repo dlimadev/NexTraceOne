@@ -42,6 +42,22 @@ const incidents = [
   },
 ];
 
+/** Gera uma série temporal de N pontos horários com um valor base + ruído determinístico. */
+const series = (base: number, n = 24) =>
+  Array.from({ length: n }, (_, i) => ({
+    timestamp: hoursAgo(n - i),
+    value: Math.round(base * (0.8 + 0.4 * Math.abs(Math.sin(i / 3)))),
+  }));
+
+const sreTimeSeries = () => ({
+  requests: series(52000),
+  requestLatency: series(180),
+  requestErrors: series(9),
+  queries: series(35000),
+  queryLatency: series(13),
+  queryErrors: series(2),
+});
+
 export const operationsHandlers = [
   // ── Rotas literais primeiro ─────────────────────────────────────────
   http.get(`${API}/incidents/summary`, () =>
@@ -78,5 +94,43 @@ export const operationsHandlers = [
       ],
       totalCount: 3, page: 1, pageSize: 20,
     }),
+  ),
+
+  // ── Reliability (lista de serviços) ─────────────────────────────────
+  http.get(`${API}/reliability/services`, () =>
+    HttpResponse.json({
+      items: [
+        { serviceName: 'svc-payments-api', displayName: 'Payments API', serviceType: 'RestApi', domain: 'Billing', teamName: 'Payments', criticality: 'Critical', reliabilityStatus: 'NeedsAttention', operationalSummary: '1 incidente crítico ativo; SLO de latência sob pressão.', trend: 'Down', activeFlags: 2, openIncidents: 1, recentChangeImpact: true, overallScore: 74, lastComputedAt: hoursAgo(1) },
+        { serviceName: 'svc-orders-api', displayName: 'Orders API', serviceType: 'RestApi', domain: 'Commerce', teamName: 'Orders', criticality: 'High', reliabilityStatus: 'Healthy', operationalSummary: 'Dentro dos SLOs; sem incidentes abertos.', trend: 'Stable', activeFlags: 0, openIncidents: 1, recentChangeImpact: true, overallScore: 88, lastComputedAt: hoursAgo(1) },
+        { serviceName: 'svc-inventory-graphql', displayName: 'Inventory GraphQL', serviceType: 'GraphqlApi', domain: 'Commerce', teamName: 'Inventory', criticality: 'Medium', reliabilityStatus: 'Degraded', operationalSummary: 'Fila de eventos acumulada; latência acima do baseline.', trend: 'Down', activeFlags: 1, openIncidents: 1, recentChangeImpact: false, overallScore: 63, lastComputedAt: hoursAgo(2) },
+        { serviceName: 'svc-notifications-worker', displayName: 'Notifications Worker', serviceType: 'BackgroundService', domain: 'Platform', teamName: 'Platform', criticality: 'Low', reliabilityStatus: 'Healthy', operationalSummary: 'Estável após resolução do timeout.', trend: 'Up', activeFlags: 0, openIncidents: 0, recentChangeImpact: false, overallScore: 95, lastComputedAt: hoursAgo(3) },
+      ],
+      totalCount: 4, page: 1, pageSize: 20,
+    }),
+  ),
+
+  // ── SRE Dashboard (telemetria agregada) ─────────────────────────────
+  http.get(`${API}/telemetry/sre/summary`, () =>
+    HttpResponse.json({
+      problems: { open: 3, total: 12 },
+      slo: { errorCompliancePct: 99.4, latencyCompliancePct: 98.1 },
+      traffic: { requestCount: 1284000, queryCount: 842000 },
+      latency: { requestAvgMs: 182, queryAvgMs: 14 },
+      errors: { http5xx: 214, http4xx: 1830, queryErrors: 42, logErrors: 96 },
+    }),
+  ),
+  http.get(`${API}/telemetry/sre/timeseries`, () => HttpResponse.json(sreTimeSeries())),
+  http.get(`${API}/telemetry/sre/top-requests`, () =>
+    HttpResponse.json([
+      { service: 'Payments API', request: 'POST /payments', count: 184000, avgLatencyMs: 210, errors: 120 },
+      { service: 'Orders API', request: 'GET /orders/{id}', count: 142000, avgLatencyMs: 96, errors: 38 },
+      { service: 'Inventory GraphQL', request: 'POST /graphql', count: 98000, avgLatencyMs: 156, errors: 21 },
+    ]),
+  ),
+  http.get(`${API}/telemetry/sre/top-queries`, () =>
+    HttpResponse.json([
+      { database: 'payments-db', query: 'SELECT * FROM payments WHERE status=$1', count: 96000, avgLatencyMs: 12 },
+      { database: 'orders-db', query: 'UPDATE orders SET state=$1 WHERE id=$2', count: 74000, avgLatencyMs: 9 },
+    ]),
   ),
 ];
