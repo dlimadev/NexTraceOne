@@ -43,6 +43,34 @@ const changes = [
   },
 ];
 
+// ── Releases de demo (partilhadas por releases/workflow/promotion/calendar) ──
+const releases = [
+  {
+    id: 'rel-1', apiAssetId: 'api-svc-payments-api', serviceName: 'Payments API', version: '2.3.0',
+    environment: 'production', status: 'Succeeded', deploymentState: 'Succeeded', changeLevel: 3,
+    riskScore: 0.72, confidenceStatus: 'NeedsAttention', description: 'Reconciliação assíncrona + reembolsos.',
+    changeType: 'Deployment', commitSha: 'a1b2c3d4e5f6', pipelineSource: 'github-actions',
+    workItemReference: 'PAY-1420', teamName: 'Payments', createdAt: daysAgo(1),
+    deploymentDurationMs: 184000, succeededAt: daysAgo(1), failedAt: null,
+  },
+  {
+    id: 'rel-2', apiAssetId: 'api-svc-orders-api', serviceName: 'Orders API', version: '1.8.2',
+    environment: 'production', status: 'Succeeded', deploymentState: 'Succeeded', changeLevel: 1,
+    riskScore: 0.18, confidenceStatus: 'Validated', description: 'Correção de idempotência.',
+    changeType: 'Deployment', commitSha: 'f6e5d4c3b2a1', pipelineSource: 'github-actions',
+    workItemReference: 'ORD-882', teamName: 'Orders', createdAt: daysAgo(2),
+    deploymentDurationMs: 96000, succeededAt: daysAgo(2), failedAt: null,
+  },
+  {
+    id: 'rel-3', apiAssetId: 'api-svc-inventory-graphql', serviceName: 'Inventory GraphQL', version: '3.1.0',
+    environment: 'staging', status: 'Failed', deploymentState: 'Failed', changeLevel: 4,
+    riskScore: 0.88, confidenceStatus: 'SuspectedRegression', description: 'Migração de schema de stock.',
+    changeType: 'Deployment', commitSha: '9a8b7c6d5e4f', pipelineSource: 'gitlab-ci',
+    workItemReference: 'INV-311', teamName: 'Inventory', createdAt: daysAgo(3),
+    deploymentDurationMs: 210000, succeededAt: null, failedAt: daysAgo(3),
+  },
+];
+
 const intelligenceByChange: Record<string, unknown> = {
   'chg-1': {
     blastRadius: {
@@ -172,6 +200,94 @@ export const changeGovernanceHandlers = [
       correlations: [
         { traceId: '7f3a9c1e20b4', description: 'POST /payments — pico de latência pós-deploy.', correlatedAt: daysAgo(1) },
         { traceId: 'b28d5e6f10a3', description: 'GET /payments/{id} — erro 500 esporádico.', correlatedAt: daysAgo(1) },
+      ],
+    }),
+  ),
+
+  // ── Releases (lista + intelligence summary) ─────────────────────────
+  http.get(`${API}/releases/:releaseId/intelligence`, ({ params }) => {
+    const rel = releases.find((r) => r.id === String(params.releaseId)) ?? releases[0]!;
+    return HttpResponse.json({
+      release: rel, score: null, blastRadius: null, markers: [],
+      baseline: null, postReleaseReview: null, rollbackAssessment: null, timeline: [],
+    });
+  }),
+  http.get(`${API}/releases`, () =>
+    HttpResponse.json({ items: releases, totalCount: releases.length, page: 1, pageSize: 20 }),
+  ),
+
+  // ── Workflow (instâncias + templates) ───────────────────────────────
+  http.get(`${API}/workflow/templates`, () =>
+    HttpResponse.json([
+      { id: 'tpl-l1', name: 'Fast-Track (Nível 1)', changeLevel: 1, stages: [{ id: 's1', name: 'Aprovação automática' }] },
+      { id: 'tpl-l3', name: 'Aprovação Nível 3', changeLevel: 3, stages: [
+        { id: 's1', name: 'Revisão de Segurança' }, { id: 's2', name: 'Comité de Mudanças' }, { id: 's3', name: 'Release Manager' },
+      ] },
+    ]),
+  ),
+  http.get(`${API}/workflow/instances`, () =>
+    HttpResponse.json({
+      items: [
+        { id: 'wf-1', releaseId: 'rel-1', status: 'InProgress', currentStage: 'Revisão de Segurança', templateName: 'Aprovação Nível 3', createdAt: daysAgo(1) },
+        { id: 'wf-2', releaseId: 'rel-2', status: 'Approved', currentStage: null, templateName: 'Fast-Track (Nível 1)', createdAt: daysAgo(2) },
+      ],
+      totalCount: 2, page: 1, pageSize: 20,
+    }),
+  ),
+
+  // ── Promotion (pedidos + avaliações de gate) ────────────────────────
+  http.get(`${API}/promotion/requests/:requestId/gate-evaluations`, ({ params }) =>
+    HttpResponse.json({
+      promotionRequestId: String(params.requestId),
+      evaluations: [
+        { evaluationId: 'ev-1', gateId: 'gate-security', passed: true, evaluatedBy: 'system', details: 'Sem vulnerabilidades críticas.', overrideJustification: null, evaluatedAt: daysAgo(1) },
+        { evaluationId: 'ev-2', gateId: 'gate-slo', passed: false, evaluatedBy: 'system', details: 'Error budget abaixo de 20%.', overrideJustification: null, evaluatedAt: daysAgo(1) },
+      ],
+    }),
+  ),
+  http.get(`${API}/promotion/requests`, () =>
+    HttpResponse.json({
+      items: [
+        {
+          id: 'pr-1', releaseId: 'rel-1', serviceName: 'Payments API', sourceEnvironment: 'staging', targetEnvironment: 'production',
+          status: 'Pending', createdAt: daysAgo(1), reviewedBy: null, reviewNotes: null,
+          gateResults: [
+            { gateName: 'Security Scan', passed: true },
+            { gateName: 'SLO Check', passed: false, message: 'Error budget baixo em produção.' },
+          ],
+        },
+        {
+          id: 'pr-2', releaseId: 'rel-2', serviceName: 'Orders API', sourceEnvironment: 'staging', targetEnvironment: 'production',
+          status: 'Approved', createdAt: daysAgo(2), reviewedBy: 'ana.silva@nextraceone.dev', reviewNotes: 'Aprovado — gates OK.',
+          gateResults: [{ gateName: 'Security Scan', passed: true }, { gateName: 'SLO Check', passed: true }],
+        },
+      ],
+      totalCount: 2, page: 1, pageSize: 20,
+    }),
+  ),
+
+  // ── Calendário de releases + janelas de congelamento ────────────────
+  http.get(`${API}/release-calendar`, () =>
+    HttpResponse.json({
+      releases: releases.map((r) => ({
+        releaseId: r.id, serviceName: r.serviceName, version: r.version, environment: r.environment,
+        status: r.status, changeType: 'Deployment', confidenceStatus: r.confidenceStatus,
+        changeScore: r.changeScore, changeLevel: r.changeLevel, teamName: r.teamName, createdAt: r.createdAt,
+      })),
+      freezeWindows: [
+        { freezeWindowId: 'fz-1', name: 'Congelamento de fim de trimestre', reason: 'Fecho financeiro Q3', scope: 'Environment', scopeValue: 'production', startsAt: daysAgo(-2), endsAt: daysAgo(-5), isActive: true },
+      ],
+      dailySummary: [
+        { date: daysAgo(1), totalReleases: 1, highRiskReleases: 0, averageScore: 0.72 },
+        { date: daysAgo(2), totalReleases: 1, highRiskReleases: 0, averageScore: 0.18 },
+        { date: daysAgo(3), totalReleases: 1, highRiskReleases: 1, averageScore: 0.88 },
+      ],
+    }),
+  ),
+  http.get(`${API}/freeze-windows`, () =>
+    HttpResponse.json({
+      items: [
+        { id: 'fz-1', name: 'Congelamento de fim de trimestre', reason: 'Fecho financeiro Q3', scope: 'Environment', scopeValue: 'production', startsAt: daysAgo(-2), endsAt: daysAgo(-5), isActive: true, createdBy: 'ana.silva@nextraceone.dev', createdAt: daysAgo(4) },
       ],
     }),
   ),
