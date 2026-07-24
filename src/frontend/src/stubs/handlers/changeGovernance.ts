@@ -291,4 +291,112 @@ export const changeGovernanceHandlers = [
       ],
     }),
   ),
+
+  // ── Ciclo de vida de release (páginas de nicho) ─────────────────────
+  // Commit pool: commits + work items associados a uma release.
+  http.get(`${API}/releases/:releaseId/commits`, ({ params }) =>
+    HttpResponse.json({
+      releaseId: String(params.releaseId),
+      commits: [
+        { id: 'cm-1', commitSha: 'a1b2c3d4e5f6', commitMessage: 'feat: reconciliação assíncrona de pagamentos', commitAuthor: 'ana.silva', committedAt: daysAgo(2), branchName: 'main', serviceName: 'Payments API', assignmentStatus: 'Assigned', assignedAt: daysAgo(1), assignedBy: 'ana.silva@nextraceone.dev', extractedWorkItemRefs: 'PAY-1420' },
+        { id: 'cm-2', commitSha: 'b2c3d4e5f6a7', commitMessage: 'fix: idempotência no endpoint de reembolsos', commitAuthor: 'joao.costa', committedAt: daysAgo(2), branchName: 'main', serviceName: 'Payments API', assignmentStatus: 'Unassigned', assignedAt: null, assignedBy: null, extractedWorkItemRefs: null },
+      ],
+    }),
+  ),
+  http.get(`${API}/releases/:releaseId/work-items`, ({ params }) =>
+    HttpResponse.json({
+      releaseId: String(params.releaseId),
+      workItems: [
+        { id: 'wi-1', externalWorkItemId: 'PAY-1420', externalSystem: 'Jira', title: 'Reconciliação assíncrona de pagamentos', workItemType: 'Story', externalStatus: 'Done', externalUrl: 'https://jira.example.com/PAY-1420', addedBy: 'ana.silva@nextraceone.dev', addedAt: daysAgo(3), isActive: true },
+      ],
+    }),
+  ),
+  // Approval gateway: pedidos de aprovação externa de uma release.
+  http.get(`${API}/releases/:releaseId/approval-requests`, ({ params }) =>
+    HttpResponse.json({
+      releaseId: String(params.releaseId),
+      approvalRequests: [
+        { id: 'ar-1', approvalType: 'ChangeAdvisoryBoard', externalSystem: 'ServiceNow', targetEnvironment: 'production', status: 'Pending', requestedAt: daysAgo(1), respondedAt: null, respondedBy: null, comments: null, externalRequestId: 'CHG0012345', callbackTokenExpiresAt: daysAgo(-2) },
+      ],
+    }),
+  ),
+  // Impact report.
+  http.get(`${API}/releases/:releaseId/impact-report`, ({ params }) =>
+    HttpResponse.json({
+      releaseId: String(params.releaseId), serviceName: 'Payments API', version: '2.3.0', environment: 'production',
+      status: 'Succeeded', riskScore: 0.72, changeLevel: 'Level3',
+      blastRadius: { totalAffectedConsumers: 6, directConsumers: ['checkout-web', 'billing-worker'], transitiveConsumers: ['orders-api', 'notifications-worker', 'ledger-service', 'reporting-api'], calculatedAt: daysAgo(1) },
+      workItemsSummary: { total: 3, stories: 2, bugs: 1, features: 0, others: 0 },
+      commitsSummary: { total: 8, byAuthor: [{ author: 'ana.silva', count: 5 }, { author: 'joao.costa', count: 3 }] },
+      pendingApprovals: 1, generatedAt: nowIso(),
+    }),
+  ),
+  // Review pós-release.
+  http.get(`${API}/releases/:releaseId/review`, ({ params }) =>
+    HttpResponse.json({
+      releaseId: String(params.releaseId), serviceName: 'Payments API', version: '2.3.0', environment: 'production',
+      currentPhase: 'Observation', isCompleted: false, outcome: null, confidenceScore: 0.72,
+      summary: 'Observação em curso — métricas dentro do baseline.', baseline: 'latency_p95=180ms, error_rate=0.4%',
+      observationWindows: [
+        { id: 'ow-1', phase: '1h', startsAt: daysAgo(1), endsAt: daysAgo(0.96), errorRate: 0.004, avgLatencyMs: 182, isCollected: true },
+        { id: 'ow-2', phase: '24h', startsAt: daysAgo(1), endsAt: daysAgo(-0), errorRate: null, avgLatencyMs: null, isCollected: false },
+      ],
+      startedAt: daysAgo(1), completedAt: null,
+    }),
+  ),
+  // Rollback assessment.
+  http.get(`${API}/releases/:releaseId/rollback-assessment`, () =>
+    HttpResponse.json({
+      isViable: true, inviabilityReason: null, readinessScore: 0.81, recommendation: 'Viável com migração de consumidores',
+      previousVersion: '2.2.4', hasReversibleMigrations: true, totalConsumersImpacted: 6, consumersAlreadyMigrated: 4,
+      assessedAt: nowIso(),
+    }),
+  ),
+  // Release notes (IA).
+  http.get(`${API}/releases/:releaseId/notes`, ({ params }) =>
+    HttpResponse.json({
+      releaseNotesId: 'rn-1', releaseId: String(params.releaseId),
+      technicalSummary: 'Adiciona reconciliação assíncrona e endpoint de reembolsos; corrige idempotência.',
+      executiveSummary: 'Pagamentos mais fiáveis com reembolsos automáticos.',
+      newEndpointsSection: 'POST /payments/{id}/refunds', breakingChangesSection: null,
+      affectedServicesSection: 'checkout-web, billing-worker', confidenceMetricsSection: 'Confiança 72%, blast radius 6',
+      evidenceLinksSection: null, modelUsed: 'qwen3.5:9b', tokensUsed: 1240, status: 'Generated',
+      generatedAt: nowIso(), lastRegeneratedAt: null, regenerationCount: 0,
+    }),
+  ),
+  // Gates dashboard: gates de promoção por ambiente.
+  http.get(`${API}/releases/promotion-gates`, () =>
+    HttpResponse.json({
+      gates: [
+        { gateId: 'g-1', name: 'Security Scan', description: 'Análise SAST/dependências.', environmentFrom: 'staging', environmentTo: 'production', isActive: true, blockOnFailure: true, createdAt: daysAgo(30) },
+        { gateId: 'g-2', name: 'SLO Check', description: 'Verifica error budget.', environmentFrom: 'staging', environmentTo: 'production', isActive: true, blockOnFailure: true, createdAt: daysAgo(30) },
+        { gateId: 'g-3', name: 'Manual Approval', description: 'Aprovação do Release Manager.', environmentFrom: 'staging', environmentTo: 'production', isActive: true, blockOnFailure: false, createdAt: daysAgo(30) },
+      ],
+    }),
+  ),
+  // Políticas de aprovação.
+  http.get(`${API}/releases/approval-policies`, () =>
+    HttpResponse.json([
+      { id: 'pol-1', name: 'Produção — Nível 3+', environmentId: 'env-prod', serviceId: null, minChangeLevel: 3, requiredApprovals: 2, approverRoles: ['ReleaseManager', 'SecurityLead'], isActive: true, createdAt: daysAgo(60) },
+      { id: 'pol-2', name: 'Staging — auto', environmentId: 'env-staging', serviceId: null, minChangeLevel: 0, requiredApprovals: 0, approverRoles: [], isActive: true, createdAt: daysAgo(60) },
+    ]),
+  ),
+  // Evidence pack de uma instância de workflow.
+  http.get(`${API}/workflow/instances/:instanceId/evidence-pack`, ({ params }) =>
+    HttpResponse.json({
+      evidencePackId: 'ep-1', workflowInstanceId: String(params.instanceId), releaseId: 'rel-1',
+      contractDiffSummary: '1 endpoint adicionado, 0 breaking changes.', blastRadiusScore: 0.4,
+      spectralScore: 0.95, changeIntelligenceScore: 0.72, approvalHistory: 'Aprovado condicionalmente por ana.silva.',
+      contractHash: 'sha256:9f2b...c41', completenessPercentage: 80, generatedAt: nowIso(),
+    }),
+  ),
+  // Release train (avaliação — POST on-demand).
+  http.post(`${API}/releases/train-evaluation`, () =>
+    HttpResponse.json({
+      trainName: 'Comboio de release semanal', requestedCount: 3, foundCount: 3, notFoundIds: [],
+      releases: releases.map((r) => ({ releaseId: r.id, serviceName: r.serviceName, version: r.version, environment: r.environment, riskScore: r.riskScore, status: r.status })),
+      aggregateRiskScore: 0.59, combinedAffectedConsumers: 9, blockingServices: ['Inventory GraphQL'],
+      readiness: 'Blocked', evaluatedAt: nowIso(),
+    }),
+  ),
 ];
