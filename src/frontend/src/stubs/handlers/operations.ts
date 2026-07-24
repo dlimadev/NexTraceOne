@@ -100,10 +100,10 @@ export const operationsHandlers = [
   http.get(`${API}/reliability/services`, () =>
     HttpResponse.json({
       items: [
-        { serviceName: 'svc-payments-api', displayName: 'Payments API', serviceType: 'RestApi', domain: 'Billing', teamName: 'Payments', criticality: 'Critical', reliabilityStatus: 'NeedsAttention', operationalSummary: '1 incidente crítico ativo; SLO de latência sob pressão.', trend: 'Down', activeFlags: 2, openIncidents: 1, recentChangeImpact: true, overallScore: 74, lastComputedAt: hoursAgo(1) },
+        { serviceName: 'svc-payments-api', displayName: 'Payments API', serviceType: 'RestApi', domain: 'Billing', teamName: 'Payments', criticality: 'Critical', reliabilityStatus: 'NeedsAttention', operationalSummary: '1 incidente crítico ativo; SLO de latência sob pressão.', trend: 'Declining', activeFlags: 2, openIncidents: 1, recentChangeImpact: true, overallScore: 74, lastComputedAt: hoursAgo(1) },
         { serviceName: 'svc-orders-api', displayName: 'Orders API', serviceType: 'RestApi', domain: 'Commerce', teamName: 'Orders', criticality: 'High', reliabilityStatus: 'Healthy', operationalSummary: 'Dentro dos SLOs; sem incidentes abertos.', trend: 'Stable', activeFlags: 0, openIncidents: 1, recentChangeImpact: true, overallScore: 88, lastComputedAt: hoursAgo(1) },
-        { serviceName: 'svc-inventory-graphql', displayName: 'Inventory GraphQL', serviceType: 'GraphqlApi', domain: 'Commerce', teamName: 'Inventory', criticality: 'Medium', reliabilityStatus: 'Degraded', operationalSummary: 'Fila de eventos acumulada; latência acima do baseline.', trend: 'Down', activeFlags: 1, openIncidents: 1, recentChangeImpact: false, overallScore: 63, lastComputedAt: hoursAgo(2) },
-        { serviceName: 'svc-notifications-worker', displayName: 'Notifications Worker', serviceType: 'BackgroundService', domain: 'Platform', teamName: 'Platform', criticality: 'Low', reliabilityStatus: 'Healthy', operationalSummary: 'Estável após resolução do timeout.', trend: 'Up', activeFlags: 0, openIncidents: 0, recentChangeImpact: false, overallScore: 95, lastComputedAt: hoursAgo(3) },
+        { serviceName: 'svc-inventory-graphql', displayName: 'Inventory GraphQL', serviceType: 'GraphqlApi', domain: 'Commerce', teamName: 'Inventory', criticality: 'Medium', reliabilityStatus: 'Degraded', operationalSummary: 'Fila de eventos acumulada; latência acima do baseline.', trend: 'Declining', activeFlags: 1, openIncidents: 1, recentChangeImpact: false, overallScore: 63, lastComputedAt: hoursAgo(2) },
+        { serviceName: 'svc-notifications-worker', displayName: 'Notifications Worker', serviceType: 'BackgroundService', domain: 'Platform', teamName: 'Platform', criticality: 'Low', reliabilityStatus: 'Healthy', operationalSummary: 'Estável após resolução do timeout.', trend: 'Improving', activeFlags: 0, openIncidents: 0, recentChangeImpact: false, overallScore: 95, lastComputedAt: hoursAgo(3) },
       ],
       totalCount: 4, page: 1, pageSize: 20,
     }),
@@ -133,4 +133,107 @@ export const operationsHandlers = [
       { database: 'orders-db', query: 'UPDATE orders SET state=$1 WHERE id=$2', count: 74000, avgLatencyMs: 9 },
     ]),
   ),
+
+  // ── Reliability: SLOs de um serviço ─────────────────────────────────
+  http.get(`${API}/reliability/services/:serviceId/slos`, ({ params }) =>
+    HttpResponse.json({
+      serviceId: String(params.serviceId),
+      items: [
+        { id: 'slo-1', name: 'Disponibilidade API', serviceId: String(params.serviceId), environment: 'production', type: 'Availability', targetPercent: 99.9, alertThresholdPercent: 99.5, windowDays: 30, isActive: true },
+        { id: 'slo-2', name: 'Latência P99', serviceId: String(params.serviceId), environment: 'production', type: 'Latency', targetPercent: 99.0, alertThresholdPercent: 98.0, windowDays: 30, isActive: true },
+        { id: 'slo-3', name: 'Taxa de Erro', serviceId: String(params.serviceId), environment: 'production', type: 'ErrorRate', targetPercent: 99.5, alertThresholdPercent: null, windowDays: 7, isActive: false },
+      ],
+    }),
+  ),
+
+  // ── Reliability: detalhe de um serviço ──────────────────────────────
+  http.get(`${API}/reliability/services/:serviceId`, ({ params }) =>
+    HttpResponse.json({
+      identity: { serviceId: String(params.serviceId), displayName: 'Payments API', serviceType: 'RestApi', domain: 'Billing', teamName: 'Payments', criticality: 'Critical' },
+      status: 'NeedsAttention',
+      operationalSummary: '1 incidente crítico ativo; SLO de latência sob pressão nas últimas 3 horas.',
+      trend: { direction: 'Declining', timeframe: '24h', summary: 'Latência P99 subiu 18% após o último deploy.' },
+      metrics: { availabilityPercent: 99.62, latencyP99Ms: 412, errorRatePercent: 0.34, requestsPerSecond: 1450, queueLag: null, processingDelay: null },
+      activeFlags: 2,
+      recentChanges: [
+        { changeId: 'chg-9001', description: 'Deploy v2.14.0 — novo motor de reconciliação', changeType: 'Deployment', confidenceStatus: 'Watch', deployedAt: hoursAgo(4) },
+        { changeId: 'chg-8994', description: 'Ajuste de connection pool', changeType: 'Configuration', confidenceStatus: 'Healthy', deployedAt: daysAgo(2) },
+      ],
+      linkedIncidents: [
+        { incidentId: 'inc-1', reference: 'INC-2041', title: 'Latência elevada no processamento de pagamentos', status: 'Investigating', reportedAt: hoursAgo(3) },
+      ],
+      dependencies: [
+        { serviceId: 'svc-orders-api', displayName: 'Orders API', status: 'Healthy' },
+        { serviceId: 'svc-ledger-db', displayName: 'Ledger DB', status: 'Degraded' },
+      ],
+      linkedContracts: [
+        { contractVersionId: 'cv-1', name: 'Payments REST', version: '2', protocol: 'REST', lifecycleState: 'Published' },
+      ],
+      runbooks: [{ title: 'Mitigar latência de pagamentos', url: '/operations/runbooks/rb-1/edit' }],
+      anomalySummary: 'Deteção de anomalia: pico de latência correlacionado com o deploy chg-9001.',
+      coverage: { hasOperationalSignals: true, hasRunbook: true, hasOwner: true, hasDependenciesMapped: true, hasRecentChangeContext: true, hasIncidentLinkage: true },
+    }),
+  ),
+
+  // ── Reliability: resumo de equipa ───────────────────────────────────
+  http.get(`${API}/reliability/teams/:teamId/summary`, ({ params }) =>
+    HttpResponse.json({
+      teamId: String(params.teamId), totalServices: 8, healthyServices: 5, degradedServices: 2,
+      unavailableServices: 0, needsAttentionServices: 1, criticalServicesImpacted: 1,
+      openIncidents: 2, overallScore: 82, trend: 'Stable',
+    }),
+  ),
+
+  // ── Reliability: SLO error-budget / burn-rate / SLAs ────────────────
+  http.get(`${API}/reliability/slos/:sloId/error-budget`, ({ params }) =>
+    HttpResponse.json({
+      sloDefinitionId: String(params.sloId), sloName: 'Latência P99', serviceId: 'svc-payments-api', environment: 'production',
+      targetPercent: 99.0, windowDays: 30, totalBudgetMinutes: 432, consumedBudgetMinutes: 261,
+      remainingBudgetMinutes: 171, consumedPercent: 60.4, status: 'AtRisk', computedAt: hoursAgo(1),
+    }),
+  ),
+  http.get(`${API}/reliability/slos/:sloId/burn-rate`, ({ params }) =>
+    HttpResponse.json({
+      sloDefinitionId: String(params.sloId), sloName: 'Latência P99', serviceId: 'svc-payments-api', environment: 'production',
+      window: 'SixHours', burnRate: 1.8, observedErrorRate: 0.9, toleratedErrorRate: 0.5, status: 'AtRisk', computedAt: hoursAgo(1),
+    }),
+  ),
+  http.get(`${API}/reliability/slos/:sloId/slas`, ({ params }) =>
+    HttpResponse.json({
+      sloDefinitionId: String(params.sloId), sloName: 'Latência P99',
+      items: [
+        { id: 'sla-1', name: 'Contrato Enterprise — Pagamentos', contractualTargetPercent: 99.5, status: 'Meeting', effectiveFrom: daysAgo(120), effectiveTo: null, hasPenaltyClauses: true, isActive: true },
+      ],
+    }),
+  ),
+  http.post(`${API}/reliability/slos/:sloId/compute-error-budget`, ({ params }) =>
+    HttpResponse.json({
+      sloDefinitionId: String(params.sloId), sloName: 'Latência P99', serviceId: 'svc-payments-api', environment: 'production',
+      targetPercent: 99.0, windowDays: 30, totalBudgetMinutes: 432, consumedBudgetMinutes: 261,
+      remainingBudgetMinutes: 171, consumedPercent: 60.4, status: 'AtRisk', computedAt: new Date().toISOString(),
+    }),
+  ),
+  http.post(`${API}/reliability/slos/:sloId/compute-burn-rate`, ({ params }) =>
+    HttpResponse.json({
+      sloDefinitionId: String(params.sloId), sloName: 'Latência P99', serviceId: 'svc-payments-api', environment: 'production',
+      observedErrorRate: 0.9, toleratedErrorRate: 0.5,
+      snapshots: [
+        { window: 'OneHour', burnRate: 2.4, status: 'Violated' },
+        { window: 'SixHours', burnRate: 1.8, status: 'AtRisk' },
+        { window: 'TwentyFourHours', burnRate: 1.1, status: 'AtRisk' },
+        { window: 'SevenDays', burnRate: 0.7, status: 'Healthy' },
+      ],
+      computedAt: new Date().toISOString(),
+    }),
+  ),
+  http.post(`${API}/reliability/slos`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as {
+      name?: string; serviceId?: string; environment?: string; type?: string; targetPercent?: number; windowDays?: number;
+    };
+    return HttpResponse.json({
+      id: 'slo-new', name: body.name ?? 'Novo SLO', serviceId: body.serviceId ?? 'svc-payments-api',
+      environment: body.environment ?? 'production', type: body.type ?? 'Availability',
+      targetPercent: body.targetPercent ?? 99.9, windowDays: body.windowDays ?? 30,
+    }, { status: 201 });
+  }),
 ];
