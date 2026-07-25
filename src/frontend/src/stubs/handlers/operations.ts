@@ -364,4 +364,126 @@ export const operationsHandlers = [
       targetPercent: body.targetPercent ?? 99.9, windowDays: body.windowDays ?? 30,
     }, { status: 201 });
   }),
+
+  // ── Automação: catálogo de ações ────────────────────────────────────
+  http.get(`${API}/automation/actions`, () =>
+    HttpResponse.json({
+      items: [
+        { actionId: 'act-1', name: 'restart_service', displayName: 'Reiniciar serviço', description: 'Reinicia as instâncias do serviço de forma controlada.', actionType: 'Remediation', riskLevel: 'Medium', requiresApproval: true, allowedPersonas: ['SRE', 'Platform'], allowedEnvironments: ['staging', 'production'], preconditionTypes: ['HealthCheck'], hasPostValidation: true },
+        { actionId: 'act-2', name: 'scale_out', displayName: 'Escalar horizontalmente', description: 'Adiciona réplicas ao serviço para absorver carga.', actionType: 'Scaling', riskLevel: 'Low', requiresApproval: false, allowedPersonas: ['SRE'], allowedEnvironments: ['production'], preconditionTypes: ['CapacityCheck'], hasPostValidation: true },
+        { actionId: 'act-3', name: 'rollback_deploy', displayName: 'Reverter deploy', description: 'Reverte para a versão anterior estável.', actionType: 'Rollback', riskLevel: 'High', requiresApproval: true, allowedPersonas: ['SRE', 'ReleaseManager'], allowedEnvironments: ['production'], preconditionTypes: ['ChangeCorrelation'], hasPostValidation: true },
+      ],
+    }),
+  ),
+
+  // ── Automação: trilha de auditoria ──────────────────────────────────
+  http.get(`${API}/automation/audit`, () =>
+    HttpResponse.json({
+      entries: [
+        { entryId: 'wa-1', workflowId: 'wf-1', action: 'WorkflowApproved', performedBy: 'ana.silva@nextraceone.dev', performedAt: hoursAgo(2), details: 'Rollback aprovado para Payments API.', serviceId: 'svc-payments-api', teamId: 'payments' },
+        { entryId: 'wa-2', workflowId: 'wf-1', action: 'WorkflowCreated', performedBy: 'joao.costa@nextraceone.dev', performedAt: hoursAgo(3), details: null, serviceId: 'svc-payments-api', teamId: 'payments' },
+        { entryId: 'wa-3', workflowId: 'wf-2', action: 'WorkflowExecuted', performedBy: 'sistema', performedAt: hoursAgo(20), details: 'Escalonamento concluído com sucesso.', serviceId: 'svc-orders-api', teamId: 'orders' },
+      ],
+    }),
+  ),
+
+  // ── Automação: workflow (detalhe) ───────────────────────────────────
+  http.get(`${API}/automation/workflows/:workflowId`, ({ params }) =>
+    HttpResponse.json({
+      workflowId: String(params.workflowId), actionId: 'act-3', actionDisplayName: 'Reverter deploy',
+      status: 'PendingApproval', riskLevel: 'High',
+      rationale: 'Deploy chg-9001 correlacionado com o incidente INC-2041; rollback recomendado.',
+      requestedBy: 'joao.costa@nextraceone.dev', approverInfo: null, scope: 'svc-payments-api',
+      environment: 'production', serviceId: 'svc-payments-api', incidentId: 'inc-1', changeId: 'chg-9001',
+      preconditions: [
+        { type: 'ChangeCorrelation', description: 'Existe uma mudança correlacionada elegível para rollback.', status: 'Passed', evaluatedAt: hoursAgo(1) },
+        { type: 'HealthCheck', description: 'Serviço acessível para operação de rollback.', status: 'Passed', evaluatedAt: hoursAgo(1) },
+      ],
+      executionSteps: [
+        { stepOrder: 1, title: 'Validar versão-alvo do rollback', status: 'Pending', completedAt: null, completedBy: null },
+        { stepOrder: 2, title: 'Executar rollback via pipeline', status: 'Pending', completedAt: null, completedBy: null },
+        { stepOrder: 3, title: 'Validar sinais pós-mitigação', status: 'Pending', completedAt: null, completedBy: null },
+      ],
+      validationInfo: null,
+      auditEntries: [
+        { action: 'WorkflowCreated', performedBy: 'joao.costa@nextraceone.dev', performedAt: hoursAgo(3), details: null },
+      ],
+      createdAt: hoursAgo(3), updatedAt: hoursAgo(1),
+    }),
+  ),
+
+  // ── Automação: workflows (lista) ────────────────────────────────────
+  http.get(`${API}/automation/workflows`, () =>
+    HttpResponse.json({
+      items: [
+        { workflowId: 'wf-1', actionId: 'act-3', actionDisplayName: 'Reverter deploy', status: 'PendingApproval', riskLevel: 'High', requestedBy: 'joao.costa@nextraceone.dev', serviceId: 'svc-payments-api', createdAt: hoursAgo(3) },
+        { workflowId: 'wf-2', actionId: 'act-2', actionDisplayName: 'Escalar horizontalmente', status: 'Completed', riskLevel: 'Low', requestedBy: 'ana.silva@nextraceone.dev', serviceId: 'svc-orders-api', createdAt: daysAgo(1) },
+        { workflowId: 'wf-3', actionId: 'act-1', actionDisplayName: 'Reiniciar serviço', status: 'InProgress', riskLevel: 'Medium', requestedBy: 'sre-oncall@nextraceone.dev', serviceId: 'svc-inventory-graphql', createdAt: hoursAgo(6) },
+      ],
+      totalCount: 3,
+    }),
+  ),
+
+  // ── Platform Operations: health / jobs / queues / events / config ───
+  http.get(`${API}/platform/health`, () =>
+    HttpResponse.json({
+      overallStatus: 'Degraded',
+      subsystems: [
+        { name: 'PostgreSQL', status: 'Healthy', description: 'Conexões dentro do limite; latência normal.', lastCheckedAt: hoursAgo(0.05) },
+        { name: 'ClickHouse', status: 'Healthy', description: 'Ingestão de telemetria operacional.', lastCheckedAt: hoursAgo(0.05) },
+        { name: 'Redis', status: 'Degraded', description: 'Latência de cache acima do baseline.', lastCheckedAt: hoursAgo(0.05) },
+        { name: 'Outbox Processor', status: 'Healthy', description: 'Fila de outbox sem atrasos.', lastCheckedAt: hoursAgo(0.05) },
+      ],
+      uptimeSeconds: 1_284_500, version: '2.14.0', checkedAt: hoursAgo(0.05),
+    }),
+  ),
+  http.get(`${API}/platform/jobs`, () =>
+    HttpResponse.json({
+      jobs: [
+        { jobId: 'job-1', name: 'LicenseRecalculationJob', status: 'Completed', lastRunAt: hoursAgo(0.2), nextRunAt: hoursAgo(-0.05), executionCount: 4820, failureCount: 2, lastError: null },
+        { jobId: 'job-2', name: 'AlertEvaluationJob', status: 'Running', lastRunAt: hoursAgo(0.02), nextRunAt: null, executionCount: 96210, failureCount: 14, lastError: null },
+        { jobId: 'job-3', name: 'RetentionSweepJob', status: 'Scheduled', lastRunAt: daysAgo(1), nextRunAt: hoursAgo(-6), executionCount: 365, failureCount: 0, lastError: null },
+        { jobId: 'job-4', name: 'OutboxDispatchJob', status: 'Failed', lastRunAt: hoursAgo(1), nextRunAt: hoursAgo(-0.1), executionCount: 15200, failureCount: 3, lastError: 'Timeout ao conectar ao broker.' },
+      ],
+      totalCount: 4, page: 1, pageSize: 20,
+    }),
+  ),
+  http.get(`${API}/platform/queues`, () =>
+    HttpResponse.json({
+      queues: [
+        { queueName: 'outbox.default', pendingCount: 42, processingCount: 3, failedCount: 1, deadLetterCount: 0, averageProcessingMs: 34, lastActivityAt: hoursAgo(0.02) },
+        { queueName: 'notifications.email', pendingCount: 8, processingCount: 1, failedCount: 0, deadLetterCount: 0, averageProcessingMs: 120, lastActivityAt: hoursAgo(0.1) },
+        { queueName: 'ingestion.telemetry', pendingCount: 310, processingCount: 12, failedCount: 4, deadLetterCount: 2, averageProcessingMs: 18, lastActivityAt: hoursAgo(0.01) },
+      ],
+      checkedAt: hoursAgo(0.02),
+    }),
+  ),
+  http.get(`${API}/platform/events`, () =>
+    HttpResponse.json({
+      events: [
+        { eventId: 'evt-1', timestamp: hoursAgo(0.5), severity: 'Warning', subsystem: 'Redis', message: 'Latência de cache acima de 5ms.', correlationId: 'corr-8891', resolved: false },
+        { eventId: 'evt-2', timestamp: hoursAgo(1), severity: 'Error', subsystem: 'Outbox Processor', message: 'Falha ao despachar mensagem outbox (timeout do broker).', correlationId: 'corr-8890', resolved: false },
+        { eventId: 'evt-3', timestamp: hoursAgo(4), severity: 'Info', subsystem: 'Scheduler', message: 'RetentionSweepJob agendado.', correlationId: null, resolved: true },
+      ],
+      totalCount: 3, page: 1, pageSize: 20,
+    }),
+  ),
+  http.get(`${API}/platform/config`, () =>
+    HttpResponse.json({
+      environmentName: 'production', deploymentMode: 'Kubernetes',
+      featureFlags: [
+        { name: 'ai_governance', enabled: true, description: 'Governança de IA (registo de modelos, routing).' },
+        { name: 'multi_region', enabled: false, description: 'Replicação multi-região.' },
+      ],
+      subsystems: [
+        { name: 'Kafka', enabled: false, description: 'Streaming de eventos (opcional).' },
+        { name: 'Redis', enabled: true, description: 'Cache distribuído.' },
+      ],
+      databases: [
+        { name: 'NexTraceOne', provider: 'PostgreSQL', connected: true, statusDescription: 'Conectado.' },
+        { name: 'Analytics', provider: 'ClickHouse', connected: true, statusDescription: 'Conectado.' },
+      ],
+      generatedAt: hoursAgo(0.05),
+    }),
+  ),
 ];
