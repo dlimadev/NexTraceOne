@@ -486,4 +486,164 @@ export const operationsHandlers = [
       generatedAt: hoursAgo(0.05),
     }),
   ),
+
+  // ── Telemetria: Log Explorer ────────────────────────────────────────
+  http.get(`${API}/telemetry/logs`, () =>
+    HttpResponse.json([
+      { timestamp: hoursAgo(0.1), environment: 'production', serviceName: 'Payments API', applicationName: 'payments-api', moduleName: 'ReconciliationEngine', level: 'Error', message: 'Timeout ao gravar transação no Ledger DB', exception: 'System.TimeoutException: The operation has timed out.', traceId: 'trace-9a1', spanId: 'span-01', correlationId: 'corr-8891', hostName: 'pod-payments-7f9', containerName: 'payments-api' },
+      { timestamp: hoursAgo(0.2), environment: 'production', serviceName: 'Payments API', level: 'Warning', message: 'Latência de escrita acima do baseline (412ms)', traceId: 'trace-9a2', spanId: 'span-02', hostName: 'pod-payments-7f9' },
+      { timestamp: hoursAgo(0.3), environment: 'production', serviceName: 'Orders API', level: 'Information', message: 'Pedido processado com sucesso', traceId: 'trace-9b1', spanId: 'span-10', hostName: 'pod-orders-4a2' },
+      { timestamp: hoursAgo(0.4), environment: 'production', serviceName: 'Inventory GraphQL', level: 'Warning', message: 'Fila de eventos acima de 500 mensagens', traceId: 'trace-9c1', spanId: 'span-20' },
+    ]),
+  ),
+
+  // ── Telemetria: Trace Explorer ──────────────────────────────────────
+  http.get(`${API}/telemetry/traces/:traceId`, ({ params }) => {
+    const id = String(params.traceId);
+    return HttpResponse.json({
+      traceId: id, durationMs: 486, services: ['Payments API', 'Ledger DB'],
+      spans: [
+        { traceId: id, spanId: 'span-01', serviceName: 'Payments API', operationName: 'POST /payments', startTime: hoursAgo(0.1), endTime: hoursAgo(0.099), durationMs: 486, statusCode: 'Error', statusMessage: 'Timeout', environment: 'production', spanKind: 'Server', serviceKind: 'REST', events: [{ name: 'exception', timestamp: hoursAgo(0.099), attributes: { 'exception.type': 'TimeoutException' } }] },
+        { traceId: id, spanId: 'span-02', parentSpanId: 'span-01', serviceName: 'Ledger DB', operationName: 'INSERT ledger_entries', startTime: hoursAgo(0.1), endTime: hoursAgo(0.099), durationMs: 402, statusCode: 'Error', environment: 'production', spanKind: 'Client', serviceKind: 'DB' },
+      ],
+    });
+  }),
+  http.get(`${API}/telemetry/traces`, () =>
+    HttpResponse.json([
+      { traceId: 'trace-9a1', serviceName: 'Payments API', operationName: 'POST /payments', startTime: hoursAgo(0.1), durationMs: 486, statusCode: 'Error', environment: 'production', spanCount: 6, hasErrors: true, rootServiceKind: 'REST' },
+      { traceId: 'trace-9b1', serviceName: 'Orders API', operationName: 'GET /orders/{id}', startTime: hoursAgo(0.3), durationMs: 96, statusCode: 'Ok', environment: 'production', spanCount: 4, hasErrors: false, rootServiceKind: 'REST' },
+      { traceId: 'trace-9c1', serviceName: 'Inventory GraphQL', operationName: 'POST /graphql', startTime: hoursAgo(0.4), durationMs: 156, statusCode: 'Ok', environment: 'production', spanCount: 8, hasErrors: false, rootServiceKind: 'REST' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/correlate/:traceId`, ({ params }) => {
+    const id = String(params.traceId);
+    return HttpResponse.json({
+      traceId: id,
+      logs: [{ timestamp: hoursAgo(0.1), environment: 'production', serviceName: 'Payments API', level: 'Error', message: 'Timeout ao gravar transação', traceId: id, spanId: 'span-01' }],
+      spans: [{ traceId: id, spanId: 'span-01', serviceName: 'Payments API', operationName: 'POST /payments', startTime: hoursAgo(0.1), endTime: hoursAgo(0.099), durationMs: 486, statusCode: 'Error', environment: 'production', spanKind: 'Server', serviceKind: 'REST' }],
+    });
+  }),
+  http.get(`${API}/telemetry/metrics`, () =>
+    HttpResponse.json(series(180).map((p) => ({ timestamp: p.timestamp, metricName: 'latency_p99_ms', value: p.value, serviceName: 'Payments API', environment: 'production' }))),
+  ),
+  http.get(`${API}/telemetry/errors/top`, () =>
+    HttpResponse.json([
+      { errorMessage: 'System.TimeoutException: operation timed out', count: 214, serviceName: 'Payments API', lastSeen: hoursAgo(0.1), level: 'Error' },
+      { errorMessage: 'Npgsql.PostgresException: deadlock detected', count: 58, serviceName: 'Ledger DB', lastSeen: hoursAgo(0.5), level: 'Error' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/latency/compare`, () =>
+    HttpResponse.json({ serviceName: 'Payments API', environmentA: 'staging', environmentB: 'production', latencyP50MsA: 78, latencyP50MsB: 96, latencyP95MsA: 180, latencyP95MsB: 320, latencyP99MsA: 260, latencyP99MsB: 412, driftPercentP95: 77.8 }),
+  ),
+  http.get(`${API}/telemetry/health`, () => HttpResponse.json({ provider: 'ClickHouse', healthy: true })),
+
+  // ── Telemetria: Request Explorer ────────────────────────────────────
+  http.get(`${API}/telemetry/requests/facets`, () =>
+    HttpResponse.json({
+      services: ['Payments API', 'Orders API', 'Inventory GraphQL'],
+      endpoints: ['POST /payments', 'GET /orders/{id}', 'POST /graphql'],
+      processGroups: ['payments-api', 'orders-api'],
+      k8sNamespaces: ['production', 'staging'],
+      k8sWorkloads: ['payments-api', 'orders-api', 'inventory-graphql'],
+    }),
+  ),
+  http.get(`${API}/telemetry/requests`, () =>
+    HttpResponse.json({
+      total: 3, page: 1, pageSize: 50,
+      items: [
+        { startTime: hoursAgo(0.1), endpoint: 'POST /payments', service: 'Payments API', durationMs: 486, requestStatus: 'Failure', httpCode: 500, processGroup: 'payments-api', k8sWorkload: 'payments-api', k8sNamespace: 'production', spanKind: 'server', spanStatus: 'Error', traceId: 'trace-9a1', spanId: 'span-01' },
+        { startTime: hoursAgo(0.3), endpoint: 'GET /orders/{id}', service: 'Orders API', durationMs: 96, requestStatus: 'Success', httpCode: 200, processGroup: 'orders-api', k8sWorkload: 'orders-api', k8sNamespace: 'production', spanKind: 'server', spanStatus: 'Ok', traceId: 'trace-9b1', spanId: 'span-10' },
+        { startTime: hoursAgo(0.4), endpoint: 'POST /graphql', service: 'Inventory GraphQL', durationMs: 156, requestStatus: 'Success', httpCode: 200, k8sNamespace: 'production', spanKind: 'server', spanStatus: 'Ok', traceId: 'trace-9c1', spanId: 'span-20' },
+      ],
+      histogram: [
+        { durationLabel: '0-100ms', successCount: 1820, failureCount: 4 },
+        { durationLabel: '100-300ms', successCount: 640, failureCount: 12 },
+        { durationLabel: '300-500ms', successCount: 90, failureCount: 48 },
+        { durationLabel: '>500ms', successCount: 12, failureCount: 30 },
+      ],
+    }),
+  ),
+
+  // ── Telemetria: Profiling / DB / Erros / Sintético ──────────────────
+  http.get(`${API}/telemetry/profiling/sessions`, () =>
+    HttpResponse.json([
+      { id: 'prof-1', serviceName: 'Payments API', version: '2.14.0', environment: 'production', cpuPercent: 82, memoryMb: 1240, heapMb: 890, sampleCount: 15200, durationMs: 60000, deployCorrelated: true, deployId: 'chg-9001', capturedAt: hoursAgo(2), profileType: 'cpu' },
+      { id: 'prof-2', serviceName: 'Orders API', version: '1.9.2', environment: 'production', cpuPercent: 34, memoryMb: 620, heapMb: 410, sampleCount: 9800, durationMs: 60000, deployCorrelated: false, capturedAt: hoursAgo(5), profileType: 'memory' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/db/slow-queries`, () =>
+    HttpResponse.json([
+      { id: 'sq-1', fingerprint: 'a1b2', database: 'payments-db', avgDurationMs: 412, maxDurationMs: 1820, executionCount: 96000, totalTimeMs: 39552000, lockWaitMs: 180, hasIndexMiss: true, indexMissCount: 34, recommendation: 'Adicionar índice em payments(status, created_at).', environment: 'production' },
+      { id: 'sq-2', fingerprint: 'c3d4', database: 'orders-db', avgDurationMs: 88, maxDurationMs: 320, executionCount: 74000, totalTimeMs: 6512000, lockWaitMs: 12, hasIndexMiss: false, indexMissCount: 0, environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/errors/groups`, () =>
+    HttpResponse.json([
+      { id: 'eg-1', fingerprint: 'to-1', message: 'System.TimeoutException: operation timed out', serviceName: 'Payments API', count: 214, affectedUsers: 88, status: 'regressing', firstSeen: hoursAgo(4), lastSeen: hoursAgo(0.1), deployCorrelated: true, deployId: 'chg-9001', environment: 'production', stackTraceSummary: 'at ReconciliationEngine.WriteAsync()' },
+      { id: 'eg-2', fingerprint: 'dl-1', message: 'Npgsql.PostgresException: deadlock detected', serviceName: 'Ledger DB', count: 58, affectedUsers: 21, status: 'new', firstSeen: hoursAgo(3), lastSeen: hoursAgo(0.5), deployCorrelated: false, environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/synthetic/probes`, () =>
+    HttpResponse.json([
+      { id: 'probe-1', name: 'Payments — checkout flow', type: 'httpMultiStep', target: 'https://api.nextraceone.dev/payments', status: 'degraded', uptimePercent: 98.4, lastCheck: hoursAgo(0.05), lastResult: 'Latência 412ms (> limiar 300ms)', schedule: '1m', contractValidation: 'pass', environment: 'production' },
+      { id: 'probe-2', name: 'Orders — health', type: 'httpSingle', target: 'https://api.nextraceone.dev/orders/health', status: 'healthy', uptimePercent: 99.98, lastCheck: hoursAgo(0.05), lastResult: '200 OK', schedule: '30s', contractValidation: 'pass', environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/telemetry/api/regressions`, () =>
+    HttpResponse.json([
+      { id: 'reg-1', endpoint: 'POST /payments', serviceName: 'Payments API', p50BaselineMs: 78, p50CurrentMs: 96, p95BaselineMs: 180, p95CurrentMs: 320, p99BaselineMs: 260, p99CurrentMs: 412, regressionPercent: 58, status: 'regressed', deployId: 'chg-9001', changeConfidence: 'high', environment: 'production' },
+      { id: 'reg-2', endpoint: 'GET /orders/{id}', serviceName: 'Orders API', p50BaselineMs: 42, p50CurrentMs: 40, p95BaselineMs: 96, p95CurrentMs: 92, p99BaselineMs: 140, p99CurrentMs: 138, regressionPercent: -2, status: 'stable', changeConfidence: 'low', environment: 'production' },
+    ]),
+  ),
+
+  // ── Operações: dependency-risk / load-tests / maturity / post-mortems / on-call ──
+  http.get(`${API}/operations/dependency-risk`, () =>
+    HttpResponse.json([
+      { id: 'dr-1', serviceName: 'Ledger DB', riskScore: 82, riskLevel: 'critical', failureCount30d: 6, sloHealthPercent: 91, blastRadius: 12, deployFrequency: 3, dependentsCount: 8, trendDirection: 'up', environment: 'production' },
+      { id: 'dr-2', serviceName: 'Payments API', riskScore: 64, riskLevel: 'high', failureCount30d: 3, sloHealthPercent: 96, blastRadius: 6, deployFrequency: 9, dependentsCount: 4, trendDirection: 'stable', environment: 'production' },
+      { id: 'dr-3', serviceName: 'Notifications Worker', riskScore: 28, riskLevel: 'low', failureCount30d: 0, sloHealthPercent: 99, blastRadius: 2, deployFrequency: 2, dependentsCount: 1, trendDirection: 'down', environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/operations/load-tests`, () =>
+    HttpResponse.json([
+      { id: 'lt-1', name: 'Payments — pico Black Friday', serviceName: 'Payments API', source: 'k6', status: 'passed', vus: 2000, durationMs: 600000, p95LatencyMs: 280, errorRate: 0.4, maxCapacityVus: 3200, maxRps: 4800, executedAt: daysAgo(2), environment: 'staging' },
+      { id: 'lt-2', name: 'Orders — carga sustentada', serviceName: 'Orders API', source: 'gatling', status: 'failed', vus: 1500, durationMs: 300000, p95LatencyMs: 620, errorRate: 3.8, maxCapacityVus: 1200, maxRps: 2100, executedAt: daysAgo(1), environment: 'staging' },
+    ]),
+  ),
+  http.get(`${API}/operations/service-maturity`, () =>
+    HttpResponse.json([
+      { id: 'sm-1', serviceName: 'Payments API', teamName: 'Payments', score: 88, maturityLevel: 'advanced', hasSlo: true, hasRunbook: true, hasOnCall: true, hasAlerts: true, hasProfiling: true, hasRecentPostMortem: true, environment: 'production' },
+      { id: 'sm-2', serviceName: 'Inventory GraphQL', teamName: 'Inventory', score: 54, maturityLevel: 'basic', hasSlo: true, hasRunbook: false, hasOnCall: false, hasAlerts: true, hasProfiling: false, hasRecentPostMortem: false, environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/operations/post-mortems`, () =>
+    HttpResponse.json([
+      { id: 'pm-1', title: 'Degradação de latência nos pagamentos', incidentId: 'inc-1', incidentTitle: 'Latência elevada no processamento de pagamentos', status: 'review', author: 'ana.silva@nextraceone.dev', severity: 'Critical', actionItemsCount: 5, openActionItemsCount: 3, createdAt: daysAgo(1), patternCount: 2, environment: 'production' },
+      { id: 'pm-2', title: 'Timeout no gateway de notificações', incidentId: 'inc-4', incidentTitle: 'Timeout no gateway de notificações', status: 'published', author: 'joao.costa@nextraceone.dev', severity: 'Warning', actionItemsCount: 3, openActionItemsCount: 0, createdAt: daysAgo(4), publishedAt: daysAgo(2), patternCount: 1, environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/operations/on-call/schedules`, () =>
+    HttpResponse.json([
+      { id: 'oc-1', name: 'Payments — Primária', teamName: 'Payments', serviceName: 'Payments API', currentOnCall: 'ana.silva@nextraceone.dev', nextOnCall: 'joao.costa@nextraceone.dev', rotationType: 'weekly', timezone: 'Europe/Lisbon', escalationLevels: 3, activeOverrides: 1, environment: 'production' },
+      { id: 'oc-2', name: 'Plataforma — Follow the Sun', teamName: 'Platform', serviceName: 'Notifications Worker', currentOnCall: 'sre-oncall@nextraceone.dev', nextOnCall: 'sre-emea@nextraceone.dev', rotationType: 'followTheSun', timezone: 'UTC', escalationLevels: 2, activeOverrides: 0, environment: 'production' },
+    ]),
+  ),
+
+  // ── IA operacional: anomalias / resumos / sugestões de runbook ──────
+  http.get(`${API}/ai/anomaly/detections`, () =>
+    HttpResponse.json([
+      { id: 'an-1', serviceName: 'Payments API', metric: 'latency_p99_ms', observedValue: 412, baselineValue: 180, sigmaDeviation: 4.2, severity: 'critical', explanation: 'Latência P99 desviou 4.2σ do baseline após o deploy v2.14.0.', detectedAt: hoursAgo(2), status: 'open', modelVersion: 'baseline-v3', environment: 'production' },
+      { id: 'an-2', serviceName: 'Inventory GraphQL', metric: 'queue_depth', observedValue: 540, baselineValue: 120, sigmaDeviation: 3.1, severity: 'high', explanation: 'Profundidade da fila acima do esperado; possível consumidor lento.', detectedAt: hoursAgo(6), status: 'acknowledged', modelVersion: 'baseline-v3', environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/ai/incident-summarizer/summaries`, () =>
+    HttpResponse.json([
+      { id: 'sum-1', incidentId: 'inc-1', incidentTitle: 'Latência elevada no processamento de pagamentos', severity: 'Critical', serviceName: 'Payments API', summaryText: 'O incidente foi despoletado pelo deploy v2.14.0, que introduziu um motor de reconciliação com contenção no connection pool. Recomenda-se rollback.', generatedAt: hoursAgo(1), modelName: 'qwen3.5:9b', confidencePercent: 87, tokensUsed: 1240, requestedBy: 'ana.silva@nextraceone.dev', environment: 'production' },
+    ]),
+  ),
+  http.get(`${API}/ai/runbook-suggester/suggestions`, () =>
+    HttpResponse.json([
+      { id: 'rs-1', incidentId: 'inc-1', incidentTitle: 'Latência elevada no processamento de pagamentos', serviceName: 'Payments API', environment: 'production', version: '2.14.0', runbookTitle: 'Rollback de deploy com erros 500', runbookId: 'rb-3', confidencePercent: 91, reasoning: 'O incidente correlaciona-se com um deploy recente; o runbook de rollback é o mais aplicável.', modelName: 'qwen3.5:9b', suggestedAt: hoursAgo(1), status: 'pending', tokensUsed: 860, knowledgeSources: ['runbook:rb-3', 'incident:inc-1'] },
+    ]),
+  ),
 ];
