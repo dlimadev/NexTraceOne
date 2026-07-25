@@ -18,25 +18,25 @@ const hoursAgo = (h: number) => new Date(Date.now() - h * 3600000).toISOString()
 const incidents = [
   {
     incidentId: 'inc-1', reference: 'INC-2041', title: 'Latência elevada no processamento de pagamentos',
-    incidentType: 'Performance', severity: 'Critical', status: 'Investigating', serviceId: 'svc-payments-api',
+    incidentType: 'ServiceDegradation', severity: 'Critical', status: 'Investigating', serviceId: 'svc-payments-api',
     serviceDisplayName: 'Payments API', ownerTeam: 'Payments', environment: 'production', createdAt: hoursAgo(3),
     hasCorrelatedChanges: true, correlationConfidence: 'High', mitigationStatus: 'Available',
   },
   {
     incidentId: 'inc-2', reference: 'INC-2040', title: 'Erros 500 esporádicos no checkout',
-    incidentType: 'Availability', severity: 'Major', status: 'Mitigating', serviceId: 'svc-orders-api',
+    incidentType: 'AvailabilityIssue', severity: 'Major', status: 'Mitigating', serviceId: 'svc-orders-api',
     serviceDisplayName: 'Orders API', ownerTeam: 'Orders', environment: 'production', createdAt: hoursAgo(8),
     hasCorrelatedChanges: true, correlationConfidence: 'Medium', mitigationStatus: 'InProgress',
   },
   {
     incidentId: 'inc-3', reference: 'INC-2039', title: 'Fila de eventos de inventário acumulada',
-    incidentType: 'Performance', severity: 'Minor', status: 'Monitoring', serviceId: 'svc-inventory-graphql',
+    incidentType: 'MessagingIssue', severity: 'Minor', status: 'Monitoring', serviceId: 'svc-inventory-graphql',
     serviceDisplayName: 'Inventory GraphQL', ownerTeam: 'Inventory', environment: 'staging', createdAt: daysAgo(1),
     hasCorrelatedChanges: false, correlationConfidence: 'Low', mitigationStatus: 'NotAvailable',
   },
   {
     incidentId: 'inc-4', reference: 'INC-2035', title: 'Timeout no gateway de notificações',
-    incidentType: 'Availability', severity: 'Warning', status: 'Resolved', serviceId: 'svc-notifications-worker',
+    incidentType: 'DependencyFailure', severity: 'Warning', status: 'Resolved', serviceId: 'svc-notifications-worker',
     serviceDisplayName: 'Notifications Worker', ownerTeam: 'Platform', environment: 'production', createdAt: daysAgo(3),
     hasCorrelatedChanges: false, correlationConfidence: 'Low', mitigationStatus: 'Completed',
   },
@@ -83,6 +83,134 @@ export const operationsHandlers = [
   http.get(`${API}/incidents`, () =>
     HttpResponse.json({ items: incidents, totalCount: incidents.length, page: 1, pageSize: 20 }),
   ),
+
+  // ── Incidente: correlação / evidência / mitigação (sub-rotas) ───────
+  http.get(`${API}/incidents/:incidentId/correlation`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId), confidence: 'High', score: 0.86,
+      reason: 'Deploy chg-9001 há 4h coincide com o início da degradação de latência.',
+      relatedChanges: [{ changeId: 'chg-9001', description: 'Deploy v2.14.0 — novo motor de reconciliação', changeType: 'Deployment', confidenceStatus: 'Watch', deployedAt: hoursAgo(4) }],
+      relatedServices: [{ serviceId: 'svc-ledger-db', displayName: 'Ledger DB', impactDescription: 'Latência de escrita aumentou 3x.' }],
+      relatedDependencies: [{ serviceId: 'svc-ledger-db', displayName: 'Ledger DB', relationship: 'Downstream' }],
+      possibleImpactedContracts: [{ contractVersionId: 'cv-1', name: 'Payments REST', version: '2', protocol: 'REST' }],
+    }),
+  ),
+  http.post(`${API}/incidents/:incidentId/correlation/refresh`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId), confidence: 'High', score: 0.88,
+      reason: 'Correlação recalculada: deploy chg-9001 confirmado como causa provável.',
+      relatedChanges: [{ changeId: 'chg-9001', description: 'Deploy v2.14.0 — novo motor de reconciliação', changeType: 'Deployment', confidenceStatus: 'Watch', deployedAt: hoursAgo(4) }],
+      relatedServices: [{ serviceId: 'svc-ledger-db', displayName: 'Ledger DB', impactDescription: 'Latência de escrita aumentou 3x.' }],
+      relatedDependencies: [{ serviceId: 'svc-ledger-db', displayName: 'Ledger DB', relationship: 'Downstream' }],
+      possibleImpactedContracts: [{ contractVersionId: 'cv-1', name: 'Payments REST', version: '2', protocol: 'REST' }],
+    }),
+  ),
+  http.get(`${API}/incidents/:incidentId/correlated-changes`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId), totalCorrelations: 1,
+      correlations: [{ changeId: 'chg-9001', serviceId: 'svc-payments-api', serviceName: 'Payments API', description: 'Deploy v2.14.0 — novo motor de reconciliação', environment: 'production', occurredAt: hoursAgo(4), confidenceLevel: 'High', matchType: 'ServiceAndTimeWindow', timeWindowHours: 6, correlatedAt: hoursAgo(2) }],
+    }),
+  ),
+  http.post(`${API}/incidents/:incidentId/correlate`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId), timeWindowHours: 6, totalCandidates: 3, newCorrelations: 1,
+      correlations: [{ changeId: 'chg-9001', serviceName: 'Payments API', description: 'Deploy v2.14.0', environment: 'production', occurredAt: hoursAgo(4), confidenceLevel: 'High', matchType: 'ServiceAndTimeWindow', isDuplicate: false }],
+    }),
+  ),
+  http.get(`${API}/incidents/:incidentId/evidence`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId),
+      operationalSignalsSummary: 'Latência P99 412ms (baseline 180ms); taxa de erro 500 a 0.34%.',
+      degradationSummary: 'Degradação iniciada há 3 horas, logo após o deploy v2.14.0.',
+      observations: [
+        { title: 'Pico de latência', description: 'P99 subiu de 180ms para 412ms em 12 minutos.' },
+        { title: 'Erros 500', description: 'Taxa de erro 500 subiu para 0.34% após o deploy.' },
+      ],
+      anomalySummary: 'Anomalia de latência correlacionada com o deploy chg-9001.',
+    }),
+  ),
+  http.get(`${API}/incidents/:incidentId/mitigation/recommendations`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId),
+      recommendations: [
+        { recommendationId: 'rec-1', title: 'Reverter deploy v2.14.0', summary: 'Rollback do deploy correlacionado restaura a latência ao baseline.', recommendedActionType: 'Rollback', rationaleSummary: 'Deploy chg-9001 é a causa provável (confiança alta).', evidenceSummary: 'Latência subiu imediatamente após o deploy.', requiresApproval: true, riskLevel: 'Medium', linkedRunbookIds: ['rb-3'], suggestedValidationSteps: ['Confirmar P99 < 200ms', 'Confirmar erro 500 < 0.1%'] },
+      ],
+    }),
+  ),
+  http.get(`${API}/incidents/:incidentId/mitigation/history`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId),
+      entries: [
+        { entryId: 'aud-1', action: 'MitigationStarted', performedBy: 'ana.silva@nextraceone.dev', performedAt: hoursAgo(1), notes: 'Rollback do connection pool iniciado.', linkedEvidence: [] },
+        { entryId: 'aud-2', action: 'IncidentAcknowledged', performedBy: 'ana.silva@nextraceone.dev', performedAt: hoursAgo(2), linkedEvidence: [] },
+      ],
+    }),
+  ),
+  http.get(`${API}/incidents/:incidentId/mitigation`, ({ params }) =>
+    HttpResponse.json({
+      incidentId: String(params.incidentId), mitigationStatus: 'InProgress',
+      suggestedActions: [
+        { description: 'Reverter connection pool para configuração anterior', status: 'InProgress', completed: false },
+        { description: 'Escalar réplicas de leitura do Ledger DB', status: 'Pending', completed: false },
+        { description: 'Notificar equipa de pagamentos', status: 'Done', completed: true },
+      ],
+      recommendedRunbooks: [{ title: 'Rollback de deploy com erros 500', url: '/operations/runbooks/rb-3/edit', description: 'Procedimento de rollback seguro.' }],
+      rollbackGuidance: 'Reverter o deploy chg-9001 via pipeline de release.',
+      rollbackRelevant: true,
+      escalationGuidance: 'Escalar para o on-call de plataforma se a latência persistir acima de 400ms por 15min.',
+    }),
+  ),
+  http.post(`${API}/incidents/:incidentId/resolve`, ({ params }) =>
+    HttpResponse.json({ incidentId: String(params.incidentId), status: 'Resolved', resolvedAt: new Date().toISOString(), resolutionNote: 'Resolvido via rollback.' }),
+  ),
+
+  // ── Incidente: detalhe ──────────────────────────────────────────────
+  http.get(`${API}/incidents/:incidentId`, ({ params }) => {
+    const inc = incidents.find((i) => i.incidentId === String(params.incidentId)) ?? incidents[0];
+    return HttpResponse.json({
+      identity: {
+        incidentId: inc.incidentId, reference: inc.reference, title: inc.title,
+        summary: 'Latência de escrita elevada na base de dados de pagamentos após o deploy v2.14.0; taxa de erro 500 a subir.',
+        incidentType: inc.incidentType, severity: inc.severity, status: inc.status,
+        createdAt: inc.createdAt, updatedAt: hoursAgo(1), resolvedAt: null,
+        acknowledgedAt: hoursAgo(2), acknowledgedBy: 'ana.silva@nextraceone.dev',
+      },
+      linkedServices: [{ serviceId: inc.serviceId, displayName: inc.serviceDisplayName, serviceType: 'RestApi', criticality: 'Critical' }],
+      ownerTeam: inc.ownerTeam, impactedDomain: 'Billing', impactedEnvironment: inc.environment,
+      timeline: [
+        { timestamp: hoursAgo(3), description: 'Incidente aberto automaticamente por alerta de latência.' },
+        { timestamp: hoursAgo(2.5), description: 'Reconhecido por ana.silva; equipa de pagamentos notificada.' },
+        { timestamp: hoursAgo(2), description: 'Correlação identificou o deploy chg-9001 como causa provável.' },
+        { timestamp: hoursAgo(1), description: 'Mitigação em curso: rollback do connection pool.' },
+      ],
+      correlation: {
+        confidence: 'High', reason: 'Deploy chg-9001 há 4h coincide com o início da degradação.',
+        relatedChanges: [{ changeId: 'chg-9001', description: 'Deploy v2.14.0 — novo motor de reconciliação', changeType: 'Deployment', confidenceStatus: 'Watch', deployedAt: hoursAgo(4) }],
+        relatedServices: [{ serviceId: 'svc-ledger-db', displayName: 'Ledger DB', impactDescription: 'Latência de escrita aumentou 3x.' }],
+      },
+      evidence: {
+        operationalSignalsSummary: 'Latência P99 412ms (baseline 180ms); erro 500 a 0.34%.',
+        degradationSummary: 'Degradação iniciada há 3 horas, após o deploy v2.14.0.',
+        observations: [
+          { title: 'Pico de latência', description: 'P99 subiu de 180ms para 412ms em 12 minutos.' },
+          { title: 'Erros 500', description: 'Taxa de erro 500 subiu para 0.34% após o deploy.' },
+        ],
+      },
+      relatedContracts: [{ contractVersionId: 'cv-1', name: 'Payments REST', version: '2', protocol: 'REST', lifecycleState: 'Published' }],
+      runbooks: [{ title: 'Mitigar latência de pagamentos', url: '/operations/runbooks/rb-1/edit' }],
+      mitigation: {
+        status: 'InProgress',
+        actions: [
+          { description: 'Reverter connection pool para configuração anterior', status: 'InProgress', completed: false },
+          { description: 'Escalar réplicas de leitura do Ledger DB', status: 'Pending', completed: false },
+          { description: 'Notificar equipa de pagamentos', status: 'Done', completed: true },
+        ],
+        rollbackGuidance: 'Reverter o deploy chg-9001 via pipeline de release.',
+        rollbackRelevant: true,
+        escalationGuidance: 'Escalar para o on-call de plataforma se a latência persistir.',
+      },
+    });
+  }),
 
   // ── Runbooks (lista) ────────────────────────────────────────────────
   http.get(`${API}/runbooks`, () =>
