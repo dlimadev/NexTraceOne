@@ -164,6 +164,31 @@ export const operationsHandlers = [
     HttpResponse.json({ incidentId: String(params.incidentId), status: 'Resolved', resolvedAt: new Date().toISOString(), resolutionNote: 'Resolvido via rollback.' }),
   ),
 
+  // ── On-Call Intelligence (literal — antes de /incidents/:id) ────────
+  http.get(`${API}/incidents/on-call-intelligence`, ({ request }) => {
+    const periodDays = Number(new URL(request.url).searchParams.get('periodDays') ?? 30);
+    return HttpResponse.json({
+      periodDays, generatedAt: new Date().toISOString(),
+      totalIncidentsInPeriod: 42, avgIncidentsPerWeek: 9.8, peakHour: 14, peakDayOfWeek: 'Tuesday',
+      fatigueSeverity: 'Moderate',
+      recommendations: [
+        'Rever a rotação da equipa de Pagamentos — 3 chamadas noturnas na última semana.',
+        'Considerar follow-the-sun para reduzir a fadiga fora de horas.',
+      ],
+      distribution: [
+        { hour: 14, dayOfWeek: 'Tuesday', incidentCount: 6 },
+        { hour: 9, dayOfWeek: 'Monday', incidentCount: 5 },
+        { hour: 22, dayOfWeek: 'Friday', incidentCount: 4 },
+        { hour: 3, dayOfWeek: 'Sunday', incidentCount: 2 },
+      ],
+      teamFatigue: [
+        { teamName: 'Payments', incidentsLastWeek: 8, incidentsLastMonth: 24, avgResponseMinutes: 12, fatigueLevel: 'High' },
+        { teamName: 'Orders', incidentsLastWeek: 3, incidentsLastMonth: 11, avgResponseMinutes: 18, fatigueLevel: 'Moderate' },
+        { teamName: 'Platform', incidentsLastWeek: 1, incidentsLastMonth: 6, avgResponseMinutes: 22, fatigueLevel: 'Low' },
+      ],
+    });
+  }),
+
   // ── Incidente: detalhe ──────────────────────────────────────────────
   http.get(`${API}/incidents/:incidentId`, ({ params }) => {
     const inc = incidents.find((i) => i.incidentId === String(params.incidentId)) ?? incidents[0];
@@ -645,5 +670,85 @@ export const operationsHandlers = [
     HttpResponse.json([
       { id: 'rs-1', incidentId: 'inc-1', incidentTitle: 'Latência elevada no processamento de pagamentos', serviceName: 'Payments API', environment: 'production', version: '2.14.0', runbookTitle: 'Rollback de deploy com erros 500', runbookId: 'rb-3', confidencePercent: 91, reasoning: 'O incidente correlaciona-se com um deploy recente; o runbook de rollback é o mais aplicável.', modelName: 'qwen3.5:9b', suggestedAt: hoursAgo(1), status: 'pending', tokensUsed: 860, knowledgeSources: ['runbook:rb-3', 'incident:inc-1'] },
     ]),
+  ),
+
+  // ── Chaos Engineering ───────────────────────────────────────────────
+  http.get(`${API}/runtime/chaos/experiments`, () =>
+    HttpResponse.json({
+      items: [
+        { experimentId: 'chaos-1', serviceName: 'payments-api', environment: 'Staging', experimentType: 'latency-injection', riskLevel: 'Medium', status: 'Completed', createdAt: daysAgo(2) },
+        { experimentId: 'chaos-2', serviceName: 'orders-api', environment: 'Staging', experimentType: 'pod-kill', riskLevel: 'High', status: 'Running', createdAt: hoursAgo(1) },
+      ],
+      totalCount: 2,
+    }),
+  ),
+  http.post(`${API}/runtime/chaos/experiments`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { serviceName?: string; environment?: string; experimentType?: string; durationSeconds?: number; targetPercentage?: number };
+    return HttpResponse.json({
+      experimentId: 'chaos-new', serviceName: body.serviceName ?? 'payments-api', environment: body.environment ?? 'Development',
+      experimentType: body.experimentType ?? 'latency-injection',
+      steps: ['Validar pré-condições de segurança', 'Injetar falha no alvo', 'Monitorizar sinais de saúde', 'Reverter e validar recuperação'],
+      riskLevel: 'Medium', estimatedDurationSeconds: body.durationSeconds ?? 60, targetPercentage: body.targetPercentage ?? 10,
+      safetyChecks: ['SLO de disponibilidade acima de 99%', 'Sem incidentes críticos ativos'],
+      createdAt: new Date().toISOString(),
+    }, { status: 201 });
+  }),
+
+  // ── Inteligência Preditiva ──────────────────────────────────────────
+  http.post(`${API}/predictive/service-failure`, async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { serviceId?: string; serviceName?: string; predictionHorizon?: string };
+    return HttpResponse.json({
+      predictionId: 'pred-1', serviceId: body.serviceId ?? 'svc-payments-api', serviceName: body.serviceName ?? 'Payments API',
+      failureProbabilityPercent: 62, riskLevel: 'High', predictionHorizon: body.predictionHorizon ?? '24h',
+      causalFactors: ['Taxa de erro acima do baseline', 'Deploy recente correlacionado (chg-9001)', 'SLO de latência sob pressão'],
+      recommendedAction: 'Preparar rollback do deploy chg-9001 e reforçar monitorização nas próximas 6h.',
+      computedAt: new Date().toISOString(),
+    });
+  }),
+  http.get(`${API}/predictive/change-risk/:changeId`, ({ params }) =>
+    HttpResponse.json({
+      changeId: String(params.changeId), serviceId: 'svc-payments-api', riskScore: 71, riskLevel: 'High',
+      riskFactors: ['Alteração breaking', 'Blast radius elevado', 'Fora do horário comercial'],
+      recommendations: ['Exigir aprovação sénior', 'Executar em janela de baixo tráfego', 'Garantir plano de rollback testado'],
+      assessedAt: new Date().toISOString(),
+    }),
+  ),
+
+  // ── Comparação de Ambientes / Runtime Intelligence ──────────────────
+  http.get(`${API}/runtime/compare`, () =>
+    HttpResponse.json({
+      serviceName: 'payments-api', environment: 'production',
+      beforeMetrics: { avgLatencyMs: 180, p99LatencyMs: 260, errorRate: 0.08, requestsPerSecond: 1420, cpuUsagePercent: 48, memoryUsageMb: 780 },
+      afterMetrics: { avgLatencyMs: 320, p99LatencyMs: 412, errorRate: 0.34, requestsPerSecond: 1450, cpuUsagePercent: 74, memoryUsageMb: 1240 },
+      beforeDataPoints: 8640, afterDataPoints: 8720,
+      latencyDeltaPercent: 77.8, errorRateDeltaPercent: 325, throughputDeltaPercent: 2.1,
+    }),
+  ),
+  http.get(`${API}/runtime/drift`, () =>
+    HttpResponse.json({
+      items: [
+        { id: 'drift-1', serviceName: 'payments-api', environment: 'production', metricName: 'latency_p99_ms', expectedValue: 260, actualValue: 412, deviationPercent: 58.5, severity: 'High', detectedAt: hoursAgo(2), acknowledgedAt: null },
+        { id: 'drift-2', serviceName: 'payments-api', environment: 'production', metricName: 'error_rate', expectedValue: 0.08, actualValue: 0.34, deviationPercent: 325, severity: 'Critical', detectedAt: hoursAgo(2), acknowledgedAt: null },
+        { id: 'drift-3', serviceName: 'inventory-graphql', environment: 'production', metricName: 'queue_depth', expectedValue: 120, actualValue: 540, deviationPercent: 350, severity: 'Medium', detectedAt: hoursAgo(6), acknowledgedAt: hoursAgo(4) },
+      ],
+      totalCount: 3, page: 1, pageSize: 20,
+    }),
+  ),
+  http.get(`${API}/runtime/observability`, () =>
+    HttpResponse.json({
+      serviceName: 'payments-api', environment: 'production', score: 74, grade: 'C', level: 'NeedsAttention',
+      breakdown: { latencyScore: 62, errorScore: 58, throughputScore: 90, resourceScore: 71 },
+      computedAt: hoursAgo(1),
+    }),
+  ),
+  http.get(`${API}/runtime/timeline`, () =>
+    HttpResponse.json({
+      serviceName: 'payments-api', environment: 'production',
+      points: [
+        { releaseId: 'rel-1', releaseName: 'v2.13.0', periodStart: daysAgo(7), periodEnd: daysAgo(4), avgLatencyMs: 178, errorRate: 0.07, requestsPerSecond: 1400, snapshotCount: 720 },
+        { releaseId: 'rel-2', releaseName: 'v2.13.5', periodStart: daysAgo(4), periodEnd: daysAgo(1), avgLatencyMs: 192, errorRate: 0.09, requestsPerSecond: 1430, snapshotCount: 720 },
+        { releaseId: 'rel-3', releaseName: 'v2.14.0', periodStart: daysAgo(1), periodEnd: hoursAgo(0), avgLatencyMs: 320, errorRate: 0.34, requestsPerSecond: 1450, snapshotCount: 240 },
+      ],
+    }),
   ),
 ];
