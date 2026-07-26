@@ -7075,6 +7075,7 @@
       "noDependencies": "No se identificaron dependencias relacionadas",
       "noServices": "No se identificaron servicios relacionados",
       "reason": "Razón de Correlación",
+      "refreshAction": "Actualizar correlación",
       "relatedChanges": "Cambios Relacionados",
       "relatedDependencies": "Dependencias Relacionadas",
       "relatedServices": "Servicios Relacionados",

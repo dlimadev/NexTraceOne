@@ -7109,6 +7109,7 @@
       "noDependencies": "Nenhuma dependência relacionada identificada",
       "noServices": "Nenhum serviço relacionado identificado",
       "reason": "Razão da Correlação",
+      "refreshAction": "Atualizar correlação",
       "relatedChanges": "Mudanças Relacionadas",
       "relatedDependencies": "Dependências Relacionadas",
       "relatedServices": "Serviços Relacionados",

@@ -5793,6 +5793,7 @@
       "noDependencies": "No related dependencies identified",
       "noServices": "No related services identified",
       "reason": "Correlation Reason",
+      "refreshAction": "Refresh correlation",
       "relatedChanges": "Related Changes",
       "relatedDependencies": "Related Dependencies",
       "relatedServices": "Related Services",
