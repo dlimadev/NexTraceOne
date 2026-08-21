@@ -5,6 +5,12 @@
 > **Gaps e degradação graciosa:** [HONEST-GAPS.md](./HONEST-GAPS.md) (fonte da verdade para "isso está mesmo implementado?")  
 > **Aviso sobre contagens:** Contagens de testes e migrations são indicativas. Correr `dotnet test tests/` e `./tools/count-dbcontexts.sh` para valores autoritativos em tempo real.
 
+> **Correção (Ago 2026).** Este documento descrevia 12 módulos com DbContexts próprios.
+> São **9 módulos** e **8 DbContexts**: `auditcompliance` foi absorvido por `governance`;
+> `knowledge` e `productanalytics` por `catalog`; e `notifications` não tem DbContext
+> próprio — as suas entidades vivem em `ConfigurationDbContext`. As secções abaixo foram
+> corrigidas para apontar para os caminhos que existem.
+
 Este documento regista o estado de implementação de cada módulo do NexTraceOne.
 
 **Legenda de status:**
@@ -123,8 +129,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | VerifyChainIntegrity | READY | Verificação de integridade da cadeia de auditoria |
 | SearchAuditLog | READY | Pesquisa de trilha de auditoria |
 
-**DbContexts:** `AuditDbContext` (2 migrações confirmadas)
-**Evidência:** `src/modules/auditcompliance/`
+**DbContexts:** consolidado em `PlatformGovernanceDbContext` — o `AuditDbContext` autónomo já não existe.
+**Evidência:** `src/modules/governance/NexTraceOne.Governance.*/AuditCompliance/` (o módulo `auditcompliance` foi absorvido por `governance`)
 
 ---
 
@@ -204,9 +210,9 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Auto Documentation | READY | `GenerateAutoDocumentation` — geração automática de documentação por serviço; `GET /api/v1/knowledge/auto-documentation/{serviceName}` |
 | IKnowledgeModule | READY | Cross-module interface implementada por `KnowledgeModuleService` |
 
-**DbContexts:** `KnowledgeDbContext` (migração confirmada: `20260328162322_InitialCreate`)
-**Tests:** 70+ testes (0 falhas). Inclui KnowledgeIntelligence, ValidateDocumentReviewGate.
-**Evidência:** `src/modules/knowledge/`
+**DbContexts:** consolidado em `ServiceCatalogDbContext` — o `KnowledgeDbContext` autónomo já não existe.
+**Tests:** correr `dotnet test tests/modules/catalog/` para a contagem autoritativa.
+**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.*/Knowledge/` (o módulo `knowledge` foi absorvido por `catalog`)
 
 ---
 
@@ -245,8 +251,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Persona Usage / Journeys | READY | Queries reais com `ProductAnalyticsDbContext`; `TrackPersonaActivity` com analytics |
 | Value Milestones | READY | Implementado com `ProductAnalyticsDbContext` |
 
-**DbContexts:** `ProductAnalyticsDbContext` com migrações confirmadas
-**Evidência:** `src/modules/productanalytics/`, 42 testes em `NexTraceOne.ProductAnalytics.Tests` (28 base + 14 advanced)
+**DbContexts:** consolidado em `ServiceCatalogDbContext` — o `ProductAnalyticsDbContext` autónomo já não existe.
+**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.*/ProductAnalytics/` (o módulo `productanalytics` foi absorvido por `catalog`)
 
 ---
 

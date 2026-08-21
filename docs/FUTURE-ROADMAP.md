@@ -24,7 +24,7 @@
 
 Este documento consolida **todas as funcionalidades planeadas** para waves futuros do NexTraceOne. Todas as funcionalidades listadas aqui são **evolução futura** — não são gaps da implementação atual.
 
-O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend, 99+ endpoints, 296+ entidades de domínio, 154+ migrações e 2000+ testes.
+O NexTraceOne tem 9 módulos backend, 130+ páginas frontend, 296+ entidades de domínio e 2000+ testes. Para contagens autoritativas correr `scripts/quality/audit-baseline.sh`; para o estado verificado, ver `docs/audit/BASELINE-2026-08-21.md`.
 
 ---
 

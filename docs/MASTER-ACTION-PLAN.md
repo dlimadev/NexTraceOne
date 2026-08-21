@@ -1,7 +1,7 @@
 # NexTraceOne — Master Action Plan
 
 > **Data:** Maio 2026 (última revisão) | Criado: Abril 2026  
-> **Estado do produto:** Backend v1.0.0 READY (12 módulos, 155 waves analytics concluídas). Gaps pós-v1.0.0 documentados em [HONEST-GAPS.md](./HONEST-GAPS.md).  
+> **Estado do produto:** Backend com 9 módulos e 8 DbContexts. A afirmação "v1.0.0 READY" é anterior à auditoria de Ago/2026, que encontrou 5 P0 — ver `docs/audit/BASELINE-2026-08-21.md`. Gaps pós-v1.0.0 documentados em [HONEST-GAPS.md](./HONEST-GAPS.md).  
 > **Propósito:** Plano único e autoritativo de tudo o que falta implementar para fechar 100% do escopo e evoluir o produto.
 
 ---

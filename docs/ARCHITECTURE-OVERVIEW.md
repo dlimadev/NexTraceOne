@@ -62,7 +62,7 @@ O produto nasce como monólito modular deliberado, sem microserviços prematuros
 
 ## 3. Bounded Contexts (Módulos)
 
-O NexTraceOne possui **12 bounded contexts** organizados em `src/modules/`. Cada módulo tem sua própria stack completa de camadas e DbContext(s) isolado(s).
+O NexTraceOne possui **9 bounded contexts** organizados em `src/modules/`, com **8 DbContexts** — `notifications` não tem contexto próprio: as suas entidades vivem em `ConfigurationDbContext`.
 
 ### 3.1 Tabela de Módulos
 
