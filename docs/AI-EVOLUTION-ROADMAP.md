@@ -213,5 +213,5 @@ Três inovações que nenhum concorrente no espaço de platform engineering ofer
 - [AI-ENTERPRISE-CAPABILITIES.md](./AI-ENTERPRISE-CAPABILITIES.md) — Capacidades enterprise
 - [AI-INNOVATION-BLUEPRINT.md](./AI-INNOVATION-BLUEPRINT.md) — Inovações únicas
 - [AI-MODELS-ANALYSIS.md](./AI-MODELS-ANALYSIS.md) — Análise de modelos
-- [AI-ARCHITECTURE.md](./AI-ARCHITECTURE.md) — Arquitectura actual
+- `AI-ARCHITECTURE.md` _(documento inexistente)_ — Arquitectura actual
 - [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md) — Roadmap geral do produto

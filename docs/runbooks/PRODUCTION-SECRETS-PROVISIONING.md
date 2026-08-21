@@ -182,7 +182,7 @@ curl -s https://api.nextraceone.com/health | jq .
 
 ## Referências
 
-- [WAVE-1-PRODUCTION-SECRETS-BASELINE.md](../execution/WAVE-1-PRODUCTION-SECRETS-BASELINE.md)
+- `WAVE-1-PRODUCTION-SECRETS-BASELINE.md` _(documento inexistente)_
 - [StartupValidation.cs](../../src/platform/NexTraceOne.ApiHost/StartupValidation.cs)
 - [.env.example](../../.env.example)
 - [production.yml](../../.github/workflows/production.yml)

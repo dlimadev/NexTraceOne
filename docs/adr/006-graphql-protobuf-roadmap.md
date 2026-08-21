@@ -81,4 +81,4 @@ As seguintes entidades e serviços foram adicionados:
 - [ADR-001: Modular Monolith](./001-modular-monolith.md)
 - [Contract Studio Vision](../CONTRACT-STUDIO-VISION.md)
 - [Service Contract Governance](../SERVICE-CONTRACT-GOVERNANCE.md)
-- [Roadmap](../ROADMAP.md)
+- `Roadmap` _(documento inexistente)_

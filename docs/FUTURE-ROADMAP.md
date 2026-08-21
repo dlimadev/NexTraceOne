@@ -260,7 +260,7 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ## 14. Evolução de Customização da Plataforma
 
-> Plano detalhado em [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
+> Plano detalhado em ``PLATFORM-CUSTOMIZATION-EVOLUTION.md`` _(documento inexistente)_
 
 Customizações que o utilizador pode realizar **sem alterar a identidade visual**:
 
@@ -4717,7 +4717,7 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 3. **Licensing module** foi removido da solução e não consta neste roadmap
 4. **Convites in-app** foram removidos por decisão de produto — onboarding é SSO-first. Ver `docs/HONEST-GAPS.md` (OOS-02).
 5. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura. A lista consolidada de gaps abertos está em [HONEST-GAPS.md](./HONEST-GAPS.md).
-6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
+6. **Customização da plataforma:** Plano detalhado em `PLATFORM-CUSTOMIZATION-EVOLUTION.md` _(documento inexistente)_
 7. **Waves pós-v1.0.0:** Secção 15 consolida Waves A/B/C/D com ADRs associados (ADR-007/008/009).
 8. **Wave S (completa):** S.1 `GetChangeWindowUtilizationReport` + S.2 `GetContractAdoptionReport` + S.3 `GetMttrTrendReport`. CG: 866/Catalog: 1873/OI: 1178 testes. +8 config keys (sort 11120–11190). **Wave T (completa):** T.1 `GetPostIncidentLearningReport` + T.2 `GetApiSchemaCoverageReport` + T.3 `GetEnvironmentStabilityReport`. CG: 879/Catalog: 1885/OI: 1192 testes. +8 config keys (sort 11200–11270). **Waves U–W (planeadas):** 3 waves detalhadas na secção 15, cobrindo itens 53–61 da lista de priorização.
 9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.

@@ -155,5 +155,5 @@ df -h /mnt/backups
 ## Referências
 
 - [backup.sh](../../scripts/db/backup.sh)
-- [WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md](../execution/WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md)
+- `WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md` _(documento inexistente)_
 - [RESTORE-OPERATIONS-RUNBOOK.md](RESTORE-OPERATIONS-RUNBOOK.md)

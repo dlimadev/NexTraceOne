@@ -254,7 +254,7 @@ A cada fase, o comportamento para tenants sem regras configuradas é **idêntico
 
 ## Referências
 
-- [ADR-003: Elasticsearch as Observability Provider](./003-elasticsearch-observability.md)
+- `ADR-003: Elasticsearch as Observability Provider` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_
 - [ADR-001: Modular Monolith](./001-modular-monolith.md)
 - [HONEST-GAPS.md](../HONEST-GAPS.md)
 - [INGESTION-PIPELINE-IMPLEMENTATION.md](../INGESTION-PIPELINE-IMPLEMENTATION.md)

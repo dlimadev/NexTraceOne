@@ -257,6 +257,6 @@ Verificar periodicamente se as expectativas registadas pelos consumers ainda sã
 - [Contract Governance — Visão geral](../CONTRACT-STUDIO-VISION.md)
 - [Service Governance](../SERVICE-CONTRACT-GOVERNANCE.md)
 - [Change Intelligence](../CHANGE-CONFIDENCE.md)
-- [ADR-004 — Consumer-Driven Contract Testing](../adr/004-consumer-driven-contract-testing.md)
+- `ADR-004 — Consumer-Driven Contract Testing` _(documento inexistente)_
 - [Runbook de Rollback geral](./ROLLBACK-RUNBOOK.md)
 - [Runbook de Resposta a Incidentes](./INCIDENT-RESPONSE-PLAYBOOK.md)

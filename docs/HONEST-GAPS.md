@@ -195,7 +195,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 ## 🟡 Gaps identificados na auditoria de Maio 2026 (pós-v1.0.0)
 
 > Identificados durante validação da documentação em Maio 2026. Não bloqueiam v1.0.0 mas devem ser endereçados.
-> Plano de resolução: [PRODUCTION-ACTION-PLAN.md](../PRODUCTION-ACTION-PLAN.md) (tasks 2.1, 3.1, 4.2, 4.3) + PLAN-02 (CC items).
+> Plano de resolução: `PRODUCTION-ACTION-PLAN.md` _(documento inexistente)_ (tasks 2.1, 3.1, 4.2, 4.3) + PLAN-02 (CC items).
 
 | ID | Tipo | Descrição | Ficheiro | Plano |
 |---|---|---|---|---|

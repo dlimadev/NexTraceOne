@@ -57,7 +57,7 @@ operações transacionais do produto e permite escalar cada workload de forma in
 
 | Cenário | Alternativa |
 |---|---|
-| Empresa já possui Elastic Stack operacional | Considerar o [provider Elastic](elastic.md) |
+| Empresa já possui Elastic Stack operacional | Considerar o `provider Elastic` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_ |
 | Requisito de SaaS gerido (sem infra própria) | Considerar Elastic Cloud ou outro SaaS |
 | Volume extremamente baixo com restrição de recursos | Avaliar se a complexidade adicional compensa |
 
@@ -832,7 +832,7 @@ reduz significativamente o uso de memória e disco.
   de configuração do provider e modos de coleta.
 - 📖 [Modos de coleta](../collection/) — diferenças entre OpenTelemetry Collector e
   Direct Push.
-- 📖 [Provider Elastic](elastic.md) — alternativa para ambientes com Elastic Stack
+- 📖 `Provider Elastic` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_ — alternativa para ambientes com Elastic Stack
   existente.
 - 📖 [Arquitetura de observabilidade](../architecture-overview.md) — visão geral da
   arquitetura de observabilidade do NexTraceOne.

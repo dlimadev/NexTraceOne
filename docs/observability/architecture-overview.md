@@ -442,7 +442,7 @@ Este valor é configurável por instalação. Ambientes com requisitos de audito
 | README de observabilidade | [docs/observability/README.md](./README.md) |
 | Estratégia de observabilidade | [docs/OBSERVABILITY-STRATEGY.md](../OBSERVABILITY-STRATEGY.md) |
 | Arquitectura de telemetria | [docs/telemetry/TELEMETRY-ARCHITECTURE.md](../telemetry/TELEMETRY-ARCHITECTURE.md) |
-| Arquitectura de dados | [docs/DATA-ARCHITECTURE.md](../DATA-ARCHITECTURE.md) |
+| Arquitectura de dados | `docs/DATA-ARCHITECTURE.md` _(documento inexistente)_ |
 | Modelos de telemetria | `src/building-blocks/NexTraceOne.BuildingBlocks.Observability/Observability/Models/TelemetryModels.cs` |
 | Abstrações de provider | `src/building-blocks/NexTraceOne.BuildingBlocks.Observability/Observability/Abstractions/IObservabilityProvider.cs` |
 | Provider ClickHouse | `src/building-blocks/NexTraceOne.BuildingBlocks.Observability/Observability/Providers/ClickHouse/` |
