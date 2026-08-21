@@ -125,7 +125,10 @@ echo
 # ── Cobertura de teste na solução ────────────────────────────────────────────
 echo "## Projetos de teste fora da solução"
 echo
-echo "Testes fora de \`NexTraceOne.sln\` nunca correm em CI (\`dotnet test NexTraceOne.sln\`)."
+echo "Estes projetos **correm** em CI — o job \`test-backend-unit\` itera"
+echo "\`find tests -name '*.csproj'\`, não a solução. Mas ficam de fora de"
+echo "\`dotnet test NexTraceOne.sln\`, o comando documentado em CLAUDE.md Parte 6,"
+echo "pelo que um programador a validar localmente não os executa."
 echo
 echo "| Projeto de teste | No .sln | [Fact]/[Theory] |"
 echo "|---|---|---|"
@@ -141,7 +144,7 @@ while IFS= read -r csproj; do
   fi
 done < <(find tests tools -name '*Tests.csproj' 2>/dev/null | sort)
 echo
-echo "**Testes invisíveis ao CI: $orphan_total**"
+echo "**Testes fora da validação local via .sln: $orphan_total**"
 echo
 
 # ── Gates executáveis ────────────────────────────────────────────────────────

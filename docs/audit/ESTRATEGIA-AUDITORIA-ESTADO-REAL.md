@@ -123,7 +123,7 @@ Cada onda tem critério de verificação explícito. Não avançar sem o cumprir
 | Onda | Objetivo | Critério de verificação |
 |---|---|---|
 | **0 — Baseline** | Tornar tudo executável e medir | ✅ **Concluída** — ver §5 e §6 |
-| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; migrations do `IncidentResponseDbContext` aplicam numa BD limpa; tag do otel-collector corrigida; `npm audit` verde |
+| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos acrescentados à solução; `VisualStudio.Tests` (net48) excluído do runner Linux; migrations do `IncidentResponseDbContext` aplicam numa BD limpa; tag do otel-collector corrigida; `npm audit` verde |
 | **2 — Mapa de fatias** | Inventário completo por fatia | toda fatia com os 13 elos classificados; zero ficheiros órfãos não explicados |
 | **3 — Verificação de declarações** | Docs = realidade | `IMPLEMENTATION-STATUS.md` e `HONEST-GAPS.md` reconciliados com evidência |
 | **4 — Fronteira real/simulado** | Saber o que é produto e o que é demonstração | cada um dos 40 ficheiros com `IsSimulated` e das 16 famílias de stub MSW classificado: produto real, degradação graciosa configurável, ou dívida |
@@ -172,7 +172,7 @@ Isto não é um projeto vazio com fachada de documentação. A base é real e su
 |---|---|---|
 | 1 | **Build de produção do frontend partido** | `npm run build` → `TS2339` em `src/stubs/handlers/changeGovernance.ts:275` (`changeScore` não existe no tipo). O job `build-frontend` do CI falha. |
 | 2 | **`npm run typecheck` é um falso-verde** | O script corre `tsc --noEmit`, que resolve `tsconfig.json` — e esse ficheiro tem `"files": []` com project references. Sem `-b`, **verifica zero ficheiros e sai 0**. Foi o que mascarou o achado #1. Corrigir para `tsc -b`. |
-| 3 | **188 testes invisíveis ao CI** | 5 projetos de teste fora de `NexTraceOne.sln`, que é o alvo de `dotnet test` no CI: `Selenium.Tests` (115), `BackgroundWorkers.Tests` (39), `OperationalIntelligence.Infrastructure.Tests` (12), `Governance.ArtifactSigning.Tests` (11), `VisualStudio.Tests` (11). Nunca correram; estado desconhecido. |
+| 3 | **`Test Backend (Unit)` fica vermelho por um projeto Windows-only** | `NexTraceOne.VisualStudio.Tests` tem `TargetFramework net48` e aborta num runner Linux com `Could not find 'mono' host` → `Test Run Aborted`. O passo tolera `No test matches the given testcase filter`, mas não este modo de falha, pelo que `failed=1` e o job inteiro fica vermelho independentemente do resultado real dos testes. Reproduzido localmente. |
 | 5 | **As migrations de `IncidentResponseDbContext` não aplicam numa BD limpa** | `20260605210807_InitialCreate` está datada **depois** de `20260603100000_AddCostAndTelemetryEntities` e recria **as 18 tabelas** que esta já criou. A segunda migration a correr rebenta com `42P07: relation "oi_carbon_score_records" already exists`. O schema de `operationalintelligence` **não pode ser criado do zero**. É a causa das 74 falhas do job `Test Backend (Integration)`. Detalhe em §6.2. |
 | 4 | **Ingestion API lança em toda a rota de auto-provisionamento de conector** | `IntegrationConnector.Create` exige `tenantId` quando `isGlobal` é `false` (`IntegrationConnector.cs:124`). Os **12 pontos de chamada em produção**, todos em `NexTraceOne.Ingestion.Api/Endpoints/`, não passam `tenantId` nem `isGlobal`. Qualquer ingestão que encontre o conector ainda inexistente atira `ArgumentException`. Detalhe em §6.1. |
 
@@ -209,11 +209,18 @@ as execuções (ver P2).
 | Gate | O que aparenta | O que faz |
 |---|---|---|
 | `npm run typecheck` | verifica os tipos do frontend | corre `tsc --noEmit` sobre um `tsconfig` com `"files": []` — verifica **zero** ficheiros e sai 0 |
-| `dotnet test NexTraceOne.sln` | corre a suíte de testes | 5 projetos (188 testes) não estão na solução; nunca são executados |
+| `dotnet test NexTraceOne.sln` (CLAUDE.md Parte 6) | valida a suíte localmente | 5 projetos (188 testes) não estão na solução — o CI corre-os, a validação local documentada não |
 
 Um gate partido é pior que um gate ausente: consome a confiança de um gate real sem
 prestar o serviço. Verificar os verificadores é, por isso, o primeiro passo da Onda 1 —
 antes de corrigir qualquer defeito de produto.
+
+> **Nota de correção (2).** Uma versão anterior afirmava que os 188 testes dos 5 projetos
+> fora da solução **nunca correm em CI**. Errado — assumi que o CI usava
+> `dotnet test NexTraceOne.sln`. Não usa: o job `test-backend-unit` itera
+> `find tests -name '*.csproj'` (excluindo apenas `IntegrationTests` e `E2E.Tests`), logo
+> executa os cinco. O que resta é uma divergência mais estreita: quem validar localmente
+> com o comando documentado em CLAUDE.md Parte 6 não os corre. Deixou de ser P0.
 
 > **Nota de correção.** Uma versão anterior deste documento listava aqui um terceiro gate,
 > o `.NET Dependency Scan`, alegando que abortava antes da própria verificação. **Estava
