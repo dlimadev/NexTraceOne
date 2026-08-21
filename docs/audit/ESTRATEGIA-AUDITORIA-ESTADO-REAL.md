@@ -203,6 +203,18 @@ Três leituras deste quadro:
 O `security.yml` está igualmente vermelho em `main` desde pelo menos 2026-07-24, em todas
 as execuções (ver P2).
 
+**Um padrão repete-se três vezes neste baseline: gates que não medem o que dizem medir.**
+
+| Gate | O que aparenta | O que faz |
+|---|---|---|
+| `npm run typecheck` | verifica os tipos do frontend | corre `tsc --noEmit` sobre um `tsconfig` com `"files": []` — verifica **zero** ficheiros e sai 0 |
+| `dotnet test NexTraceOne.sln` | corre a suíte de testes | 5 projetos (188 testes) não estão na solução; nunca são executados |
+| `.NET Dependency Scan` | falha quando há pacotes vulneráveis | aborta no `.esproj` antes de a verificação correr; a sua própria mensagem de erro nunca dispara |
+
+Um gate partido é pior que um gate ausente: consome a confiança de um gate real sem
+prestar o serviço. Verificar os verificadores é, por isso, o primeiro passo da Onda 1 —
+antes de corrigir qualquer defeito de produto.
+
 **Consequência para a estratégia:** `main` não é uma base verde da qual se parte. A Onda 1
 não é "manter o verde" — é *alcançá-lo pela primeira vez*. Nenhuma medição de progresso é
 significativa enquanto o sinal de CI estiver saturado a vermelho, porque uma regressão nova
@@ -269,6 +281,7 @@ todos, sempre.
 | Achado | Medida |
 |---|---|
 | **NuGet: 2 pacotes com vulnerabilidade alta** | `Microsoft.OpenApi` 2.0.0 (GHSA-v5pm-xwqc-g5wc) e `SSH.NET` 2025.1.0 (GHSA-q939-rpr3-3284) — 7 avisos `NU1903` |
+| **O gate `.NET Dependency Scan` aborta antes de verificar** | O passo corre `dotnet list NexTraceOne.sln package --vulnerable \| tee …` e só depois faz `grep` pelo veredito. O shell do GitHub Actions é `bash -eo pipefail`, e `dotnet list` sai com código 1 porque `src/frontend/nextraceone.frontend.esproj` usa `package.config` em vez de `PackageReference`. O passo morre nessa linha: **o `grep` e a mensagem `::error::Vulnerable NuGet packages detected` nunca chegam a executar.** As vulnerabilidades são reais (confirmado localmente: 5 projetos afetados), mas o log atribui a falha ao `.esproj`, não a elas. Corrigir com `--no-restore` num filtro de projetos ou excluindo o `.esproj` do comando. |
 | **npm: 13 vulnerabilidades, 9 altas** | `npm audit --audit-level=high` falha. `react-router` ≤7.18.1 (5 avisos, incl. open redirect e XSS), `undici` ≤7.28.0 (11 avisos), `vite` ≤7.3.3 (2 avisos). O job `Frontend npm Audit` está vermelho em **todas** as execuções em `main` desde pelo menos 2026-07-24. `npm audit fix` resolve, mas exige subir `react-router` — validar impacto antes. |
 | **4 `Null*Repository`** | Todos em `aiknowledge`: `NullAiAnalyticsRepository`, `NullAiSearchRepository`, `NullAiUsageEntryRepository`, `NullVectorStoreRepository`. Pela regra de ouro do CLAUDE.md §21, `Null*Repository` é bug — mas os 87 `Null*Reader` são legítimos. Classificar caso a caso. |
 | **`notifications` sem migrations** | 6 implementações de repositório e 6 EF configs, **0 migrations**. O schema não existe. |
