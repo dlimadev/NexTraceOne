@@ -123,7 +123,7 @@ Cada onda tem critério de verificação explícito. Não avançar sem o cumprir
 | Onda | Objetivo | Critério de verificação |
 |---|---|---|
 | **0 — Baseline** | Tornar tudo executável e medir | ✅ **Concluída** — ver §5 e §6 |
-| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; 17 testes backend resolvidos; 188 testes órfãos na solução |
+| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; serviço Postgres do CI corrigido; `npm audit` verde |
 | **2 — Mapa de fatias** | Inventário completo por fatia | toda fatia com os 13 elos classificados; zero ficheiros órfãos não explicados |
 | **3 — Verificação de declarações** | Docs = realidade | `IMPLEMENTATION-STATUS.md` e `HONEST-GAPS.md` reconciliados com evidência |
 | **4 — Fronteira real/simulado** | Saber o que é produto e o que é demonstração | cada um dos 40 ficheiros com `IsSimulated` e das 16 famílias de stub MSW classificado: produto real, degradação graciosa configurável, ou dívida |
@@ -174,6 +174,39 @@ Isto não é um projeto vazio com fachada de documentação. A base é real e su
 | 2 | **`npm run typecheck` é um falso-verde** | O script corre `tsc --noEmit`, que resolve `tsconfig.json` — e esse ficheiro tem `"files": []` com project references. Sem `-b`, **verifica zero ficheiros e sai 0**. Foi o que mascarou o achado #1. Corrigir para `tsc -b`. |
 | 3 | **188 testes invisíveis ao CI** | 5 projetos de teste fora de `NexTraceOne.sln`, que é o alvo de `dotnet test` no CI: `Selenium.Tests` (115), `BackgroundWorkers.Tests` (39), `OperationalIntelligence.Infrastructure.Tests` (12), `Governance.ArtifactSigning.Tests` (11), `VisualStudio.Tests` (11). Nunca correram; estado desconhecido. |
 | 4 | **Ingestion API lança em toda a rota de auto-provisionamento de conector** | `IntegrationConnector.Create` exige `tenantId` quando `isGlobal` é `false` (`IntegrationConnector.cs:124`). Os **12 pontos de chamada em produção**, todos em `NexTraceOne.Ingestion.Api/Endpoints/`, não passam `tenantId` nem `isGlobal`. Qualquer ingestão que encontre o conector ainda inexistente atira `ArgumentException`. Detalhe em §6.1. |
+
+### 6.0 — O CI de `main` está vermelho há um mês
+
+Verificado via GitHub Actions API. A última execução do `ci.yml` em `main`
+(run `30196949018`, 2026-07-26, sobre `e3eaf52` — o **head atual** de `main`):
+
+```
+validate: success                 build-tools: success
+build-backend: success            test-tools: success
+test-backend-unit: FAILURE        build-vscode-extension: success
+test-backend-integration: FAILURE build-vsix: success
+test-backend-e2e: FAILURE         build-frontend: FAILURE
+openapi-artifact: FAILURE         test-frontend: SKIPPED
+```
+
+Três leituras deste quadro:
+
+1. **`build-frontend` falha com exatamente o mesmo `TS2339`** do P0 #1 — desde 2026-07-26.
+   O achado não é novo; é apenas a primeira vez que alguém o regista.
+2. **`test-frontend` está `skipped`**, porque depende de `build-frontend`. Os 2.496 testes
+   de frontend que passam localmente **nunca correm em CI**. Somando aos 188 testes fora
+   da solução, o total de testes escritos que o CI não executa passa de 2.600.
+3. **`test-backend-integration` falha com `FATAL: role "root" does not exist`** — configuração
+   do serviço PostgreSQL no workflow, não defeito de produto. Mas mascara o estado real dos
+   testes de integração, que continua desconhecido.
+
+O `security.yml` está igualmente vermelho em `main` desde pelo menos 2026-07-24, em todas
+as execuções (ver P2).
+
+**Consequência para a estratégia:** `main` não é uma base verde da qual se parte. A Onda 1
+não é "manter o verde" — é *alcançá-lo pela primeira vez*. Nenhuma medição de progresso é
+significativa enquanto o sinal de CI estiver saturado a vermelho, porque uma regressão nova
+é indistinguível do ruído existente.
 
 ### 6.1 — Anatomia do P0 #4 (porque a estratégia funciona)
 
@@ -235,7 +268,8 @@ todos, sempre.
 
 | Achado | Medida |
 |---|---|
-| **2 pacotes com vulnerabilidade alta** | `Microsoft.OpenApi` 2.0.0 (GHSA-v5pm-xwqc-g5wc) e `SSH.NET` 2025.1.0 (GHSA-q939-rpr3-3284) — 7 avisos `NU1903` |
+| **NuGet: 2 pacotes com vulnerabilidade alta** | `Microsoft.OpenApi` 2.0.0 (GHSA-v5pm-xwqc-g5wc) e `SSH.NET` 2025.1.0 (GHSA-q939-rpr3-3284) — 7 avisos `NU1903` |
+| **npm: 13 vulnerabilidades, 9 altas** | `npm audit --audit-level=high` falha. `react-router` ≤7.18.1 (5 avisos, incl. open redirect e XSS), `undici` ≤7.28.0 (11 avisos), `vite` ≤7.3.3 (2 avisos). O job `Frontend npm Audit` está vermelho em **todas** as execuções em `main` desde pelo menos 2026-07-24. `npm audit fix` resolve, mas exige subir `react-router` — validar impacto antes. |
 | **4 `Null*Repository`** | Todos em `aiknowledge`: `NullAiAnalyticsRepository`, `NullAiSearchRepository`, `NullAiUsageEntryRepository`, `NullVectorStoreRepository`. Pela regra de ouro do CLAUDE.md §21, `Null*Repository` é bug — mas os 87 `Null*Reader` são legítimos. Classificar caso a caso. |
 | **`notifications` sem migrations** | 6 implementações de repositório e 6 EF configs, **0 migrations**. O schema não existe. |
 | **3.837 chaves i18n extra** | Chaves nos locales sem correspondência no base — drift, não bloqueio. |
