@@ -123,7 +123,7 @@ Cada onda tem critério de verificação explícito. Não avançar sem o cumprir
 | Onda | Objetivo | Critério de verificação |
 |---|---|---|
 | **0 — Baseline** | Tornar tudo executável e medir | ✅ **Concluída** — ver §5 e §6 |
-| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; serviço Postgres do CI corrigido; `npm audit` verde |
+| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; serviço Postgres do CI corrigido; tag do otel-collector corrigida; `npm audit` verde |
 | **2 — Mapa de fatias** | Inventário completo por fatia | toda fatia com os 13 elos classificados; zero ficheiros órfãos não explicados |
 | **3 — Verificação de declarações** | Docs = realidade | `IMPLEMENTATION-STATUS.md` e `HONEST-GAPS.md` reconciliados com evidência |
 | **4 — Fronteira real/simulado** | Saber o que é produto e o que é demonstração | cada um dos 40 ficheiros com `IsSimulated` e das 16 famílias de stub MSW classificado: produto real, degradação graciosa configurável, ou dívida |
@@ -203,17 +203,24 @@ Três leituras deste quadro:
 O `security.yml` está igualmente vermelho em `main` desde pelo menos 2026-07-24, em todas
 as execuções (ver P2).
 
-**Um padrão repete-se três vezes neste baseline: gates que não medem o que dizem medir.**
+**Dois gates deste baseline não medem o que dizem medir:**
 
 | Gate | O que aparenta | O que faz |
 |---|---|---|
 | `npm run typecheck` | verifica os tipos do frontend | corre `tsc --noEmit` sobre um `tsconfig` com `"files": []` — verifica **zero** ficheiros e sai 0 |
 | `dotnet test NexTraceOne.sln` | corre a suíte de testes | 5 projetos (188 testes) não estão na solução; nunca são executados |
-| `.NET Dependency Scan` | falha quando há pacotes vulneráveis | aborta no `.esproj` antes de a verificação correr; a sua própria mensagem de erro nunca dispara |
 
 Um gate partido é pior que um gate ausente: consome a confiança de um gate real sem
 prestar o serviço. Verificar os verificadores é, por isso, o primeiro passo da Onda 1 —
 antes de corrigir qualquer defeito de produto.
+
+> **Nota de correção.** Uma versão anterior deste documento listava aqui um terceiro gate,
+> o `.NET Dependency Scan`, alegando que abortava antes da própria verificação. **Estava
+> errado.** O shell do passo é `bash -e {0}` — sem `pipefail` — pelo que o estado do
+> pipeline `dotnet list … | tee` é o do `tee` (0) e o passo prossegue. O log confirma que
+> o `grep` correu e que `::error::Vulnerable NuGet packages detected` disparou. O gate
+> funciona: falha porque há mesmo pacotes vulneráveis (ver P2). A mensagem sobre o
+> `.esproj` é ruído no meio do output, não a causa.
 
 **Consequência para a estratégia:** `main` não é uma base verde da qual se parte. A Onda 1
 não é "manter o verde" — é *alcançá-lo pela primeira vez*. Nenhuma medição de progresso é
@@ -281,7 +288,7 @@ todos, sempre.
 | Achado | Medida |
 |---|---|
 | **NuGet: 2 pacotes com vulnerabilidade alta** | `Microsoft.OpenApi` 2.0.0 (GHSA-v5pm-xwqc-g5wc) e `SSH.NET` 2025.1.0 (GHSA-q939-rpr3-3284) — 7 avisos `NU1903` |
-| **O gate `.NET Dependency Scan` aborta antes de verificar** | O passo corre `dotnet list NexTraceOne.sln package --vulnerable \| tee …` e só depois faz `grep` pelo veredito. O shell do GitHub Actions é `bash -eo pipefail`, e `dotnet list` sai com código 1 porque `src/frontend/nextraceone.frontend.esproj` usa `package.config` em vez de `PackageReference`. O passo morre nessa linha: **o `grep` e a mensagem `::error::Vulnerable NuGet packages detected` nunca chegam a executar.** As vulnerabilidades são reais (confirmado localmente: 5 projetos afetados), mas o log atribui a falha ao `.esproj`, não a elas. Corrigir com `--no-restore` num filtro de projetos ou excluindo o `.esproj` do comando. |
+| **`docker-compose.yml` referencia uma imagem inexistente** | `otel/opentelemetry-collector-contrib:0.115.0` devolve 404 no Docker Hub — a tag já não existe. `docker compose up -d postgres clickhouse otel-collector` aborta, e `postgres` e `clickhouse` ficam `Interrupted`: **nenhuma infraestrutura sobe**. É a causa da falha do job `Playwright E2E Tests` (`Process from config.webServer was not able to start`). Afeta também o arranque local via docker-compose. |
 | **npm: 13 vulnerabilidades, 9 altas** | `npm audit --audit-level=high` falha. `react-router` ≤7.18.1 (5 avisos, incl. open redirect e XSS), `undici` ≤7.28.0 (11 avisos), `vite` ≤7.3.3 (2 avisos). O job `Frontend npm Audit` está vermelho em **todas** as execuções em `main` desde pelo menos 2026-07-24. `npm audit fix` resolve, mas exige subir `react-router` — validar impacto antes. |
 | **4 `Null*Repository`** | Todos em `aiknowledge`: `NullAiAnalyticsRepository`, `NullAiSearchRepository`, `NullAiUsageEntryRepository`, `NullVectorStoreRepository`. Pela regra de ouro do CLAUDE.md §21, `Null*Repository` é bug — mas os 87 `Null*Reader` são legítimos. Classificar caso a caso. |
 | **`notifications` sem migrations** | 6 implementações de repositório e 6 EF configs, **0 migrations**. O schema não existe. |
