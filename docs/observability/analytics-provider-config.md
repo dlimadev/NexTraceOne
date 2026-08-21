@@ -1,84 +1,78 @@
 # Analytics Provider Configuration
 
-NexTraceOne supports multiple analytics storage backends. The active provider is
-controlled by the `Analytics:Provider` configuration key.
+ClickHouse is the platform's **only** analytics storage backend. The `Analytics`
+section controls whether analytics writes happen and where they go.
 
-## Supported Providers
+> **Correction (Aug 2026).** Earlier revisions of this document described an
+> `Analytics:Provider` key with `ClickHouse`, `Elasticsearch` and `InMemory`
+> values, and called Elasticsearch the default. **No such key exists.**
+> `AnalyticsOptions` has no `Provider` property and `appsettings.json` sets none.
+> Setting `Analytics__Provider=Elasticsearch` had no effect — writes always went
+> to ClickHouse. Elasticsearch was removed from the product.
 
-| Value | Description |
-|-------|-------------|
-| `ClickHouse` | ClickHouse HTTP API (recommended for high-volume analytics) |
-| `Elasticsearch` | Elasticsearch Bulk API (default; rich full-text search) |
-| `InMemory` | In-memory null provider (for testing and local development) |
+## How the provider is selected
 
-## Switching Provider
+There is no selection. `AddBuildingBlocksAnalytics`
+(`BuildingBlocks.Observability/DependencyInjection.cs:210`) binds `AnalyticsOptions`
+and branches only on `Enabled`:
 
-Update `appsettings.json` (or environment variable `Analytics__Provider`):
+```csharp
+if (!analyticsOptions.Enabled)
+{
+    services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
+    return services;
+}
+
+services.AddHttpClient<ClickHouseAnalyticsWriter>(…).AddStandardResilienceHandler();
+services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
+```
+
+- `Enabled: false` → `NullAnalyticsWriter` (no analytics I/O)
+- `Enabled: true` → `ClickHouseAnalyticsWriter`
+
+## Configuration keys
+
+The real properties on `AnalyticsOptions`:
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `Analytics:Enabled` | `false` | Enables analytics writes. Activate explicitly once ClickHouse is reachable. |
+| `Analytics:ConnectionString` | — | ClickHouse HTTP endpoint |
+| `Analytics:ApiKey` | — | Optional credential |
+| `Analytics:TablePrefix` | — | Prefix for analytics tables |
+| `Analytics:WriteTimeoutSeconds` | `10` | HTTP write timeout |
+| `Analytics:MaxBatchSize` | `1000` | Max records per INSERT batch |
+| `Analytics:SuppressWriteErrors` | `true` | Swallow write failures instead of propagating |
+
+Example, matching `src/platform/NexTraceOne.ApiHost/appsettings.json`:
 
 ```json
 {
   "Analytics": {
     "Enabled": true,
-    "Provider": "ClickHouse",
-    "ConnectionString": "http://clickhouse:8123/?database=nextraceone_obs",
+    "ConnectionString": "http://localhost:8123",
     "WriteTimeoutSeconds": 10,
-    "MaxBatchSize": 1000,
+    "MaxBatchSize": 500,
     "SuppressWriteErrors": true
   }
 }
 ```
 
-### ClickHouse
+See [clickhouse-setup.md](clickhouse-setup.md) for schema DDL and the docker-compose snippet.
 
-```json
-{
-  "Analytics": {
-    "Provider": "ClickHouse",
-    "ConnectionString": "http://clickhouse:8123/?database=nextraceone_obs"
-  }
-}
-```
+## Environment variable override
 
-See [clickhouse-setup.md](clickhouse-setup.md) for schema DDL and docker-compose snippet.
-
-### Elasticsearch
-
-```json
-{
-  "Analytics": {
-    "Provider": "Elasticsearch",
-    "ConnectionString": "http://elasticsearch:9200",
-    "ApiKey": "YOUR_API_KEY",
-    "IndexPrefix": "nextraceone-analytics"
-  }
-}
-```
-
-### InMemory (testing)
-
-```json
-{
-  "Analytics": {
-    "Provider": "InMemory",
-    "Enabled": false
-  }
-}
-```
-
-## Environment Variable Override
-
-For container deployments, use environment variables:
+For container deployments:
 
 ```bash
-Analytics__Provider=ClickHouse
-Analytics__ConnectionString=http://clickhouse:8123/?database=nextraceone_obs
 Analytics__Enabled=true
+Analytics__ConnectionString=http://clickhouse:8123/?database=nextraceone_obs
 ```
 
-## Health Check
+## Health check
 
-When `Provider = "ClickHouse"` and `Enabled = true`, the ClickHouse health check is
-registered automatically at `/health` under the tag `analytics`.
+When `Enabled = true`, the ClickHouse health check is registered automatically at
+`/health` under the tag `analytics`.
 
 ```
 GET /health
@@ -89,9 +83,9 @@ GET /health
 }
 ```
 
-## Platform Configuration Keys
+## Platform configuration keys
 
-These keys can also be managed via the NexTraceOne Configuration module:
+These can also be managed via the NexTraceOne Configuration module:
 
 | Key | Default | Description |
 |-----|---------|-------------|

@@ -99,7 +99,7 @@ echo "| Categoria | Ocorrências | Veredito |"
 echo "|---|---|---|"
 echo "| \`Null*Reader\` | $(count_matches 'class Null[A-Za-z]+Reader' src) | legítimo (phase-gated) |"
 echo "| \`Null*Provider\` / \`Null*Service\` | $(count_matches 'class Null[A-Za-z]+(Provider|Service)' src) | legítimo (provider externo opcional) |"
-echo "| \`Null*Repository\` | $(count_matches 'class Null[A-Za-z]+Repository' src) | **investigar — candidato a bug** |"
+echo "| \`Null*Repository\` | $(count_matches 'class Null[A-Za-z]+Repository' src) | ler o XML doc: fallback de provider externo (legítimo) ou persistência por implementar (bug) |"
 echo
 if grep -rhoE "class Null[A-Za-z]+Repository" src --include=*.cs 2>/dev/null | grep -q .; then
   echo "Ficheiros \`Null*Repository\`:"

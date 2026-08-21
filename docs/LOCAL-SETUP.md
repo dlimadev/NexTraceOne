@@ -90,12 +90,14 @@ cd src/frontend && npm test
 | `NEXTRACE_SKIP_INTEGRITY` | Set `true` to skip assembly integrity check |
 | `NEXTRACE_IGNORE_PENDING_MODEL_CHANGES` | Set `true` to suppress EF model change warnings |
 
-## Elasticsearch
+## ClickHouse
 
-Start Elasticsearch with Docker Compose:
+ClickHouse is the platform's only analytics provider. Start it with Docker Compose:
 
 ```bash
-docker compose up -d elasticsearch
+docker compose up -d clickhouse
 ```
 
-> ⚠️ **Security:** The default `docker-compose.yml` disables Elasticsearch security for local development. For staging and production, always use `docker-compose.production.yml` or a custom override with `xpack.security.enabled=true`.
+> **Note:** Elasticsearch was removed from the product. Earlier revisions of this
+> guide told you to run `docker compose up -d elasticsearch`; that service no
+> longer exists in `docker-compose.yml`.

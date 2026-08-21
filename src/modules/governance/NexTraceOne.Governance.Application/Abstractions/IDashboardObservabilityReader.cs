@@ -2,8 +2,8 @@ namespace NexTraceOne.Governance.Application.Abstractions;
 
 /// <summary>
 /// Port de leitura de dados de observabilidade para widgets de dashboard.
-/// A implementação concreta roteia para Elasticsearch ou ClickHouse
-/// conforme a configuração do provider ativo — opaco para o consumidor.
+/// A implementação concreta lê do ClickHouse, o provider analítico único
+/// da plataforma — opaco para o consumidor.
 /// </summary>
 public interface IDashboardObservabilityReader
 {
@@ -32,7 +32,7 @@ public interface IDashboardObservabilityReader
         DashboardServiceHealthRequest request,
         CancellationToken cancellationToken = default);
 
-    /// <summary>Retorna o nome do backend de observabilidade activo ("Elasticsearch" ou "ClickHouse").</summary>
+    /// <summary>Retorna o nome do backend de observabilidade activo ("ClickHouse").</summary>
     string BackendName { get; }
 }
 
