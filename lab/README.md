@@ -7,9 +7,7 @@ Ambiente de laboratório para testes reais de observabilidade, change intelligen
 Este laboratório fornece:
 
 - **3 fake APIs instrumentadas com OpenTelemetry** que simulam um ecossistema de microserviços
-- **Elasticsearch** como provider de observabilidade
 - **OpenTelemetry Collector** configurado com o pipeline real do NexTraceOne
-- **Kibana** para visualização direta dos dados no Elasticsearch
 - **PostgreSQL** para os serviços fake
 - **Gerador de tráfego** para produzir telemetria realista
 - **Postman Collection** com todos os endpoints, testes automáticos e fluxo E2E
@@ -30,10 +28,14 @@ Este laboratório fornece:
                           │
                           ▼
        ┌───────────────────────────────────────┐
-       │      Elasticsearch :9200              │
-       │      Kibana :5601                     │
+       │   exporter `debug` → logs do collector │
        └───────────────────────────────────────┘
 ```
+
+> **Sem backend de telemetria.** O Elasticsearch foi removido do produto
+> (ClickHouse é o provider único) e retirado deste lab. O collector exporta via
+> `debug`, ou seja, para os seus próprios logs. Ligar o lab a um ClickHouse é
+> trabalho separado, ainda por fazer.
 
 ## Serviços Fake
 
@@ -80,17 +82,14 @@ curl http://localhost:5010/api/orders
 ./scripts/generate-traffic.sh
 ```
 
-### 4. Verificar telemetria no Elasticsearch
+### 4. Verificar telemetria
 
 ```bash
-# Verificar traces
-curl http://localhost:9200/nextraceone-obs-traces/_search?pretty&size=5
+# Saúde do collector e das fake APIs
+./scripts/verify-telemetry.sh
 
-# Verificar logs
-curl http://localhost:9200/nextraceone-obs-logs/_search?pretty&size=5
-
-# Verificar métricas
-curl http://localhost:9200/nextraceone-obs-metrics/_search?pretty&size=5
+# Traces, logs e métricas saem no exporter `debug`
+docker compose -f docker-compose.lab.yml logs -f otel-collector
 ```
 
 ### 5. Usar a Postman Collection
@@ -105,20 +104,16 @@ A coleção Postman em `postman/NexTraceOne-Lab.postman_collection.json` cobre t
 
 | Folder | Descrição |
 |--------|-----------|
-| 🏥 Health Checks | Saúde de todos os serviços (APIs + Elasticsearch + OTel Collector) |
+| 🏥 Health Checks | Saúde de todos os serviços (APIs + OTel Collector) |
 | 📦 Order Service | CRUD completo de encomendas (list, create, get, cancel) |
 | 💳 Payment Service | Processamento e consulta de pagamentos |
 | 📦 Inventory Service | Consulta de stock, reservas e libertações |
 | 🔄 E2E Flow | Fluxo completo em 6 passos (stock → order → verify → cancel) |
-| 🔍 Observability Verification | Queries ao Elasticsearch para validar traces, logs e distributed trace |
+| 🔍 Observability Verification | Queries ao Elasticsearch — **obsoleto** desde a remoção do ES |
 
 **Variáveis automáticas:** `order_id`, `payment_id`, `reservation_id` e `trace_id` são preenchidas automaticamente pelos scripts de teste de cada request.
 
-### 6. Aceder ao Kibana
-
-Abrir no browser: http://localhost:5601
-
-### 7. Parar o laboratório
+### 6. Parar o laboratório
 
 ```bash
 docker compose -f docker-compose.lab.yml down -v
@@ -160,6 +155,5 @@ Ver `.env.lab` para configuração completa. Valores padrão funcionam out-of-th
 ## Notas
 
 - Este ambiente é **apenas para desenvolvimento e testes**. Não usar em produção.
-- O Elasticsearch não tem segurança activada (xpack.security.enabled=false).
 - Os serviços fake geram erros aleatórios (~5%) para simular cenários reais.
 - O OpenTelemetry Collector usa a mesma configuração de pipeline do NexTraceOne real.

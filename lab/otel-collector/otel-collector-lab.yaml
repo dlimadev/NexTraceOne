@@ -2,7 +2,8 @@
 # NexTraceOne Lab — OpenTelemetry Collector Configuration
 #
 # Configuração simplificada para o ambiente de laboratório.
-# Exporta traces, logs e métricas para Elasticsearch.
+# Exporta traces, logs e métricas via `debug` (stdout do collector).
+# O exporter Elasticsearch foi removido — ClickHouse é o provider único do produto.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 receivers:
@@ -45,18 +46,6 @@ processors:
         value: "nextraceone-lab"
 
 exporters:
-  elasticsearch:
-    endpoints: ["${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}"]
-    logs_index: nextraceone-obs-logs
-    traces_index: nextraceone-obs-traces
-    mapping:
-      mode: ecs
-    flush:
-      bytes: 1048576
-    retry:
-      enabled: true
-      max_requests: 3
-
   debug:
     verbosity: detailed
     sampling_initial: 10
@@ -94,7 +83,7 @@ service:
         - resource
         - attributes/normalize
         - batch
-      exporters: [elasticsearch, spanmetrics, debug]
+      exporters: [spanmetrics, debug]
 
     metrics:
       receivers: [otlp, spanmetrics]
@@ -103,7 +92,7 @@ service:
         - resource
         - attributes/normalize
         - batch
-      exporters: [elasticsearch, debug]
+      exporters: [debug]
 
     logs:
       receivers: [otlp]
@@ -112,7 +101,7 @@ service:
         - resource
         - attributes/normalize
         - batch
-      exporters: [elasticsearch, debug]
+      exporters: [debug]
 
   extensions: [health_check]
 

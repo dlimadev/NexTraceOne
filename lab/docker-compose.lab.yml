@@ -1,8 +1,13 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 # NexTraceOne — Laboratory Docker Compose
 #
-# Ambiente de laboratório com fake APIs instrumentadas, Elasticsearch,
-# OpenTelemetry Collector e Kibana para testes reais de observabilidade.
+# Ambiente de laboratório com fake APIs instrumentadas e OpenTelemetry
+# Collector para testes reais de observabilidade.
+#
+# Sem backend de telemetria: o Elasticsearch foi removido do produto
+# (ClickHouse é o provider único) e retirado daqui. O collector exporta via
+# `debug`, ou seja, para os seus próprios logs. Ligar a um ClickHouse é
+# trabalho separado.
 #
 # Uso:
 #   cd lab
@@ -11,52 +16,6 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 
 services:
-
-  # ── Elasticsearch (Observability Store) ─────────────────────────────────────
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
-    container_name: nextraceone-lab-elasticsearch
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: "false"
-      ES_JAVA_OPTS: "${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
-      cluster.name: nextraceone-lab
-    volumes:
-      - lab-elasticsearch-data:/usr/share/elasticsearch/data
-      - ./elasticsearch/setup-indices.sh:/docker-entrypoint-initdb.d/setup-indices.sh:ro
-    ports:
-      - "9200:9200"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 60s
-    restart: unless-stopped
-    networks:
-      - lab-net
-
-  # ── Kibana (Visualization) ─────────────────────────────────────────────────
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.17.0
-    container_name: nextraceone-lab-kibana
-    environment:
-      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
-      SERVER_NAME: nextraceone-lab-kibana
-    ports:
-      - "${KIBANA_PORT:-5601}:5601"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:5601/api/status || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
-    restart: unless-stopped
-    networks:
-      - lab-net
 
   # ── OpenTelemetry Collector ─────────────────────────────────────────────────
   otel-collector:
@@ -70,11 +29,6 @@ services:
       - "4318:4318"    # OTLP HTTP
       - "8888:8888"    # Prometheus metrics (Collector self-monitoring)
       - "13133:13133"  # Health check
-    environment:
-      ELASTICSEARCH_ENDPOINT: "${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
     restart: unless-stopped
     networks:
       - lab-net
@@ -164,10 +118,6 @@ services:
       - lab-net
 
 # ── Volumes ──────────────────────────────────────────────────────────────────
-volumes:
-  lab-elasticsearch-data:
-    driver: local
-
 # ── Networks ─────────────────────────────────────────────────────────────────
 networks:
   lab-net:
