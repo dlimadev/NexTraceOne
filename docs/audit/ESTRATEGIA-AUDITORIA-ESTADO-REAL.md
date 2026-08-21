@@ -123,7 +123,7 @@ Cada onda tem critério de verificação explícito. Não avançar sem o cumprir
 | Onda | Objetivo | Critério de verificação |
 |---|---|---|
 | **0 — Baseline** | Tornar tudo executável e medir | ✅ **Concluída** — ver §5 e §6 |
-| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; serviço Postgres do CI corrigido; tag do otel-collector corrigida; `npm audit` verde |
+| **1 — Verde executável** | Zero vermelhos no Nível 0 | build FE passa; `test-frontend` deixa de ser `skipped`; 17 testes backend resolvidos; 188 testes órfãos na solução; migrations do `IncidentResponseDbContext` aplicam numa BD limpa; tag do otel-collector corrigida; `npm audit` verde |
 | **2 — Mapa de fatias** | Inventário completo por fatia | toda fatia com os 13 elos classificados; zero ficheiros órfãos não explicados |
 | **3 — Verificação de declarações** | Docs = realidade | `IMPLEMENTATION-STATUS.md` e `HONEST-GAPS.md` reconciliados com evidência |
 | **4 — Fronteira real/simulado** | Saber o que é produto e o que é demonstração | cada um dos 40 ficheiros com `IsSimulated` e das 16 famílias de stub MSW classificado: produto real, degradação graciosa configurável, ou dívida |
@@ -173,6 +173,7 @@ Isto não é um projeto vazio com fachada de documentação. A base é real e su
 | 1 | **Build de produção do frontend partido** | `npm run build` → `TS2339` em `src/stubs/handlers/changeGovernance.ts:275` (`changeScore` não existe no tipo). O job `build-frontend` do CI falha. |
 | 2 | **`npm run typecheck` é um falso-verde** | O script corre `tsc --noEmit`, que resolve `tsconfig.json` — e esse ficheiro tem `"files": []` com project references. Sem `-b`, **verifica zero ficheiros e sai 0**. Foi o que mascarou o achado #1. Corrigir para `tsc -b`. |
 | 3 | **188 testes invisíveis ao CI** | 5 projetos de teste fora de `NexTraceOne.sln`, que é o alvo de `dotnet test` no CI: `Selenium.Tests` (115), `BackgroundWorkers.Tests` (39), `OperationalIntelligence.Infrastructure.Tests` (12), `Governance.ArtifactSigning.Tests` (11), `VisualStudio.Tests` (11). Nunca correram; estado desconhecido. |
+| 5 | **As migrations de `IncidentResponseDbContext` não aplicam numa BD limpa** | `20260605210807_InitialCreate` está datada **depois** de `20260603100000_AddCostAndTelemetryEntities` e recria **as 18 tabelas** que esta já criou. A segunda migration a correr rebenta com `42P07: relation "oi_carbon_score_records" already exists`. O schema de `operationalintelligence` **não pode ser criado do zero**. É a causa das 74 falhas do job `Test Backend (Integration)`. Detalhe em §6.2. |
 | 4 | **Ingestion API lança em toda a rota de auto-provisionamento de conector** | `IntegrationConnector.Create` exige `tenantId` quando `isGlobal` é `false` (`IntegrationConnector.cs:124`). Os **12 pontos de chamada em produção**, todos em `NexTraceOne.Ingestion.Api/Endpoints/`, não passam `tenantId` nem `isGlobal`. Qualquer ingestão que encontre o conector ainda inexistente atira `ArgumentException`. Detalhe em §6.1. |
 
 ### 6.0 — O CI de `main` está vermelho há um mês
@@ -274,6 +275,51 @@ A conclusão que orienta as ondas seguintes: **este projeto não sofre de falta 
 sofre de falta de execução de testes.** São 10.337 testes de backend e 2.496 de frontend
 escritos. O trabalho da Onda 1 não é escrever mais; é garantir que os que existem correm,
 todos, sempre.
+
+### 6.2 — `InitialCreate` gerada depois das outras migrations
+
+O job `Test Backend (Integration)` falha com 74 testes e uma única exceção repetida:
+
+```
+Npgsql.PostgresException : 42P07: relation "oi_carbon_score_records" already exists
+```
+
+As migrations de `IncidentResponseDbContext`, por ordem de aplicação:
+
+```
+20260603100000_AddCostAndTelemetryEntities   ← cria 18 tabelas
+20260605210807_InitialCreate                 ← cria 19 tabelas, 18 das quais já existem
+20260608100000_OI_AddIncidentLifecycleFields
+20260608200000_OI_AddAlertFiringRecords
+20260608210000_OI_AddIncidentPostMortemFields
+20260721094659_SyncIncidentsAndMapTypedIdFks
+```
+
+A sobreposição é **total** — as 18 tabelas de `AddCostAndTelemetryEntities` são todas
+recriadas por `InitialCreate`:
+
+```
+oi_carbon_score_records      ops_cost_import_batches      ops_ts_anomaly_snapshots
+oi_waste_signals             ops_cost_records             ops_ts_dependency_metrics
+ops_cost_attributions        ops_cost_snapshots           ops_ts_investigation_contexts
+ops_cost_budget_forecasts    ops_cost_trends              ops_ts_observed_topology
+ops_cost_efficiency_…        ops_service_cost_allocations ops_ts_release_correlations
+                             ops_service_cost_profiles    ops_ts_service_metrics
+                                                          ops_ts_telemetry_references
+```
+
+O sintoma revelador está nos nomes das constraints: `AddCostAndTelemetryEntities` usa
+`pk_` e `ix_` (snake_case), `InitialCreate` usa `PK_` e `IX_` (PascalCase). Foram geradas
+sob convenções de nomenclatura diferentes — sinal de que a `InitialCreate` foi produzida
+mais tarde, a partir de um histórico de migrations vazio, sem contar com a que já existia.
+
+**Consequência:** o schema de `operationalintelligence` não pode ser aplicado a uma base
+de dados limpa. Qualquer ambiente novo — CI, um programador a arrancar do zero, um deploy
+inicial — falha na segunda migration. Ambientes já povoados não notam, porque a tabela
+`__EFMigrationsHistory` marca ambas como aplicadas.
+
+Isto explica também por que o job de integração está vermelho em `main` desde julho sem
+que ninguém tropeçasse nele localmente.
 
 ### P1 — 17 testes de backend a falhar
 
