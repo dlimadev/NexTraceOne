@@ -15,7 +15,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
-| [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
 
 ---
 
@@ -24,7 +23,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
-| [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
 | [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
 | [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
 | [`DEPLOYMENT-ARCHITECTURE.md`](DEPLOYMENT-ARCHITECTURE.md) | Arquitectura de deployment |
@@ -40,7 +38,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|---------|
 | [`adr/001-modular-monolith.md`](adr/001-modular-monolith.md) | Modular Monolith |
 | [`adr/002-single-database-per-tenant.md`](adr/002-single-database-per-tenant.md) | Single database per tenant |
-| [`adr/003-elasticsearch-observability.md`](adr/003-elasticsearch-observability.md) | Elasticsearch para observabilidade |
 | [`adr/004-local-ai-first.md`](adr/004-local-ai-first.md) | Local AI first |
 | [`adr/005-react-frontend-stack.md`](adr/005-react-frontend-stack.md) | React frontend stack |
 | [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf roadmap |
@@ -51,7 +48,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`AI-ARCHITECTURE.md`](AI-ARCHITECTURE.md) | Arquitectura AI |
 | [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
 | [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
 | [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |

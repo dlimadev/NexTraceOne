@@ -1,7 +1,7 @@
 # 02 — Tabelas a migrar → ClickHouse (Store Primário)
 
 > ClickHouse é o analytics store **primário**. Todos os schemas aqui definidos são os schemas
-> de referência. O ficheiro [03-ELASTICSEARCH-MIGRATE.md](./03-ELASTICSEARCH-MIGRATE.md) define
+> de referência. O ficheiro `03-ELASTICSEARCH-MIGRATE.md` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_ define
 > os índices Elasticsearch **equivalentes** para clientes que escolhem o store alternativo.
 
 ---

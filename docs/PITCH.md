@@ -67,7 +67,7 @@ A maioria das plataformas modernas ignora o legado. O NexTraceOne governa contra
 ### 4. Arquitetura enterprise-grade já implementada
 
 Não é um MVP. É uma plataforma com:
-- 12 bounded contexts isolados
+- 9 módulos isolados (12 bounded contexts, três absorvidos como subdomínios)
 - 2.000+ testes automatizados
 - 154+ migrações de banco de dados
 - 113 rotas no frontend

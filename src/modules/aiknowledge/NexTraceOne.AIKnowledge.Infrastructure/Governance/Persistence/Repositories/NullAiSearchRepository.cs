@@ -5,8 +5,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Reposito
 
 /// <summary>
 /// Implementação nula do repositório de search.
-/// Usada quando o usuário NÃO escolheu ElasticSearch durante a instalação.
-/// Retorna coleções vazias e resultados padrão para evitar NullReferenceException.
+/// Permanente desde a remoção do Elasticsearch do produto: não existe outra
+/// implementação de IAiSearchRepository. Retorna coleções vazias e resultados
+/// padrão para evitar NullReferenceException. A busca semântica está prevista
+/// via pgvector ou PostgreSQL FTS — ver DependencyInjection.cs:216.
 /// </summary>
 internal sealed class NullAiSearchRepository : IAiSearchRepository
 {

@@ -198,5 +198,5 @@ Pode ocorrer se:
 - [restore.sh](../../scripts/db/restore.sh)
 - [restore-all.sh](../../scripts/db/restore-all.sh)
 - [verify-restore.sh](../../scripts/db/verify-restore.sh)
-- [WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md](../execution/WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md)
+- `WAVE-1-BACKUP-AND-RESTORE-STRATEGY.md` _(documento inexistente)_
 - [BACKUP-OPERATIONS-RUNBOOK.md](BACKUP-OPERATIONS-RUNBOOK.md)

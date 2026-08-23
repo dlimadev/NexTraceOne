@@ -23,7 +23,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 |---|---|
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
 | [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | Formal commercial and institutional presentation document |
-| [PLATFORM-CAPABILITIES.md](./PLATFORM-CAPABILITIES.md) | Platform capability overview |
+| `PLATFORM-CAPABILITIES.md` _(documento inexistente)_ | Platform capability overview |
 | [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md) | Full documentation index |
 
 ---
@@ -33,7 +33,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | Document | Description |
 |---|---|
 | [ARCHITECTURE-OVERVIEW.md](./ARCHITECTURE-OVERVIEW.md) | High-level system architecture |
-| [DATA-ARCHITECTURE.md](./DATA-ARCHITECTURE.md) | Data architecture and persistence strategy |
+| `DATA-ARCHITECTURE.md` _(documento inexistente)_ | Data architecture and persistence strategy |
 | [DEPLOYMENT-ARCHITECTURE.md](./DEPLOYMENT-ARCHITECTURE.md) | Deployment and infrastructure architecture |
 | [INTEGRATIONS-ARCHITECTURE.md](./INTEGRATIONS-ARCHITECTURE.md) | Integration patterns and adapters |
 | [SOURCE-OF-TRUTH-STRATEGY.md](./SOURCE-OF-TRUTH-STRATEGY.md) | Source of truth principles |
@@ -45,7 +45,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 
 | Document | Description |
 |---|---|
-| [AI-ARCHITECTURE.md](./AI-ARCHITECTURE.md) | AI subsystem architecture |
+| `AI-ARCHITECTURE.md` _(documento inexistente)_ | AI subsystem architecture |
 | [AI-GOVERNANCE.md](./AI-GOVERNANCE.md) | AI governance policy |
 | [AI-ASSISTED-OPERATIONS.md](./AI-ASSISTED-OPERATIONS.md) | AI-assisted operations capabilities |
 | [AI-DEVELOPER-EXPERIENCE.md](./AI-DEVELOPER-EXPERIENCE.md) | AI developer experience and IDE integration |

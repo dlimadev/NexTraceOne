@@ -111,7 +111,7 @@ Para configuração detalhada do ambiente, variáveis e providers, consultar:
 |-----------|-----------|
 | [OBSERVABILITY-STRATEGY.md](../OBSERVABILITY-STRATEGY.md) | Estratégia global de observabilidade do produto |
 | [TELEMETRY-ARCHITECTURE.md](../telemetry/TELEMETRY-ARCHITECTURE.md) | Arquitetura da fundação de telemetria |
-| [DATA-ARCHITECTURE.md](../DATA-ARCHITECTURE.md) | Arquitetura de dados global (PostgreSQL + ClickHouse) |
+| `DATA-ARCHITECTURE.md` _(documento inexistente)_ | Arquitetura de dados global (PostgreSQL + ClickHouse) |
 | [DOCKER-AND-COMPOSE.md](../deployment/DOCKER-AND-COMPOSE.md) | Infraestrutura Docker e Compose |
 | [ENVIRONMENT-VARIABLES.md](../ENVIRONMENT-VARIABLES.md) | Variáveis de ambiente de configuração |
 

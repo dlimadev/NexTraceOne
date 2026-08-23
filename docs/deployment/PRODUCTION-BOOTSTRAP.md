@@ -105,13 +105,18 @@ dotnet ef database update --project src/modules/changegovernance/NexTraceOne.Cha
 dotnet ef database update --project src/modules/governance/NexTraceOne.Governance.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
 dotnet ef database update --project src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
 dotnet ef database update --project src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
-dotnet ef database update --project src/modules/knowledge/NexTraceOne.Knowledge.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
 dotnet ef database update --project src/modules/configuration/NexTraceOne.Configuration.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
-dotnet ef database update --project src/modules/notifications/NexTraceOne.Notifications.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
 dotnet ef database update --project src/modules/integrations/NexTraceOne.Integrations.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
-dotnet ef database update --project src/modules/productanalytics/NexTraceOne.ProductAnalytics.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
-dotnet ef database update --project src/modules/auditcompliance/NexTraceOne.AuditCompliance.Infrastructure --startup-project src/platform/NexTraceOne.ApiHost
 ```
+
+> **Correção (Ago 2026).** Esta lista tinha 12 comandos, dos quais **4 falhavam**:
+> `knowledge`, `productanalytics` e `auditcompliance` apontavam para projectos que já
+> não existem — foram absorvidos por `catalog` e `governance` na consolidação de
+> bounded contexts — e `notifications` existe como projecto mas não tem DbContext
+> próprio: as suas entidades foram consolidadas em `ConfigurationDbContext`
+> (`ConfigurationDbContext.cs:115`), pelo que a migration do `configuration` já as cobre.
+>
+> São **8 DbContexts** em módulos, e são estes os 8 comandos acima.
 
 > **Alternativa:** Na primeira instalação, pode-se ativar temporariamente `NEXTRACE_AUTO_MIGRATE=true` e iniciar a aplicação uma vez. Depois desativar.
 

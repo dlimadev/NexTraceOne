@@ -2,7 +2,7 @@
 
 > Scripts SQL prontos a usar para criar todas as tabelas do `nextraceone_analytics` database.
 > Estes scripts complementam o `build/clickhouse/analytics-schema.sql` já existente.
-> Para Elasticsearch, usar os index templates do ficheiro [03-ELASTICSEARCH-MIGRATE.md](./03-ELASTICSEARCH-MIGRATE.md).
+> Para Elasticsearch, usar os index templates do ficheiro `03-ELASTICSEARCH-MIGRATE.md` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_.
 
 ---
 

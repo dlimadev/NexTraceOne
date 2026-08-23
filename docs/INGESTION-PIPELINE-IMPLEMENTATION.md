@@ -485,7 +485,7 @@ public class KafkaMessageDispatcher
 
 - [ADR-010: Server-Side Ingestion Pipeline](./adr/010-server-side-ingestion-pipeline.md)
 - [ADR-001: Modular Monolith](./adr/001-modular-monolith.md)
-- [ADR-003: Elasticsearch as Observability Provider](./adr/003-elasticsearch-observability.md)
+- `ADR-003: Elasticsearch as Observability Provider` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_
 - [HONEST-GAPS.md](./HONEST-GAPS.md)
 - [docs/onprem/INDEX.md](./onprem/INDEX.md)
 - Dynatrace OpenPipeline Docs — https://docs.dynatrace.com/docs/platform/openpipeline

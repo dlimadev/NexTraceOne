@@ -264,7 +264,17 @@ src/building-blocks/
 
 ---
 
-## Parte 5 — Os 12 Bounded Contexts (Módulos)
+## Parte 5 — Os 9 Módulos (12 Bounded Contexts)
+
+São **9 directórios em `src/modules/`** e **8 DbContexts**. Três bounded contexts
+foram absorvidos como subdomínios de outros módulos, e um módulo não tem contexto próprio:
+
+| Contexto absorvido | Vive em | DbContext |
+|---|---|---|
+| `auditcompliance` | `governance/NexTraceOne.Governance.*/AuditCompliance/` | `PlatformGovernanceDbContext` |
+| `knowledge` | `catalog/NexTraceOne.Catalog.*/Knowledge/` | `ServiceCatalogDbContext` |
+| `productanalytics` | `catalog/NexTraceOne.Catalog.*/ProductAnalytics/` | `ServiceCatalogDbContext` |
+| `notifications` | módulo próprio, sem DbContext | `ConfigurationDbContext` |
 
 Cada módulo tem exatamente **5 projetos** (exceto aiknowledge que tem 6):
 
@@ -284,12 +294,12 @@ NexTraceOne.<Module>.API
 | **governance** | `gov_` | Policy & Risk | SLO/SLA, correlação de incidentes, RCA, AlertEvaluationJob |
 | **operationalintelligence** | `opi_` | Runtime Observability | incidentes, custo, reliability, SLO tracking |
 | **aiknowledge** | `aik_` | AI Governance | SemanticKernel, model registry, Ollama/OpenAI routing, Qdrant, 6 projetos |
-| **auditcompliance** | `aud_` | Audit & Compliance | trilha imutável, frameworks de conformidade, PDF/Excel export, assinaturas digitais |
+| **auditcompliance** ⟶ `governance` | `aud_` | Audit & Compliance | trilha imutável, frameworks de conformidade, PDF/Excel export, assinaturas digitais |
 | **integrations** | `int_` | External Systems | CI/CD webhooks, multi-cluster, Jira, Slack, GitHub, Dead Letter Queue |
-| **knowledge** | `knw_` | Operational Knowledge | runbooks, documentação, busca semântica (pgvector) |
+| **knowledge** ⟶ `catalog` | `knw_` | Operational Knowledge | runbooks, documentação, busca semântica (pgvector) |
 | **notifications** | `ntf_` | Notifications | email, Slack channels, templates, preferências por tenant |
 | **configuration** | `cfg_` | Platform Configuration | feature flags por tenant/serviço, settings por ambiente |
-| **productanalytics** | `pdt_` | Product Analytics | adoção de features, telemetria de produto |
+| **productanalytics** ⟶ `catalog` | `pdt_` | Product Analytics | adoção de features, telemetria de produto |
 
 **AIKnowledge tem 6 projetos:**
 ```

@@ -6,7 +6,7 @@
 |----------|----------|
 | [01-POSTGRESQL-KEEP.md](./01-POSTGRESQL-KEEP.md) | Entidades que **ficam** no PostgreSQL |
 | [02-CLICKHOUSE-MIGRATE.md](./02-CLICKHOUSE-MIGRATE.md) | Schemas no **ClickHouse** (store primário) |
-| [03-ELASTICSEARCH-MIGRATE.md](./03-ELASTICSEARCH-MIGRATE.md) | Schemas equivalentes no **Elasticsearch** (store alternativo) |
+| `03-ELASTICSEARCH-MIGRATE.md` _(Elasticsearch removido do produto — ClickHouse é o provider analítico único.)_ | Schemas equivalentes no **Elasticsearch** (store alternativo) |
 | [04-DUAL-STORE-PATTERNS.md](./04-DUAL-STORE-PATTERNS.md) | Abstracção **IAnalyticsStore** e registo condicional |
 | [05-ACTION-PLAN-PHASES.md](./05-ACTION-PLAN-PHASES.md) | Plano de acção por **fases** |
 | [06-NULL-REPOSITORIES.md](./06-NULL-REPOSITORIES.md) | 73 **Null repositories** a implementar |
