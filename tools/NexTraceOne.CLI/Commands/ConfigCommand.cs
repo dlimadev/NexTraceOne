@@ -99,7 +99,7 @@ public static class ConfigCommand
 
             AddConfigRow(table, "url", config.Url,
                 Environment.GetEnvironmentVariable("NEX_API_URL"),
-                "http://localhost:8080");
+                CliConfig.DefaultUrl);
 
             var tokenEnv = Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
             var tokenDisplay = !string.IsNullOrWhiteSpace(config.Token)

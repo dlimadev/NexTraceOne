@@ -338,18 +338,12 @@ public static class McpCommand
 
     // ── HTTP helper ────────────────────────────────────────────────────────────
 
-    private static HttpClient CreateHttpClient(string baseUrl, string? token)
-    {
-        var client = new HttpClient
+    private static HttpClient CreateHttpClient(string baseUrl, string? token) =>
+        NexTrace.Sdk.NexTraceHttpClientFactory.Create(new NexTrace.Sdk.NexTraceSdkOptions
         {
-            BaseAddress = new Uri(baseUrl.TrimEnd('/')),
-            Timeout = TimeSpan.FromSeconds(30)
-        };
-        if (!string.IsNullOrWhiteSpace(token))
-            client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        return client;
-    }
+            BaseUrl = baseUrl,
+            ApiToken = token ?? string.Empty
+        });
 
     // ── DTOs ────────────────────────────────────────────────────────────────────
 

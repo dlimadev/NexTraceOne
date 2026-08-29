@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NexTrace.Sdk;
 
 namespace NexTraceOne.CLI.Services;
 
@@ -19,14 +20,12 @@ public sealed class CatalogApiClient : IDisposable
 
     public CatalogApiClient(string baseUrl, string? token = null)
     {
-        _httpClient = new HttpClient
+        // Reusa a factory resiliente do SDK (retry exponencial em 5xx/timeout).
+        _httpClient = NexTraceHttpClientFactory.Create(new NexTraceSdkOptions
         {
-            BaseAddress = new Uri(baseUrl.TrimEnd('/')),
-            Timeout = TimeSpan.FromSeconds(30)
-        };
-        if (!string.IsNullOrWhiteSpace(token))
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            BaseUrl = baseUrl,
+            ApiToken = token ?? string.Empty
+        });
     }
 
     public async Task<CatalogListResponse> ListServicesAsync(CancellationToken cancellationToken = default)

@@ -24,6 +24,8 @@ rootCommand.Add(CompletionCommand.Create());
 rootCommand.Add(ConfidenceCommand.Create());
 rootCommand.Add(ComplianceCommand.Create());
 rootCommand.Add(IntegrationCommand.Create());
+rootCommand.Add(SecurityCommand.Create());
+rootCommand.Add(ArtifactCommand.Create());
 
 // Show banner only when invoked with no arguments
 if (args.Length == 0)
